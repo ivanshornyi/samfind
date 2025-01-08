@@ -3,7 +3,7 @@ const App = () => {
     <>
       <p>admin panel</p>
     </>
-  )
-}
+  );
+};
 
 export default App;
