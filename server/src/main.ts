@@ -18,7 +18,9 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       "http://localhost:3000",
+      "http://localhost:5173",
       configService.get("FRONTEND_DOMAIN"),
+      configService.get("ADMIN_FRONTEND_DOMAIN"),
     ],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
   });
