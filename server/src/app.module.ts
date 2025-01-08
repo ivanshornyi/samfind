@@ -17,16 +17,20 @@ import { AppService } from "./app.service";
 import { AuthModule } from "./modules/auth/auth.module";
 import { UserModule } from "./modules/user/user.module";
 
+import { ConfigService } from "@nestjs/config"; 
+
+const configService = new ConfigService();
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: "postgres",
-      host: "localhost",
-      port: 5432,
-      username: "postgres",
-      password: "123456",
-      database: "samfind-db",
+      host: configService.get("POSTGRESS_HOST"),
+      port: configService.get("POSTGRESS_PORT"),
+      username: configService.get("POSTGRESS_USER_NAME"),
+      password: configService.get("POSTGRESS_PASSWORD"),
+      database: configService.get("POSTGRESS_DATABASE_NAME"),
       autoLoadEntities: true,
       synchronize: true,
     }),
