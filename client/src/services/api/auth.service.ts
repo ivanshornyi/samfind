@@ -3,9 +3,13 @@ import { handleApiError } from "@/errors";
 
 export enum UserAuthType {
   Email = "email",
-};
+}
 
-const signIn = async (email: string, password: string, authType: UserAuthType) => {
+const signIn = async (
+  email: string,
+  password: string,
+  authType: UserAuthType
+) => {
   try {
     const response = await apiClient.post("/auth/sign-in", {
       email,
@@ -24,7 +28,7 @@ const signUp = async (
   lastName: string,
   email: string,
   password: string,
-  authType: UserAuthType,
+  authType: UserAuthType
 ) => {
   try {
     const response = await apiClient.post("/auth/sign-up", {
@@ -51,7 +55,11 @@ const sendVerificationCode = async (email: string) => {
   }
 };
 
-const resetPassword = async (email: string, verificationCode: string, newPassword: string) => {
+const resetPassword = async (
+  email: string,
+  verificationCode: string,
+  newPassword: string
+) => {
   try {
     await apiClient.post("/auth/reset-password", {
       email,

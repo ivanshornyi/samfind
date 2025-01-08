@@ -4,7 +4,11 @@ import { useState } from "react";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-export const TanstackProvider = ({ children }: { children: React.ReactNode }) => {
+export const TanstackProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -16,5 +20,7 @@ export const TanstackProvider = ({ children }: { children: React.ReactNode }) =>
       })
   );
 
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+  return (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
 };

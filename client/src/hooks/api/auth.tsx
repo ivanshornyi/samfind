@@ -18,8 +18,12 @@ export const useSignIn = () => {
   const { toast } = useToast();
 
   const { ...rest } = useMutation({
-    mutationFn: (data: { email: string, password: string, authType: UserAuthType }) => AuthApiService.signIn(data.email, data.password, data.authType),
-    onSuccess: (data: { accessToken: string, refreshToken: string }) => {
+    mutationFn: (data: {
+      email: string;
+      password: string;
+      authType: UserAuthType;
+    }) => AuthApiService.signIn(data.email, data.password, data.authType),
+    onSuccess: (data: { accessToken: string; refreshToken: string }) => {
       toast({
         title: "Success",
         description: "Successfully logged in",
@@ -50,14 +54,15 @@ export const useSignUp = () => {
   const { toast } = useToast();
 
   const { ...rest } = useMutation({
-    mutationFn: (data: SignUpData) => AuthApiService.signUp(
-      data.firstName,
-      data.lastName,
-      data.email,
-      data.password,
-      data.authType,
-    ),
-    onSuccess: (data: { accessToken: string, refreshToken: string }) => {
+    mutationFn: (data: SignUpData) =>
+      AuthApiService.signUp(
+        data.firstName,
+        data.lastName,
+        data.email,
+        data.password,
+        data.authType
+      ),
+    onSuccess: (data: { accessToken: string; refreshToken: string }) => {
       toast({
         title: "Success",
         description: "Successfully logged in",
@@ -103,11 +108,12 @@ export const useResetPassword = () => {
   const { toast } = useToast();
 
   const { ...rest } = useMutation({
-    mutationFn: (data: ResetPasswordData) => AuthApiService.resetPassword(
-      data.email,
-      data.verificationCode,
-      data.newPassword,
-    ),
+    mutationFn: (data: ResetPasswordData) =>
+      AuthApiService.resetPassword(
+        data.email,
+        data.verificationCode,
+        data.newPassword
+      ),
     onSuccess: () => {
       toast({
         title: "Success",

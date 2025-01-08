@@ -45,10 +45,7 @@ export const Header = () => {
           <nav>
             <ul className="flex items-center gap-2">
               {NAVIGATION_ITEMS.map((item) => (
-                <Link
-                  key={item.title}
-                  href={item.path}
-                >
+                <Link key={item.title} href={item.path}>
                   <li className="font-medium text-sm hover:opacity-80">
                     {item.title}
                   </li>
@@ -65,10 +62,7 @@ export const Header = () => {
               </Button>
             </Link>
           ) : (
-            <Link 
-              href="/account/license"
-              className="flex items-center gap-2"
-            >
+            <Link href="/account/license" className="flex items-center gap-2">
               <Button variant="secondary" className="text-zinc-800 flex">
                 <User />
                 <span>Account</span>

@@ -1,17 +1,17 @@
 export enum UserStatus {
   Active = "active",
   Inactive = "inactive",
-};
+}
 
 export enum UserRole {
   Admin = "admin",
-  Customer = "customer",  
-};
+  Customer = "customer",
+}
 
 export enum UserAuthType {
   Email = "email",
   Google = "google",
-};
+}
 
 export interface User {
   id: string;
@@ -21,4 +21,4 @@ export interface User {
   authType: UserAuthType;
   role: UserRole;
   status: UserStatus;
-};
+}

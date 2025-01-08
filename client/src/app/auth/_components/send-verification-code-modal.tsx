@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { useSendVerificationCode } from "@/hooks";
 
-import { 
+import {
   AlertDialog,
   AlertDialogTrigger,
   Button,
@@ -16,7 +16,7 @@ import {
   AlertDialogDescription,
   AlertDialogCancel,
   Input,
- } from "@/components";
+} from "@/components";
 
 import { X } from "lucide-react";
 
@@ -24,9 +24,9 @@ export const SendVerificationCodeModal = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
 
-  const { 
-    mutate: sendVerificationCodeMutation, 
-    isPending: isSendingPending, 
+  const {
+    mutate: sendVerificationCodeMutation,
+    isPending: isSendingPending,
     isSuccess: isSendingSuccess,
   } = useSendVerificationCode();
 
@@ -41,13 +41,15 @@ export const SendVerificationCodeModal = () => {
   useEffect(() => {
     if (isSendingSuccess) {
       router.push(`/auth/reset-password?recoveryEmail=${email}`);
-    } 
+    }
   }, [isSendingSuccess]);
 
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <button className="text-sm text-blue-400 mt-2 hover:opacity-80">Forgot password</button>
+        <button className="text-sm text-blue-400 mt-2 hover:opacity-80">
+          Forgot password
+        </button>
       </AlertDialogTrigger>
       <AlertDialogContent className="w-[420px]">
         <div className="absolute right-0 top-0">
@@ -58,18 +60,20 @@ export const SendVerificationCodeModal = () => {
 
         <AlertDialogHeader>
           <AlertDialogTitle>Password recovery</AlertDialogTitle>
-          <AlertDialogDescription>Email for verification code</AlertDialogDescription>
+          <AlertDialogDescription>
+            Email for verification code
+          </AlertDialogDescription>
         </AlertDialogHeader>
 
         <div>
           <form className="flex" onSubmit={handleSubmit}>
-            <Input 
+            <Input
               placeholder="Enter email"
               className="rounded-r-none px-3 py-6"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
             />
-            <Button 
+            <Button
               className="rounded-l-none py-6 border-[1px] border-primary"
               loading={isSendingPending}
               disabled={isSendingPending}

@@ -35,7 +35,7 @@ const buttonVariants = cva(
       size: "default",
     },
   }
-)
+);
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -46,8 +46,19 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, loading, withLoader, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button"
+  (
+    {
+      className,
+      variant,
+      size,
+      asChild = false,
+      loading,
+      withLoader,
+      ...props
+    },
+    ref
+  ) => {
+    const Comp = asChild ? Slot : "button";
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
@@ -57,10 +68,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {withLoader ? (
           <>
             {loading && (
-              <LoaderCircle
-                className="animate-spin absolute"
-                size={18}
-              />
+              <LoaderCircle className="animate-spin absolute" size={18} />
             )}
 
             <div
@@ -75,9 +83,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           <>{props.children}</>
         )}
       </Comp>
-    )
+    );
   }
-)
-Button.displayName = "Button"
+);
+Button.displayName = "Button";
 
-export { Button, buttonVariants }
+export { Button, buttonVariants };

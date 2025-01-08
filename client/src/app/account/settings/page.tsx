@@ -11,12 +11,7 @@ import { Button, Card, FullScreenLoader, Input } from "@/components";
 import { UserStatus } from "@/types";
 import { useToast } from "@/hooks";
 
-import { 
-  ShieldPlus,
-  ShieldMinus, 
-  LogOut, 
-  LoaderCircle,
-} from "lucide-react";
+import { ShieldPlus, ShieldMinus, LogOut, LoaderCircle } from "lucide-react";
 
 export default function Settings() {
   const { toast } = useToast();
@@ -32,19 +27,22 @@ export default function Settings() {
     confirmPassword: "",
   });
 
-  const { mutate: updateUserDataMutation, isPending: isUpdateUserPending } = useUpdateUser();
+  const { mutate: updateUserDataMutation, isPending: isUpdateUserPending } =
+    useUpdateUser();
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
     const value = event.target.value;
-    
+
     setUserFormData({ ...userFormData, [name]: value });
   };
 
-  const handlePasswordFormInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePasswordFormInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const name = event.target.name;
     const value = event.target.value;
-    
+
     setUserPasswordFormData({ ...userPasswordFormData, [name]: value });
   };
 
@@ -63,7 +61,9 @@ export default function Settings() {
   const handleChangePasswordSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (userPasswordFormData.newPassword !== userPasswordFormData.confirmPassword) {
+    if (
+      userPasswordFormData.newPassword !== userPasswordFormData.confirmPassword
+    ) {
       toast({
         description: "Password is not the same",
       });
@@ -71,13 +71,20 @@ export default function Settings() {
       return;
     }
 
-    if (userPasswordFormData.newPassword === "" || userPasswordFormData.confirmPassword === "") {
+    if (
+      userPasswordFormData.newPassword === "" ||
+      userPasswordFormData.confirmPassword === ""
+    ) {
       toast({
         description: "Some fields are empty",
       });
-    }    
+    }
 
-    user && updateUserDataMutation({ id: user.id, userData: { password: userPasswordFormData.newPassword } });
+    user &&
+      updateUserDataMutation({
+        id: user.id,
+        userData: { password: userPasswordFormData.newPassword },
+      });
   };
 
   // const handleDeactivateAccount = () => {
@@ -101,7 +108,7 @@ export default function Settings() {
       });
     }
   }, [user]);
-  
+
   return (
     <div>
       {(isUpdateUserPending || userLoading) && <FullScreenLoader />}
@@ -127,55 +134,57 @@ export default function Settings() {
         <Card className="min-w-[360px] px-8 py-7 mt-5">
           <p className="font-semibold text-[18px]">Change credentials</p>
 
-          <form 
+          <form
             onSubmit={handleSaveSettingsSubmit}
             className="mt-3 flex flex-col gap-2"
           >
             <div>
-              <label htmlFor="firstName" className="text-sm">First name</label>
+              <label htmlFor="firstName" className="text-sm">
+                First name
+              </label>
               <Input
                 id="firstName"
                 name="firstName"
-                className="py-5 px-3" 
+                className="py-5 px-3"
                 value={userFormData.firstName}
                 onChange={handleInputChange}
               />
             </div>
             <div>
-              <label id="lastName" className="text-sm">Last name</label>
+              <label id="lastName" className="text-sm">
+                Last name
+              </label>
               <Input
                 id="lastName"
                 name="lastName"
-                className="py-5 px-3" 
+                className="py-5 px-3"
                 value={userFormData.lastName}
                 onChange={handleInputChange}
               />
             </div>
             <div>
-              <label id="email" className="text-sm">Email</label>
+              <label id="email" className="text-sm">
+                Email
+              </label>
               <Input
                 id="email"
                 name="email"
-                className="py-5 px-3 disabled:opacity-80" 
+                className="py-5 px-3 disabled:opacity-80"
                 type="email"
                 value={userFormData.email}
-                onChange={handleInputChange}  
+                onChange={handleInputChange}
                 disabled={true}
               />
             </div>
 
-            <Button 
-              className="mt-3 w-full py-5"
-            >
-              Save
-            </Button>
+            <Button className="mt-3 w-full py-5">Save</Button>
           </form>
         </Card>
 
         <Card className="min-w-[360px] px-8 py-7 mt-5">
           <p className="font-semibold text-[18px]">Change password</p>
 
-          <form 
+          <form
             onSubmit={handleChangePasswordSubmit}
             className="mt-3 flex flex-col gap-2"
           >
@@ -186,7 +195,7 @@ export default function Settings() {
                 type="password"
                 value={userPasswordFormData.newPassword}
                 onChange={handlePasswordFormInputChange}
-                className="py-5 px-3" 
+                className="py-5 px-3"
               />
             </div>
             <div>
@@ -196,32 +205,30 @@ export default function Settings() {
                 type="password"
                 value={userPasswordFormData.confirmPassword}
                 onChange={handlePasswordFormInputChange}
-                className="py-5 px-3" 
+                className="py-5 px-3"
               />
             </div>
 
-            <Button 
-              className="mt-3 w-full py-5"
-            >
-              Update
-            </Button>
+            <Button className="mt-3 w-full py-5">Update</Button>
           </form>
         </Card>
       </div>
 
       <Card className="px-10 py-5 mt-3">
         <p className="font-semibold text-[18px]">Deactivate account</p>
-        <p className="text-sm text-gray-600">This action will change your status</p>
+        <p className="text-sm text-gray-600">
+          This action will change your status
+        </p>
 
-        <Button 
+        <Button
           variant="destructive"
           className={`${user?.status === UserStatus.Inactive && "bg-green-600 hover:bg-green-500"} mt-4`}
           // onClick={handleDeactivateAccount}
         >
           {user?.status === UserStatus.Active ? (
             <>
-             <ShieldMinus size={18} />
-             <span>Deactivate</span>
+              <ShieldMinus size={18} />
+              <span>Deactivate</span>
             </>
           ) : (
             <>
@@ -233,4 +240,4 @@ export default function Settings() {
       </Card>
     </div>
   );
-};
+}

@@ -21,10 +21,14 @@ const NAVIGATION_ITEMS = [
     title: "Account settings",
     path: "/account/settings",
     icon: <UserRoundCog />,
-  }
+  },
 ];
 
-export default function AccountLayout({ children }: { children: React.ReactNode }) {
+export default function AccountLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
   const { logout } = useContext(AuthContext);
 
@@ -33,14 +37,11 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
       <div className="flex gap-10">
         <div>
           <ul className="flex flex-col min-w-[220px]">
-            {NAVIGATION_ITEMS.map(item => {
+            {NAVIGATION_ITEMS.map((item) => {
               const isActive = pathname === item.path;
 
               return (
-                <Link 
-                  key={item.title} 
-                  href={item.path}
-                >
+                <Link key={item.title} href={item.path}>
                   <li>
                     <Button
                       variant={isActive ? "outline" : "ghost"}
@@ -54,12 +55,12 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                     </Button>
                   </li>
                 </Link>
-              )
+              );
             })}
           </ul>
 
           <div className="mt-3 pt-3 border-t-[1px]">
-            <Button 
+            <Button
               variant="default"
               onClick={logout}
               className="w-[220px] flex items-center justify-start py-5"
@@ -74,4 +75,4 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
       </div>
     </div>
   );
-};
+}

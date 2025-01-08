@@ -16,7 +16,7 @@ interface AuthContextType {
   userLoading: boolean;
   login: (token: string, refreshToken: string) => void;
   logout: () => void;
-};
+}
 
 let logoutTimer: any;
 
@@ -28,10 +28,16 @@ const calculateRemainingTime = (expirationTime: number) => {
 
 export const AuthContext = React.createContext({} as AuthContextType);
 
-export const AuthContextProvider = ({ children } : { children: React.ReactNode }) => {
+export const AuthContextProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const router = useRouter();
   const localStorageToken = localStorage.getItem("accessToken");
-  const [accessToken, setAccessToken] = useState<string | null>(localStorageToken);
+  const [accessToken, setAccessToken] = useState<string | null>(
+    localStorageToken
+  );
   const [userLoading, setUserLoading] = useState(false);
   const [user, setUser] = useState<User | null>(null);
 
@@ -49,10 +55,7 @@ export const AuthContextProvider = ({ children } : { children: React.ReactNode }
     router.push("/");
   }, []);
 
-  const login = (
-    accessToken: string,
-    refreshToken: string,
-  ) => {
+  const login = (accessToken: string, refreshToken: string) => {
     setAccessToken(accessToken);
 
     localStorage.setItem("accessToken", accessToken);
