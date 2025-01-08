@@ -10,6 +10,8 @@ import { AuthApiService, UserAuthType } from "@/services";
 
 import { useToast } from "@/hooks";
 
+import { handleToastError } from "@/errors";
+
 export const useSignIn = () => {
   const router = useRouter();
   const { login } = useContext(AuthContext);
@@ -27,12 +29,7 @@ export const useSignIn = () => {
       router.push("/");
     },
     onError: (error) => {
-      const errorMessage = error instanceof Error ? error.message : "Something went wrong";
-
-      toast({
-        title: "Error",
-        description: errorMessage,
-      });
+      handleToastError(error, toast);
     },
   });
 
@@ -70,12 +67,7 @@ export const useSignUp = () => {
       router.push("/");
     },
     onError: (error) => {
-      const errorMessage = error instanceof Error ? error.message : "Something went wrong";
-
-      toast({
-        title: "Error",
-        description: errorMessage,
-      });
+      handleToastError(error, toast);
     },
   });
 
@@ -93,12 +85,7 @@ export const useSendVerificationCode = () => {
       });
     },
     onError: (error) => {
-      const errorMessage = error instanceof Error ? error.message : "Something went wrong";
-
-      toast({
-        title: "Error",
-        description: errorMessage,
-      });
+      handleToastError(error, toast);
     },
   });
 
@@ -127,15 +114,10 @@ export const useResetPassword = () => {
         description: "Successfully updated",
       });
 
-      // router.push("/auth/sign-in");
+      router.push("/auth/sign-in");
     },
     onError: (error) => {
-      const errorMessage = error instanceof Error ? error.message : "Something went wrong";
-
-      toast({
-        title: "Error",
-        description: errorMessage,
-      });
+      handleToastError(error, toast);
     },
   });
 
