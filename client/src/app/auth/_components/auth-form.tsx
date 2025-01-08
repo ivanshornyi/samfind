@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useContext, useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import Link from "next/link";
-import { useSearchParams, useRouter } from "next/navigation";
-
-import { AuthContext } from "@/context";
+import { useSearchParams } from "next/navigation";
 
 import { useResetPassword, useSignIn, useSignUp, useToast } from "@/hooks";
 
@@ -22,8 +20,6 @@ interface AuthFormProps {
 
 export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
   const { toast } = useToast();
-  const router = useRouter();
-  const { isLoggedIn } = useContext(AuthContext);
 
   const searchParams = useSearchParams();
 
@@ -89,7 +85,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
 
       signInMutation({
         email: formData.email,
-        password: formData.password,
+        password: formData.password.trim(),
         authType: UserAuthType.Email,
       });
     }

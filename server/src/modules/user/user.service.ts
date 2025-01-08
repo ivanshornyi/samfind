@@ -9,7 +9,7 @@ import { UserAuthType, UserRole, UserStatus } from "./types/user";
 import { UpdateUserDto } from "./dto/update-user-dto";
 import { CreateUserDto } from "./dto/create-user-dto";
 
-import { createHash } from "crypto";
+import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class UserService {
@@ -51,15 +51,15 @@ export class UserService {
     return user || null;
   }
 
-  async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+  async updateUser(id: string, updateUserDto: UpdateUserDto, resetPassword?: boolean): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id } });
 
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
-    if (updateUserDto.password) {
-      updateUserDto.password = this.hashPassword(updateUserDto.password);
+    if (updateUserDto.password && !resetPassword) {
+      updateUserDto.password = await this.hashPassword(updateUserDto.password);
     }
 
     const updatedUser = Object.assign(user, updateUserDto);
@@ -68,7 +68,9 @@ export class UserService {
     return updatedUser;
   }
 
-  private hashPassword(password: string): string {
-    return createHash("sha256").update(password).digest("hex");
+  public async hashPassword(password: string): Promise<string> {
+    const saltRounds = 10;
+    
+    return bcrypt.hash(password, saltRounds);
   }
 }
