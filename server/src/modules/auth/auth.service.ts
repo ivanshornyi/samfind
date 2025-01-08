@@ -13,7 +13,7 @@ import { MailService } from "../mail/mail.service";
 import { SignInDto, SignUpDto } from "./dto/auth-user-dto";
 import { UserAuthType } from "../user/types/user";
 
-import { createHash } from "crypto";
+import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class AuthService {
@@ -32,7 +32,7 @@ export class AuthService {
       throw new ConflictException("User with this email already exists");
     }
 
-    const hashedPassword = this.hashPassword(password);
+    const hashedPassword = await this.hashPassword(password);
 
     const newUser = await this.userService.create({
       firstName,
@@ -61,26 +61,31 @@ export class AuthService {
     const { email, password, authType } = signInDto;
 
     const user = await this.userService.findUserByEmail(email, authType);
-
+  
     if (!user) {
       throw new NotFoundException("User not found");
     }
-
-    console.log(password, user.password);
-
-    if (!this.isPasswordValid(password, user.password)) {
+  
+    console.log('Password from input:', password);
+    console.log('Stored password hash:', user.password);
+  
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+  
+    console.log("Is password valid:", isPasswordValid);
+  
+    if (!isPasswordValid) {
       throw new UnauthorizedException("Invalid password");
     }
-
+  
     const tokens = await this.tokenService.generateTokens({
       sub: user.id,
     });
-
+  
     await this.tokenService.updateRefreshToken(user.id, tokens.refreshToken);
-
+  
     delete user.password;
     delete user.refreshToken;
-
+  
     return {
       ...user,
       ...tokens,
@@ -111,37 +116,44 @@ export class AuthService {
       resetPasswordDto.email,
       UserAuthType.Email,
     );
-
+  
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+  
     if (resetPasswordDto.verificationCode !== user?.resetCode) {
       throw new NotFoundException("Verification code is not correct");
     }
-
+  
     if (user.resetCodeExpiresAt < new Date().getTime()) {
       throw new NotFoundException("Verification code has expired");
     }
-
+  
     if (
       resetPasswordDto.verificationCode === user?.resetCode &&
       user.resetCodeExpiresAt > new Date().getTime()
     ) {
-      const hashedNewPassword = this.hashPassword(resetPasswordDto.newPassword);
-      console.log("pass", resetPasswordDto.newPassword, hashedNewPassword);
+      console.log(resetPasswordDto);
+      const hashedNewPassword = await bcrypt.hash(resetPasswordDto.newPassword, 10);  
+      console.log(hashedNewPassword)
 
-      await this.userService.updateUser(user.id, {
-        password: hashedNewPassword,
-      });
+      await this.userService.updateUser(
+        user.id, { password: hashedNewPassword }, true
+      );
+  
+      return { message: "Password reset successfully" };
     }
-
-    return { message: "Password reset successfully" };
+  
+    throw new UnauthorizedException("Password reset failed");
   }
 
-  public hashPassword(password: string): string {
-    return createHash("sha256").update(password).digest("hex");
+  public async hashPassword(password: string): Promise<string> {
+    const saltRounds = 10;
+    
+    return bcrypt.hash(password, saltRounds);
   }
 
-  private isPasswordValid(password: string, hashedPassword: string): boolean {
-    const hash = this.hashPassword(password);
-
-    return hash === hashedPassword;
+  public async isPasswordValid(password: string, hashedPassword: string): Promise<boolean> {
+    return bcrypt.compare(password, hashedPassword);
   }
 }
