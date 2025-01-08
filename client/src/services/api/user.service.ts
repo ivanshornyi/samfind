@@ -1,5 +1,7 @@
 import { User, UserStatus } from "@/types";
 
+import { handleApiError } from "@/errors";
+
 import { apiClient } from "@/vars";
 
 const getUser = async (id: string) => {
@@ -8,11 +10,7 @@ const getUser = async (id: string) => {
 
     return response.data as User;
   } catch(error: any) {
-    if (error.response && error.response.data) {
-      throw new Error(error.response.data.message || "Something went wrong.");
-    }
-
-    throw new Error("Server connection error");
+    handleApiError(error);
   }
 };
 
@@ -30,11 +28,7 @@ const updateUser = async (id: string, data: UpdateUserData) => {
       ...data,
     });
   } catch(error: any) {
-    if (error.response && error.response.data) {
-      throw new Error(error.response.data.message || "Something went wrong.");
-    }
-
-    throw new Error("Server connection error");
+    handleApiError(error);
   }
 };
 

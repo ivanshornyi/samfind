@@ -85,7 +85,7 @@ export const AuthContextProvider = ({ children } : { children: React.ReactNode }
           try {
             const userData = await UserApiService.getUser(decodedToken.sub);
 
-            setUser(userData);
+            setUser(userData as User);
           } catch (error) {
             console.error("Failed to fetch user data:", error);
           } finally {

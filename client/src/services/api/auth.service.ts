@@ -1,4 +1,5 @@
 import { apiClient } from "@/vars";
+import { handleApiError } from "@/errors";
 
 export enum UserAuthType {
   Email = "email",
@@ -14,11 +15,7 @@ const signIn = async (email: string, password: string, authType: UserAuthType) =
 
     return response.data;
   } catch (error: any) {
-    if (error.response && error.response.data) {
-      throw new Error(error.response.data.message || "Something went wrong.");
-    }
-
-    throw new Error("Server connection error");
+    handleApiError(error);
   }
 };
 
@@ -40,11 +37,7 @@ const signUp = async (
 
     return response.data;
   } catch (error: any) {
-    if (error.response && error.response.data) {
-      throw new Error(error.response.data.message || "Something went wrong.");
-    }
-
-    throw new Error("Server connection error");
+    handleApiError(error);
   }
 };
 
@@ -54,11 +47,7 @@ const sendVerificationCode = async (email: string) => {
       email,
     });
   } catch (error: any) {
-    if (error.response && error.response.data) {
-      throw new Error(error.response.data.message || "Something went wrong.");
-    }
-
-    throw new Error("Server connection error");
+    handleApiError(error);
   }
 };
 
@@ -70,11 +59,7 @@ const resetPassword = async (email: string, verificationCode: string, newPasswor
       newPassword,
     });
   } catch (error: any) {
-    if (error.response && error.response.data) {
-      throw new Error(error.response.data.message || "Something went wrong.");
-    }
-
-    throw new Error("Server connection error");
+    handleApiError(error);
   }
 };
 
