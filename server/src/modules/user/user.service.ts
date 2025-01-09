@@ -18,8 +18,11 @@ export class UserService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async findAll(): Promise<User[]> {
-    return this.userRepository.find();
+  async findAll(offset: number, limit: number): Promise<User[]> {
+    return this.userRepository.find({
+      take: limit,
+      skip: offset,
+    });
   }
 
   async findOne(id: string) {

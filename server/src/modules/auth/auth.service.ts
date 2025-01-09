@@ -66,12 +66,7 @@ export class AuthService {
       throw new NotFoundException("User not found");
     }
   
-    console.log('Password from input:', password);
-    console.log('Stored password hash:', user.password);
-  
     const isPasswordValid = await bcrypt.compare(password, user.password);
-  
-    console.log("Is password valid:", isPasswordValid);
   
     if (!isPasswordValid) {
       throw new UnauthorizedException("Invalid password");
@@ -133,9 +128,7 @@ export class AuthService {
       resetPasswordDto.verificationCode === user?.resetCode &&
       user.resetCodeExpiresAt > new Date().getTime()
     ) {
-      console.log(resetPasswordDto);
       const hashedNewPassword = await bcrypt.hash(resetPasswordDto.newPassword, 10);  
-      console.log(hashedNewPassword)
 
       await this.userService.updateUser(
         user.id, { password: hashedNewPassword }, true
