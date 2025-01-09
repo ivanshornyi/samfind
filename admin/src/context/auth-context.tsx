@@ -1,9 +1,13 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { jwtDecode } from "jwt-decode";
+import { userApiService } from "@/services";
+import { User } from "@shared/types";
 
 interface AuthContextType {
   isLoggedIn: boolean;
+  user: User | null;
+  userLoading: boolean;
   login: (token: string, refreshToken: string) => void;
   logout: () => void;
 }
@@ -28,6 +32,8 @@ export const AuthContextProvider = ({
   const [accessToken, setAccessToken] = useState<string | null>(
     localStorageToken
   );
+  const [userLoading, setUserLoading] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   const logout = useCallback(() => {
     setAccessToken(null);
@@ -68,6 +74,24 @@ export const AuthContextProvider = ({
 
       if (remainingTime > 0) {
         setAccessToken(localStorageToken);
+
+        const decodedToken = jwtDecode<{ sub: string }>(localStorageToken!);
+
+        const fetchUser = async () => {
+          setUserLoading(true);
+
+          try {
+            const userData = await userApiService.findUserById(decodedToken.sub);
+            setUser(userData as User);
+          } catch (error) {
+            console.error("Failed to fetch user data:", error);
+          } finally {
+            setUserLoading(false);
+          }
+        };
+
+        fetchUser();
+        
         logoutTimer = setTimeout(logout, remainingTime);
       } else {
         logout();
@@ -79,6 +103,8 @@ export const AuthContextProvider = ({
     <AuthContext.Provider
       value={{
         isLoggedIn: accessToken !== null,
+        user,
+        userLoading,
         login,
         logout,
       }}

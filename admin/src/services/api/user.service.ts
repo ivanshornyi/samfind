@@ -1,3 +1,4 @@
+import { handleApiError } from "@/errors";
 import { apiClient } from "@/vars/axios-instance";
 
 const findUsers = async () => {
@@ -8,10 +9,21 @@ const findUsers = async () => {
 
     return response.data;
   } catch (err) {
-    console.log(err);
+    handleApiError(err);
+  }
+};
+
+const findUserById = async (id: string) => {
+  try {
+    const response = await apiClient.get(`/user/${id}`);
+
+    return response.data;
+  } catch (err) {
+    handleApiError(err);
   }
 };
 
 export const userApiService = {
   findUsers,
+  findUserById,
 };
