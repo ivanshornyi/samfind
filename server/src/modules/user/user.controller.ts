@@ -6,6 +6,7 @@ import { User } from "./entities/user.entity";
 import { ApiOperation, ApiTags, ApiQuery } from "@nestjs/swagger";
 
 import { UpdateUserDto } from "./dto/update-user-dto";
+import { FindUserDto } from "./dto/find-user-dto";
 
 // import { RefreshGuard } from "src/common/guards/refresh.guard";
 
@@ -30,13 +31,18 @@ export class UserController {
     description: "End of range",
     required: true,
   })
+  @ApiQuery({
+    name: "name",
+    type: String,
+    description: "User name",
+    required: false,
+  })
   @Get("/find")
-  async findAll(
-    // @Req() req: AuthenticatedRequest`
-    @Query("offset") offset: number,
-    @Query("limit") limit: number,
+  async find(
+    // @Req() req: AuthenticatedRequest
+    @Query() findUserDto: FindUserDto,
   ): Promise<User[]> {
-    return this.userService.findAll(offset, limit);
+    return this.userService.findAll(findUserDto);
   }
 
   @ApiOperation({ summary: "Find one user" })
