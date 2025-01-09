@@ -1,6 +1,6 @@
 import { NavLink } from "react-router";
 import { Button } from "./ui";
-import { LogIn } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { useContext } from "react";
 import { AuthContext } from "@/context";
 
@@ -36,28 +36,26 @@ export const Header = () => {
         </NavLink>
 
         <div className="flex gap-6 items-center">
-          <nav>
-            <ul className="flex items-center gap-2">
-              {NAVIGATION_ITEMS.map((item) => (
-                <NavLink key={item.title} to={item.path}>
-                  <li className="font-medium text-sm hover:opacity-80">
-                    {item.title}
-                  </li>
-                </NavLink>
-              ))}
-            </ul>
-          </nav>
+          {isLoggedIn ? (
+            <nav>
+              <ul className="flex items-center gap-2">
+                {NAVIGATION_ITEMS.map((item) => (
+                  <NavLink key={item.title} to={item.path}>
+                    <li className="font-medium text-sm hover:opacity-80">
+                      {item.title}
+                    </li>
+                  </NavLink>
+                ))}
+              </ul>
+            </nav>
+          ) : null}
 
-          {!isLoggedIn ? (
-            <NavLink to="/login">
-              <Button>
-                <LogIn size={14} />
-                <span>Login</span>
-              </Button>
-            </NavLink>
-          ) : (
-            <Button onClick={logout}>Logout</Button>
-          )}
+          {isLoggedIn ? (
+            <Button onClick={logout}>
+              <LogOut size={14} />
+              <p>Logout</p>
+            </Button>
+          ) : null}
         </div>
       </div>
     </header>
