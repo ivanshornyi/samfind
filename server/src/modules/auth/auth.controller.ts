@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Post, Req, UseGuards } from "@nestjs/common";
 
 import { SignInDto, SignUpDto } from "./dto/auth-user-dto";
 import { ResetPasswordDto } from "./dto/reset-password-dto";
@@ -6,6 +6,8 @@ import { ResetPasswordDto } from "./dto/reset-password-dto";
 import { AuthService } from "./auth.service";
 
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { AuthenticatedRequest } from "src/common/types/interfaces/auth-request.interface";
+import { SendCodeForEmailDto } from "./dto/send-code-for-email.dto";
 
 @ApiTags("Authentication")
 @Controller("auth")
@@ -34,5 +36,17 @@ export class AuthController {
   @Post("/reset-password")
   public async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(resetPasswordDto);
+  }
+
+  @ApiOperation({ summary: "Send verification code for email update" })
+  @Post("/email/send-verification-code")
+  public async sendVerificationCodeForEmail(@Body() sendCodeForEmailDto: SendCodeForEmailDto) {
+    return this.authService.sendResetEmailVerificationCode(sendCodeForEmailDto);
+  }
+
+  @ApiOperation({ summary: "Update user email" })
+  @Post("/email/update")
+  public async updateEmail(@Body() emailUpdateDto: { userId: string, verificationCode: string, newEmail: string }) {
+    return this.authService.resetEmail(emailUpdateDto);
   }
 }

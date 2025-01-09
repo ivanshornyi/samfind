@@ -46,6 +46,12 @@ export class User {
   @Column({ type: "bigint", nullable: true })
   resetCodeExpiresAt: number;
 
+  @Column({ nullable: true })
+  emailResetCode: string;
+ 
+  @Column({ type: "bigint", nullable: true })
+  emailResetCodeExpiresAt: number;
+
   constructor() {
     if (!this.id) {
       this.id = uuidv4();

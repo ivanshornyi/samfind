@@ -11,6 +11,7 @@ import { TokenService } from "./token.service";
 import { MailService } from "../mail/mail.service";
 
 import { SignInDto, SignUpDto } from "./dto/auth-user-dto";
+import { SendCodeForEmailDto } from "./dto/send-code-for-email.dto";
 import { UserAuthType } from "../user/types/user";
 
 import * as bcrypt from "bcrypt";
@@ -106,6 +107,29 @@ export class AuthService {
     return { message: "Reset code sent successfully" };
   }
 
+  public async sendResetEmailVerificationCode(sendCodeForEmailDto: SendCodeForEmailDto) {
+    const user = await this.userService.findOne(sendCodeForEmailDto.userId);
+
+    const isUserWithSameEmailExist = await this.userService.findUserByEmail(sendCodeForEmailDto.email, UserAuthType.Email);
+
+    if (isUserWithSameEmailExist) {
+      throw new UnauthorizedException("User with this email already exist");
+    }
+
+    const isPasswordValid = await bcrypt.compare(sendCodeForEmailDto.password, user.password);
+  
+    if (!isPasswordValid) {
+      throw new UnauthorizedException("Invalid password");
+    }
+
+    const emailResetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const emailResetCodeExpiresAt = new Date(Date.now() + 15 * 60 * 1000).getTime();
+
+    await this.userService.updateUser(user.id, { emailResetCode, emailResetCodeExpiresAt });
+
+    await this.mailService.sendResetCodeForEmailUpdate(user.email, emailResetCode);
+  }
+
   public async resetPassword(resetPasswordDto: ResetPasswordDto) {
     const user = await this.userService.findUserByEmail(
       resetPasswordDto.email,
@@ -138,6 +162,31 @@ export class AuthService {
     }
   
     throw new UnauthorizedException("Password reset failed");
+  }
+
+  public async resetEmail(emailUpdateDto: { userId: string, verificationCode: string, newEmail: string }) {
+    const user = await this.userService.findOne(emailUpdateDto.userId);
+  
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+  
+    if (emailUpdateDto.verificationCode !== user?.emailResetCode) {
+      throw new NotFoundException("Verification code is not correct");
+    }
+  
+    if (user.emailResetCodeExpiresAt < new Date().getTime()) {
+      throw new NotFoundException("Verification code has expired");
+    }
+
+    if (
+      emailUpdateDto.verificationCode === user?.emailResetCode &&
+      user.emailResetCodeExpiresAt > new Date().getTime()
+    ) {
+      await this.userService.updateUser(
+        user.id, { email: emailUpdateDto.newEmail }
+      );
+    }
   }
 
   public async hashPassword(password: string): Promise<string> {
