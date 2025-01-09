@@ -16,6 +16,7 @@ interface AuthContextType {
   userLoading: boolean;
   login: (token: string, refreshToken: string) => void;
   logout: () => void;
+  fetchUser: () => void;
 }
 
 let logoutTimer: any;
@@ -71,6 +72,22 @@ export const AuthContextProvider = ({
     logoutTimer = setTimeout(logout, remainingTime);
   };
 
+  const fetchUser = async () => {
+    const decodedToken = jwtDecode<{ sub: string }>(localStorageToken!);
+    
+    setUserLoading(true);
+
+    try {
+      const userData = await UserApiService.getUser(decodedToken.sub);
+
+      setUser(userData as User);
+    } catch (error) {
+      console.error("Failed to fetch user data:", error);
+    } finally {
+      setUserLoading(false);
+    }
+  };
+
   useEffect(() => {
     const localStorageToken = localStorage.getItem("accessToken");
 
@@ -80,21 +97,6 @@ export const AuthContextProvider = ({
 
       if (remainingTime > 0) {
         setAccessToken(localStorageToken);
-        const decodedToken = jwtDecode<{ sub: string }>(localStorageToken!);
-
-        const fetchUser = async () => {
-          setUserLoading(true);
-
-          try {
-            const userData = await UserApiService.getUser(decodedToken.sub);
-
-            setUser(userData as User);
-          } catch (error) {
-            console.error("Failed to fetch user data:", error);
-          } finally {
-            setUserLoading(false);
-          }
-        };
 
         fetchUser();
         logoutTimer = setTimeout(logout, remainingTime);
@@ -112,6 +114,7 @@ export const AuthContextProvider = ({
         userLoading,
         login,
         logout,
+        fetchUser,
       }}
     >
       {children}

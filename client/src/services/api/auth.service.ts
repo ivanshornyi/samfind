@@ -71,9 +71,43 @@ const resetPassword = async (
   }
 };
 
+const sendVerificationCodeToUpdateEmail = async (
+  userId: string,
+  email: string,
+  password: string,
+) => {
+  try {
+    await apiClient.post("/auth/email/send-verification-code", {
+      userId,
+      email,
+      password,
+    });
+  } catch(error: any) {
+    handleApiError(error);
+  }
+};
+
+const updateEmail = async (
+  userId: string,
+  verificationCode: string,
+  newEmail: string,
+) => {
+  try {
+    await apiClient.post("/auth/email/update", {
+      userId,
+      verificationCode,
+      newEmail,
+    });
+  } catch(error: any) {
+    handleApiError(error);
+  }
+};
+
 export const AuthApiService = {
   signIn,
   signUp,
   sendVerificationCode,
   resetPassword,
+  sendVerificationCodeToUpdateEmail,
+  updateEmail,
 };
