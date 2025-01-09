@@ -31,7 +31,11 @@ export const ChangeEmailModal = () => {
     password: "",
   });
 
-  const { mutate: sendVerificationCodeMutation, isPending: isSendingPending, isSuccess: isSendingSuccess } = useSendVerificationCodeToUpdateEmail();
+  const {
+    mutate: sendVerificationCodeMutation,
+    isPending: isSendingPending,
+    isSuccess: isSendingSuccess,
+  } = useSendVerificationCodeToUpdateEmail();
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
@@ -51,23 +55,23 @@ export const ChangeEmailModal = () => {
       return;
     }
 
-    user && sendVerificationCodeMutation({ 
-      userId: user.id, 
-      email: formData.email, 
-      password: formData.password, 
-    });
+    user &&
+      sendVerificationCodeMutation({
+        userId: user.id,
+        email: formData.email,
+        password: formData.password,
+      });
   };
 
   useEffect(() => {
-    if (isSendingSuccess) router.push(`/account/settings/reset-email?email=${formData.email}`);
+    if (isSendingSuccess)
+      router.push(`/account/settings/reset-email?email=${formData.email}`);
   }, [isSendingSuccess]);
 
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button className="w-full mt-4">
-          Change email
-        </Button>
+        <Button className="w-full mt-4">Change email</Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="w-[400px]">
         <div className="absolute right-0 top-0">
@@ -103,7 +107,7 @@ export const ChangeEmailModal = () => {
             />
 
             <AlertDialogFooter className="flex gap-2 justify-end mt-3 pt-2">
-              <AlertDialogCancel 
+              <AlertDialogCancel
                 className="px-6 py-5"
                 disabled={isSendingPending}
               >

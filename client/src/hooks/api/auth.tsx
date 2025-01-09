@@ -134,8 +134,12 @@ export const useSendVerificationCodeToUpdateEmail = () => {
   const { toast } = useToast();
 
   const { ...rest } = useMutation({
-    mutationFn: (data: { userId: string, email: string, password: string, }) => {
-      return AuthApiService.sendVerificationCodeToUpdateEmail(data.userId, data.email, data.password);
+    mutationFn: (data: { userId: string; email: string; password: string }) => {
+      return AuthApiService.sendVerificationCodeToUpdateEmail(
+        data.userId,
+        data.email,
+        data.password
+      );
     },
     onSuccess: () => {
       toast({
@@ -157,8 +161,16 @@ export const useUpdateUserEmail = () => {
   const { fetchUser } = useContext(AuthContext);
 
   const { ...rest } = useMutation({
-    mutationFn: (data: { userId: string, verificationCode: string, newEmail: string, }) => {
-      return AuthApiService.updateEmail(data.userId, data.verificationCode, data.newEmail);
+    mutationFn: (data: {
+      userId: string;
+      verificationCode: string;
+      newEmail: string;
+    }) => {
+      return AuthApiService.updateEmail(
+        data.userId,
+        data.verificationCode,
+        data.newEmail
+      );
     },
     onSuccess: () => {
       toast({

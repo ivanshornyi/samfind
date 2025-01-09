@@ -17,16 +17,18 @@ export default function ResetEmail() {
 
   const [verificationCode, setVerificationCode] = useState("");
 
-  const { mutate: updateUserEmailMutation, isPending: isUpdatePending } = useUpdateUserEmail();
+  const { mutate: updateUserEmailMutation, isPending: isUpdatePending } =
+    useUpdateUserEmail();
 
   const handleVerificationCodeSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
-    user && updateUserEmailMutation({ 
-      userId: user.id,
-      verificationCode,
-      newEmail: searchParams.get("email")!,  
-    }); 
+    user &&
+      updateUserEmailMutation({
+        userId: user.id,
+        verificationCode,
+        newEmail: searchParams.get("email")!,
+      });
   };
 
   useEffect(() => {
@@ -39,15 +41,15 @@ export default function ResetEmail() {
         <p className="text-lg">Confirm verification code</p>
         <form onSubmit={handleVerificationCodeSubmit} className="mt-3">
           <div>
-            <Input 
-              className="text-center py-5" 
+            <Input
+              className="text-center py-5"
               maxLength={6}
               value={verificationCode}
               onChange={(event) => setVerificationCode(event.target.value)}
             />
           </div>
 
-          <Button 
+          <Button
             className="w-full mt-3 py-5"
             withLoader={true}
             loading={isUpdatePending}
@@ -58,4 +60,4 @@ export default function ResetEmail() {
       </Card>
     </div>
   );
-};
+}

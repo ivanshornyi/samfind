@@ -30,8 +30,11 @@ export default function Settings() {
     confirmPassword: "",
   });
 
-  const { mutate: updateUserDataMutation, isPending: isUpdateUserPending, isSuccess: isUpdateUserSuccess } =
-    useUpdateUser();
+  const {
+    mutate: updateUserDataMutation,
+    isPending: isUpdateUserPending,
+    isSuccess: isUpdateUserSuccess,
+  } = useUpdateUser();
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
@@ -126,7 +129,8 @@ export default function Settings() {
   }, [user]);
 
   useEffect(() => {
-    if (isUpdateUserSuccess) setUserPasswordFormData({ newPassword: "", confirmPassword: "" });
+    if (isUpdateUserSuccess)
+      setUserPasswordFormData({ newPassword: "", confirmPassword: "" });
   }, [isUpdateUserSuccess]);
 
   return (
@@ -223,19 +227,23 @@ export default function Settings() {
               className="mt-3 flex flex-col gap-2"
             >
               <div>
-                <label htmlFor="newPassword" className="text-sm">New password</label>
+                <label htmlFor="newPassword" className="text-sm">
+                  New password
+                </label>
                 <Input
                   id="newPassword"
                   name="newPassword"
                   type="password"
-                  placeholder="Enter new password" 
+                  placeholder="Enter new password"
                   value={userPasswordFormData.newPassword}
                   onChange={handlePasswordFormInputChange}
                   className="py-5 px-3"
                 />
               </div>
               <div>
-                <label htmlFor="confirmPassword" className="text-sm">Confirm password</label>
+                <label htmlFor="confirmPassword" className="text-sm">
+                  Confirm password
+                </label>
                 <Input
                   id="confirmPassword"
                   name="confirmPassword"

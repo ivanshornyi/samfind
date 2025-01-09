@@ -74,7 +74,7 @@ export const AuthContextProvider = ({
 
   const fetchUser = async () => {
     const decodedToken = jwtDecode<{ sub: string }>(localStorageToken!);
-    
+
     setUserLoading(true);
 
     try {

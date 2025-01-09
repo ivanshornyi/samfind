@@ -74,7 +74,7 @@ const resetPassword = async (
 const sendVerificationCodeToUpdateEmail = async (
   userId: string,
   email: string,
-  password: string,
+  password: string
 ) => {
   try {
     await apiClient.post("/auth/email/send-verification-code", {
@@ -82,7 +82,7 @@ const sendVerificationCodeToUpdateEmail = async (
       email,
       password,
     });
-  } catch(error: any) {
+  } catch (error: any) {
     handleApiError(error);
   }
 };
@@ -90,7 +90,7 @@ const sendVerificationCodeToUpdateEmail = async (
 const updateEmail = async (
   userId: string,
   verificationCode: string,
-  newEmail: string,
+  newEmail: string
 ) => {
   try {
     await apiClient.post("/auth/email/update", {
@@ -98,7 +98,7 @@ const updateEmail = async (
       verificationCode,
       newEmail,
     });
-  } catch(error: any) {
+  } catch (error: any) {
     handleApiError(error);
   }
 };
