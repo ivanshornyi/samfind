@@ -1,6 +1,8 @@
-"use client";
-
 import { NavLink } from "react-router";
+import { Button } from "./ui";
+import { LogIn } from "lucide-react";
+import { useContext } from "react";
+import { AuthContext } from "@/context";
 
 const NAVIGATION_ITEMS = [
   {
@@ -14,6 +16,8 @@ const NAVIGATION_ITEMS = [
 ];
 
 export const Header = () => {
+  const { isLoggedIn, logout } = useContext(AuthContext);
+
   return (
     <header
       className="
@@ -43,6 +47,17 @@ export const Header = () => {
               ))}
             </ul>
           </nav>
+
+          {!isLoggedIn ? (
+            <NavLink to="/login">
+              <Button>
+                <LogIn size={14} />
+                <span>Login</span>
+              </Button>
+            </NavLink>
+          ) : (
+            <Button onClick={logout}>Logout</Button>
+          )}
         </div>
       </div>
     </header>

@@ -1,12 +1,7 @@
 import { DataTable } from "@/components/data-table";
+import { useFindUsers } from "@/hooks";
+import { User } from "@shared/types";
 import { ColumnDef } from "@tanstack/react-table";
-
-export type User = {
-  id: number;
-  status: string;
-  name: string;
-  email: string;
-};
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -14,30 +9,37 @@ export const columns: ColumnDef<User>[] = [
     header: "ID",
   },
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "firstName",
+    header: "First Name",
   },
   {
-    accessorKey: "name",
-    header: "Name",
+    accessorKey: "lastName",
+    header: "Last Name",
   },
   {
     accessorKey: "email",
     header: "Email",
   },
-];
-
-const users: User[] = [
-  { id: 1, status: "Success", name: "John Doe", email: "john@gmail.com" },
-  { id: 2, status: "Success", name: "Jane Smith", email: "jane@gmail.com" },
-  { id: 3, status: "Success", name: "Alice Johnson", email: "alice@gmail.com" },
-  { id: 4, status: "Success", name: "Bob Brown", email: "bob@gmail.com" },
+  {
+    accessorKey: "status",
+    header: "Status",
+  },
+  {
+    accessorKey: "role",
+    header: "Role",
+  },
 ];
 
 export const UserManagementPage = () => {
+  const { data, isLoading, isError } = useFindUsers();
+
+  if (isLoading) return <div>Loading...</div>;
+
+  if (isError) return <div>Error</div>;
+
   return (
     <div>
-      <DataTable columns={columns} data={users} />
+      <DataTable columns={columns} data={data} />
     </div>
   );
 };
