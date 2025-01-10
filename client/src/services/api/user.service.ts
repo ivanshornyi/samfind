@@ -9,7 +9,7 @@ const getUser = async (id: string) => {
     const response = await apiClient.get(`/user/${id}`);
 
     return response.data as User;
-  } catch (error: any) {
+  } catch (error) {
     handleApiError(error);
   }
 };
@@ -27,7 +27,7 @@ const updateUser = async (id: string, data: UpdateUserData) => {
     await apiClient.patch(`/user/${id}`, {
       ...data,
     });
-  } catch (error: any) {
+  } catch (error) {
     handleApiError(error);
   }
 };

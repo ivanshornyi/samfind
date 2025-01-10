@@ -41,9 +41,9 @@ import {
   LoaderCircle,
   MoreHorizontal,
 } from "lucide-react";
-import { UserLicenseStatus } from "@/types";
+import { UserLicense, UserLicenseStatus } from "@/types";
 
-export const columns: ColumnDef<any>[] = [
+export const columns: ColumnDef<UserLicense>[] = [
   {
     accessorKey: "status",
     header: "Status",
@@ -80,7 +80,7 @@ export const columns: ColumnDef<any>[] = [
   {
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => {
+    cell: () => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

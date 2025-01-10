@@ -55,18 +55,19 @@ export const ChangeEmailModal = () => {
       return;
     }
 
-    user &&
+    if (user) {
       sendVerificationCodeMutation({
         userId: user.id,
         email: formData.email,
         password: formData.password,
       });
+    }
   };
 
   useEffect(() => {
     if (isSendingSuccess)
       router.push(`/account/settings/reset-email?email=${formData.email}`);
-  }, [isSendingSuccess]);
+  }, [isSendingSuccess, formData.email, router]);
 
   return (
     <AlertDialog>

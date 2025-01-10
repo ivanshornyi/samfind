@@ -13,11 +13,10 @@ import { UserStatus } from "@/types";
 import { useToast } from "@/hooks";
 
 import { ShieldPlus, ShieldMinus } from "lucide-react";
-import { apiClient } from "@/vars";
 
 export default function Settings() {
   const { toast } = useToast();
-  const { user, userLoading, logout } = useContext(AuthContext);
+  const { user, userLoading } = useContext(AuthContext);
   const [userFormData, setUserFormData] = useState({
     firstName: "",
     lastName: "",
@@ -61,7 +60,7 @@ export default function Settings() {
       });
     }
 
-    user && updateUserDataMutation({ id: user?.id, userData: userFormData });
+    if (user) updateUserDataMutation({ id: user?.id, userData: userFormData });
   };
 
   const handleChangeEmailSubmit = (event: React.FormEvent) => {
@@ -72,8 +71,6 @@ export default function Settings() {
         description: "Email can not be empty",
       });
     }
-
-    // update email
   };
 
   const handleChangePasswordSubmit = (event: React.FormEvent) => {
@@ -98,11 +95,12 @@ export default function Settings() {
       });
     }
 
-    user &&
+    if (user) {
       updateUserDataMutation({
         id: user.id,
         userData: { password: userPasswordFormData.newPassword },
       });
+    }
   };
 
   // const handleDeactivateAccount = () => {

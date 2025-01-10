@@ -40,7 +40,7 @@ export class AuthService {
       lastName,
       email,
       authType,
-      password: hashedPassword,
+      password,
     });
 
     const tokens = await this.tokenService.generateTokens({
@@ -61,6 +61,8 @@ export class AuthService {
   public async signIn(signInDto: SignInDto) {
     const { email, password, authType } = signInDto;
 
+    console.log(password);
+
     const user = await this.userService.findUserByEmail(email, authType);
   
     if (!user) {
@@ -68,6 +70,8 @@ export class AuthService {
     }
   
     const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    console.log(isPasswordValid)
   
     if (!isPasswordValid) {
       throw new UnauthorizedException("Invalid password");

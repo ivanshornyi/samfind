@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 
 import type { Metadata } from "next";
 
@@ -38,11 +38,13 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-100`}
         >
           <Toaster />
-          <AuthContextProvider>
-            <Header />
+          <Suspense>
+            <AuthContextProvider>
+              <Header />
 
-            <main className="pt-20 px-5">{children}</main>
-          </AuthContextProvider>
+              <main className="pt-20 px-5">{children}</main>
+            </AuthContextProvider>
+          </Suspense>
         </body>
       </html>
     </TanstackProvider>

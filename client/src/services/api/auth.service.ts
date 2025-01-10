@@ -18,7 +18,7 @@ const signIn = async (
     });
 
     return response.data;
-  } catch (error: any) {
+  } catch (error) {
     handleApiError(error);
   }
 };
@@ -40,7 +40,7 @@ const signUp = async (
     });
 
     return response.data;
-  } catch (error: any) {
+  } catch (error) {
     handleApiError(error);
   }
 };
@@ -50,7 +50,7 @@ const sendVerificationCode = async (email: string) => {
     await apiClient.post("/auth/send-verification-code", {
       email,
     });
-  } catch (error: any) {
+  } catch (error) {
     handleApiError(error);
   }
 };
@@ -66,7 +66,7 @@ const resetPassword = async (
       verificationCode,
       newPassword,
     });
-  } catch (error: any) {
+  } catch (error) {
     handleApiError(error);
   }
 };
@@ -82,7 +82,7 @@ const sendVerificationCodeToUpdateEmail = async (
       email,
       password,
     });
-  } catch (error: any) {
+  } catch (error) {
     handleApiError(error);
   }
 };
@@ -98,7 +98,7 @@ const updateEmail = async (
       verificationCode,
       newEmail,
     });
-  } catch (error: any) {
+  } catch (error) {
     handleApiError(error);
   }
 };

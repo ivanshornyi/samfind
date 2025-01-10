@@ -23,17 +23,18 @@ export default function ResetEmail() {
   const handleVerificationCodeSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
-    user &&
+    if (user) {
       updateUserEmailMutation({
         userId: user.id,
         verificationCode,
         newEmail: searchParams.get("email")!,
       });
+    }
   };
 
   useEffect(() => {
     if (!searchParams.get("email")) router.push("/");
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   return (
     <div>
