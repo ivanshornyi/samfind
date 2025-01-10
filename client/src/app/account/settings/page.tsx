@@ -138,9 +138,7 @@ export default function Settings() {
       {(isUpdateUserPending || userLoading) && <FullScreenLoader />}
 
       <div>
-        <h2 className="text-[24px]">
-          <span>Settings</span>
-        </h2>
+        <h2 className="text-[24px]">Settings</h2>
 
         <div>
           <p>

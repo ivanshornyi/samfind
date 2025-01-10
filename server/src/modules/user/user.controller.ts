@@ -1,7 +1,8 @@
 import { Controller, Get, Param, Patch, Body, Query } from "@nestjs/common";
 
+import { User } from "@prisma/client";
+
 import { UserService } from "./user.service";
-import { User } from "./entities/user.entity";
 
 import { ApiOperation, ApiTags, ApiQuery } from "@nestjs/swagger";
 

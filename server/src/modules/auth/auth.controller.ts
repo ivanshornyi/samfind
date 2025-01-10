@@ -6,7 +6,6 @@ import { ResetPasswordDto } from "./dto/reset-password-dto";
 import { AuthService } from "./auth.service";
 
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
-import { AuthenticatedRequest } from "src/common/types/interfaces/auth-request.interface";
 import { SendCodeForEmailDto } from "./dto/send-code-for-email.dto";
 
 @ApiTags("Authentication")

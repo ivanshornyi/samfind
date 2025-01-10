@@ -30,8 +30,6 @@ export class RefreshGuard implements CanActivate {
 
       return true;
     } catch (error) {
-      console.error("Token validation failed:", error);
-
       throw new ForbiddenException(error.message);
     }
   }

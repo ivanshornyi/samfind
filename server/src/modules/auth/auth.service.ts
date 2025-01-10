@@ -12,7 +12,7 @@ import { MailService } from "../mail/mail.service";
 
 import { SignInDto, SignUpDto } from "./dto/auth-user-dto";
 import { SendCodeForEmailDto } from "./dto/send-code-for-email.dto";
-import { UserAuthType } from "../user/types/user";
+import { UserAuthType } from "@prisma/client";
 
 import * as bcrypt from "bcrypt";
 
@@ -89,7 +89,7 @@ export class AuthService {
   }
 
   public async sendResetPasswordVerificationCode(email: string) {
-    const user = await this.userService.findUserByEmail(email, UserAuthType.Email);
+    const user = await this.userService.findUserByEmail(email, UserAuthType.email);
 
     if (!user) {
       throw new NotFoundException(
@@ -110,7 +110,7 @@ export class AuthService {
   public async sendResetEmailVerificationCode(sendCodeForEmailDto: SendCodeForEmailDto) {
     const user = await this.userService.findOne(sendCodeForEmailDto.userId);
 
-    const isUserWithSameEmailExist = await this.userService.findUserByEmail(sendCodeForEmailDto.email, UserAuthType.Email);
+    const isUserWithSameEmailExist = await this.userService.findUserByEmail(sendCodeForEmailDto.email, UserAuthType.email);
 
     if (isUserWithSameEmailExist) {
       throw new UnauthorizedException("User with this email already exist");
@@ -133,7 +133,7 @@ export class AuthService {
   public async resetPassword(resetPasswordDto: ResetPasswordDto) {
     const user = await this.userService.findUserByEmail(
       resetPasswordDto.email,
-      UserAuthType.Email,
+      UserAuthType.email,
     );
   
     if (!user) {

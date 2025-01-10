@@ -35,10 +35,7 @@ export const AuthContextProvider = ({
   children: React.ReactNode;
 }) => {
   const router = useRouter();
-  const localStorageToken = localStorage.getItem("accessToken");
-  const [accessToken, setAccessToken] = useState<string | null>(
-    localStorageToken
-  );
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [userLoading, setUserLoading] = useState(false);
   const [user, setUser] = useState<User | null>(null);
 
@@ -54,6 +51,14 @@ export const AuthContextProvider = ({
     }
 
     router.push("/");
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("accessToken");
+
+      setAccessToken(token);
+    }
   }, []);
 
   const login = (accessToken: string, refreshToken: string) => {
@@ -73,18 +78,22 @@ export const AuthContextProvider = ({
   };
 
   const fetchUser = async () => {
-    const decodedToken = jwtDecode<{ sub: string }>(localStorageToken!);
+    const token = localStorage.getItem("accessToken");
 
-    setUserLoading(true);
+    if (token) {
+      const decodedToken = jwtDecode<{ sub: string }>(token);
 
-    try {
-      const userData = await UserApiService.getUser(decodedToken.sub);
+      setUserLoading(true);
 
-      setUser(userData as User);
-    } catch (error) {
-      console.error("Failed to fetch user data:", error);
-    } finally {
-      setUserLoading(false);
+      try {
+        const userData = await UserApiService.getUser(decodedToken.sub);
+
+        setUser(userData as User);
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+      } finally {
+        setUserLoading(false);
+      }
     }
   };
 

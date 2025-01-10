@@ -3,8 +3,7 @@ import { Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { User } from "../user/entities/user.entity";
+import { PrismaModule } from "../prisma/prisma.module";
 
 import { AuthService } from "./auth.service";
 import { AuthController } from "./auth.controller";
@@ -22,7 +21,7 @@ import { MailService } from "../mail/mail.service";
         };
       },
     }),
-    TypeOrmModule.forFeature([User]),
+    PrismaModule,
   ],
   controllers: [AuthController],
   providers: [
