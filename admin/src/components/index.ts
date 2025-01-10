@@ -3,4 +3,4 @@ export * from "./modals";
 export * from "./layout";
 export * from "./header";
 export * from "./data-table";
-export * from "./private-route";
+export * from "./protect-route";
