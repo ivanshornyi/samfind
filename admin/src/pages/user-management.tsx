@@ -26,13 +26,13 @@ export const UserManagementPage = () => {
       <Input placeholder="Search users..." className="max-w-96" />
       <DataTable columns={userColumns} data={data} />
       <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
+        {page > 0 ? <Button
           variant="outline"
           size="sm"
           onClick={handlePrevPage}
         >
           Previous
-        </Button>
+        </Button> : null}
         <Button
           variant="outline"
           size="sm"
