@@ -13,6 +13,10 @@ const NAVIGATION_ITEMS = [
     title: "User Management",
     path: "/user-management",
   },
+  {
+    title: "Referral Management",
+    path: "/referral-management",
+  }
 ];
 
 export const Header = () => {
