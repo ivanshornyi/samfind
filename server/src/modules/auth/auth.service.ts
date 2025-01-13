@@ -14,7 +14,7 @@ import { SignInDto, SignUpDto } from "./dto/auth-user-dto";
 import { SendCodeForEmailDto } from "./dto/send-code-for-email.dto";
 import { UserAuthType } from "@prisma/client";
 
-import * as bcrypt from "bcrypt";
+import { createHash } from "crypto";
 
 @Injectable()
 export class AuthService {
@@ -33,14 +33,14 @@ export class AuthService {
       throw new ConflictException("User with this email already exists");
     }
 
-    const hashedPassword = await this.hashPassword(password);
+    const hashedPassword = this.hashField(password);
 
     const newUser = await this.userService.create({
       firstName,
       lastName,
       email,
       authType,
-      password,
+      password: hashedPassword,
     });
 
     const tokens = await this.tokenService.generateTokens({
@@ -61,17 +61,13 @@ export class AuthService {
   public async signIn(signInDto: SignInDto) {
     const { email, password, authType } = signInDto;
 
-    console.log(password);
-
     const user = await this.userService.findUserByEmail(email, authType);
   
     if (!user) {
       throw new NotFoundException("User not found");
     }
   
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    console.log(isPasswordValid)
+    const isPasswordValid = this.isPasswordValid(password, user.password);
   
     if (!isPasswordValid) {
       throw new UnauthorizedException("Invalid password");
@@ -120,7 +116,7 @@ export class AuthService {
       throw new UnauthorizedException("User with this email already exist");
     }
 
-    const isPasswordValid = await bcrypt.compare(sendCodeForEmailDto.password, user.password);
+    const isPasswordValid = this.isPasswordValid(sendCodeForEmailDto.password, user.password);
   
     if (!isPasswordValid) {
       throw new UnauthorizedException("Invalid password");
@@ -156,7 +152,7 @@ export class AuthService {
       resetPasswordDto.verificationCode === user?.resetCode &&
       user.resetCodeExpiresAt > new Date().getTime()
     ) {
-      const hashedNewPassword = await bcrypt.hash(resetPasswordDto.newPassword, 10);  
+      const hashedNewPassword = this.hashField(resetPasswordDto.newPassword);
 
       await this.userService.updateUser(
         user.id, { password: hashedNewPassword }, true
@@ -193,13 +189,13 @@ export class AuthService {
     }
   }
 
-  public async hashPassword(password: string): Promise<string> {
-    const saltRounds = 10;
-    
-    return bcrypt.hash(password, saltRounds);
+  private hashField(password: string): string {
+    return createHash("sha256").update(password).digest("hex");
   }
 
-  public async isPasswordValid(password: string, hashedPassword: string): Promise<boolean> {
-    return bcrypt.compare(password, hashedPassword);
+  private isPasswordValid(password: string, hashedPassword: string): boolean {
+    const hash = this.hashField(password);
+
+    return hash === hashedPassword;
   }
 }

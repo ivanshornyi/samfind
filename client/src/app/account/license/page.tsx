@@ -43,15 +43,17 @@ import {
 } from "lucide-react";
 import { UserLicense, UserLicenseStatus } from "@/types";
 
-export const columns: ColumnDef<UserLicense>[] = [
+const columns: ColumnDef<UserLicense>[] = [
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => (
       <div
-        className={`
-        ${row.getValue("status") === UserLicenseStatus.Active ? "text-green-500" : "text-orange-400"} capitalize text-xs
-      `}
+        className={`${
+          row.getValue("status") === UserLicenseStatus.Active
+            ? "text-green-500"
+            : "text-orange-400"
+        } capitalize text-xs`}
       >
         {row.getValue("status")}
       </div>
@@ -64,39 +66,35 @@ export const columns: ColumnDef<UserLicense>[] = [
   },
   {
     accessorKey: "name",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Name
-          <ArrowUpDown />
-        </Button>
-      );
-    },
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Name
+        <ArrowUpDown />
+      </Button>
+    ),
     cell: ({ row }) => <div className="lowercase">{row.getValue("name")}</div>,
   },
   {
     id: "actions",
     enableHiding: false,
-    cell: () => {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: () => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem>View details</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    ),
   },
 ];
 
@@ -109,11 +107,11 @@ export default function LicenseList() {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const { data: userLicenses, isPending: isUserLicensesPending } =
+  const { data: userLicenses = [], isPending: isUserLicensesPending } =
     useGetUserLicenses();
 
   const table = useReactTable({
-    data: userLicenses ?? [],
+    data: userLicenses,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

@@ -19,7 +19,7 @@ interface AuthContextType {
   fetchUser: () => void;
 }
 
-let logoutTimer: any;
+let logoutTimer: ReturnType<typeof setTimeout>;
 
 const calculateRemainingTime = (expirationTime: number) => {
   const currentTime = new Date().getTime();
@@ -51,7 +51,7 @@ export const AuthContextProvider = ({
     }
 
     router.push("/");
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
