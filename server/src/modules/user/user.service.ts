@@ -38,6 +38,46 @@ export class UserService {
     return user || null;
   }
 
+  async findAndUpdateUserByReferralCode(referralCode: string, newUserId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { referralCode },
+    });
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        // update discount
+        // update percent
+      },
+    });
+
+    const userReferral = await this.prisma.userReferral.findUnique({
+      where: { userId: user.id },
+    });
+
+    const referralUserIds = userReferral.invitedUserIds;
+    referralUserIds.push(newUserId);
+
+    await this.prisma.userReferral.update({
+      where: { 
+        userId: user.id,
+      },
+      data: {
+        invitedUserIds: referralUserIds,
+      },
+    });
+  }
+
+  async findUsersByIds(ids: string[]) {
+    // const users = await this.prisma.user.findMany({
+    //   id: {
+    //     in: ids,
+    //   }
+    // });
+
+    // return users;
+  }
+
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { password, ...rest } = createUserDto;
 
@@ -86,6 +126,6 @@ export class UserService {
   }
 
   private hashPassword(password: string): string {
-      return createHash("sha256").update(password).digest("hex");
-    }
+    return createHash("sha256").update(password).digest("hex");
+  }
 }

@@ -14,6 +14,7 @@ import { AuthMiddleware } from "./common/middlewares/auth.middleware";
 import { AuthModule } from "./modules/auth/auth.module";
 import { UserModule } from "./modules/user/user.module";
 import { UserLicenseModule } from "./modules/user-license/user-license.module";
+import { UserReferralModule } from "./modules/user-referral/user-referral.module";
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { UserLicenseModule } from "./modules/user-license/user-license.module";
     AuthModule,
     UserModule,
     UserLicenseModule,
+    UserReferralModule,
   ],
   controllers: [],
   providers: [],
