@@ -1,14 +1,18 @@
 import { handleApiError } from "@/errors";
-import { apiClient } from "@/vars/axios-instance";
+import { apiClient } from "@/vars";
 import { User } from "@shared/types";
 
-const findUsers = async () => {
+const findUsers = async (
+  name: string,
+  offset: number,
+  limit: number
+): Promise<User[] | undefined> => {
   try {
     const response = await apiClient.get("/user/find", {
-      params: { name: "", offset: 0, limit: 10 },
+      params: { name, offset, limit },
     });
 
-    return response.data;
+    return response.data as User[];
   } catch (err) {
     handleApiError(err);
   }
@@ -18,7 +22,7 @@ const findUserById = async (id: string) => {
   try {
     const response = await apiClient.get(`/user/${id}`);
 
-    return response.data;
+    return response.data as User;
   } catch (err) {
     handleApiError(err);
   }
