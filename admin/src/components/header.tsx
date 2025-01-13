@@ -1,5 +1,5 @@
 import { NavLink } from "react-router";
-import { Button } from "./ui";
+import { Button } from "@/components";
 import { LogOut } from "lucide-react";
 import { useContext } from "react";
 import { AuthContext } from "@/context";

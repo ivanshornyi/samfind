@@ -1,8 +1,7 @@
 import { Outlet } from "react-router";
-import { Header } from "./header";
+import { Header, Toaster } from "@/components";
 import { AuthContextProvider } from "@/context";
 import { TanstackProvider } from "@/providers";
-import { Toaster } from "./ui";
 
 export const Layout = () => {
   return (
