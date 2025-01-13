@@ -2,12 +2,12 @@ import { User } from "@shared/types";
 import { userApiService } from "@/services";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { handleToastError } from "@/errors";
-import { useToast } from "../use-toast";
+import { useToast } from "@/hooks";
 
-export const useFindUsers = () => {
-  return useQuery<User[]>({
-    queryFn: () => userApiService.findUsers(),
-    queryKey: ["users"],
+export const useFindUsers = (name: string, offset: number, limit: number) => {
+  return useQuery<User[] | undefined>({
+    queryFn: () => userApiService.findUsers(name, offset, limit),
+    queryKey: ["users", offset],
   });
 };
 

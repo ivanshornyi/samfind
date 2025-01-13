@@ -1,5 +1,5 @@
 import { UserAuthType } from "@shared/types";
-import { apiClient } from "../../vars/axios-instance";
+import { apiClient } from "@/vars";
 
 const signIn = async (
   email: string,

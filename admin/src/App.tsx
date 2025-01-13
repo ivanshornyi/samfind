@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router";
-import { HomePage, LoginPage, ReferralManagementPage, UserManagementPage } from "./pages";
-import { Layout, PrivateRoute, PublicRoute } from "./components";
+import { HomePage, LoginPage, ReferralManagementPage, UserManagementPage } from "@/pages";
+import { Layout, PrivateRoute, PublicRoute } from "@/components";
 
 const App = () => {
   return (

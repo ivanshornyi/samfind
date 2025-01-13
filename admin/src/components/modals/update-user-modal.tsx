@@ -12,7 +12,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui";
+} from "@/components";
 import { User, UserStatus } from "@shared/types";
 import { useState } from "react";
 import { useUpdateUser } from "@/hooks";
