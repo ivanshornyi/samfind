@@ -3,21 +3,7 @@ import { Button } from "./ui";
 import { LogOut } from "lucide-react";
 import { useContext } from "react";
 import { AuthContext } from "@/context";
-
-const NAVIGATION_ITEMS = [
-  {
-    title: "Home",
-    path: "/",
-  },
-  {
-    title: "User Management",
-    path: "/user-management",
-  },
-  {
-    title: "Referral Management",
-    path: "/referral-management",
-  }
-];
+import { SidebarTrigger } from "./ui/sidebar";
 
 export const Header = () => {
   const { isLoggedIn, logout } = useContext(AuthContext);
@@ -35,25 +21,14 @@ export const Header = () => {
           py-4
         "
       >
-        <NavLink to="/">
-          <p className="text-xl font-bold font-sans select-none">Samfind</p>
-        </NavLink>
+        <div className="flex gap-2">
+          {isLoggedIn ? <SidebarTrigger /> : null}
+          <NavLink to="/">
+            <p className="text-xl font-bold font-sans select-none">Samfind</p>
+          </NavLink>
+        </div>
 
         <div className="flex gap-6 items-center">
-          {isLoggedIn ? (
-            <nav>
-              <ul className="flex items-center gap-2">
-                {NAVIGATION_ITEMS.map((item) => (
-                  <NavLink key={item.title} to={item.path}>
-                    <li className="font-medium text-sm hover:opacity-80">
-                      {item.title}
-                    </li>
-                  </NavLink>
-                ))}
-              </ul>
-            </nav>
-          ) : null}
-
           {isLoggedIn ? (
             <Button onClick={logout}>
               <LogOut size={14} />
