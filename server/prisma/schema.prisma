@@ -38,7 +38,8 @@ model User {
   emailResetCode          String?      @db.VarChar
   emailResetCodeExpiresAt BigInt?
   discount                Float        @default(0)
-  referralCode            String       @unique @default(uuid())
+  discountPercent         Float        @default(0)
+  referralCode            Float        @unique
 
   @@map("user")
 }
@@ -61,8 +62,8 @@ model UserLicense {
 model UserReferral {
   id             String   @id @default(uuid())
   userId         String   @unique
-  invitedUserIds String[]
-  referralCode   String   @unique
+  invitedUserIds String[] @default([])
+  referralCode   Float    @unique 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

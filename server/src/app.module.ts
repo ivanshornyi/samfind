@@ -36,6 +36,6 @@ export class AppModule implements NestModule {
         path: "/user",
         method: RequestMethod.POST,
       })
-      .forRoutes("user", "user-license");
+      .forRoutes("user", "user-license", "user-referral");
   }
 }

@@ -14,7 +14,7 @@ import { useToast } from "@/hooks";
 
 import { ShieldPlus, ShieldMinus, Copy } from "lucide-react";
 
-const frontendUrl = process.env.NEXT_FRONTEND_DOMAIN;
+const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN;
 
 export default function Settings() {
   const { toast } = useToast();
@@ -137,7 +137,6 @@ export default function Settings() {
   }, [isUpdateUserSuccess]);
 
   const onCopyReferralCode = () => {
-    console.log(frontendUrl)
     if (user) {
       const link = `${frontendUrl}/auth/register?userReferralCode=${user.referralCode}`;  
 
