@@ -21,4 +21,6 @@ export interface User {
   authType: UserAuthType;
   role: UserRole;
   status: UserStatus;
+  discount: number;
+  referralCode: string;
 }

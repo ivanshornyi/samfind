@@ -38,8 +38,64 @@ export class UserService {
     return user || null;
   }
 
+  async findAndUpdateUserByReferralCode(referralCode: number, newUserId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { referralCode },
+    });
+
+    if (!user) {
+      new NotFoundException("User not found");
+    }
+
+    if (user.discount < 50) {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          discount: user.discount + 10,
+        },
+      });
+    }
+
+    const userReferral = await this.prisma.userReferral.findUnique({
+      where: { userId: user.id },
+    });
+
+    const referralUserIds = userReferral.invitedUserIds;
+    referralUserIds.push(newUserId);
+
+    await this.prisma.userReferral.update({
+      where: { 
+        userId: user.id,
+      },
+      data: {
+        invitedUserIds: referralUserIds,
+      },
+    });
+  }
+
+  async findUsersByIds(ids: string[]) {
+    const users = await this.prisma.user.findMany({
+      where: {
+        id: {
+          in: ids,
+        }
+      },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        status: true,
+      },
+    });
+
+    return users;
+  }
+
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { password, ...rest } = createUserDto;
+
+    const referralCode = Math.floor(Math.random() * 1_000_000);
 
     const user = await this.prisma.user.create({
       data: {
@@ -47,7 +103,15 @@ export class UserService {
         password,
         status: UserStatus.active,
         role: UserRole.customer,
+        referralCode,
       },
+    });
+
+    await this.prisma.userReferral.create({
+      data: {
+        userId: user.id,
+        referralCode,
+      }
     });
 
     return user;
@@ -86,6 +150,6 @@ export class UserService {
   }
 
   private hashPassword(password: string): string {
-      return createHash("sha256").update(password).digest("hex");
-    }
+    return createHash("sha256").update(password).digest("hex");
+  }
 }

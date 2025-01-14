@@ -12,11 +12,14 @@ import { ChangeEmailModal } from "./_components";
 import { UserStatus } from "@/types";
 import { useToast } from "@/hooks";
 
-import { ShieldPlus, ShieldMinus } from "lucide-react";
+import { ShieldPlus, ShieldMinus, Copy } from "lucide-react";
+
+const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN;
 
 export default function Settings() {
   const { toast } = useToast();
   const { user, userLoading } = useContext(AuthContext);
+
   const [userFormData, setUserFormData] = useState({
     firstName: "",
     lastName: "",
@@ -93,6 +96,8 @@ export default function Settings() {
       toast({
         description: "Some fields are empty",
       });
+
+      return;
     }
 
     if (user) {
@@ -127,9 +132,22 @@ export default function Settings() {
   }, [user]);
 
   useEffect(() => {
-    if (isUpdateUserSuccess)
+    if (isUpdateUserSuccess) {
       setUserPasswordFormData({ newPassword: "", confirmPassword: "" });
+    }
   }, [isUpdateUserSuccess]);
+
+  const onCopyReferralCode = () => {
+    if (user) {
+      const link = `${frontendUrl}/auth/sign-up?userReferralCode=${user.referralCode}`;
+
+      navigator.clipboard.writeText(link);
+    }
+
+    toast({
+      description: "Copied",
+    });
+  };
 
   return (
     <div className="pb-[50px] flex justify-center">
@@ -138,7 +156,7 @@ export default function Settings() {
       <div>
         <h2 className="text-[24px]">Settings</h2>
 
-        <div>
+        <div className="flex justify-between items-center">
           <p>
             <span>Account status: </span>
             {!userLoading && (
@@ -149,6 +167,13 @@ export default function Settings() {
               </span>
             )}
           </p>
+
+          <div>
+            <Button variant="outline" onClick={onCopyReferralCode}>
+              <Copy />
+              Copy your referral code
+            </Button>
+          </div>
         </div>
 
         <div className="flex gap-3 items-start">

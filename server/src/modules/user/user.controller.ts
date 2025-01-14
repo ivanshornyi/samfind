@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Patch, Body, Query } from "@nestjs/common";
+import { 
+  Controller, 
+  Get, 
+  Param, 
+  Patch, 
+  Body,
+  Query, 
+  ParseArrayPipe, 
+} from "@nestjs/common";
 
 import { User } from "@prisma/client";
 
@@ -56,5 +64,20 @@ export class UserController {
   @Patch("/:id")
   async updateUser(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.updateUser(id, updateUserDto);
+  }
+
+  @ApiOperation({ summary: "Find users by ids" })
+  @Get("/find/find-by-ids")
+  async findUsersByIds(@Query("userId", new ParseArrayPipe) ids: string[]) {
+    return this.userService.findUsersByIds(ids);
+  }
+
+  @ApiOperation({ summary: "Update user discount by referral code" })
+  @Patch("/referral/:referralCode")
+  async updateUserByReferralCode(
+    @Param("referralCode") referralCode: number,
+    @Body() dto: { newUserId: string },
+  ) {
+    return this.userService.findAndUpdateUserByReferralCode(referralCode, dto.newUserId);
   }
 }
