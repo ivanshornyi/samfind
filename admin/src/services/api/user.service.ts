@@ -28,6 +28,16 @@ const findUserById = async (id: string) => {
   }
 };
 
+const findUserReferrals = async (id: string) => {
+  try {
+    const response = await apiClient.get(`/user-referral/${id}`);
+
+    return response.data as User[];
+  } catch (err) {
+    handleApiError(err);
+  }
+};
+
 const updateUser = async (id: string, data: Partial<User>) => {
   try {
     const response = await apiClient.patch(`/user/${id}`, data);
@@ -41,5 +51,6 @@ const updateUser = async (id: string, data: Partial<User>) => {
 export const userApiService = {
   findUsers,
   findUserById,
+  findUserReferrals,
   updateUser,
 };

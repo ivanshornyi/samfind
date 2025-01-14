@@ -21,4 +21,8 @@ export interface User {
   authType: UserAuthType;
   role: UserRole;
   status: UserStatus;
+  emailResetCode: string | null;
+  emailResetCodeExpiresAt: Date | null;
+  discount: number;
+  referralCode: string;
 }

@@ -15,8 +15,6 @@ export const UserManagementPage = () => {
 
   if (isError) return <div>Error</div>;
 
-  if (!data) return null;
-
   const handleNextPage = () => setPage((prev) => prev + 1);
 
   const handlePrevPage = () => setPage((prev) => prev - 1);
@@ -24,7 +22,7 @@ export const UserManagementPage = () => {
   return (
     <div className="flex flex-col gap-4 py-6 px-3 rounded-lg">
       <Input placeholder="Search users..." className="max-w-96" />
-      <DataTable columns={userColumns} data={data} />
+      <DataTable columns={userColumns} data={data || []} />
       <div className="flex items-center justify-end space-x-2 py-4">
         {page > 0 ? <Button
           variant="outline"

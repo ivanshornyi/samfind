@@ -11,6 +11,14 @@ export const useFindUsers = (name: string, offset: number, limit: number) => {
   });
 };
 
+export const useFindUserReferrals = (id: string) => {
+  return useQuery<User[] | undefined>({
+    queryFn: () => userApiService.findUserReferrals(id),
+    queryKey: ["user-referrals", id],
+    enabled: !!id,
+  });
+};
+
 export const useUpdateUser = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
