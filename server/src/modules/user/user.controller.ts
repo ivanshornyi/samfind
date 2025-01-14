@@ -76,8 +76,8 @@ export class UserController {
   @Patch("/referral/:referralCode")
   async updateUserByReferralCode(
     @Param("referralCode") referralCode: number,
-    @Body() newUserId: string,
+    @Body() dto: { newUserId: string },
   ) {
-    return this.userService.findAndUpdateUserByReferralCode(referralCode, newUserId);
+    return this.userService.findAndUpdateUserByReferralCode(referralCode, dto.newUserId);
   }
 }

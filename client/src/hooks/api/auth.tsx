@@ -6,11 +6,13 @@ import { AuthContext } from "@/context";
 
 import { useMutation } from "@tanstack/react-query";
 
-import { AuthApiService, UserAuthType } from "@/services";
+import { AuthApiService, UserAuthType, UserApiService } from "@/services";
 
 import { useToast } from "@/hooks";
 
 import { handleToastError } from "@/errors";
+
+import { jwtDecode } from "jwt-decode";
 
 export const useSignIn = () => {
   const router = useRouter();
@@ -67,6 +69,13 @@ export const useSignUp = () => {
         title: "Success",
         description: "Successfully logged in",
       });
+
+      const referralCode = localStorage.getItem("userReferralCode");
+      const userId = jwtDecode(data.accessToken).sub;
+
+      if (referralCode && userId) {
+        UserApiService.updateUserReferral(Number(referralCode), userId);
+      }
 
       login(data.accessToken, data.refreshToken);
       router.push("/");

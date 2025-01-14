@@ -43,6 +43,10 @@ export class UserService {
       where: { referralCode },
     });
 
+    if (!user) {
+      new NotFoundException("User not found");
+    }
+
     if (user.discount < 50) {
       await this.prisma.user.update({
         where: { id: user.id },
