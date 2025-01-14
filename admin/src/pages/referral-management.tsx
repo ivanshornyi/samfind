@@ -1,4 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { AuthContext } from "@/context";
 import { useContext, useState } from "react";
 import { Copy } from "lucide-react";
@@ -7,6 +13,16 @@ import { useFindUserReferrals, useToast } from "@/hooks";
 import { handleApiError } from "@/errors";
 import { ColumnDef } from "@tanstack/react-table";
 import { User } from "@shared/types";
+import {
+  FacebookIcon,
+  FacebookShareButton,
+  LinkedinIcon,
+  LinkedinShareButton,
+  TelegramIcon,
+  TelegramShareButton,
+  TwitterIcon,
+  TwitterShareButton,
+} from "react-share";
 
 const columns: ColumnDef<User>[] = [
   {
@@ -56,13 +72,28 @@ export const ReferralManagementPage = () => {
             {user?.firstName} {user?.lastName}
           </CardTitle>
         </CardHeader>
-        <CardContent >
-          <div className="flex justify-center items-center gap-4">
-            <p className="text-blue-700">{code}</p>
-            <Button onClick={shareLink} disabled={copied}>
-              Copy
+        <CardContent className="flex flex-col gap-4 items-center">
+          <div className="flex items-center gap-4">
+            <p className="font-semibold">
+              Referral code: <span className="text-blue-700">{code}</span>
+            </p>
+            <Button size="sm" onClick={shareLink} disabled={copied}>
               <Copy />
             </Button>
+          </div>
+          <div className="flex items-center gap-2">
+            <FacebookShareButton url={link}>
+              <FacebookIcon size={34} round />
+            </FacebookShareButton>
+            <TwitterShareButton url={link}>
+              <TwitterIcon size={34} round />
+            </TwitterShareButton>
+            <TelegramShareButton url={link}>
+              <TelegramIcon size={34} round />
+            </TelegramShareButton>
+            <LinkedinShareButton url={link}>
+              <LinkedinIcon size={34} round />
+            </LinkedinShareButton>
           </div>
           <CardDescription>Discount: {user?.discount}</CardDescription>
         </CardContent>
