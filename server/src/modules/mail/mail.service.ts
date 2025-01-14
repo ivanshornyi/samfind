@@ -36,4 +36,19 @@ export class MailService {
       throw error;
     }
   };
+
+  async sendResetCodeForEmailUpdate(to: string, resetCode: string) {
+    try {
+      const mailOptions = {
+        from: configService.get("MAIL_USER"),
+        to,
+        subject: "Verification code for email update from Samfind",
+        text: `Verification code: ${resetCode}`,
+      };
+
+      await this.transporter.sendMail(mailOptions);
+    } catch (error) {
+      throw error;
+    }
+  }
 };

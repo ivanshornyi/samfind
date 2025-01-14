@@ -42,7 +42,7 @@ export const SendVerificationCodeModal = () => {
     if (isSendingSuccess) {
       router.push(`/auth/reset-password?recoveryEmail=${email}`);
     }
-  }, [isSendingSuccess]);
+  }, [isSendingSuccess, email, router]);
 
   return (
     <AlertDialog>

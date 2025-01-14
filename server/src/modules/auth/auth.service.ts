@@ -11,9 +11,10 @@ import { TokenService } from "./token.service";
 import { MailService } from "../mail/mail.service";
 
 import { SignInDto, SignUpDto } from "./dto/auth-user-dto";
-import { UserAuthType } from "../user/types/user";
+import { SendCodeForEmailDto } from "./dto/send-code-for-email.dto";
+import { UserAuthType } from "@prisma/client";
 
-import * as bcrypt from "bcrypt";
+import { createHash } from "crypto";
 
 @Injectable()
 export class AuthService {
@@ -32,7 +33,7 @@ export class AuthService {
       throw new ConflictException("User with this email already exists");
     }
 
-    const hashedPassword = await this.hashPassword(password);
+    const hashedPassword = this.hashField(password);
 
     const newUser = await this.userService.create({
       firstName,
@@ -66,7 +67,7 @@ export class AuthService {
       throw new NotFoundException("User not found");
     }
   
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = this.isPasswordValid(password, user.password);
   
     if (!isPasswordValid) {
       throw new UnauthorizedException("Invalid password");
@@ -88,7 +89,7 @@ export class AuthService {
   }
 
   public async sendResetPasswordVerificationCode(email: string) {
-    const user = await this.userService.findUserByEmail(email, UserAuthType.Email);
+    const user = await this.userService.findUserByEmail(email, UserAuthType.email);
 
     if (!user) {
       throw new NotFoundException(
@@ -106,10 +107,33 @@ export class AuthService {
     return { message: "Reset code sent successfully" };
   }
 
+  public async sendResetEmailVerificationCode(sendCodeForEmailDto: SendCodeForEmailDto) {
+    const user = await this.userService.findOne(sendCodeForEmailDto.userId);
+
+    const isUserWithSameEmailExist = await this.userService.findUserByEmail(sendCodeForEmailDto.email, UserAuthType.email);
+
+    if (isUserWithSameEmailExist) {
+      throw new UnauthorizedException("User with this email already exist");
+    }
+
+    const isPasswordValid = this.isPasswordValid(sendCodeForEmailDto.password, user.password);
+  
+    if (!isPasswordValid) {
+      throw new UnauthorizedException("Invalid password");
+    }
+
+    const emailResetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const emailResetCodeExpiresAt = new Date(Date.now() + 15 * 60 * 1000).getTime();
+
+    await this.userService.updateUser(user.id, { emailResetCode, emailResetCodeExpiresAt });
+
+    await this.mailService.sendResetCodeForEmailUpdate(user.email, emailResetCode);
+  }
+
   public async resetPassword(resetPasswordDto: ResetPasswordDto) {
     const user = await this.userService.findUserByEmail(
       resetPasswordDto.email,
-      UserAuthType.Email,
+      UserAuthType.email,
     );
   
     if (!user) {
@@ -128,7 +152,7 @@ export class AuthService {
       resetPasswordDto.verificationCode === user?.resetCode &&
       user.resetCodeExpiresAt > new Date().getTime()
     ) {
-      const hashedNewPassword = await bcrypt.hash(resetPasswordDto.newPassword, 10);  
+      const hashedNewPassword = this.hashField(resetPasswordDto.newPassword);
 
       await this.userService.updateUser(
         user.id, { password: hashedNewPassword }, true
@@ -140,13 +164,38 @@ export class AuthService {
     throw new UnauthorizedException("Password reset failed");
   }
 
-  public async hashPassword(password: string): Promise<string> {
-    const saltRounds = 10;
-    
-    return bcrypt.hash(password, saltRounds);
+  public async resetEmail(emailUpdateDto: { userId: string, verificationCode: string, newEmail: string }) {
+    const user = await this.userService.findOne(emailUpdateDto.userId);
+  
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+  
+    if (emailUpdateDto.verificationCode !== user?.emailResetCode) {
+      throw new NotFoundException("Verification code is not correct");
+    }
+  
+    if (user.emailResetCodeExpiresAt < new Date().getTime()) {
+      throw new NotFoundException("Verification code has expired");
+    }
+
+    if (
+      emailUpdateDto.verificationCode === user?.emailResetCode &&
+      user.emailResetCodeExpiresAt > new Date().getTime()
+    ) {
+      await this.userService.updateUser(
+        user.id, { email: emailUpdateDto.newEmail }
+      );
+    }
   }
 
-  public async isPasswordValid(password: string, hashedPassword: string): Promise<boolean> {
-    return bcrypt.compare(password, hashedPassword);
+  private hashField(password: string): string {
+    return createHash("sha256").update(password).digest("hex");
+  }
+
+  private isPasswordValid(password: string, hashedPassword: string): boolean {
+    const hash = this.hashField(password);
+
+    return hash === hashedPassword;
   }
 }

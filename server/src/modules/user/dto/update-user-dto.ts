@@ -35,6 +35,14 @@ export class UpdateUserDto {
   @IsNumber()
   resetCodeExpiresAt?: number;
 
+  @IsOptional()
+  @IsString()
+  emailResetCode?: string;
+
+  @IsOptional()
+  @IsNumber()
+  emailResetCodeExpiresAt?: number;
+
   // @IsString()
   // @IsOptional()
   // logo?: string;

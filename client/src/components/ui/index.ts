@@ -4,3 +4,6 @@ export * from "./toast";
 export * from "./toaster";
 export * from "./alert-dialog";
 export * from "./card";
+export * from "./table";
+export * from "./checkbox";
+export * from "./dropdown-menu";

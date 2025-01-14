@@ -129,3 +129,62 @@ export const useResetPassword = () => {
 
   return rest;
 };
+
+export const useSendVerificationCodeToUpdateEmail = () => {
+  const { toast } = useToast();
+
+  const { ...rest } = useMutation({
+    mutationFn: (data: { userId: string; email: string; password: string }) => {
+      return AuthApiService.sendVerificationCodeToUpdateEmail(
+        data.userId,
+        data.email,
+        data.password
+      );
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Verification code has been sent to your email",
+      });
+    },
+    onError: (error) => {
+      handleToastError(error, toast);
+    },
+  });
+
+  return rest;
+};
+
+export const useUpdateUserEmail = () => {
+  const router = useRouter();
+  const { toast } = useToast();
+  const { fetchUser } = useContext(AuthContext);
+
+  const { ...rest } = useMutation({
+    mutationFn: (data: {
+      userId: string;
+      verificationCode: string;
+      newEmail: string;
+    }) => {
+      return AuthApiService.updateEmail(
+        data.userId,
+        data.verificationCode,
+        data.newEmail
+      );
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Successfully updated",
+      });
+
+      router.push("/account/settings");
+      fetchUser();
+    },
+    onError: (error) => {
+      handleToastError(error, toast);
+    },
+  });
+
+  return rest;
+};

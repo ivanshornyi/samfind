@@ -8,7 +8,7 @@ export const FullScreenLoader = () => {
         flex items-center justify-center z-40
       "
     >
-      <LoaderCircle size={40} className="text-gray-700 animate-spin" />
+      <LoaderCircle size={40} className="text-gray-800 animate-spin" />
     </div>
   );
 };
