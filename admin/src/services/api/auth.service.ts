@@ -1,8 +1,19 @@
-import { apiClient } from "../../vars/axios-instance";
+import { UserAuthType } from "@shared/types";
+import { apiClient } from "@/vars";
 
-const signIn = async () => {
+const signIn = async (
+  email: string,
+  password: string,
+  authType: UserAuthType
+) => {
   try {
-    await apiClient.post("/auth/sign-in");
+    const response = await apiClient.post("/auth/sign-in", {
+      email,
+      password,
+      authType,
+    });
+
+    return response.data;
   } catch (error) {
     console.log(error);
   }
