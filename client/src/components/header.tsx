@@ -28,7 +28,7 @@ export const Header = () => {
     <header
       className="
         border-b-[1px] w-full fixed top-0 left-0 z-10 bg-card
-        px-5 md:px-0
+        px-5
       "
     >
       <div

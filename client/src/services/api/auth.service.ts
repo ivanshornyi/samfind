@@ -18,7 +18,7 @@ const signIn = async (
     });
 
     return response.data;
-  } catch (error: any) {
+  } catch (error) {
     handleApiError(error);
   }
 };
@@ -40,7 +40,7 @@ const signUp = async (
     });
 
     return response.data;
-  } catch (error: any) {
+  } catch (error) {
     handleApiError(error);
   }
 };
@@ -50,7 +50,7 @@ const sendVerificationCode = async (email: string) => {
     await apiClient.post("/auth/send-verification-code", {
       email,
     });
-  } catch (error: any) {
+  } catch (error) {
     handleApiError(error);
   }
 };
@@ -66,7 +66,39 @@ const resetPassword = async (
       verificationCode,
       newPassword,
     });
-  } catch (error: any) {
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
+const sendVerificationCodeToUpdateEmail = async (
+  userId: string,
+  email: string,
+  password: string
+) => {
+  try {
+    await apiClient.post("/auth/email/send-verification-code", {
+      userId,
+      email,
+      password,
+    });
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
+const updateEmail = async (
+  userId: string,
+  verificationCode: string,
+  newEmail: string
+) => {
+  try {
+    await apiClient.post("/auth/email/update", {
+      userId,
+      verificationCode,
+      newEmail,
+    });
+  } catch (error) {
     handleApiError(error);
   }
 };
@@ -76,4 +108,6 @@ export const AuthApiService = {
   signUp,
   sendVerificationCode,
   resetPassword,
+  sendVerificationCodeToUpdateEmail,
+  updateEmail,
 };

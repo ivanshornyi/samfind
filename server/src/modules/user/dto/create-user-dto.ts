@@ -1,5 +1,6 @@
 import { IsString } from "class-validator";
-import { UserAuthType, UserStatus } from "../types/user";
+
+import { UserAuthType } from "@prisma/client"; 
 
 export class CreateUserDto {
   @IsString()

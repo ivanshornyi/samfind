@@ -72,13 +72,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
   const handleAuthFormSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
-    const emptyFieldsMessage = toast({
-      description: "Some fields are empty",
-    });
-
     if (authPageType === "signIn") {
       if (formData.email === "" || formData.password === "") {
-        emptyFieldsMessage;
+        toast({
+          description: "Some fields are empty",
+        });
 
         return;
       }
@@ -96,7 +94,9 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
         formData.email === "" ||
         formData.password === ""
       ) {
-        emptyFieldsMessage;
+        toast({
+          description: "Some fields are empty",
+        });
 
         return;
       }
@@ -115,7 +115,9 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
         resetPasswordFormData.newPassword === "" ||
         resetPasswordFormData.verificationCode === ""
       ) {
-        emptyFieldsMessage;
+        toast({
+          description: "Some fields are empty",
+        });
 
         return;
       }

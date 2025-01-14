@@ -71,7 +71,7 @@ export default function AccountLayout({
           </div>
         </div>
 
-        <div>{children}</div>
+        <div className="w-full">{children}</div>
       </div>
     </div>
   );

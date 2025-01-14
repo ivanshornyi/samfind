@@ -1,0 +1,70 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  active
+  inactive
+}
+
+enum UserAuthType {
+  email
+  google
+}
+
+enum UserRole {
+  admin
+  customer
+}
+
+model User {
+  id                      String       @id @default(uuid())
+  email                   String       @unique()
+  password                String       @db.VarChar
+  firstName               String       @db.VarChar
+  lastName                String       @db.VarChar
+  authType                UserAuthType
+  refreshToken            String?      @db.VarChar
+  status                  UserStatus
+  resetCode               String?      @db.VarChar
+  role                    UserRole
+  resetCodeExpiresAt      BigInt?
+  emailResetCode          String?      @db.VarChar
+  emailResetCodeExpiresAt BigInt?
+  discount                Float        @default(0)
+  referralCode            String       @unique @default(uuid())
+
+  @@map("user")
+}
+
+enum UserLicenseStatus {
+  active
+  inactive
+}
+
+model UserLicense {
+  id     String            @id @default(uuid())
+  userId String            @db.VarChar
+  name   String            @db.VarChar
+  key    String            @db.VarChar
+  status UserLicenseStatus @default(active)
+
+  @@map("user_license")
+}
+
+model UserReferral {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  invitedUserIds String[]
+  referralCode   String   @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("user_referral")
+}

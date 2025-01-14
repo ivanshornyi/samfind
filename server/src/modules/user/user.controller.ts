@@ -1,7 +1,8 @@
 import { Controller, Get, Param, Patch, Body, Query } from "@nestjs/common";
 
+import { User } from "@prisma/client";
+
 import { UserService } from "./user.service";
-import { User } from "./entities/user.entity";
 
 import { ApiOperation, ApiTags, ApiQuery } from "@nestjs/swagger";
 
@@ -55,5 +56,19 @@ export class UserController {
   @Patch("/:id")
   async updateUser(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.updateUser(id, updateUserDto);
+  }
+
+  @Get("/find-users/:userIds")
+  async findUsersByIds() {
+    
+  }
+
+  @ApiOperation({ summary: "Update user discount by referral code" })
+  @Patch("/referral/:referralCode")
+  async updateUserByReferralCode(
+    @Param("referralCode") referralCode: string,
+    @Body() newUserId: string,
+  ) {
+    return this.userService.findAndUpdateUserByReferralCode(referralCode, newUserId);
   }
 }
