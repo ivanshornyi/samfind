@@ -19,6 +19,7 @@ const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN;
 export default function Settings() {
   const { toast } = useToast();
   const { user, userLoading } = useContext(AuthContext);
+
   const [userFormData, setUserFormData] = useState({
     firstName: "",
     lastName: "",
@@ -138,7 +139,7 @@ export default function Settings() {
 
   const onCopyReferralCode = () => {
     if (user) {
-      const link = `${frontendUrl}/auth/register?userReferralCode=${user.referralCode}`;  
+      const link = `${frontendUrl}/auth/sign-up?userReferralCode=${user.referralCode}`;
 
       navigator.clipboard.writeText(link);
     }
@@ -168,11 +169,8 @@ export default function Settings() {
           </p>
 
           <div>
-            <Button 
-              variant="outline"
-              onClick={onCopyReferralCode}
-            >
-              <Copy />  
+            <Button variant="outline" onClick={onCopyReferralCode}>
+              <Copy />
               Copy your referral code
             </Button>
           </div>

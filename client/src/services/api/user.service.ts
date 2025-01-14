@@ -32,7 +32,18 @@ const updateUser = async (id: string, data: UpdateUserData) => {
   }
 };
 
+const updateUserReferral = async (referralCode: number, newUserId: string) => {
+  try {
+    await apiClient.patch(`/user/referral/${referralCode}`, {
+      newUserId,
+    });
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 export const UserApiService = {
   getUser,
   updateUser,
+  updateUserReferral,
 };

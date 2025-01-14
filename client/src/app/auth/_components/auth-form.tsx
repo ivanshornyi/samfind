@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -140,6 +140,15 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
 
   const disabledFormItems =
     isSignInPending || isSignUpPending || isResetPasswordPending;
+
+  useEffect(() => {
+    const referralCode = searchParams.get("userReferralCode");
+    const token = localStorage.getItem("accessToken");
+
+    if (referralCode && !token) {
+      localStorage.setItem("userReferralCode", referralCode);
+    }
+  }, [searchParams]);
 
   return (
     <>
