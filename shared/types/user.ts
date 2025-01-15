@@ -13,6 +13,13 @@ export enum UserAuthType {
   Google = "google",
 }
 
+export interface UserReferralInfo {
+  id: string
+  userId: string
+  invitedUserIds: string[]
+  referralCode: number
+}
+
 export interface User {
   id: string;
   firstName: string;

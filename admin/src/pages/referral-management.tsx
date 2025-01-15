@@ -6,10 +6,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { AuthContext } from "@/context";
-import { useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { Copy } from "lucide-react";
 import { Button, DataTable } from "@/components";
-import { useFindUserReferrals, useToast } from "@/hooks";
+import { useToast, useUserReferralInfo } from "@/hooks";
 import { handleApiError } from "@/errors";
 import { ColumnDef } from "@tanstack/react-table";
 import { User } from "@shared/types";
@@ -23,6 +23,7 @@ import {
   TwitterIcon,
   TwitterShareButton,
 } from "react-share";
+import { userApiService } from "@/services";
 
 const columns: ColumnDef<User>[] = [
   {
@@ -50,7 +51,20 @@ export const ReferralManagementPage = () => {
   const link = import.meta.env.VITE_BASE_REFERRAL_URL + code;
   const [copied, setCopied] = useState<boolean>(false);
 
-  const { data: users } = useFindUserReferrals(user?.id || "");
+  const { data: userReferralInfo } = useUserReferralInfo(user?.id || "");
+  const [users, setUsers] = useState<User[]>([]);
+
+  const loadUsers = useCallback(async () => {
+    if (!userReferralInfo?.invitedUserIds) return;
+    const res = await userApiService.findUsersByIds(
+      userReferralInfo.invitedUserIds
+    );
+    setUsers(res || []);
+  }, [userReferralInfo]);
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
 
   const shareLink = async () => {
     try {
@@ -98,7 +112,7 @@ export const ReferralManagementPage = () => {
           <CardDescription>Discount: {user?.discount}</CardDescription>
         </CardContent>
       </Card>
-      <DataTable columns={columns} data={users || []} />
+      <DataTable columns={columns} data={users} />
     </div>
   );
 };
