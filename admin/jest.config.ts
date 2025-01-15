@@ -1,4 +1,5 @@
 export default {
+  modulePaths: ["<rootDir>"],
   preset: "ts-jest",
   testEnvironment: "jest-environment-jsdom",
   transform: {

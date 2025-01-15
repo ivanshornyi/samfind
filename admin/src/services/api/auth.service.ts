@@ -1,5 +1,5 @@
-import { UserAuthType } from "@shared/types";
-import { apiClient } from "@/vars";
+import { UserAuthType } from "../../../../shared/types";
+import { apiClient } from "../../vars";
 
 const signIn = async (
   email: string,
