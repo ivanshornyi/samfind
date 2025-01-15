@@ -24,5 +24,5 @@ export interface User {
   emailResetCode: string | null;
   emailResetCodeExpiresAt: Date | null;
   discount: number;
-  referralCode: string;
+  referralCode: number;
 }
