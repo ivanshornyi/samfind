@@ -91,8 +91,8 @@ export const UpdateUserModal: React.FC<UpdateUserModalProps> = ({
               </label>
               <Select
                 onValueChange={handleSelectChange.bind(null, "status")}
-                defaultValue={Object.keys(UserStatus).find(
-                  (key) => key === user.status
+                defaultValue={Object.values(UserStatus).find(
+                  (value) => value === user.status
                 )}
               >
                 <SelectTrigger className="py-6 px-3 rounded-lg" id="status">
@@ -102,7 +102,7 @@ export const UpdateUserModal: React.FC<UpdateUserModalProps> = ({
                   {Object.keys(UserStatus).map((key: string) => (
                     <SelectItem
                       key={UserStatus[key as keyof typeof UserStatus]}
-                      value={key}
+                      value={UserStatus[key as keyof typeof UserStatus]}
                     >
                       {key}
                     </SelectItem>
