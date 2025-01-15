@@ -1,5 +1,5 @@
-import { handleApiError } from "@/errors";
-import { apiClient } from "@/vars";
+import { handleApiError } from "../../errors";
+import { apiClient } from "../../vars";
 import { User } from "@shared/types";
 
 const findUsers = async (
