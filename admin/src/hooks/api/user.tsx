@@ -4,10 +4,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { handleToastError } from "@/errors";
 import { useToast } from "@/hooks";
 
-export const useFindUsers = (name: string, offset: number, limit: number) => {
+export const useFindUsers = (name: string | undefined, offset: number, limit: number) => {
   return useQuery<User[] | undefined>({
-    queryFn: () => userApiService.findUsers(name, offset, limit),
-    queryKey: ["users", offset],
+    queryFn: () => userApiService.findUsers(name || "", offset, limit),
+    queryKey: ["users", name, offset],
   });
 };
 
