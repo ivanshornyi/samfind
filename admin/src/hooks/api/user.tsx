@@ -1,4 +1,4 @@
-import { User } from "../../shared/types";
+import { User, UserReferralInfo } from "@shared/types";
 import { userApiService } from "@/services";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { handleToastError } from "@/errors";
@@ -8,6 +8,14 @@ export const useFindUsers = (name: string, offset: number, limit: number) => {
   return useQuery<User[] | undefined>({
     queryFn: () => userApiService.findUsers(name, offset, limit),
     queryKey: ["users", offset],
+  });
+};
+
+export const useUserReferralInfo = (id: string) => {
+  return useQuery<UserReferralInfo | undefined>({
+    queryFn: () => userApiService.getUserReferralInfo(id),
+    queryKey: ["user-referrals", id],
+    enabled: !!id,
   });
 };
 
