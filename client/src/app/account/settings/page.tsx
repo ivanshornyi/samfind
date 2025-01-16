@@ -291,6 +291,7 @@ export default function Settings() {
             variant="destructive"
             className={`${user?.status === UserStatus.Inactive && "bg-green-600 hover:bg-green-500"} mt-4`}
             // onClick={handleDeactivateAccount}
+            disabled={true}
           >
             {user?.status === UserStatus.Active ? (
               <>

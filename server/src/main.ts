@@ -13,7 +13,7 @@ async function bootstrap() {
 
   const PORT = configService.get("SERVER_PORT") || 4000;
 
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { rawBody: true });
 
   app.enableCors({
     origin: [

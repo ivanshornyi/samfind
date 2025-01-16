@@ -14,6 +14,7 @@ export class UserLicenseController {
   @ApiOperation({ summary: "Add license to user" })
   @Post("/")
   async addLicense(@Body() addUserLicenseDto: AddUserLicenseDto) {
+    console.log(addUserLicenseDto);
     return this.licenseService.addLicense(addUserLicenseDto);
   }
 

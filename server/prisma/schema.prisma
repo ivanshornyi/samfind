@@ -24,22 +24,24 @@ enum UserRole {
 }
 
 model User {
-  id                      String       @id @default(uuid())
-  email                   String       @unique()
-  password                String       @db.VarChar
-  firstName               String       @db.VarChar
-  lastName                String       @db.VarChar
+  id                      String         @id @default(uuid())
+  email                   String         @unique()
+  password                String         @db.VarChar
+  firstName               String         @db.VarChar
+  lastName                String         @db.VarChar
   authType                UserAuthType
-  refreshToken            String?      @db.VarChar
+  refreshToken            String?        @db.VarChar
   status                  UserStatus
-  resetCode               String?      @db.VarChar
+  resetCode               String?        @db.VarChar
   role                    UserRole
   resetCodeExpiresAt      BigInt?
-  emailResetCode          String?      @db.VarChar
+  emailResetCode          String?        @db.VarChar
   emailResetCodeExpiresAt BigInt?
-  discount                Float        @default(0)
-  discountPercent         Float        @default(0)
-  referralCode            Float        @unique
+  discount                Float          @default(0)
+  discountPercent         Float          @default(0)
+  referralCode            Float          @unique
+  UserReferral            UserReferral[]
+  UserLicense             UserLicense[]
 
   @@map("user")
 }
@@ -50,22 +52,25 @@ enum UserLicenseStatus {
 }
 
 model UserLicense {
-  id     String            @id @default(uuid())
-  userId String            @db.VarChar
-  name   String            @db.VarChar
-  key    String            @db.VarChar
-  status UserLicenseStatus @default(active)
+  id        String            @id @default(uuid())
+  user      User              @relation(fields: [userId], references: [id])
+  name      String            @db.VarChar
+  key       String            @db.VarChar
+  status    UserLicenseStatus @default(active)
+  userId    String
+  licenseId String            @unique
 
   @@map("user_license")
 }
 
 model UserReferral {
   id             String   @id @default(uuid())
-  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id])
   invitedUserIds String[] @default([])
-  referralCode   Float    @unique 
+  referralCode   Float    @unique
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  userId         String   @unique
 
   @@map("user_referral")
 }
