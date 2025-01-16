@@ -9,4 +9,7 @@ export class AddUserLicenseDto {
 
   @IsString()
   key: string;
+
+  @IsString()
+  licenseId: string;
 }

@@ -6,13 +6,11 @@ import { AuthContext } from "@/context";
 
 import { useMutation } from "@tanstack/react-query";
 
-import { AuthApiService, UserAuthType, UserApiService } from "@/services";
+import { AuthApiService, UserAuthType } from "@/services";
 
 import { useToast } from "@/hooks";
 
 import { handleToastError } from "@/errors";
-
-import { jwtDecode } from "jwt-decode";
 
 export const useSignIn = () => {
   const router = useRouter();
@@ -55,7 +53,7 @@ export const useSignUp = () => {
   const { login } = useContext(AuthContext);
   const { toast } = useToast();
 
-  const { ...rest } = useMutation({
+  const { ...mutationProps } = useMutation({
     mutationFn: (data: SignUpData) =>
       AuthApiService.signUp(
         data.firstName,
@@ -70,13 +68,6 @@ export const useSignUp = () => {
         description: "Successfully logged in",
       });
 
-      const referralCode = localStorage.getItem("userReferralCode");
-      const userId = jwtDecode(data.accessToken).sub;
-
-      if (referralCode && userId) {
-        UserApiService.updateUserReferral(Number(referralCode), userId);
-      }
-
       login(data.accessToken, data.refreshToken);
       router.push("/");
     },
@@ -85,13 +76,13 @@ export const useSignUp = () => {
     },
   });
 
-  return rest;
+  return mutationProps;
 };
 
 export const useSendVerificationCode = () => {
   const { toast } = useToast();
 
-  const { ...rest } = useMutation({
+  const { ...mutationProps } = useMutation({
     mutationFn: (email: string) => AuthApiService.sendVerificationCode(email),
     onSuccess: () => {
       toast({
@@ -103,7 +94,7 @@ export const useSendVerificationCode = () => {
     },
   });
 
-  return rest;
+  return mutationProps;
 };
 
 type ResetPasswordData = {
@@ -116,7 +107,7 @@ export const useResetPassword = () => {
   const router = useRouter();
   const { toast } = useToast();
 
-  const { ...rest } = useMutation({
+  const { ...mutationProps } = useMutation({
     mutationFn: (data: ResetPasswordData) =>
       AuthApiService.resetPassword(
         data.email,
@@ -136,13 +127,13 @@ export const useResetPassword = () => {
     },
   });
 
-  return rest;
+  return mutationProps;
 };
 
 export const useSendVerificationCodeToUpdateEmail = () => {
   const { toast } = useToast();
 
-  const { ...rest } = useMutation({
+  const { ...mutationProps } = useMutation({
     mutationFn: (data: { userId: string; email: string; password: string }) => {
       return AuthApiService.sendVerificationCodeToUpdateEmail(
         data.userId,
@@ -161,7 +152,7 @@ export const useSendVerificationCodeToUpdateEmail = () => {
     },
   });
 
-  return rest;
+  return mutationProps;
 };
 
 export const useUpdateUserEmail = () => {
@@ -169,7 +160,7 @@ export const useUpdateUserEmail = () => {
   const { toast } = useToast();
   const { fetchUser } = useContext(AuthContext);
 
-  const { ...rest } = useMutation({
+  const { ...mutationProps } = useMutation({
     mutationFn: (data: {
       userId: string;
       verificationCode: string;
@@ -195,5 +186,5 @@ export const useUpdateUserEmail = () => {
     },
   });
 
-  return rest;
+  return mutationProps;
 };
