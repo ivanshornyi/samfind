@@ -15,6 +15,7 @@ import { AuthModule } from "./modules/auth/auth.module";
 import { UserModule } from "./modules/user/user.module";
 import { UserLicenseModule } from "./modules/user-license/user-license.module";
 import { UserReferralModule } from "./modules/user-referral/user-referral.module";
+import { StripeModule } from "./modules/stripe/stripe.module";
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { UserReferralModule } from "./modules/user-referral/user-referral.module
     UserModule,
     UserLicenseModule,
     UserReferralModule,
+    StripeModule,
   ],
   controllers: [],
   providers: [],

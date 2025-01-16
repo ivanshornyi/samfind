@@ -35,23 +35,31 @@ export class UserService {
       where: { id },
     });
 
-    return user || null;
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    return user;
   }
 
-  async findAndUpdateUserByReferralCode(referralCode: number, newUserId: string) {
+  async findAndUpdateUserByReferralCode(
+    referralCode: number, 
+    newUserId: string,
+    // discount number => get 10% percent from user product that he bought  
+  ) {
     const user = await this.prisma.user.findUnique({
       where: { referralCode },
     });
 
     if (!user) {
-      new NotFoundException("User not found");
+      throw new NotFoundException("User not found");
     }
 
     if (user.discount < 50) {
       await this.prisma.user.update({
         where: { id: user.id },
         data: {
-          discount: user.discount + 10,
+          discount: user.discount + 10, // + discount number
         },
       });
     }
@@ -125,7 +133,7 @@ export class UserService {
       },
     });
 
-    return user || null;
+    return user;
   }
 
   async updateUser(id: string, updateUserDto: UpdateUserDto, resetPassword?: boolean): Promise<User> {

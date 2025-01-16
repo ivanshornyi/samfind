@@ -5,9 +5,9 @@
       "@/*": [
         "./src/*"
       ],
-      "@shared/*": [
-        "../shared/*"
-      ]
+      // "@shared/*": [
+      //   "../shared/*"
+      // ]
     },
     
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",

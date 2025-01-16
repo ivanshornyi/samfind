@@ -1,4 +1,4 @@
-import { UserAuthType } from "@shared/types";
+import { UserAuthType } from "../../shared/types";
 import { apiClient } from "@/vars";
 
 const signIn = async (
