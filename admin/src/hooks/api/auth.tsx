@@ -2,7 +2,7 @@ import { AuthContext } from "@/context";
 import { useContext } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
-import { UserAuthType } from "@shared/types";
+import { UserAuthType } from "@/types";
 import { useNavigate } from "react-router";
 import { AuthApiService } from "@/services";
 import { handleToastError } from "@/errors";

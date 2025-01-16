@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components";
-import { User, UserStatus } from "@shared/types";
+import { User, UserStatus } from "@/types";
 import { useState } from "react";
 import { useUpdateUser } from "@/hooks";
 

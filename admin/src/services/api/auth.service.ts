@@ -1,4 +1,4 @@
-import { UserAuthType } from "@shared/types";
+import { UserAuthType } from "@/types";
 import { apiClient } from "@/vars";
 import { handleApiError } from "@/errors";
 

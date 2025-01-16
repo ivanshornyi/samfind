@@ -1,6 +1,6 @@
 import { handleApiError } from "@/errors";
 import { apiClient } from "@/vars";
-import { User, UserReferralInfo } from "@shared/types";
+import { User, UserReferralInfo } from "@/types";
 
 const findUsers = async (
   name: string,

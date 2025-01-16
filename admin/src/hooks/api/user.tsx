@@ -1,4 +1,4 @@
-import { User, UserReferralInfo } from "@shared/types";
+import { User, UserReferralInfo } from "@/types";
 import { userApiService } from "@/services";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { handleToastError } from "@/errors";
