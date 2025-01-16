@@ -1,6 +1,6 @@
 import { Button, UpdateUserModal } from "@/components";
 import { useDisclosure } from "@/hooks";
-import { User } from "@shared/types";
+import { User } from "../shared/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import {

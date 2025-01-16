@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 
 import { PrismaService } from "../prisma/prisma.service";
 import { UserLicense, UserLicenseStatus } from "@prisma/client";
@@ -27,7 +27,11 @@ export class UserLicenseService {
       }
     });
 
-    return license || null;
+    if (!license) {
+      throw new NotFoundException("User not found");
+    }
+
+    return license;
   }
 
   async findByUserId(id: string): Promise<UserLicense[]> {
