@@ -1,7 +1,7 @@
 import { Button, Input } from "@/components";
 import { useSignIn, useToast } from "@/hooks";
 import { useState } from "react";
-import { UserAuthType } from "../shared/types";
+import { UserAuthType } from "@/types";
 
 export const LoginPage = () => {
   const { toast } = useToast();
