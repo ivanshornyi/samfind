@@ -8,7 +8,7 @@ import { Header, Toaster } from "@/components";
 
 import { TanstackProvider } from "@/providers";
 
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Manrope } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -20,6 +20,11 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+const manrope = Manrope({
+  variable: "--font-monrope",
+  subsets: ["latin"],
+})
 
 export const metadata: Metadata = {
   title: "Samfind",
@@ -35,7 +40,7 @@ export default function RootLayout({
     <TanstackProvider>
       <html lang="en">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-100`}
+          className={`${manrope.variable} dark antialiased bg-[#1F1E1F]`}
         >
           <Toaster />
           <Suspense>

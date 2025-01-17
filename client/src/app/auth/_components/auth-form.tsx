@@ -133,9 +133,15 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
   };
 
   const formTitle = {
-    signIn: "Sign In",
+    signIn: "Log in",
     signUp: "Sign Up",
     resetPassword: "Password recovery",
+  };
+
+  const formSubtitle = {
+    signIn: "Welcome back! Access your personalized experience",
+    signUp: "Join the innovation! You&apos;re almost there!",
+    resetPassword: "",
   };
 
   const disabledFormItems =
@@ -152,9 +158,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
 
   return (
     <>
-      <div className="w-96 border-[1px] rounded-2xl px-10 py-8 shadow-lg bg-card mt-20">
+      <div className="w-full max-w-[591px] rounded-[30px] border-[1px] border-solid border-[#A64CE8] p-8 shadow-lg mt-20">
         <form onSubmit={handleAuthFormSubmit}>
-          <h2 className="font-semibold text-xl">{formTitle[authPageType]}</h2>
+          <h2 className="font-semibold text-[32px] leading-[43.71px] mb-4">{formTitle[authPageType]}</h2>
+          <h3 className="font-normal text-xl">{formSubtitle[authPageType]}</h3>
 
           <div className="mt-3 flex flex-col gap-2">
             {authPageType === "signUp" && (
@@ -223,22 +230,16 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
             {authPageType !== "resetPassword" && (
               <>
                 <div>
-                  <label htmlFor="email" className="text-sm">
-                    Email
-                  </label>
                   <Input
                     id="email"
                     name="email"
-                    placeholder="Enter email"
+                    placeholder="Email address"
                     value={formData.email}
                     onChange={handleFormInputChange}
-                    className="py-6 px-3 rounded-lg"
+                    className="px-6 h-[44px] rounded-[30px]"
                   />
                 </div>
                 <div>
-                  <label htmlFor="password" className="text-sm">
-                    Password
-                  </label>
                   <div className="relative">
                     <Input
                       id="password"
@@ -247,7 +248,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                       type={passwordInputType}
                       value={formData.password}
                       onChange={handleFormInputChange}
-                      className="py-6 px-3 rounded-lg"
+                      className="px-6 h-[44px] rounded-[30px]"
                     />
 
                     <button
@@ -272,13 +273,14 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
           </div>
 
           <Button
-            className="mt-4 p-6 w-full rounded-lg"
+            className="mt-4 h-[44px] w-full rounded-[30px] bg-[#363637]"
             withLoader={true}
             loading={disabledFormItems}
             disabled={disabledFormItems}
+            variant="secondary"
           >
             {authPageType !== "resetPassword" ? (
-              <span>Submit</span>
+              <span>Continue</span>
             ) : (
               <span>Save</span>
             )}
