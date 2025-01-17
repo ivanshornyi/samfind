@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { jwtDecode } from "jwt-decode";
 import { userApiService } from "@/services";
-import { User } from "../shared/types";
+import { User } from "@/types";
 
 interface AuthContextType {
   isLoggedIn: boolean;

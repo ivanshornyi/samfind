@@ -12,7 +12,7 @@ import { Button, DataTable } from "@/components";
 import { useToast, useUserReferralInfo } from "@/hooks";
 import { handleApiError } from "@/errors";
 import { ColumnDef } from "@tanstack/react-table";
-import { User } from "@shared/types";
+import { User } from "@/types";
 import {
   FacebookIcon,
   FacebookShareButton,
