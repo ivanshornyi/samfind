@@ -1,5 +1,6 @@
-import { UserAuthType } from "../../shared/types";
+import { UserAuthType } from "@/types";
 import { apiClient } from "@/vars";
+import { handleApiError } from "@/errors";
 
 const signIn = async (
   email: string,
@@ -15,7 +16,7 @@ const signIn = async (
 
     return response.data;
   } catch (error) {
-    console.log(error);
+    handleApiError(error);
   }
 };
 
