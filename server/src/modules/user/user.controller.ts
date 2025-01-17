@@ -62,7 +62,10 @@ export class UserController {
 
   @ApiOperation({ summary: "Update user" })
   @Patch("/:id")
-  async updateUser(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
+  async updateUser(
+    @Param("id") id: string, 
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     return this.userService.updateUser(id, updateUserDto);
   }
 
@@ -76,8 +79,17 @@ export class UserController {
   @Patch("/referral/:referralCode")
   async updateUserByReferralCode(
     @Param("referralCode") referralCode: number,
-    @Body() dto: { newUserId: string },
+    @Body() dto: { newUserId: string; discount: number; },
   ) {
-    return this.userService.findAndUpdateUserByReferralCode(referralCode, dto.newUserId);
+    return this.userService.findAndUpdateUserByReferralCode(referralCode, dto.newUserId, dto.discount);
   }
+
+  @ApiOperation({ summary: "Get domain info" })
+  @Get("/check-user-domain/:domain")
+  async getDomainInfo(@Param() domain: string) {
+
+  }
+
+  // @ApiOperation({ summary: "" })
+  // async 
 }

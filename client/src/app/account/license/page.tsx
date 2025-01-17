@@ -41,16 +41,16 @@ import {
   LoaderCircle,
   MoreHorizontal,
 } from "lucide-react";
-import { UserLicense, UserLicenseStatus } from "@/types";
+import { License, LicenseStatus } from "@/types";
 
-const columns: ColumnDef<UserLicense>[] = [
+const columns: ColumnDef<License>[] = [
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => (
       <div
         className={`${
-          row.getValue("status") === UserLicenseStatus.Active
+          row.getValue("status") === LicenseStatus.Active
             ? "text-green-500"
             : "text-orange-400"
         } capitalize text-xs`}
@@ -58,11 +58,6 @@ const columns: ColumnDef<UserLicense>[] = [
         {row.getValue("status")}
       </div>
     ),
-  },
-  {
-    accessorKey: "key",
-    header: "Key",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("key")}</div>,
   },
   {
     accessorKey: "name",

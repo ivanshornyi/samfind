@@ -41,26 +41,24 @@ model User {
   discountPercent         Float          @default(0)
   referralCode            Float          @unique
   UserReferral            UserReferral[]
-  UserLicense             UserLicense[]
+  License                 License[]
+  // domain                  String
 
   @@map("user")
 }
 
-enum UserLicenseStatus {
+enum LicenseStatus {
   active
   inactive
 }
 
-model UserLicense {
-  id        String            @id @default(uuid())
-  user      User              @relation(fields: [userId], references: [id])
-  name      String            @db.VarChar
-  key       String            @db.VarChar
-  status    UserLicenseStatus @default(active)
-  userId    String
-  licenseId String            @unique
+model License {
+  id     String        @id @default(uuid())
+  user   User          @relation(fields: [userId], references: [id])
+  status LicenseStatus @default(active)
+  userId String
 
-  @@map("user_license")
+  @@map("license")
 }
 
 model UserReferral {

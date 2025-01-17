@@ -45,7 +45,7 @@ export class UserService {
   async findAndUpdateUserByReferralCode(
     referralCode: number, 
     newUserId: string,
-    // discount number => get 10% percent from user product that he bought  
+    discountNumber: number,
   ) {
     const user = await this.prisma.user.findUnique({
       where: { referralCode },
@@ -59,7 +59,7 @@ export class UserService {
       await this.prisma.user.update({
         where: { id: user.id },
         data: {
-          discount: user.discount + 10, // + discount number
+          discount: user.discount + discountNumber,
         },
       });
     }

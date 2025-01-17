@@ -1,4 +1,4 @@
-import { UserLicense } from "@/types";
+import { License } from "@/types";
 
 import { apiClient } from "@/vars";
 
@@ -25,7 +25,7 @@ const getUserLicense = async (id: string) => {
   try {
     const response = await apiClient.get(`/user-license/${id}`);
 
-    return response.data as UserLicense;
+    return response.data as License;
   } catch (error) {
     handleApiError(error);
   }
@@ -35,7 +35,7 @@ const getUserLicenses = async (userId: string) => {
   try {
     const response = await apiClient.get(`/user-license/find/${userId}`);
 
-    return response.data as UserLicense[];
+    return response.data as License[];
   } catch (error) {
     handleApiError(error);
   }

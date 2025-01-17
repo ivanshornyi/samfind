@@ -1,27 +1,16 @@
 "use client";
 
-import { useEffect } from "react";
-
-import { useSearchParams } from "next/navigation";
-
 import { Card } from "@/components";
 import { PaymentsModal } from "./_components";
 
 const items = [
   {
-    name: "License 1",
+    name: "License",
     amount: 100,
-    key: "key 1",
   },
 ];
 
 export default function Products() {
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    console.log(searchParams.get("redirect_status"));
-  }, [searchParams]);
-
   return (
     <div className="container mx-auto">
       <p>Products list</p>
@@ -36,11 +25,10 @@ export default function Products() {
           </p>
 
           <div>
-            <p className="text-center mb-2">$10.99</p>
             <PaymentsModal
               amount={item.amount}
               currency="USD"
-              license={{ name: item.name, key: item.key }}
+              license={{ name: item.name }}
             />
           </div>
         </Card>

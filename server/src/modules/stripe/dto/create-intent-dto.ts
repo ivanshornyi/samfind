@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from "class-validator";
+import { IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateIntentDto {
   @IsNumber()
@@ -10,9 +10,7 @@ export class CreateIntentDto {
   @IsString()
   userId: string;
 
-  @IsString()
-  licenseName: string;
-
-  @IsString()
-  licenseKey: string;
+  @IsNumber()
+  @IsOptional()
+  userReferralCode?: number;
 }

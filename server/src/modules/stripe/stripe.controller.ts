@@ -37,6 +37,7 @@ export class StripeController {
     return this.stripeService.createPaymentIntent(createIntentDto);
   }
 
+  @ApiOperation({ summary: "Stripe webhook" })
   @Post("/webhook")
   async createWebhook(@Req() req: RawBodyRequest<Request>) {
     const sig = req.headers["stripe-signature"];

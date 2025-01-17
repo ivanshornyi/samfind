@@ -91,6 +91,7 @@ export const AuthContextProvider = ({
         setUser(userData as User);
       } catch (error) {
         console.error("Failed to fetch user data:", error);
+        logout();
       } finally {
         setUserLoading(false);
       }

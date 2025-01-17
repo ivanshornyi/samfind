@@ -6,11 +6,17 @@ import { PrismaService } from "../prisma/prisma.service";
 
 import { StripeService } from "./stripe.service";
 import { StripeController } from "./stripe.controller";
+import { UserModule } from "../user/user.module";
+import { UserService } from "../user/user.service";
 
 @Module({
-  imports: [ConfigModule.forRoot(), PrismaModule],
+  imports: [
+    ConfigModule.forRoot(), 
+    PrismaModule,
+    UserModule,
+  ],
   controllers: [StripeController],
-  providers: [StripeService, PrismaService],
+  providers: [StripeService, PrismaService, UserService],
   exports: [StripeService],
 })
 export class StripeModule {}
