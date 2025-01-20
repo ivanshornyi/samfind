@@ -4,22 +4,13 @@ import type { Metadata } from "next";
 
 import { AuthContextProvider } from "@/context";
 
-import { Header, Toaster } from "@/components";
+import { Footer, Header, Toaster } from "@/components";
 
 import { TanstackProvider } from "@/providers";
 
-import { Geist, Geist_Mono, Manrope } from "next/font/google";
+import { Manrope } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 const manrope = Manrope({
   variable: "--font-monrope",
@@ -48,6 +39,7 @@ export default function RootLayout({
               <Header />
 
               <main className="pt-20 px-5">{children}</main>
+              <Footer />
             </AuthContextProvider>
           </Suspense>
         </body>
