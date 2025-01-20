@@ -4,6 +4,8 @@ import React, { useContext } from "react";
 
 import { AuthContext } from "@/context";
 
+import { CreateIntent } from "@/services";
+
 import { useGetStripeClient } from "@/hooks";
 
 import {
@@ -30,13 +32,12 @@ const stripePromise = loadStripe(stripePublishableKey as string);
 interface PaymentsModalProps {
   amount: number;
   currency: string;
-  license: { name: string; key: string };
+  license: { name: string };
 }
 
 export const PaymentsModal: React.FC<PaymentsModalProps> = ({
   amount,
   currency,
-  license,
 }) => {
   const { user } = useContext(AuthContext);
 
@@ -47,14 +48,23 @@ export const PaymentsModal: React.FC<PaymentsModalProps> = ({
   } = useGetStripeClient();
 
   const handleIntent = () => {
+    const referral = localStorage.getItem("userReferralCode");
+
     if (user) {
-      getStripeClientMutation({
+      let intent: CreateIntent = {
         amount,
         currency,
         userId: user.id,
-        licenseKey: license.key,
-        licenseName: license.name,
-      });
+      };
+
+      if (referral) {
+        intent = {
+          ...intent,
+          userReferralCode: Number(referral),
+        };
+      }
+
+      getStripeClientMutation(intent);
     }
   };
 
@@ -89,7 +99,7 @@ export const PaymentsModal: React.FC<PaymentsModalProps> = ({
               stripe={stripePromise}
               options={{ clientSecret: stripClientData.client_secret }}
             >
-              <PaymentsForm license={license} />
+              <PaymentsForm />
             </Elements>
           )}
         </div>

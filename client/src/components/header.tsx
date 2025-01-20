@@ -3,21 +3,34 @@
 import React, { useContext } from "react";
 
 import Link from "next/link";
+import Image from "next/image";
 
 import { AuthContext } from "@/context";
 
 import { Button } from "@/components";
 
-import { LogIn, User } from "lucide-react";
+import { Logo } from "../../public";
 
 const NAVIGATION_ITEMS = [
   {
-    title: "Home",
+    title: "Pricing",
     path: "/",
   },
   {
-    title: "Buy product",
-    path: "/products",
+    title: "About",
+    path: "/",
+  },
+  {
+    title: "FAQ",
+    path: "/",
+  },
+  {
+    title: "Contact",
+    path: "/",
+  },
+  {
+    title: "License Management",
+    path: "/",
   },
 ];
 
@@ -27,7 +40,7 @@ export const Header = () => {
   return (
     <header
       className="
-        border-b-[1px] w-full fixed top-0 left-0 z-10 bg-card
+        w-full fixed top-0 left-0 z-10 bg-background
         px-5
       "
     >
@@ -37,13 +50,13 @@ export const Header = () => {
           py-4
         "
       >
-        <Link href="/">
-          <p className="text-xl font-bold font-sans select-none">Samfind</p>
-        </Link>
+        <div className="flex items-center gap-10">
+          <Link href="/">
+            <Image src={Logo} alt="logo" className="h-7 w-[110px]" />
+          </Link>
 
-        <div className="flex gap-6 items-center">
           <nav>
-            <ul className="flex items-center gap-2">
+            <ul className="flex items-center gap-8">
               {NAVIGATION_ITEMS.map((item) => (
                 <Link key={item.title} href={item.path}>
                   <li className="font-medium text-sm hover:opacity-80">
@@ -53,18 +66,24 @@ export const Header = () => {
               ))}
             </ul>
           </nav>
+        </div>
 
+        <div className="flex gap-6 items-center">
           {!isLoggedIn ? (
-            <Link href="/auth/sign-in">
-              <Button>
-                <LogIn size={14} />
-                <span>Login</span>
-              </Button>
-            </Link>
+            <div className="flex items-center gap-8">
+              <Link href="/auth/sign-in">
+                <span>Log in</span>
+              </Link>
+
+              <Link href="/auth/sign-up">
+                <Button variant="tetrary" className="py-2 px-8 border-none">
+                  <span>Sign up</span>
+                </Button>
+              </Link>
+            </div>
           ) : (
             <Link href="/account/license" className="flex items-center gap-2">
-              <Button variant="secondary" className="text-zinc-800 flex">
-                <User />
+              <Button variant="secondary" className="flex">
                 <span>Account</span>
               </Button>
             </Link>

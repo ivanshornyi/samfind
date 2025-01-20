@@ -6,8 +6,7 @@ export interface CreateIntent {
   userId: string;
   amount: number;
   currency: string;
-  licenseName: string;
-  licenseKey: string;
+  userReferralCode?: number;
 }
 
 const getStripeClient = async (data: CreateIntent) => {

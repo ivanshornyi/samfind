@@ -3,6 +3,7 @@ import { ConfigService } from "@nestjs/config";
 
 import Stripe from "stripe";
 import { PrismaService } from "../prisma/prisma.service";
+import { UserService } from "../user/user.service";
 
 import { CreateIntentDto } from "./dto/create-intent-dto";
 
@@ -14,6 +15,7 @@ export class StripeService {
   constructor(
     private readonly configService: ConfigService,
     private readonly prisma: PrismaService,
+    private readonly userService: UserService,
   ) {
     this.stripe = new Stripe(this.configService.get("STRIPE_SECRET_KEY"), {
       apiVersion: "2024-12-18.acacia",
@@ -27,17 +29,34 @@ export class StripeService {
   async createPaymentIntent(
     createPaymentDto: CreateIntentDto,
   ): Promise<Stripe.PaymentIntent> {
-    const { userId, licenseName, licenseKey, amount, currency } = createPaymentDto;
+    const { 
+      userId, 
+      amount, 
+      currency, 
+      userReferralCode,
+    } = createPaymentDto;
 
-    return this.stripe.paymentIntents.create({
+    const referralDiscount = amount / 10;
+
+    let metadata: any = {
+      userId,
+    };
+
+    let intent = {
       amount,
       currency,
-      metadata: {
-        userId,
-        licenseName,
-        licenseKey,
-      },
-    });
+      metadata,
+    };
+
+    if (userReferralCode) {
+      intent.metadata = {
+        ...metadata,
+        userReferralCode,
+        referralDiscount,
+      }
+    }
+
+    return this.stripe.paymentIntents.create(intent);
   }
 
   constructEvent(
@@ -54,11 +73,9 @@ export class StripeService {
         const paymentIntent = event.data.object;
 
         this.handleSuccessfulPayment(paymentIntent);
-        console.log(paymentIntent, "paymentIntent");
         break;
       case "identity.verification_session.created":
-        const verificationCreated = event.data.object;
-        console.log(verificationCreated, "verificationCreated");
+        // const verificationCreated = event.data.object;
         break;
       default:
         console.log(`Unhandled event type ${event.type}`);
@@ -67,17 +84,16 @@ export class StripeService {
 
   private async handleSuccessfulPayment(paymentIntent: Stripe.PaymentIntent) {
     try {
-      const userId = paymentIntent.metadata.userId;
-      const licenseName = paymentIntent.metadata.licenseName;
-      const licenseKey = paymentIntent.metadata.licenseName;
-      // const 
+      const { userId, userReferralCode, referralDiscount } = paymentIntent.metadata;
 
-      await this.prisma.userLicense.create({
+      if (userReferralCode) {
+        // find user and update user discount
+        this.userService.findAndUpdateUserByReferralCode(Number(userReferralCode), userId, Number(referralDiscount));
+      }
+
+      await this.prisma.license.create({
         data: {
           userId,
-          licenseId: `license-${Math.random()}`,
-          name: licenseName,
-          key: licenseKey,
           // licenseType,
           // purchasedAt: new Date(),
         },

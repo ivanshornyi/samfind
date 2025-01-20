@@ -2,15 +2,11 @@
 
 import { useConfirmPayment } from "@/hooks";
 
-import { PaymentElement, useElements } from "@stripe/react-stripe-js";
+import { PaymentElement } from "@stripe/react-stripe-js";
 
 import { Button } from "@/components";
 
-interface PaymentsFormProps {
-  license: { name: string; key: string };
-}
-
-export const PaymentsForm: React.FC<PaymentsFormProps> = ({ license }) => {
+export const PaymentsForm = () => {
   const { mutate: confirmPaymentMutation, isPending: isConfirmPaymentPending } =
     useConfirmPayment();
 
