@@ -133,7 +133,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
   };
 
   const formTitle = {
-    signIn: "Sign In",
+    signIn: "Log in",
     signUp: "Sign Up",
     resetPassword: "Password recovery",
   };
@@ -152,37 +152,37 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
 
   return (
     <>
-      <div className="w-96 border-[1px] rounded-2xl px-10 py-8 shadow-lg bg-card mt-20">
+      <div className="w-[500px] border-[1px] border- rounded-2xl p-8">
         <form onSubmit={handleAuthFormSubmit}>
-          <h2 className="font-semibold text-xl">{formTitle[authPageType]}</h2>
+          <h2 className="font-semibold text-3xl">{formTitle[authPageType]}</h2>
+          {authPageType === "signIn" && (
+            <p className="mt-4">
+              Welcome back! Access your personalized experience
+            </p>
+          )}
+          {authPageType === "signUp" && (
+            <p className="mt-4">Join the innovation! You’re almost there!</p>
+          )}
 
-          <div className="mt-3 flex flex-col gap-2">
+          <div className="mt-8 flex flex-col gap-2">
             {authPageType === "signUp" && (
               <>
                 <div>
-                  <label htmlFor="firstName" className="text-sm">
-                    First name
-                  </label>
                   <Input
                     id="firstName"
                     name="firstName"
-                    placeholder="Enter first name"
+                    placeholder="First name"
                     value={formData.firstName}
                     onChange={handleFormInputChange}
-                    className="py-6 px-3 rounded-lg"
                   />
                 </div>
                 <div>
-                  <label htmlFor="lastName" className="text-sm">
-                    Last name
-                  </label>
                   <Input
                     id="lastName"
                     name="lastName"
-                    placeholder="Enter last name"
+                    placeholder="Last name"
                     value={formData.lastName}
                     onChange={handleFormInputChange}
-                    className="py-6 px-3 rounded-lg"
                   />
                 </div>
               </>
@@ -191,22 +191,15 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
             {authPageType === "resetPassword" && (
               <>
                 <div>
-                  <label htmlFor="verificationCode" className="text-sm">
-                    Verification code
-                  </label>
                   <Input
                     id="verificationCode"
                     name="verificationCode"
-                    placeholder="Enter verification code"
+                    placeholder="Verification code"
                     value={resetPasswordFormData.verificationCode}
                     onChange={handleResetPasswordFormInputChange}
-                    className="py-6 px-3 rounded-lg"
                   />
                 </div>
                 <div>
-                  <label htmlFor="newPassword" className="text-sm">
-                    New password
-                  </label>
                   <Input
                     id="newPassword"
                     name="newPassword"
@@ -214,7 +207,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                     type="password"
                     value={resetPasswordFormData.newPassword}
                     onChange={handleResetPasswordFormInputChange}
-                    className="py-6 px-3 rounded-lg"
                   />
                 </div>
               </>
@@ -223,31 +215,23 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
             {authPageType !== "resetPassword" && (
               <>
                 <div>
-                  <label htmlFor="email" className="text-sm">
-                    Email
-                  </label>
                   <Input
                     id="email"
                     name="email"
-                    placeholder="Enter email"
+                    placeholder="Email address"
                     value={formData.email}
                     onChange={handleFormInputChange}
-                    className="py-6 px-3 rounded-lg"
                   />
                 </div>
                 <div>
-                  <label htmlFor="password" className="text-sm">
-                    Password
-                  </label>
                   <div className="relative">
                     <Input
                       id="password"
                       name="password"
-                      placeholder="Enter password"
+                      placeholder="Password"
                       type={passwordInputType}
                       value={formData.password}
                       onChange={handleFormInputChange}
-                      className="py-6 px-3 rounded-lg"
                     />
 
                     <button
@@ -255,7 +239,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                       disabled={disabledFormItems}
                       onClick={handlePasswordInputTypeChange}
                       className="
-                        absolute top-1 right-1 inset-y-1 p-3
+                        absolute top-0 right-1 inset-y-1 p-3
                         rounded-r-xl
                       "
                     >
@@ -272,13 +256,14 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
           </div>
 
           <Button
-            className="mt-4 p-6 w-full rounded-lg"
+            variant="secondary"
+            className="mt-5 w-full"
             withLoader={true}
             loading={disabledFormItems}
             disabled={disabledFormItems}
           >
             {authPageType !== "resetPassword" ? (
-              <span>Submit</span>
+              <span>Continue</span>
             ) : (
               <span>Save</span>
             )}
@@ -286,30 +271,37 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
         </form>
 
         <div className="pt-4">
-          {authPageType === "signIn" && (
-            <>
-              <p className="text-sm">
-                <span>Dont have an account? </span>
-                <Link
-                  href="/auth/sign-up"
-                  className="text-blue-400 hover:opacity-80"
-                >
-                  Sign up
-                </Link>
-              </p>
+          {authPageType === "signIn" && <SendVerificationCodeModal />}
 
-              <SendVerificationCodeModal />
-            </>
+          <p className="text-center my-5">Or</p>
+
+          {authPageType !== "resetPassword" && (
+            <div className="flex flex-col gap-2">
+              <Button className="text-sm">google login</Button>
+              <Button className="text-sm">github login</Button>
+            </div>
+          )}
+
+          {authPageType === "signIn" && (
+            <p className="text-sm text-center mt-3">
+              <span>Not a member yet? </span>
+              <Link
+                href="/auth/sign-up"
+                className="font-semibold underline hover:opacity-80"
+              >
+                Sign up
+              </Link>
+            </p>
           )}
 
           {authPageType === "signUp" && (
-            <p className="text-sm">
+            <p className="text-sm text-center mt-3">
               <span>Already have an account? </span>
               <Link
                 href="/auth/sign-in"
-                className="text-blue-400 hover:opacity-80"
+                className="font-semibold underline hover:opacity-80"
               >
-                Sign in
+                Log in
               </Link>
             </p>
           )}

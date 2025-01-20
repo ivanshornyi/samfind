@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 
 import { AuthContextProvider } from "@/context";
 
-import { Header, Toaster } from "@/components";
+import { Toaster, MainLayout } from "@/components";
 
 import { TanstackProvider } from "@/providers";
 
@@ -22,8 +22,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Samfind",
-  description: "Samfind app",
+  title: "Onsio",
+  description: "Onsio app",
 };
 
 export default function RootLayout({
@@ -35,14 +35,12 @@ export default function RootLayout({
     <TanstackProvider>
       <html lang="en">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-100`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background`}
         >
           <Toaster />
           <Suspense>
             <AuthContextProvider>
-              <Header />
-
-              <main className="pt-20 px-5">{children}</main>
+              <MainLayout>{children}</MainLayout>
             </AuthContextProvider>
           </Suspense>
         </body>

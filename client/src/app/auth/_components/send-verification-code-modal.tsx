@@ -47,8 +47,8 @@ export const SendVerificationCodeModal = () => {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <button className="text-sm text-blue-400 mt-2 hover:opacity-80">
-          Forgot password
+        <button className="font-semibold mt-2 underline hover:opacity-80">
+          Forgot your password?
         </button>
       </AlertDialogTrigger>
       <AlertDialogContent className="w-[420px]">

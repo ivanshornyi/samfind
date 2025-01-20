@@ -32,7 +32,7 @@ const stripePromise = loadStripe(stripePublishableKey as string);
 interface PaymentsModalProps {
   amount: number;
   currency: string;
-  license: { name: string; };
+  license: { name: string };
 }
 
 export const PaymentsModal: React.FC<PaymentsModalProps> = ({
