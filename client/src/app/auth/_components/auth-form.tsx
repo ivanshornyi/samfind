@@ -158,38 +158,37 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
 
   return (
     <>
-      <div className="w-full max-w-[591px] rounded-[30px] border-[1px] border-solid border-[#A64CE8] p-8 shadow-lg mt-20">
+      <div className="w-[500px] border-[1px] border- rounded-2xl p-8">
         <form onSubmit={handleAuthFormSubmit}>
-          <h2 className="font-semibold text-[32px] leading-[43.71px] mb-4">{formTitle[authPageType]}</h2>
-          <h3 className="font-normal text-xl">{formSubtitle[authPageType]}</h3>
+          <h2 className="font-semibold text-3xl">{formTitle[authPageType]}</h2>
+          {authPageType === "signIn" && (
+            <p className="mt-4">
+              Welcome back! Access your personalized experience
+            </p>
+          )}
+          {authPageType === "signUp" && (
+            <p className="mt-4">Join the innovation! You’re almost there!</p>
+          )}
 
-          <div className="mt-3 flex flex-col gap-2">
+          <div className="mt-8 flex flex-col gap-2">
             {authPageType === "signUp" && (
               <>
                 <div>
-                  <label htmlFor="firstName" className="text-sm">
-                    First name
-                  </label>
                   <Input
                     id="firstName"
                     name="firstName"
-                    placeholder="Enter first name"
+                    placeholder="First name"
                     value={formData.firstName}
                     onChange={handleFormInputChange}
-                    className="py-6 px-3 rounded-lg"
                   />
                 </div>
                 <div>
-                  <label htmlFor="lastName" className="text-sm">
-                    Last name
-                  </label>
                   <Input
                     id="lastName"
                     name="lastName"
-                    placeholder="Enter last name"
+                    placeholder="Last name"
                     value={formData.lastName}
                     onChange={handleFormInputChange}
-                    className="py-6 px-3 rounded-lg"
                   />
                 </div>
               </>
@@ -198,22 +197,15 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
             {authPageType === "resetPassword" && (
               <>
                 <div>
-                  <label htmlFor="verificationCode" className="text-sm">
-                    Verification code
-                  </label>
                   <Input
                     id="verificationCode"
                     name="verificationCode"
-                    placeholder="Enter verification code"
+                    placeholder="Verification code"
                     value={resetPasswordFormData.verificationCode}
                     onChange={handleResetPasswordFormInputChange}
-                    className="py-6 px-3 rounded-lg"
                   />
                 </div>
                 <div>
-                  <label htmlFor="newPassword" className="text-sm">
-                    New password
-                  </label>
                   <Input
                     id="newPassword"
                     name="newPassword"
@@ -221,7 +213,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                     type="password"
                     value={resetPasswordFormData.newPassword}
                     onChange={handleResetPasswordFormInputChange}
-                    className="py-6 px-3 rounded-lg"
                   />
                 </div>
               </>
@@ -236,7 +227,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                     placeholder="Email address"
                     value={formData.email}
                     onChange={handleFormInputChange}
-                    className="px-6 h-[44px] rounded-[30px]"
                   />
                 </div>
                 <div>
@@ -244,11 +234,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                     <Input
                       id="password"
                       name="password"
-                      placeholder="Enter password"
+                      placeholder="Password"
                       type={passwordInputType}
                       value={formData.password}
                       onChange={handleFormInputChange}
-                      className="px-6 h-[44px] rounded-[30px]"
                     />
 
                     <button
@@ -256,7 +245,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                       disabled={disabledFormItems}
                       onClick={handlePasswordInputTypeChange}
                       className="
-                        absolute top-1 right-1 inset-y-1 p-3
+                        absolute top-0 right-1 inset-y-1 p-3
                         rounded-r-xl
                       "
                     >
@@ -273,11 +262,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
           </div>
 
           <Button
-            className="mt-4 h-[44px] w-full rounded-[30px] bg-[#363637]"
+            variant="secondary"
+            className="mt-5 w-full"
             withLoader={true}
             loading={disabledFormItems}
             disabled={disabledFormItems}
-            variant="secondary"
           >
             {authPageType !== "resetPassword" ? (
               <span>Continue</span>
@@ -288,30 +277,37 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
         </form>
 
         <div className="pt-4">
-          {authPageType === "signIn" && (
-            <>
-              <p className="text-sm">
-                <span>Dont have an account? </span>
-                <Link
-                  href="/auth/sign-up"
-                  className="text-blue-400 hover:opacity-80"
-                >
-                  Sign up
-                </Link>
-              </p>
+          {authPageType === "signIn" && <SendVerificationCodeModal />}
 
-              <SendVerificationCodeModal />
-            </>
+          <p className="text-center my-5">Or</p>
+
+          {authPageType !== "resetPassword" && (
+            <div className="flex flex-col gap-2">
+              <Button className="text-sm">google login</Button>
+              <Button className="text-sm">github login</Button>
+            </div>
+          )}
+
+          {authPageType === "signIn" && (
+            <p className="text-sm text-center mt-3">
+              <span>Not a member yet? </span>
+              <Link
+                href="/auth/sign-up"
+                className="font-semibold underline hover:opacity-80"
+              >
+                Sign up
+              </Link>
+            </p>
           )}
 
           {authPageType === "signUp" && (
-            <p className="text-sm">
+            <p className="text-sm text-center mt-3">
               <span>Already have an account? </span>
               <Link
                 href="/auth/sign-in"
-                className="text-blue-400 hover:opacity-80"
+                className="font-semibold underline hover:opacity-80"
               >
-                Sign in
+                Log in
               </Link>
             </p>
           )}

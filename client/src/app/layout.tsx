@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 
 import { AuthContextProvider } from "@/context";
 
-import { Footer, Header, Toaster } from "@/components";
+import { Toaster, MainLayout } from "@/components";
 
 import { TanstackProvider } from "@/providers";
 
@@ -18,8 +18,8 @@ const manrope = Manrope({
 })
 
 export const metadata: Metadata = {
-  title: "Samfind",
-  description: "Samfind app",
+  title: "Onsio",
+  description: "Onsio app",
 };
 
 export default function RootLayout({
@@ -31,15 +31,12 @@ export default function RootLayout({
     <TanstackProvider>
       <html lang="en">
         <body
-          className={`${manrope.variable} dark antialiased bg-[#1F1E1F]`}
+          className={`${manrope.variable} dark antialiased bg-background`}
         >
           <Toaster />
           <Suspense>
             <AuthContextProvider>
-              <Header />
-
-              <main className="pt-20 px-5">{children}</main>
-              <Footer />
+              <MainLayout>{children}</MainLayout>
             </AuthContextProvider>
           </Suspense>
         </body>
