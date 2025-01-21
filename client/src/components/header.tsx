@@ -93,14 +93,6 @@ export const Header = () => {
               </Button>
             </Link>
           )}
-          ) : (
-            <Link href="/account/license" className="flex items-center gap-2">
-              <Button variant="secondary" className="text-zinc-800 flex">
-                <User />
-                <span>Account</span>
-              </Button>
-            </Link>
-          )}
         </div>
 
         <div className="lg:hidden">
