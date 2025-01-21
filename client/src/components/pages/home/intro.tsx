@@ -7,7 +7,7 @@ export const Intro = () => {
       <div className="relative font-manrope h-[743px] sm:h-[824px] flex items-center justify-center">
         <div className="absolute sm:inset-0 flex flex-col items-center justify-center space-y-[83px] sm:space-y-8 text-center bottom-[8%]">
           <div className="space-y-4">
-            <h1 className="text-start sm:text-center text-[40px] sm:text-[96px] leading-[48px] sm:leading-[96px] font-extrabold">
+            <h1 className="text-start sm:text-center text-[40px] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold">
               Transform Your Digital <br className="hidden sm:block" />
               Experience with Onsio
             </h1>
