@@ -20,9 +20,13 @@ body {
     --primary-foreground: #501a88;
     --secondary: #363637;
     --secondary-foreground: #26222b;
+    --secondary-active: #23192e;
     --tetrary-background: #363637;
+    --link-hover: #beb8ff;
+    --link-active: #8f40e5;
     --muted: 240 4.8% 95.9%;
     --muted-foreground: #ffffff1a;
+    --disabled: #a8a8a8;
     --accent: 240 4.8% 95.9%;
     --accent-foreground: 240 5.9% 10%;
     --destructive: 0 84.2% 60.2%;

@@ -45,10 +45,17 @@ export default {
         },
         tetrary: {
           DEFAULT: "var(--tetrary-background)",
+          foreground: "var(--tetrary-background)",
+        },
+        link: {
+          DEFAULT: "var(--primary)",
+          hover: "var(--link-hover)",
+          active: "var(--link-active)",
         },
         border: "hsl(var(--border))",
         input: "var(--input)",
         ring: "var(--ring)",
+        disabled: "var(--disabled)",
         violet: {
           100: "#A64CE8",
           200: "#8F40E5",
@@ -58,8 +65,8 @@ export default {
         },
       },
       fontFamily: {
-        manrope: 'var(--font-monrope)',
-      }
+        manrope: "var(--font-monrope)",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
