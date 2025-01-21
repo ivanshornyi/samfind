@@ -19,7 +19,7 @@ const buttonVariants = cva(
         outline:
           "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
         secondary:
-          "border-primary-foreground bg-tetrary-background text-light active:shadow-[0_2px_20px_0_#B668F080] hover:bg-secondary-foreground active:bg-secondary-active disabled:text-disabled disabled:border-disabled",
+          "border-primary-foreground bg-tetrary text-light active:shadow-[0_2px_20px_0_#B668F080] hover:bg-secondary-foreground active:bg-secondary-active disabled:text-disabled disabled:border-disabled",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "border-none text-primary text-2xl font-medium underline-offset-4 hover:underline [text-decoration-style:wavy] hover:text-link-hover active:text-link-active",
         tetrary:
