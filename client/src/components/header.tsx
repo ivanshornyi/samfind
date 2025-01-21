@@ -17,7 +17,7 @@ const NAVIGATION_ITEMS = [
   },
   {
     title: "About",
-    path: "/",
+    path: "/about",
   },
   {
     title: "FAQ",
@@ -39,7 +39,7 @@ export const Header = () => {
   return (
     <header
       className="
-        w-full fixed top-0 left-0 z-10 bg-background
+        w-full max-w-[1440px] fixed top-0 left-0 z-10 bg-background
         px-5
       "
     >
@@ -80,14 +80,14 @@ export const Header = () => {
                 </Button>
               </Link>
             </div>
-        ) : (
-          <Link href="/account/license" className="flex items-center gap-2">
-            <Button variant="secondary" className="text-zinc-800 flex">
-              <User />
-              <span>Account</span>
-            </Button>
-          </Link>
-        )}
+          ) : (
+            <Link href="/account/license" className="flex items-center gap-2">
+              <Button variant="secondary" className="text-zinc-800 flex">
+                <User />
+                <span>Account</span>
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
     </header>
