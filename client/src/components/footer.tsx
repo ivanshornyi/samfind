@@ -6,9 +6,9 @@ import { Button, Input } from "@/components/ui";
 
 export const Footer = () => {
   return (
-    <footer className="font-manrope text-white py-10 px-6">
+    <footer className="text-white py-10 pb-[60px] px-6">
       <div className="mx-auto flex flex-row justify-between">
-        <div className="flex flex-col space-y-2">
+        <div className="flex flex-col space-y-[122px]">
           <Link href="/">
             <Image src="/Logo.png" width={110} height={30} alt="" />
           </Link>
@@ -49,13 +49,11 @@ export const Footer = () => {
             <Input
               type="email"
               placeholder="Enter your email address"
-              className="px-6 h-[44px] rounded-[30px]"
             />
             <Button
               type="submit"
               variant="ghost"
               className="h-[44px] w-[200px] rounded-[30px]"
-              //   className="px-4 py-2 text-sm font-semibold text-white bg-purple-500 rounded-md hover:bg-purple-600"
             >
               Subscribe now
             </Button>

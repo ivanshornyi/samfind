@@ -10,10 +10,10 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const hideHeader = pathname.startsWith("/auth");
 
   return (
-    <div>
+    <div className="max-w-[1440px] mx-auto">
       {!hideHeader && <Header />}
 
-      <main className={`${hideHeader ? "" : "pt-20"} px-5`}>{children}</main>
+      <main className={`${hideHeader ? "" : "pt-20"}  px-5`}>{children}</main>
       <Footer />
     </div>
   );
