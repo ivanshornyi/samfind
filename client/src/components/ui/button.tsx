@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ArrowUpRightIcon } from "@heroicons/react/24/solid";
+import { MoveUpRight } from "lucide-react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
@@ -79,7 +79,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ) : (
           <>
             {props.children}
-            {icon && <ArrowUpRightIcon className="size-20" />}
+            {icon && <MoveUpRight className="size-20" />}
           </>
         )}
       </Comp>
