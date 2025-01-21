@@ -39,7 +39,7 @@ export const Header = () => {
   return (
     <header
       className="
-        w-full max-w-[1440px] fixed top-0 left-0 z-10 bg-background
+        w-full fixed top-0 left-0 z-10 bg-background
         px-5
       "
     >
