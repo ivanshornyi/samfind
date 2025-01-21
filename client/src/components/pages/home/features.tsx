@@ -35,13 +35,13 @@ const features = [
 export const Features = () => {
   return (
     <div className="mt-[120px]">
-      <h2 className="text-[40px] font-semibold mb-[50px]">Unlock Features</h2>
+      <h2 className="text-2xl lg:text-[40px] font-semibold mb-[30px] sm:mb-[50px]">Unlock Features</h2>
 
-      <div className="flex gap-[20px]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-[20px]">
         {features.map((feature, index) => (
           <div
             key={index}
-            className={`bg-card w-full h-[317px] py-8 px-6 rounded-[20px] flex flex-col justify-between ${index % 2 === 0 ? "mb-[113px]" : "mt-[113px]"}`}
+            className={`bg-card w-full h-[209px] sm:h-[317px] py-8 px-6 rounded-[20px] flex flex-col justify-between ${index % 2 === 0 ? "sm:mb-[113px]" : "sm:mt-[113px]"}`}
           >
             <div className="flex items-center gap-5">
               <Image src={feature.icon} width={24} height={24} alt="Icon" />

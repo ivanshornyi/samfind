@@ -5,7 +5,7 @@ type LicensingOption = {
   id: number;
   title: string;
   description: string;
-  price?: string;
+  price?: number;
   buttonText: string;
   buttonVariant: "default" | "secondary";
   features: string[];
@@ -30,7 +30,7 @@ const licensingOptions: LicensingOption[] = [
     title: "Standart",
     description:
       "Boost your capabilities with premium features and priority support.",
-    price: "19.99/month",
+    price: 19.99,
     buttonText: "Buy Professional",
     buttonVariant: "default",
     features: ["Enhanced capabilities", "Priority updates", "Premium support"],
@@ -42,15 +42,15 @@ const licensingOptions: LicensingOption[] = [
 export const LicensingOptions = () => {
   return (
     <div className="mt-[120px] mb-20">
-      <div className="mb-[50px] flex items-center justify-between">
-        <h2 className="text-[40px] font-semibold ">Licensing Options</h2>
-        <span className="font-medium text-xl">
+      <div className="mb-[40px] sm:mb-[50px] flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5 lg:gap-0">
+        <h2 className="text-2xl lg:text-[40px] font-semibold ">Licensing Options</h2>
+        <span className="font-medium text-base lg:text-xl">
           Adapt and evolve with your growing needs. Choose what <br /> works
           best for you.
         </span>
       </div>
 
-      <div className="flex gap-5">
+      <div className="flex flex-col ml:flex-row gap-5">
         {licensingOptions.map((option) => (
           <div
             key={option.id}
@@ -63,7 +63,7 @@ export const LicensingOptions = () => {
 
             {option.price ? (
               <div className="mb-10 flex gap-2">
-                <div className="flex items-start">
+                <div className="flex items-start justify-end">
                   <Image
                     src="home/icons/dollar.svg"
                     alt="dollar"
@@ -71,9 +71,10 @@ export const LicensingOptions = () => {
                     height={49}
                   />
                 </div>
-                <span className="font-semibold text-5xl text-[#DCDCDC] leading-[52px]">
+                <p className="font-semibold text-5xl text-[#DCDCDC] leading-[52px]">
                   {option.price}
-                </span>
+                  <span className="text-[32px]">/month</span>
+                </p>
               </div>
             ) : null}
 
