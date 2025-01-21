@@ -1,5 +1,5 @@
 import * as React from "react";
-import { MoveUpRight } from "lucide-react";
+import { MoveUpRight, MoveRight } from "lucide-react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
@@ -45,7 +45,7 @@ export interface ButtonProps
   asChild?: boolean;
   loading?: boolean;
   withLoader?: boolean;
-  icon?: boolean;
+  icon?: "right" | "up-right";
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -79,7 +79,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ) : (
           <>
             {props.children}
-            {icon && <MoveUpRight className="size-20" />}
+            {icon === "up-right" && <MoveUpRight className="size-20" />}
+            {icon === "right" && <MoveRight className="size-20" />}
           </>
         )}
       </Comp>
