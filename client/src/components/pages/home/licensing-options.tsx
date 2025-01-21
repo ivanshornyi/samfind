@@ -65,7 +65,7 @@ export const LicensingOptions = () => {
               <div className="mb-10 flex gap-2">
                 <div className="flex items-start">
                   <Image
-                    src="/icons/dollar.svg"
+                    src="home/icons/dollar.svg"
                     alt="dollar"
                     width={23}
                     height={49}

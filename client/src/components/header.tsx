@@ -45,20 +45,25 @@ export const Header = () => {
     >
       <div
         className="
-          container w-full mx-auto flex items-center justify-between
+          container w-full max-w-[1440px] mx-auto flex items-center justify-between
           py-4
         "
       >
         <div className="flex items-center gap-10">
           <Link href="/">
-            <Image src={Logo} alt="logo" className="h-7 w-[110px]" />
+            <Image
+              src={Logo}
+              alt="logo"
+              width={110}
+              className="h-7 w-[110px] min-w-[110px]"
+            />
           </Link>
 
-          <nav>
+          <nav className="hidden lg:block">
             <ul className="flex items-center gap-8">
               {NAVIGATION_ITEMS.map((item) => (
                 <Link key={item.title} href={item.path}>
-                  <li className="font-medium text-sm hover:opacity-80">
+                  <li className="font-medium text-base transition-all hover:text-[#CE9DF3] hover:underline active:text-[#8F40E5]">
                     {item.title}
                   </li>
                 </Link>
@@ -67,7 +72,7 @@ export const Header = () => {
           </nav>
         </div>
 
-        <div className="flex gap-6 items-center">
+        <div className="hidden lg:flex gap-6 items-center">
           {!isLoggedIn ? (
             <div className="flex items-center gap-8">
               <Link href="/auth/sign-in">
@@ -80,14 +85,23 @@ export const Header = () => {
                 </Button>
               </Link>
             </div>
-        ) : (
-          <Link href="/account/license" className="flex items-center gap-2">
-            <Button variant="secondary" className="text-zinc-800 flex">
-              <User />
-              <span>Account</span>
-            </Button>
-          </Link>
-        )}
+          ) : (
+            <Link href="/account/license" className="flex items-center gap-2">
+              <Button variant="secondary" className="text-zinc-800 flex">
+                <User />
+                <span>Account</span>
+              </Button>
+            </Link>
+          )}
+        </div>
+
+        <div className="lg:hidden">
+          <Image
+            src="icons/header-menu.svg"
+            alt="menu"
+            width={44}
+            height={44}
+          />
         </div>
       </div>
     </header>
