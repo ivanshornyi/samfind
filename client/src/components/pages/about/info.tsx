@@ -34,7 +34,11 @@ export const Info = () => {
         Empowering individuals and organizations to achieve more through
         cutting-edge technology.
       </p>
-      <Button variant="secondary" icon onClick={() => router.push("/contact")}>
+      <Button
+        variant="link"
+        icon="up-right"
+        onClick={() => router.push("/contact")}
+      >
         Contact us
       </Button>
       <h1 className="text-[32px] sm:text-[48px] mt-[56px] leading-[44px] sm:leading-[65px] font-extrabold max-w-[1180px]">

@@ -21,7 +21,7 @@ const NAVIGATION_ITEMS = [
   },
   {
     title: "FAQ",
-    path: "/",
+    path: "/faq",
   },
   {
     title: "Contact",
