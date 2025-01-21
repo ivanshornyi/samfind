@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Param, Post, Req, UseGuards } from "@nestjs/common";
 
 import { SignInDto, SignUpDto } from "./dto/auth-user-dto";
 import { ResetPasswordDto } from "./dto/reset-password-dto";
@@ -7,6 +7,7 @@ import { AuthService } from "./auth.service";
 
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { SendCodeForEmailDto } from "./dto/send-code-for-email.dto";
+import { AuthVerificationDto } from "./dto/auth-verification-dto"; 
 
 @ApiTags("Authentication")
 @Controller("auth")
@@ -47,5 +48,11 @@ export class AuthController {
   @Post("/email/update")
   public async updateEmail(@Body() emailUpdateDto: { userId: string, verificationCode: string, newEmail: string }) {
     return this.authService.resetEmail(emailUpdateDto);
+  }
+
+  @ApiOperation({ summary: "Verify user" })
+  @Post("/verify")
+  public async verifyUser(@Body() verificationDto: AuthVerificationDto) {
+    return this.authService.verifyUserCode(verificationDto.email, verificationDto.verificationCode);
   }
 }

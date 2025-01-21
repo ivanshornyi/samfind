@@ -2,6 +2,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
 import Stripe from "stripe";
+import { LicenseTierType } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { UserService } from "../user/user.service";
 
@@ -33,6 +34,8 @@ export class StripeService {
       userId, 
       amount, 
       currency, 
+      tierType,
+      count,
       userReferralCode,
     } = createPaymentDto;
 
@@ -40,6 +43,8 @@ export class StripeService {
 
     let metadata: any = {
       userId,
+      tierType,
+      count,
     };
 
     let intent = {
@@ -55,6 +60,8 @@ export class StripeService {
         referralDiscount,
       }
     }
+
+    console.log(intent);
 
     return this.stripe.paymentIntents.create(intent);
   }
@@ -84,7 +91,13 @@ export class StripeService {
 
   private async handleSuccessfulPayment(paymentIntent: Stripe.PaymentIntent) {
     try {
-      const { userId, userReferralCode, referralDiscount } = paymentIntent.metadata;
+      const { 
+        userId, 
+        count,
+        tierType,
+        userReferralCode, 
+        referralDiscount,
+      } = paymentIntent.metadata;
 
       if (userReferralCode) {
         // find user and update user discount
@@ -93,8 +106,9 @@ export class StripeService {
 
       await this.prisma.license.create({
         data: {
-          userId,
-          // licenseType,
+          ownerId: userId,
+          count: Number(count),
+          tierType: tierType as LicenseTierType,
           // purchasedAt: new Date(),
         },
       });

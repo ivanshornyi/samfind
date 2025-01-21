@@ -74,3 +74,16 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px; 
+  padding: 1px; 
+  background: linear-gradient(91.31deg, #A8A8A8 -23.65%, #A64CE8 109.99%); 
+  mask: 
+    linear-gradient(#000 0 0) content-box, 
+    linear-gradient(#000 0 0);
+  mask-composite: exclude; 
+}

@@ -152,7 +152,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
 
   return (
     <>
-      <div className="w-[500px] border-[1px] border- rounded-2xl p-8">
+      <div className="w-[591px] border-[1px] border-violet-100 rounded-[30px] p-8">
         <form onSubmit={handleAuthFormSubmit}>
           <h2 className="font-semibold text-3xl">{formTitle[authPageType]}</h2>
           {authPageType === "signIn" && (
@@ -277,8 +277,12 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
 
           {authPageType !== "resetPassword" && (
             <div className="flex flex-col gap-2">
-              <Button className="text-sm">google login</Button>
-              <Button className="text-sm">github login</Button>
+              <button className="py-2.5 bg-white text-black rounded-full">
+                Sign in with Google
+              </button>
+              <button className="py-2.5 bg-white text-black rounded-full">
+                Sign in with Github
+              </button>
             </div>
           )}
 

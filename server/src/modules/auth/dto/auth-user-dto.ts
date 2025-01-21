@@ -2,6 +2,7 @@ import {
   IsString,
   IsOptional,
   IsEmail,
+  IsNumber,
 } from "class-validator";
 
 import { UserAuthType } from "src/modules/user/types/user";

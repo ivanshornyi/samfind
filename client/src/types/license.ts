@@ -3,8 +3,16 @@ export enum LicenseStatus {
   Inactive = "inactive",
 }
 
+export enum LicenseTierType {
+  Freemium = "freemium",
+  Standard = "standard",
+}
+
 export interface License {
   id: string;
-  userId: string;
+  ownerId: string;
   status: LicenseStatus;
+  tierType: LicenseTierType;
+  count: number;
+  userIds: [];
 }

@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsNumber } from "class-validator";
+import { IsOptional, IsString, IsNumber, IsBoolean, IsDate } from "class-validator";
 
 import { UserStatus } from "../types/user";
 
@@ -42,6 +42,18 @@ export class UpdateUserDto {
   @IsOptional()
   @IsNumber()
   emailResetCodeExpiresAt?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  isVerified?: boolean;
+
+  @IsOptional()
+  @IsString()
+  registrationCode?: string;
+
+  @IsOptional()
+  @IsDate()
+  registrationCodeExpiresAt?: Date;
 
   // @IsString()
   // @IsOptional()

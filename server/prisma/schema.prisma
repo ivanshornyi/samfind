@@ -23,26 +23,36 @@ enum UserRole {
   customer
 }
 
+enum UserAccountType {
+  private
+  business
+}
+
 model User {
-  id                      String         @id @default(uuid())
-  email                   String         @unique()
-  password                String         @db.VarChar
-  firstName               String         @db.VarChar
-  lastName                String         @db.VarChar
-  authType                UserAuthType
-  refreshToken            String?        @db.VarChar
-  status                  UserStatus
-  resetCode               String?        @db.VarChar
-  role                    UserRole
-  resetCodeExpiresAt      BigInt?
-  emailResetCode          String?        @db.VarChar
-  emailResetCodeExpiresAt BigInt?
-  discount                Float          @default(0)
-  discountPercent         Float          @default(0)
-  referralCode            Float          @unique
-  UserReferral            UserReferral[]
-  License                 License[]
-  // domain                  String
+  id                        String          @id @default(uuid())
+  email                     String          @unique()
+  password                  String          @db.VarChar
+  firstName                 String          @db.VarChar
+  lastName                  String          @db.VarChar
+  authType                  UserAuthType
+  refreshToken              String?         @db.VarChar
+  status                    UserStatus
+  role                      UserRole
+  isVerified                Boolean         @default(false)
+  registrationCode          String?
+  registrationCodeExpiresAt DateTime?       
+  resetCode                 String?         @db.VarChar
+  resetCodeExpiresAt        BigInt?
+  emailResetCode            String?         @db.VarChar
+  emailResetCodeExpiresAt   BigInt?
+  discount                  Float           @default(0)
+  discountPercent           Float           @default(0)
+  referralCode              Float           @unique
+  accountType               UserAccountType @default(private)
+  organizationId            String?
+  organization              Organization?   @relation(fields: [organizationId], references: [id])
+  UserReferral              UserReferral[]
+  License                   License[]
 
   @@map("user")
 }
@@ -52,11 +62,21 @@ enum LicenseStatus {
   inactive
 }
 
+enum LicenseTierType {
+  freemium
+  standard
+}
+
 model License {
-  id     String        @id @default(uuid())
-  user   User          @relation(fields: [userId], references: [id])
-  status LicenseStatus @default(active)
-  userId String
+  id        String          @id @default(uuid())
+  user      User            @relation(fields: [ownerId], references: [id])
+  status    LicenseStatus   @default(active)
+  ownerId   String
+  userIds   String[]        @default([])
+  count     Float           @default(0)
+  tierType  LicenseTierType @default(freemium)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
 
   @@map("license")
 }
@@ -71,4 +91,17 @@ model UserReferral {
   userId         String   @unique
 
   @@map("user_referral")
+}
+
+model Organization {
+  id                         String   @id @default(uuid())
+  name                       String
+  domain                     String?
+  VAT                        String
+  businessOrganizationNumber String
+  User                       User[]
+  ownerId                    String   @unique
+  userIds                    String[] @default([])
+
+  @@map("organization")
 }
