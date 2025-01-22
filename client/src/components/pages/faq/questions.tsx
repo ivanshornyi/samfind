@@ -1,6 +1,58 @@
 "use client";
 
 import { Button, Input } from "@/components/ui";
+import { QuestionDataItem } from "./questionDataItem";
+
+const questionsData = [
+  {
+    title: "General Questions",
+    description:
+      "Learn how to get started and explore available support options.",
+    questions: [
+      {
+        question: "How do I get started?",
+        answer: "Download, install, and experience the difference immediately.",
+      },
+      {
+        question: "What support options are available?",
+        answer:
+          "From community forums to dedicated enterprise support, we've got you covered.",
+      },
+    ],
+  },
+  {
+    title: "Technical Questions",
+    description:
+      "Understand system requirements and discover customization possibilities.",
+    questions: [
+      {
+        question: "What are the system requirements?",
+        answer:
+          "Modern hardware with standard specifications will run smoothly.",
+      },
+      {
+        question: "Can I customize my experience?",
+        answer: "Absolutely! Flexibility is at our core.",
+      },
+    ],
+  },
+  {
+    title: "Privacy & Security",
+    description:
+      " Discover how your data is protected and how you maintain control.",
+    questions: [
+      {
+        question: "How is my data protected?",
+        answer:
+          "We employ industry-leading security measures with a focus on privacy.",
+      },
+      {
+        question: "Can I control my data?",
+        answer: "You maintain complete control over all your information.",
+      },
+    ],
+  },
+];
 
 export const Questions = () => {
   return (
@@ -28,6 +80,20 @@ export const Questions = () => {
           ></Button>
         </div>
       </form>
+      <p className="mt-[25px] sm:mt-[36px] text-[14px] sm:text-[16px] leading-[19px] sm:leading-[22px] text-center">
+        Can’t find an answer? Chat to{" "}
+        <span className="underline">our team</span>
+      </p>
+      <div className="mt-[60px] sm:mt-[100px] mb-[60px] sm:mb-[120px]">
+        {questionsData.map((data) => (
+          <QuestionDataItem
+            key={data.title}
+            title={data.title}
+            description={data.description}
+            questions={data.questions}
+          />
+        ))}
+      </div>
     </div>
   );
 };
