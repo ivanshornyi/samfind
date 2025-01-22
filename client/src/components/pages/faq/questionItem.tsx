@@ -3,12 +3,12 @@
 import { Button } from "@/components/ui";
 import { useState } from "react";
 
-interface QuestionItemItem {
+interface QuestionItemProps {
   question: string;
   answer: string;
 }
 
-export function QuestionItem({ question, answer }: QuestionItemItem) {
+export function QuestionItem({ question, answer }: QuestionItemProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggle = () => {
