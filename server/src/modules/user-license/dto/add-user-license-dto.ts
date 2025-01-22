@@ -1,15 +1,15 @@
-import { IsString } from "class-validator";
+import { IsEnum, IsNumber, IsString } from "class-validator";
+
+import { LicenseTierType } from "@prisma/client";
 
 export class AddUserLicenseDto {
   @IsString()
-  userId: string;
+  ownerId: string;
 
+  @IsEnum(LicenseTierType)
   @IsString()
-  name: string;
+  tierType: LicenseTierType;
 
-  @IsString()
-  key: string;
-
-  @IsString()
-  licenseId: string;
+  @IsNumber()
+  count: number;
 }

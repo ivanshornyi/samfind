@@ -25,12 +25,24 @@ export class AuthService {
   ) {}
 
   public async signUp(signUpDto: SignUpDto) {
-    const { firstName, lastName, email, password, authType } = signUpDto;
+    const { 
+      firstName, 
+      lastName, 
+      email, 
+      password, 
+      authType,
+    } = signUpDto;
+
+    // send verification code
+    const registrationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const registrationCodeExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+    await this.mailService.sendRegistrationCode(email, registrationCode);
 
     const existingUser = await this.userService.findUserByEmail(email, authType);
 
-    if (existingUser) {
-      throw new ConflictException("User with this email already exists");
+    if (existingUser && existingUser.isVerified) {
+      throw new ConflictException("User with this email already exists and verified");
     }
 
     const hashedPassword = this.hashField(password);
@@ -41,21 +53,11 @@ export class AuthService {
       email,
       authType,
       password: hashedPassword,
+      registrationCode,
+      registrationCodeExpiresAt,
     });
 
-    const tokens = await this.tokenService.generateTokens({
-      sub: newUser.id,
-    });
-
-    await this.tokenService.updateRefreshToken(newUser.id, tokens.refreshToken);
-
-    delete newUser.password;
-    delete newUser.refreshToken;
-
-    return {
-      ...newUser,
-      ...tokens,
-    };
+    return newUser;
   }
 
   public async signIn(signInDto: SignInDto) {
@@ -67,8 +69,12 @@ export class AuthService {
       throw new NotFoundException("User not found");
     }
   
+    if (!user.isVerified) {
+      throw new UnauthorizedException("User is not verified");
+    }
+
     const isPasswordValid = this.isPasswordValid(password, user.password);
-  
+
     if (!isPasswordValid) {
       throw new UnauthorizedException("Invalid password");
     }
@@ -95,6 +101,10 @@ export class AuthService {
       throw new NotFoundException(
         "User does not exist or does not use email authentication",
       );
+    }
+
+    if (!user.isVerified) {
+      throw new NotFoundException("User is not verified");
     }
 
     const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
@@ -189,6 +199,43 @@ export class AuthService {
     }
   }
 
+  public async verifyUserCode(email: string, code: string) {
+    const user = await this.userService.findUserByEmail(email, UserAuthType.email);
+  
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+  
+    if (user.isVerified) {
+      throw new ConflictException("User is already verified");
+    }
+  
+    if (code !== user.registrationCode) {
+      throw new UnauthorizedException("Invalid verification code");
+    }
+  
+    if (user.registrationCodeExpiresAt.getTime() < new Date().getTime()) {
+      throw new UnauthorizedException("Verification code has expired");
+    }
+  
+    await this.userService.updateUser(user.id, {
+      isVerified: true,
+      registrationCode: null,
+      registrationCodeExpiresAt: null,
+    });
+
+    const tokens = await this.tokenService.generateTokens({
+      sub: user.id,
+    });
+
+    await this.tokenService.updateRefreshToken(user.id, tokens.refreshToken);
+
+    return {
+      ...user,
+      ...tokens,
+    };
+  }
+
   private hashField(password: string): string {
     return createHash("sha256").update(password).digest("hex");
   }
@@ -197,5 +244,15 @@ export class AuthService {
     const hash = this.hashField(password);
 
     return hash === hashedPassword;
+  }
+
+  private generateResetFields() {
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const codeExpiresAt = new Date(Date.now() + 15 * 60 * 1000).getTime();
+
+    return {
+      code,
+      codeExpiresAt,
+    }
   }
 }

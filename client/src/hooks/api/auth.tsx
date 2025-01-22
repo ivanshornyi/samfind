@@ -49,8 +49,6 @@ type SignUpData = {
 };
 
 export const useSignUp = () => {
-  const router = useRouter();
-  const { login } = useContext(AuthContext);
   const { toast } = useToast();
 
   const { ...mutationProps } = useMutation({
@@ -62,14 +60,11 @@ export const useSignUp = () => {
         data.password,
         data.authType
       ),
-    onSuccess: (data: { accessToken: string; refreshToken: string }) => {
+    onSuccess: () => {
       toast({
         title: "Success",
-        description: "Successfully logged in",
+        description: "Verification code has been send to your email",
       });
-
-      login(data.accessToken, data.refreshToken);
-      router.push("/");
     },
     onError: (error) => {
       handleToastError(error, toast);
@@ -144,7 +139,7 @@ export const useSendVerificationCodeToUpdateEmail = () => {
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "Verification code has been sent to your email",
+        description: "Verification code has been sent to your mail",
       });
     },
     onError: (error) => {
@@ -180,6 +175,30 @@ export const useUpdateUserEmail = () => {
 
       router.push("/account/settings");
       fetchUser();
+    },
+    onError: (error) => {
+      handleToastError(error, toast);
+    },
+  });
+
+  return mutationProps;
+};
+
+export const useVerifyUser = () => {
+  const router = useRouter();
+  const { login } = useContext(AuthContext);
+  const { toast } = useToast();
+
+  const { ...mutationProps } = useMutation({
+    mutationFn: (data: { email: string, verificationCode: string }) => AuthApiService.verifyUser(data.email, data.verificationCode),
+    onSuccess: (data: { accessToken: string, refreshToken: string }) => {
+      toast({
+        title: "Success",
+        description: "Successfully logged in",
+      });
+
+      login(data.accessToken, data.refreshToken);
+      router.push("/");
     },
     onError: (error) => {
       handleToastError(error, toast);
