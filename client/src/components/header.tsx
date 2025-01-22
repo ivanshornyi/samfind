@@ -25,11 +25,11 @@ const NAVIGATION_ITEMS = [
   },
   {
     title: "Contact",
-    path: "/",
+    path: "/contact",
   },
   {
     title: "License Management",
-    path: "/",
+    path: "/license",
   },
 ];
 
