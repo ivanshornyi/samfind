@@ -63,7 +63,7 @@ export const LicenseCardList = () => {
 
   return (
     <div className="pt-[152px] md:pt-[200px] pb-[60px] md:pb-[120px]">
-      <div className="w-fit rounded-3xl bg-[#242424] py-[6.4px] px-[25.6px] mb-6 mx-auto md:mx-[0] relative z-[11]">
+      <div className="w-fit rounded-3xl bg-[#242424] py-[6.4px] px-[25.6px] mb-6 mx-auto md:mx-[0] relative">
         <span className="font-medium text-base text-[#CE9DF3]">
           Explore more
         </span>
@@ -93,7 +93,7 @@ export const LicenseCardList = () => {
         width={412}
         height={200}
         alt="Background illustration"
-        className="absolute top-[28px] left-0 z-[10]"
+        className="absolute top-[28px] left-0 z-[-1]"
       />
     </div>
   );
