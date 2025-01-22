@@ -30,7 +30,7 @@ export const NAVIGATION_ITEMS = [
   },
   {
     title: "License Management",
-    path: "/",
+    path: "/license-management",
   },
 ];
 
