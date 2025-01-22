@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export const BeginJourney = () => {
   return (
-    <div className="flex flex-col items-center justify-center space-y-[47px] mt-[120px]">
+    <div className="flex flex-col items-center justify-center space-y-[47px] mt-20 sm:mt-[120px]">
       <div className="font-bold text-[32px] sm:text-[64px] leading-[32px] sm:leading-[64px] text-center">
         <h2>Begin Your Journey</h2>
         <h2>Today.</h2>

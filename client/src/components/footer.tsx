@@ -4,9 +4,46 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button, Input } from "@/components/ui";
 
+type Link = {
+  label: string;
+  href: string;
+};
+
+const links: { menu: Link[]; legals: Link[] } = {
+  menu: [
+    { label: "Pricing", href: "/pricing" },
+    { label: "About", href: "/about" },
+    { label: "FAQ", href: "/faq" },
+    { label: "Contact", href: "/contact" },
+    { label: "License Management", href: "/license-management" },
+  ],
+  legals: [
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Terms of Use", href: "/terms" },
+    { label: "Cookie Policy", href: "/cookies" },
+  ],
+};
+
+const FooterSection = ({ title, links }: { title: string; links: Link[] }) => (
+  <div className="space-y-[28px]">
+    <h3 className="text-xl font-semibold">{title}</h3>
+    <div className="flex flex-col gap-[21px] text-sm lg:text-base font-semibold">
+      {links.map((item, index) => (
+        <Link
+          href="/"
+          key={index}
+          className="transition-all hover:text-[#CE9DF3] hover:underline active:text-[#8F40E5]"
+        >
+          {item.label}
+        </Link>
+      ))}
+    </div>
+  </div>
+);
+
 export const Footer = () => {
   return (
-    <footer className="text-white py-10 pb-[60px] px-6 text-nowrap">
+    <footer className="text-white py-[14px] sm:py-10 sm:pb-[60px] px-5 sm:px-6 text-nowrap">
       <div className="mx-auto flex flex-col lg:flex-row justify-between gap-10">
         <div className="flex flex-col space-y-[30px] lg:space-y-[122px]">
           <Link href="/">
@@ -31,7 +68,7 @@ export const Footer = () => {
             <Button
               type="submit"
               variant="secondary"
-              className="py-[22.5px] rounded-[30px] border-none w-full"
+              className="py-[22.5px] rounded-[30px] border-none w-full mb-6"
             >
               Subscribe now
             </Button>
@@ -48,46 +85,13 @@ export const Footer = () => {
         </div>
 
         <div className="flex flex-row xl:gap-12">
-          {/* Menu */}
-          <div className="space-y-[28px]">
-            <h3 className="text-xl font-semibold">Menu</h3>
-            <div className="flex flex-col gap-[21px] text-sm lg:text-base font-semibold">
-              {[
-                "Pricing",
-                "About",
-                "FAQ",
-                "Contact",
-                "Linkcense Management",
-              ].map((item) => (
-                <Link
-                  href="/"
-                  key={item}
-                  className="transition-all hover:text-[#CE9DF3] hover:underline active:text-[#8F40E5]"
-                >
-                  {item}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* Legals */}
-          <div className="space-y-[28px]">
-            <h3 className="text-xl font-semibold">Legals</h3>
-            <div className="flex flex-col gap-[21px] text-sm lg:text-base font-semibold">
-              {["Privacy Policy", "Terms of use", "Cookie Policy"].map(
-                (item) => (
-                  <Link
-                    href="/"
-                    key={item}
-                    className="transition-all hover:text-[#CE9DF3] hover:underline active:text-[#8F40E5]"
-                  >
-                    {item}
-                  </Link>
-                )
-              )}
-            </div>
-          </div>
+          <FooterSection title="Menu" links={links.menu} />
+          <FooterSection title="Legals" links={links.legals} />
         </div>
+
+        <p className="lg:hidden font-normal text-sm text-[#E6E6E6]">
+          © Onsio2025. All rights reserved.
+        </p>
 
         {/* Stay Updated */}
         <div className="w-full lg:max-w-[400px] xl:max-w-[608px] space-y-4 hidden lg:block">
@@ -111,7 +115,7 @@ export const Footer = () => {
               Privacy policy
             </Link>
           </p>
-          <div className="text-sm text-[#616161] flex space-x-2  overflow-x-scroll no-scrollbar">
+          <div className="text-sm text-[#616161] flex space-x-2 overflow-x-scroll no-scrollbar">
             <span>• Latest updates</span>
             <span>• Technology insights</span>
             <span>• Success stories</span>
