@@ -27,7 +27,7 @@ export class MailService {
       const mailOptions = {
         from: configService.get("MAIL_USER"),
         to,
-        subject: "Reset password code from Samfind",
+        subject: "Reset password code from Onsio",
         text: `Verification code: ${resetCode}`,
       };
 
@@ -42,7 +42,22 @@ export class MailService {
       const mailOptions = {
         from: configService.get("MAIL_USER"),
         to,
-        subject: "Verification code for email update from Samfind",
+        subject: "Verification code for email update from Onsio",
+        text: `Verification code: ${resetCode}`,
+      };
+
+      await this.transporter.sendMail(mailOptions);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async sendRegistrationCode(to: string, resetCode: string) {
+    try {
+      const mailOptions = {
+        from: configService.get("MAIL_USER"),
+        to,
+        subject: "Verification code for registration from Onsio",
         text: `Verification code: ${resetCode}`,
       };
 

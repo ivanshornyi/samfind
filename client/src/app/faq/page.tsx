@@ -2,7 +2,7 @@ import { Questions } from "@/components/pages/faq";
 
 export default function Faq() {
   return (
-    <div>
+    <div className="w-full">
       <Questions />
     </div>
   );

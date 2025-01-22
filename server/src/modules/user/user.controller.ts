@@ -85,9 +85,11 @@ export class UserController {
   }
 
   @ApiOperation({ summary: "Get domain info" })
-  @Get("/check-user-domain/:domain")
-  async getDomainInfo(@Param() domain: string) {
-
+  @Get("/check-user-email/:email")
+  async getDomainInfo(
+    @Param("email") email: string,
+  ) {
+    // find license and users by this domain and email
   }
 
   // @ApiOperation({ summary: "" })

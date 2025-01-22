@@ -103,6 +103,19 @@ const updateEmail = async (
   }
 };
 
+const verifyUser = async (email: string, verificationCode: string) => {
+  try {
+    const response = await apiClient.post("/auth/verify", {
+      email,
+      verificationCode,
+    });
+
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 export const AuthApiService = {
   signIn,
   signUp,
@@ -110,4 +123,5 @@ export const AuthApiService = {
   resetPassword,
   sendVerificationCodeToUpdateEmail,
   updateEmail,
+  verifyUser,
 };

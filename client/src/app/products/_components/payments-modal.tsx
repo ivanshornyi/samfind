@@ -8,6 +8,8 @@ import { CreateIntent } from "@/services";
 
 import { useGetStripeClient } from "@/hooks";
 
+import { LicenseTierType } from "@/types";
+
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -54,6 +56,8 @@ export const PaymentsModal: React.FC<PaymentsModalProps> = ({
       let intent: CreateIntent = {
         amount,
         currency,
+        count: 10,
+        tierType: LicenseTierType.Freemium,
         userId: user.id,
       };
 
@@ -73,8 +77,9 @@ export const PaymentsModal: React.FC<PaymentsModalProps> = ({
       <AlertDialogTrigger asChild>
         <Button
           variant="secondary"
-          className="text-sm w-full" // if user registered
+          className="text-sm w-full"
           onClick={handleIntent}
+          disabled={!user}
         >
           Buy
         </Button>
