@@ -9,8 +9,9 @@ import { Button } from "@/components";
 
 import { Logo } from "../../public";
 import { User } from "lucide-react";
+import { MenuMobile } from "./menu-mobile";
 
-const NAVIGATION_ITEMS = [
+export const NAVIGATION_ITEMS = [
   {
     title: "Pricing",
     path: "/",
@@ -95,14 +96,7 @@ export const Header = () => {
           )}
         </div>
 
-        <div className="lg:hidden">
-          <Image
-            src="icons/header-menu.svg"
-            alt="menu"
-            width={44}
-            height={44}
-          />
-        </div>
+        <MenuMobile />
       </div>
     </header>
   );
