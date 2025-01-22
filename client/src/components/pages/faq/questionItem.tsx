@@ -16,7 +16,7 @@ export function QuestionItem({ question, answer }: QuestionItemItem) {
   };
 
   return (
-    <div className="border-b border-[#444444] py-4 w-full sm:max-w-[690px]">
+    <div className="border-b border-[#444444] py-4 w-full  sm:w-[690px]">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">{question}</h2>
 

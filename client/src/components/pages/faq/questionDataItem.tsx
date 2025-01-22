@@ -14,8 +14,8 @@ export function QuestionDataItem({
   questions,
 }: QuestionDataItemProps) {
   return (
-    <div className="flex flex-col sm:flex-row mb-[60px] sm:mb-[100px] justify-evenly">
-      <div className="w-full sm:w-[334px]">
+    <div className="flex flex-col sm:flex-row mb-[60px] sm:mb-[100px] w-full sm:gap-[145px] justify-evenly ">
+      <div className="w-full sm:w-[334px] pt-2">
         <p className="mb-4 text-[24px] sm:text-[32px] leading-[32px] sm:leading-[44px] font-semibold">
           {title}
         </p>
