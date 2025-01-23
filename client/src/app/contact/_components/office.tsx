@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { Button } from "@/components/ui";
 import { Map } from "@public/contact/icons";
-import { EllispeRedImage } from "@public/contact";
+import { EllipseBlueImage } from "@public/contact";
 
 const contacts = [
   {
@@ -70,7 +70,7 @@ export const Office = () => {
         ))}
       </div>
       <Image
-        src={EllispeRedImage}
+        src={EllipseBlueImage}
         width={1200}
         height={400}
         alt="Background illustration"
