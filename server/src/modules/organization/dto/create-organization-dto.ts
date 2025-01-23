@@ -9,7 +9,7 @@ export class CreateOrganizationDto {
 
   @IsString()
   @IsOptional()
-  domain: string;
+  domain?: string;
 
   @IsString()
   VAT: string;

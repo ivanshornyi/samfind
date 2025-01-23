@@ -22,7 +22,8 @@ export const PaymentsForm = () => {
 
       <div className="flex justify-end">
         <Button
-          className="mt-3 px-3"
+          variant="tetrary"
+          className="mt-3 w-[120px] bg-slate-400"
           withLoader
           loading={isConfirmPaymentPending}
           disabled={isConfirmPaymentPending}

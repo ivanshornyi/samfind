@@ -25,18 +25,16 @@ export default function AuthLayout({
   }, [isLoggedIn]);
 
   return (
-    <div className="container px-5 h-[100dvh] mx-auto flex justify-center items-center">
-      <div className="flex flex-col items-center gap-8">
-        <div>
+    <div className="container px-5 h-[100dvh] mx-auto flex flex-col gap-4 justify-between items-center">
+        <div className="pt-12">
           <Link href="/">
             <Image src={Logo} alt="logo" className="w-24 h-6" />
           </Link>
         </div>
         <div className="flex items-center justify-center">{children}</div>
-        <div>
+        <div className="py-5">
           <p>@ Osio2025. All rights reserved.</p>
         </div>
-      </div>
     </div>
   );
 }

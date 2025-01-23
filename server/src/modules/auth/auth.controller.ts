@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Post, } from "@nestjs/common";
 
 import { SignInDto, SignUpDto } from "./dto/auth-user-dto";
 import { ResetPasswordDto } from "./dto/reset-password-dto";
@@ -8,6 +8,7 @@ import { AuthService } from "./auth.service";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { SendCodeForEmailDto } from "./dto/send-code-for-email.dto";
 import { AuthVerificationDto } from "./dto/auth-verification-dto"; 
+import { CheckEmailDto } from "./dto/check-email-dto";
 
 @ApiTags("Authentication")
 @Controller("auth")
@@ -53,6 +54,12 @@ export class AuthController {
   @ApiOperation({ summary: "Verify user" })
   @Post("/verify")
   public async verifyUser(@Body() verificationDto: AuthVerificationDto) {
-    return this.authService.verifyUserCode(verificationDto.email, verificationDto.verificationCode);
+    return this.authService.verifyUserCode(verificationDto);
+  }
+
+  @ApiOperation({ summary: "Check user email if user registering by link with organization" })
+  @Post("/check-email-for-organization")
+  public async checkEmailBelongToOrganization(@Body() checkEmailDto: CheckEmailDto) {
+    return this.authService.checkEmailForDomain(checkEmailDto);
   }
 }

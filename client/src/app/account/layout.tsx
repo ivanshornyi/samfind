@@ -47,7 +47,7 @@ export default function AccountLayout({
                       variant={isActive ? "outline" : "ghost"}
                       className={`
                         ${!isActive && "hover:opacity-80"}
-                        w-full flex justify-start items-center py-5
+                        w-full flex justify-start items-center
                       `}
                     >
                       {item.icon}
@@ -61,9 +61,9 @@ export default function AccountLayout({
 
           <div className="mt-3 pt-3 border-t-[1px]">
             <Button
-              variant="default"
+              variant="secondary"
               onClick={logout}
-              className="w-[220px] flex items-center justify-start py-5"
+              className="w-[220px] flex items-center justify-start"
             >
               <LogOut size={18} />
               <span>Logout</span>

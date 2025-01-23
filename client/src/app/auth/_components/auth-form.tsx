@@ -3,14 +3,16 @@
 import React, { useState, useEffect } from "react";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+
+import { UserAccountType } from "@/types";
 
 import { useResetPassword, useSignIn, useSignUp, useToast } from "@/hooks";
 
-import { UserAuthType } from "@/services";
+import { SignUpData, UserAuthType } from "@/services";
 
 import { Button, Input } from "@/components";
-import { SendVerificationCodeModal } from "./send-verification-code-modal";
+import { SendResetPasswordCodeModal, VerifyUserModal } from "../_components";
 
 import { EyeIcon, EyeOff } from "lucide-react";
 
@@ -21,7 +23,9 @@ interface AuthFormProps {
 export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
   const { toast } = useToast();
 
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const accountType = searchParams.get("accountType") as UserAccountType;
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -38,8 +42,15 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
     newPassword: "",
   });
 
+  const [organizationFormData, setOrganizationFormData] = useState({
+    name: "",
+    businessOrganizationNumber: "",
+    VAT: "",
+    domain: "",
+  });
+
   const { mutate: signInMutation, isPending: isSignInPending } = useSignIn();
-  const { mutate: signUpMutation, isPending: isSignUpPending } = useSignUp();
+  const { mutate: signUpMutation, isPending: isSignUpPending, isSuccess: isSignUpSuccess } = useSignUp();
   const { mutate: resetPasswordMutation, isPending: isResetPasswordPending } =
     useResetPassword();
 
@@ -59,6 +70,13 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
     const value = event.target.value;
 
     setResetPasswordFormData({ ...resetPasswordFormData, [name]: value });
+  };
+
+  const handleOrganizationFormInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const name = event.target.name;
+    const value = event.target.value;
+
+    setOrganizationFormData({ ...organizationFormData, [name]: value });
   };
 
   const handlePasswordInputTypeChange = () => {
@@ -101,13 +119,55 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
         return;
       }
 
-      signUpMutation({
+      let signUpData: SignUpData = {
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
         email: formData.email.trim(),
         password: formData.password.trim(),
         authType: UserAuthType.Email,
-      });
+        accountType,
+      }
+
+      if (accountType === UserAccountType.Business) {
+        if (
+          organizationFormData.name === "" ||
+          organizationFormData.businessOrganizationNumber === "" ||
+          organizationFormData.VAT === ""
+        ) {
+          toast({
+            description: "Some fields are empty",
+          });
+  
+          return;
+        }
+
+        let organization: { 
+          name: string;
+          VAT: string;
+          businessOrganizationNumber: string;
+          domain?: string; 
+        } = {
+          name: organizationFormData.name,
+          VAT: organizationFormData.VAT,
+          businessOrganizationNumber: organizationFormData.businessOrganizationNumber,
+        }
+
+        // TODO add validation
+        if (organizationFormData.domain !== "") {
+          organization = {
+            ...organization,
+            domain: organizationFormData.domain,
+          }
+        }
+
+        // add organization
+        signUpData = {
+          ...signUpData,
+          organization,
+        }
+      }
+
+      signUpMutation(signUpData);
     }
 
     if (authPageType === "resetPassword") {
@@ -138,31 +198,56 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
     resetPassword: "Password recovery",
   };
 
+  const formDescription = {
+    signIn: "Welcome back! Access your personalized experience",
+    signUp: "Join the innovation! You’re almost there!",
+    resetPassword: "Set a secure password to protect your account and ensure safe access.",
+  }
+
   const disabledFormItems =
     isSignInPending || isSignUpPending || isResetPasswordPending;
 
   useEffect(() => {
     const referralCode = searchParams.get("userReferralCode");
+    const organizationId = searchParams.get("organizationId");
+    const licenseId = searchParams.get("licenseId");
     const token = localStorage.getItem("accessToken");
 
     if (referralCode && !token) {
       localStorage.setItem("userReferralCode", referralCode);
     }
-  }, [searchParams]);
+
+    if (organizationId && !token) {
+      localStorage.setItem("organizationId", organizationId);
+      // check if organization has a domain
+    }
+
+    if (licenseId && !token) {
+      localStorage.setItem("licenseId", licenseId);
+    }
+
+    if (
+      (authPageType === "signUp" && (!accountType ||
+        (
+          ![UserAccountType.Private, UserAccountType.Business].includes(accountType)
+        ))
+      )
+    ) {
+      router.push("/");
+    }
+  }, [searchParams, accountType]);
 
   return (
     <>
       <div className="w-[591px] border-[1px] border-violet-100 rounded-[30px] p-8">
-        <form onSubmit={handleAuthFormSubmit}>
+        {authPageType === "signUp" && (
+          <div className="capitalize text-violet-50 font-semibold">
+            {accountType} Account
+          </div>
+        )}
+        <form onSubmit={handleAuthFormSubmit} className="mt-4">
           <h2 className="font-semibold text-3xl">{formTitle[authPageType]}</h2>
-          {authPageType === "signIn" && (
-            <p className="mt-4">
-              Welcome back! Access your personalized experience
-            </p>
-          )}
-          {authPageType === "signUp" && (
-            <p className="mt-4">Join the innovation! You’re almost there!</p>
-          )}
+          <p className="mt-4 text-lg">{formDescription[authPageType]}</p>
 
           <div className="mt-8 flex flex-col gap-2">
             {authPageType === "signUp" && (
@@ -255,25 +340,56 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
             )}
           </div>
 
-          <Button
-            variant="secondary"
-            className="mt-5 w-full"
-            withLoader={true}
-            loading={disabledFormItems}
-            disabled={disabledFormItems}
-          >
-            {authPageType !== "resetPassword" ? (
-              <span>Continue</span>
-            ) : (
-              <span>Save</span>
-            )}
-          </Button>
+          {authPageType === "signUp" && accountType === UserAccountType.Business && (
+            <div className="flex flex-col gap-2 mt-4"> 
+              <p>Provide detailed information about your business to help us customize your experience</p>
+
+              <Input 
+                name="name"
+                placeholder="Company name" 
+                value={organizationFormData.name}
+                onChange={handleOrganizationFormInputChange}
+              />
+              <Input 
+                name="businessOrganizationNumber"
+                placeholder="Business registration number" 
+                value={organizationFormData.businessOrganizationNumber}
+                onChange={handleOrganizationFormInputChange}
+              />
+              <Input 
+                name="VAT"
+                placeholder="VAT number" 
+                value={organizationFormData.VAT}
+                onChange={handleOrganizationFormInputChange}
+              />
+              <Input 
+                name="domain"
+                placeholder="domain.com(optional)" 
+                value={organizationFormData.domain}
+                onChange={handleOrganizationFormInputChange}
+              />
+            </div>
+          )}
+
+            <Button
+              variant="secondary"
+              className="mt-5 w-full"
+              withLoader={true}
+              loading={disabledFormItems}
+              disabled={disabledFormItems}
+            >
+              {authPageType !== "resetPassword" ? (
+                <span>Continue</span>
+              ) : (
+                <span>Save</span>
+              )}
+            </Button>
         </form>
 
         <div className="pt-4">
-          {authPageType === "signIn" && <SendVerificationCodeModal />}
+          {authPageType === "signIn" && <SendResetPasswordCodeModal />}
 
-          <p className="text-center my-5">Or</p>
+          {authPageType !== "resetPassword" && <p className="text-center my-5">Or</p>}
 
           {authPageType !== "resetPassword" && (
             <div className="flex flex-col gap-2">
@@ -290,7 +406,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
             <p className="text-sm text-center mt-3">
               <span>Not a member yet? </span>
               <Link
-                href="/auth/sign-up"
+                href="/auth/account-type"
                 className="font-semibold underline hover:opacity-80"
               >
                 Sign up
@@ -311,6 +427,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
           )}
         </div>
       </div>
+
+      {authPageType === "signUp" && <VerifyUserModal isOpen={isSignUpSuccess} email={formData.email} />}
     </>
   );
 };
