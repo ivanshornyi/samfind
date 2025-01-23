@@ -1,4 +1,3 @@
-
 import { licensingOptions } from "@app/(home)/_lib";
 import { LicensingOptionCard } from "./licensing-option-card";
 
@@ -15,12 +14,15 @@ export const LicensingOptionList = () => {
         </span>
       </div>
 
-      <div className="flex flex-col ml:flex-row gap-5">
-        {licensingOptions.map((option) => (
-          <LicensingOptionCard key={option.id} option={option} />
+      <div className="flex flex-col items-center ml:flex-row gap-5">
+        {licensingOptions.map((option, index) => (
+          <LicensingOptionCard
+            key={option.id}
+            option={option}
+            isLarge={index % 2 !== 0}
+          />
         ))}
       </div>
     </div>
   );
 };
-
