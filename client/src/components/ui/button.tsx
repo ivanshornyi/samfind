@@ -1,5 +1,12 @@
 import * as React from "react";
-import { MoveUpRight, MoveRight, Plus, Minus, ArrowLeftIcon, LoaderCircle } from "lucide-react";
+import {
+  MoveUpRight,
+  MoveRight,
+  Plus,
+  Minus,
+  ArrowLeftIcon,
+  LoaderCircle,
+} from "lucide-react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
@@ -76,12 +83,22 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           </>
         ) : (
           <>
-            {icon === "left-arrow" && <ArrowLeftIcon />}
+            {icon === "left-arrow" && (
+              <ArrowLeftIcon style={{ width: "30px", height: "30px" }} />
+            )}
             {props.children}
-            {icon === "up-right" && <MoveUpRight className="size-20" />}
-            {icon === "right" && <MoveRight className="size-20" />}
-            {icon === "plus" && <Plus className="size-20" />}
-            {icon === "minus" && <Minus className="size-20" />}
+            {icon === "up-right" && (
+              <MoveUpRight style={{ width: "20px", height: "20px" }} />
+            )}
+            {icon === "right" && (
+              <MoveRight style={{ width: "20px", height: "20px" }} />
+            )}
+            {icon === "plus" && (
+              <Plus style={{ width: "20px", height: "20px" }} />
+            )}
+            {icon === "minus" && (
+              <Minus style={{ width: "20px", height: "20px" }} />
+            )}
           </>
         )}
       </Comp>

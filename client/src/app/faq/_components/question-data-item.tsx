@@ -1,6 +1,6 @@
 "use client";
 
-import { QuestionItem } from "./questionItem";
+import { QuestionItem } from "./question-item";
 
 interface QuestionDataItemProps {
   title: string;

@@ -2,20 +2,20 @@
 
 import Image from "next/image";
 import { LinkedIn, GitHub, Twitter } from "@public/contact/icons";
-import { NetworkItem } from "./networkItem";
+import { NetworkItem } from "./network-item";
 
 const networks = [
   {
     name: "Twitter:",
     icon: Twitter,
     text: "@OnsioTech",
-    link: "https://twitter.com/OnsioTech",
+    link: "https://x.com/OnsioAI",
   },
   {
     name: "LinkedIn:",
     icon: LinkedIn,
     text: "Onsio Technologies",
-    link: "https://www.linkedin.com/company/onsio",
+    link: "https://linkedin.com/company/onsio/about",
   },
   {
     name: "GitHub:",
@@ -27,7 +27,7 @@ const networks = [
 
 export const SocialNetworks = () => {
   return (
-    <div className="relative overflow-hidden flex flex-col sm:flex-row mb-[60px] sm:mb-[680px] justify-evenly align-center pt-[100px] pb-[32px] sm:py-[87px] rounded-[20px] bg-[#262525]">
+    <div className="relative overflow-hidden flex flex-col sm:flex-row mt-[60px] mb-[60px] sm:mb-[680px] justify-evenly align-center pt-[100px] pb-[32px] sm:py-[87px] rounded-[20px] bg-[#262525]">
       <div className="z-10 mt-4">
         <h2 className="font-semibold text-[32px] leading-[43px] w-full sm:max-w-[334px] text-center sm:text-start">
           Connect With Us

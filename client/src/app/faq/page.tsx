@@ -1,4 +1,4 @@
-import { Questions } from "@/components/pages/faq";
+import { Questions } from "@/app/faq/_components";
 
 export default function Faq() {
   return (

@@ -24,7 +24,7 @@ export function QuestionItem({ question, answer }: QuestionItemProps) {
           variant="tetrary"
           icon={isOpen ? "minus" : "plus"}
           onClick={toggle}
-          className="w-9"
+          className="w-10"
         ></Button>
       </div>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, Input } from "@/components/ui";
-import { QuestionDataItem } from "./questionDataItem";
+import { QuestionDataItem } from "./question-data-item";
 
 const questionsData = [
   {
@@ -76,7 +76,7 @@ export const Questions = () => {
             type="submit"
             variant="secondary"
             icon="right"
-            className="w-5"
+            className="w-10"
           ></Button>
         </div>
       </form>

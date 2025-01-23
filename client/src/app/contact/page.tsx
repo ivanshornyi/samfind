@@ -1,4 +1,4 @@
-import { Office, SocialNetworks } from "@/components/pages/contact";
+import { Office, SocialNetworks } from "@/app/contact/_components";
 
 export default function Contact() {
   return (
