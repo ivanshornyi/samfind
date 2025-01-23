@@ -4,6 +4,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 
 import { PrismaModule } from "../prisma/prisma.module";
+import { PrismaService } from "../prisma/prisma.service";
 
 import { AuthService } from "./auth.service";
 import { AuthController } from "./auth.controller";
@@ -29,6 +30,7 @@ import { MailService } from "../mail/mail.service";
     UserService,
     TokenService,
     MailService,
+    PrismaService,
   ],
   exports: [TokenService],
 })

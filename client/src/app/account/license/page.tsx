@@ -165,7 +165,7 @@ export default function LicenseList() {
           </DropdownMenu>
         </div>
         <div className="rounded-md border">
-          <Table className="bg-card rounded-md">
+          <Table className="bg-card rounded-md border-none">
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>

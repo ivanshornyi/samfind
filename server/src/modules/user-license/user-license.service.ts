@@ -37,7 +37,7 @@ export class UserLicenseService {
   async findByUserId(id: string): Promise<License[]> {
     const licenses = await this.prisma.license.findMany({
       where: {
-        userId: id,
+        ownerId: id,
       },
       // take: limit,
       // skip: offset,

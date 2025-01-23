@@ -1,4 +1,6 @@
-import { IsNumber, IsOptional, IsString } from "class-validator";
+import { IsNumber, IsOptional, IsString, IsEnum } from "class-validator";
+
+import { LicenseTierType } from "@prisma/client";
 
 export class CreateIntentDto {
   @IsNumber()
@@ -13,4 +15,11 @@ export class CreateIntentDto {
   @IsNumber()
   @IsOptional()
   userReferralCode?: number;
+
+  @IsEnum(LicenseTierType)
+  @IsString()
+  tierType: LicenseTierType;
+
+  @IsNumber()
+  count: number;
 }

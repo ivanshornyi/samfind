@@ -6,56 +6,86 @@ import {
   ConflictException,
 } from "@nestjs/common";
 
+import { UserAuthType } from "@prisma/client";
+import { PrismaService } from "../prisma/prisma.service";
+
 import { UserService } from "../user/user.service";
 import { TokenService } from "./token.service";
 import { MailService } from "../mail/mail.service";
 
 import { SignInDto, SignUpDto } from "./dto/auth-user-dto";
 import { SendCodeForEmailDto } from "./dto/send-code-for-email.dto";
-import { UserAuthType } from "@prisma/client";
+import { CheckEmailDto } from "./dto/check-email-dto";
 
 import { createHash } from "crypto";
+import { AuthVerificationDto } from "./dto/auth-verification-dto";
 
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly prisma: PrismaService,
     private readonly userService: UserService,
     private readonly tokenService: TokenService,
     private readonly mailService: MailService,
   ) {}
 
   public async signUp(signUpDto: SignUpDto) {
-    const { firstName, lastName, email, password, authType } = signUpDto;
+    const { 
+      firstName, 
+      lastName, 
+      email, 
+      password, 
+      authType,
+      accountType,
+      organization,
+    } = signUpDto;
+
+    // send verification code
+    const registrationCode = this.generateCode().code;
+    const registrationCodeExpiresAt = this.generateCode().codeExpiresAt;
+
+    await this.mailService.sendRegistrationCode(email, registrationCode);
 
     const existingUser = await this.userService.findUserByEmail(email, authType);
 
-    if (existingUser) {
-      throw new ConflictException("User with this email already exists");
+    if (existingUser && existingUser.isVerified) {
+      throw new ConflictException("User with this email already exists and verified");
     }
 
     const hashedPassword = this.hashField(password);
 
-    const newUser = await this.userService.create({
-      firstName,
-      lastName,
-      email,
-      authType,
-      password: hashedPassword,
-    });
+    // if user have a link (have licenseId or organizationId) =>
+    // with organization add to organization, add to license
 
-    const tokens = await this.tokenService.generateTokens({
-      sub: newUser.id,
-    });
+    // with user group add to license
 
-    await this.tokenService.updateRefreshToken(newUser.id, tokens.refreshToken);
+    if (!existingUser) {
+      const newUser = await this.userService.create({
+        firstName,
+        lastName,
+        email,
+        authType,
+        password: hashedPassword,
+        registrationCode,
+        registrationCodeExpiresAt,
+        accountType,
+      });
 
-    delete newUser.password;
-    delete newUser.refreshToken;
+      if (organization) {
+        await this.prisma.organization.create({
+          data: {
+            ...organization,
+            ownerId: newUser.id,
+          }
+        });
+      }
 
-    return {
-      ...newUser,
-      ...tokens,
-    };
+      return newUser;
+    } else {
+      await this.userService.updateUser(existingUser.id, { registrationCode, registrationCodeExpiresAt, accountType });
+
+      return existingUser;
+    }
   }
 
   public async signIn(signInDto: SignInDto) {
@@ -67,8 +97,12 @@ export class AuthService {
       throw new NotFoundException("User not found");
     }
   
+    if (!user.isVerified) {
+      throw new UnauthorizedException("User is not verified");
+    }
+
     const isPasswordValid = this.isPasswordValid(password, user.password);
-  
+
     if (!isPasswordValid) {
       throw new UnauthorizedException("Invalid password");
     }
@@ -97,8 +131,12 @@ export class AuthService {
       );
     }
 
-    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
-    const resetCodeExpiresAt = new Date(Date.now() + 15 * 60 * 1000).getTime();
+    if (!user.isVerified) {
+      throw new NotFoundException("User is not verified");
+    }
+
+    const resetCode = this.generateCode().code;
+    const resetCodeExpiresAt = this.generateCode().codeExpiresAt;
 
     await this.userService.updateUser(user.id, { resetCode, resetCodeExpiresAt });
 
@@ -122,8 +160,8 @@ export class AuthService {
       throw new UnauthorizedException("Invalid password");
     }
 
-    const emailResetCode = Math.floor(100000 + Math.random() * 900000).toString();
-    const emailResetCodeExpiresAt = new Date(Date.now() + 15 * 60 * 1000).getTime();
+    const emailResetCode = this.generateCode().code;
+    const emailResetCodeExpiresAt = this.generateCode().codeExpiresAt;
 
     await this.userService.updateUser(user.id, { emailResetCode, emailResetCodeExpiresAt });
 
@@ -144,13 +182,13 @@ export class AuthService {
       throw new NotFoundException("Verification code is not correct");
     }
   
-    if (user.resetCodeExpiresAt < new Date().getTime()) {
+    if (user.resetCodeExpiresAt.getTime() < new Date().getTime()) {
       throw new NotFoundException("Verification code has expired");
     }
   
     if (
       resetPasswordDto.verificationCode === user?.resetCode &&
-      user.resetCodeExpiresAt > new Date().getTime()
+      user.resetCodeExpiresAt.getTime() > new Date().getTime()
     ) {
       const hashedNewPassword = this.hashField(resetPasswordDto.newPassword);
 
@@ -175,18 +213,87 @@ export class AuthService {
       throw new NotFoundException("Verification code is not correct");
     }
   
-    if (user.emailResetCodeExpiresAt < new Date().getTime()) {
+    if (user.emailResetCodeExpiresAt.getTime() < new Date().getTime()) {
       throw new NotFoundException("Verification code has expired");
     }
 
     if (
       emailUpdateDto.verificationCode === user?.emailResetCode &&
-      user.emailResetCodeExpiresAt > new Date().getTime()
+      user.emailResetCodeExpiresAt.getTime() > new Date().getTime()
     ) {
       await this.userService.updateUser(
         user.id, { email: emailUpdateDto.newEmail }
       );
     }
+  }
+
+  public async verifyUserCode(authVerificationDto: AuthVerificationDto) {
+    const user = await this.userService.findUserByEmail(authVerificationDto.email, UserAuthType.email);
+  
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+  
+    if (user.isVerified) {
+      throw new ConflictException("User is already verified");
+    }
+  
+    if (authVerificationDto.verificationCode !== user.registrationCode) {
+      throw new UnauthorizedException("Invalid verification code");
+    }
+  
+    if (user.registrationCodeExpiresAt.getTime() < new Date().getTime()) {
+      throw new UnauthorizedException("Verification code has expired");
+    }
+  
+    await this.userService.updateUser(user.id, {
+      isVerified: true,
+      registrationCode: null,
+      registrationCodeExpiresAt: null,
+    });
+
+    if (authVerificationDto.licenseId) {
+      // add user email to license
+    }
+
+    if (authVerificationDto.organizationId) {
+      // add user email to organization
+      // add to license
+    }
+
+    const tokens = await this.tokenService.generateTokens({
+      sub: user.id,
+    });
+
+    await this.tokenService.updateRefreshToken(user.id, tokens.refreshToken);
+
+    return {
+      ...user,
+      ...tokens,
+    };
+  }
+
+  public async checkEmailForDomain(checkEmailDto: CheckEmailDto) {
+    const { email, organizationId } = checkEmailDto;
+
+    const organization = await this.prisma.organization.findUnique({
+      where: {
+        id: organizationId,
+      }
+    });
+
+    if (!organization) {
+      throw new NotFoundException("Organization not found");
+    }
+    
+    if (!organization.domain) {
+      throw new ConflictException("This organization does not have a domain");
+    }
+
+    const emailDomainPart = email.split("@")[1];
+
+    // find organization if organization has a domain check by second part of email
+    // check includes domain email or not
   }
 
   private hashField(password: string): string {
@@ -197,5 +304,15 @@ export class AuthService {
     const hash = this.hashField(password);
 
     return hash === hashedPassword;
+  }
+
+  private generateCode() {
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const codeExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+    return {
+      code,
+      codeExpiresAt,
+    }
   }
 }

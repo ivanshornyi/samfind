@@ -20,7 +20,7 @@ import {
 
 import { X } from "lucide-react";
 
-export const SendVerificationCodeModal = () => {
+export const SendResetPasswordCodeModal = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
 
@@ -51,30 +51,30 @@ export const SendVerificationCodeModal = () => {
           Forgot your password?
         </button>
       </AlertDialogTrigger>
-      <AlertDialogContent className="w-[420px]">
-        <div className="absolute right-0 top-0">
-          <AlertDialogCancel className="shadow-none border-none p-3">
+      <AlertDialogContent className="w-[591px] p-8">
+        <div className="absolute right-5 top-5">
+          <AlertDialogCancel className="shadow-none border-none p-1 rounded-full bg-card">
             <X size={18} />
           </AlertDialogCancel>
         </div>
 
         <AlertDialogHeader>
-          <AlertDialogTitle>Password recovery</AlertDialogTitle>
+          <AlertDialogTitle className="text-xl">Forgot your password?</AlertDialogTitle>
           <AlertDialogDescription>
-            Email for verification code
+            Enter your email address to receive a recovery code.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         <div>
-          <form className="flex" onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit}>
             <Input
-              placeholder="Enter email"
-              className="rounded-r-none px-3 py-6"
+              placeholder="Email address"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
             />
             <Button
-              className="rounded-l-none py-6 border-[1px] border-primary"
+              variant="secondary"
+              className="w-full mt-4"
               loading={isSendingPending}
               disabled={isSendingPending}
               withLoader={true}

@@ -6,7 +6,7 @@ import { AuthContext } from "@/context";
 
 import { useMutation } from "@tanstack/react-query";
 
-import { AuthApiService, UserAuthType } from "@/services";
+import { AuthApiService, UserAuthType, SignUpData } from "@/services";
 
 import { useToast } from "@/hooks";
 
@@ -40,36 +40,16 @@ export const useSignIn = () => {
   return rest;
 };
 
-type SignUpData = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  authType: UserAuthType;
-};
-
 export const useSignUp = () => {
-  const router = useRouter();
-  const { login } = useContext(AuthContext);
   const { toast } = useToast();
 
   const { ...mutationProps } = useMutation({
-    mutationFn: (data: SignUpData) =>
-      AuthApiService.signUp(
-        data.firstName,
-        data.lastName,
-        data.email,
-        data.password,
-        data.authType
-      ),
-    onSuccess: (data: { accessToken: string; refreshToken: string }) => {
+    mutationFn: (data: SignUpData) => AuthApiService.signUp(data),
+    onSuccess: () => {
       toast({
         title: "Success",
-        description: "Successfully logged in",
+        description: "Verification code has been send to your email",
       });
-
-      login(data.accessToken, data.refreshToken);
-      router.push("/");
     },
     onError: (error) => {
       handleToastError(error, toast);
@@ -144,7 +124,7 @@ export const useSendVerificationCodeToUpdateEmail = () => {
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "Verification code has been sent to your email",
+        description: "Verification code has been sent to your mail",
       });
     },
     onError: (error) => {
@@ -180,6 +160,36 @@ export const useUpdateUserEmail = () => {
 
       router.push("/account/settings");
       fetchUser();
+    },
+    onError: (error) => {
+      handleToastError(error, toast);
+    },
+  });
+
+  return mutationProps;
+};
+
+export const useVerifyUser = () => {
+  const router = useRouter();
+  const { login } = useContext(AuthContext);
+  const { toast } = useToast();
+
+  const { ...mutationProps } = useMutation({
+    mutationFn: (data: { email: string, verificationCode: string, licenseId?: string, organizationId?: string, }) =>
+      AuthApiService.verifyUser(data.email, data.verificationCode)
+    ,
+    onSuccess: (data: { accessToken: string, refreshToken: string }) => {
+      toast({
+        title: "Success",
+        description: "Successfully logged in",
+      });
+
+      login(data.accessToken, data.refreshToken);
+
+      localStorage.removeItem("licenseId");
+      localStorage.removeItem("organizationId");
+
+      router.push("/");
     },
     onError: (error) => {
       handleToastError(error, toast);

@@ -16,6 +16,7 @@ import { UserModule } from "./modules/user/user.module";
 import { UserLicenseModule } from "./modules/user-license/user-license.module";
 import { UserReferralModule } from "./modules/user-referral/user-referral.module";
 import { StripeModule } from "./modules/stripe/stripe.module";
+import { OrganizationModule } from "./modules/organization/organization.module";
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { StripeModule } from "./modules/stripe/stripe.module";
     UserLicenseModule,
     UserReferralModule,
     StripeModule,
+    OrganizationModule,
   ],
   controllers: [],
   providers: [],
@@ -34,10 +36,16 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthMiddleware)
-      .exclude("user", {
-        path: "/user",
-        method: RequestMethod.POST,
-      })
+      .exclude(
+        {
+          path: "/user",
+          method: RequestMethod.POST,
+        },
+        {
+          path: "/stripe/webhook",
+          method: RequestMethod.POST,
+        },
+      )
       .forRoutes("user", "user-license", "user-referral", "stripe");
   }
 }

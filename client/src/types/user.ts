@@ -13,12 +13,18 @@ export enum UserAuthType {
   Google = "google",
 }
 
+export enum UserAccountType {
+  Private = "private",
+  Business = "business",
+}
+
 export interface User {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
   authType: UserAuthType;
+  accountType: UserAccountType;
   role: UserRole;
   status: UserStatus;
   discount: number;

@@ -1,6 +1,6 @@
-import { IsString } from "class-validator";
+import { IsDate, IsString } from "class-validator";
 
-import { UserAuthType } from "@prisma/client"; 
+import { UserAccountType, UserAuthType } from "@prisma/client"; 
 
 export class CreateUserDto {
   @IsString()
@@ -17,4 +17,13 @@ export class CreateUserDto {
 
   @IsString()
   authType: UserAuthType;
+
+  @IsString()
+  registrationCode: string;
+
+  @IsDate()
+  registrationCodeExpiresAt: Date;
+
+  @IsString()
+  accountType: UserAccountType;
 }

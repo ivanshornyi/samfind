@@ -47,6 +47,7 @@ export default {
         input: "var(--input)",
         ring: "var(--ring)",
         violet: {
+          50: "#CE9DF3",
           100: "#A64CE8",
           200: "#8F40E5",
           300: "#713FA5",
