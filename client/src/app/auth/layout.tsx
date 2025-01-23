@@ -9,6 +9,7 @@ import Link from "next/link";
 import { AuthContext } from "@/context";
 
 import { Logo } from "../../../public";
+import { Button } from "@/components";
 
 export default function AuthLayout({
   children,
@@ -26,6 +27,13 @@ export default function AuthLayout({
 
   return (
     <div className="container px-5 h-[100dvh] mx-auto flex justify-center items-center">
+      <Button
+        variant="link"
+        className="absolute top-[50px] left-[22px] w-[300px]"
+        icon="left-arrow"
+      >
+        Back
+      </Button>
       <div className="flex flex-col items-center gap-8">
         <div>
           <Link href="/">

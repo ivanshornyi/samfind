@@ -1,11 +1,9 @@
 import * as React from "react";
-import { MoveUpRight, MoveRight, Plus, Minus } from "lucide-react";
+import { MoveUpRight, MoveRight, Plus, Minus, ArrowLeftIcon, LoaderCircle } from "lucide-react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
-
-import { LoaderCircle } from "lucide-react";
 
 const buttonVariants = cva(
   "relative inline-flex z-100 cursor-pointer items-center rounded-full justify-center gap-2 whitespace-nowrap rounded-full font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
@@ -45,7 +43,7 @@ export interface ButtonProps
   asChild?: boolean;
   loading?: boolean;
   withLoader?: boolean;
-  icon?: "right" | "up-right" | "minus" | "plus";
+  icon?: "right" | "up-right" | "minus" | "plus" | "left-arrow";
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -78,6 +76,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           </>
         ) : (
           <>
+            {icon === "left-arrow" && <ArrowLeftIcon />}
             {props.children}
             {icon === "up-right" && <MoveUpRight className="size-20" />}
             {icon === "right" && <MoveRight className="size-20" />}
