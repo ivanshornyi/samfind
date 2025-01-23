@@ -1,4 +1,5 @@
 export * from "./icons";
-import Intro from "./intro.png";
+import HomeIntro from "./intro.png";
+import HomeIntroMobile from "./intro-mobile.png";
 
-export { Intro };
+export { HomeIntro, HomeIntroMobile };

@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui";
+import { ArrowUpRight, HomeIntro, HomeIntroMobile } from "@public/home";
 import Image from "next/image";
 
 export const Intro = () => {
@@ -26,7 +27,7 @@ export const Intro = () => {
             <button className="w-[250px] h-[44px] flex justify-center items-center gap-[5px] text-2xl font-medium">
               <span>Try Demo</span>
               <Image
-                src="home/icons/arrow-up-right.svg"
+                src={ArrowUpRight}
                 width={43}
                 height={43}
                 alt="Arrow up right"
@@ -35,14 +36,14 @@ export const Intro = () => {
           </div>
         </div>
         <Image
-          src="/home/intro.png"
+          src={HomeIntro}
           width={703}
           height={676}
           alt="Background illustration"
           className="hidden md:block absolute top-[45%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 -z-[1]"
         />
         <Image
-          src="/home/intro-mobile.png"
+          src={HomeIntroMobile}
           width={703}
           height={676}
           alt="Background illustration"

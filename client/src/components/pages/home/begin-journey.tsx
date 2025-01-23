@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui";
+import { ArrowUpRight } from "@public/home";
 import Image from "next/image";
 
 export const BeginJourney = () => {
@@ -18,7 +19,7 @@ export const BeginJourney = () => {
         <button className="w-[250px] h-[44px] flex justify-center items-center gap-[5px] text-2xl font-medium">
           <span>Try Demo</span>{" "}
           <Image
-            src="home/icons/arrow-up-right.svg"
+            src={ArrowUpRight}
             width={43}
             height={43}
             alt="Arrow up right"

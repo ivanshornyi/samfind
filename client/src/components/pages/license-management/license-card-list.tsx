@@ -2,9 +2,11 @@ import React from "react";
 import { LicenseCard } from "./license-card";
 import {
   ActiveIcon,
+  EllipseBlueImage,
   SettingsIcon,
+  StarsImage,
   SupportIcon,
-} from "@/../public/license-management";
+} from "@public/license-management";
 import Image, { StaticImageData } from "next/image";
 
 export type LicenseManagement = {
@@ -54,7 +56,7 @@ const cards: LicenseManagement[] = [
 export const LicenseCardList = () => {
   const starsImage = (
     <Image
-      src="/license-management/stars.png"
+      src={StarsImage}
       alt="icon"
       width={130}
       height={128}
@@ -89,7 +91,7 @@ export const LicenseCardList = () => {
         ))}
       </div>
       <Image
-        src="/license-management/ellipse-blue.png"
+        src={EllipseBlueImage}
         width={412}
         height={200}
         alt="Background illustration"

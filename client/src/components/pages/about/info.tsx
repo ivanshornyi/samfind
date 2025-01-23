@@ -4,6 +4,7 @@ import { Button } from "@/components/ui";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { EllipseBlueImage } from "@public/about";
 
 export const Info = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -24,7 +25,7 @@ export const Info = () => {
   return (
     <div className="relative font-manrope pt-[100px] sm:pt-[150px] mb-[70px] sm:mb-[172px]">
       <Image
-        src="/about/ellipse-blue.png"
+        src={EllipseBlueImage}
         width={450}
         height={1200}
         alt="Background illustration"
