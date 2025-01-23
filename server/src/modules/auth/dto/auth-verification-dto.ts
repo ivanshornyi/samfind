@@ -1,4 +1,4 @@
-import { IsEmail, IsString } from "class-validator";
+import { IsEmail, IsString, IsOptional } from "class-validator";
 
 export class AuthVerificationDto {
   @IsEmail()
@@ -6,4 +6,12 @@ export class AuthVerificationDto {
 
   @IsString()
   verificationCode: string;
+
+  @IsString()
+  @IsOptional()
+  organizationId?: string;
+
+  @IsString()
+  @IsOptional()
+  licenseId?: string;
 }

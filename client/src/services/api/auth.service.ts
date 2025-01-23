@@ -1,4 +1,7 @@
+import { UserAccountType } from "@/types";
+
 import { apiClient } from "@/vars";
+
 import { handleApiError } from "@/errors";
 
 export enum UserAuthType {
@@ -23,20 +26,25 @@ const signIn = async (
   }
 };
 
-const signUp = async (
-  firstName: string,
-  lastName: string,
-  email: string,
-  password: string,
-  authType: UserAuthType
-) => {
+export type SignUpData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  authType: UserAuthType;
+  accountType: UserAccountType;
+  organization?: {
+    name: string;
+    VAT: string;
+    businessOrganizationNumber: string;
+    domain?: string;
+  }
+};
+
+const signUp = async (data: SignUpData) => {
   try {
     const response = await apiClient.post("/auth/sign-up", {
-      firstName,
-      lastName,
-      email,
-      password,
-      authType,
+      ...data,
     });
 
     return response.data;
@@ -103,11 +111,18 @@ const updateEmail = async (
   }
 };
 
-const verifyUser = async (email: string, verificationCode: string) => {
+const verifyUser = async (
+  email: string, 
+  verificationCode: string,
+  licenseId?: string,
+  organizationId?: string,
+) => {
   try {
     const response = await apiClient.post("/auth/verify", {
       email,
       verificationCode,
+      licenseId,
+      organizationId,
     });
 
     return response.data;

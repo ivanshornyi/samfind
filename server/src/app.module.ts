@@ -37,7 +37,6 @@ export class AppModule implements NestModule {
     consumer
       .apply(AuthMiddleware)
       .exclude(
-        "user", 
         {
           path: "/user",
           method: RequestMethod.POST,

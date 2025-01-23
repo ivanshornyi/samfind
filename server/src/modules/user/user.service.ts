@@ -8,6 +8,7 @@ import { CreateUserDto } from "./dto/create-user-dto";
 import { FindUserDto } from "./dto/find-user-dto";
 
 import { createHash } from "crypto";
+import { CreateOrganizationDto } from "../organization/dto/create-organization-dto";
 
 @Injectable()
 export class UserService {
@@ -121,6 +122,8 @@ export class UserService {
         referralCode,
       }
     });
+
+    // if
 
     return user;
   }

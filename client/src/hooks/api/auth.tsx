@@ -6,7 +6,7 @@ import { AuthContext } from "@/context";
 
 import { useMutation } from "@tanstack/react-query";
 
-import { AuthApiService, UserAuthType } from "@/services";
+import { AuthApiService, UserAuthType, SignUpData } from "@/services";
 
 import { useToast } from "@/hooks";
 
@@ -40,26 +40,11 @@ export const useSignIn = () => {
   return rest;
 };
 
-type SignUpData = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  authType: UserAuthType;
-};
-
 export const useSignUp = () => {
   const { toast } = useToast();
 
   const { ...mutationProps } = useMutation({
-    mutationFn: (data: SignUpData) =>
-      AuthApiService.signUp(
-        data.firstName,
-        data.lastName,
-        data.email,
-        data.password,
-        data.authType
-      ),
+    mutationFn: (data: SignUpData) => AuthApiService.signUp(data),
     onSuccess: () => {
       toast({
         title: "Success",
@@ -190,7 +175,9 @@ export const useVerifyUser = () => {
   const { toast } = useToast();
 
   const { ...mutationProps } = useMutation({
-    mutationFn: (data: { email: string, verificationCode: string }) => AuthApiService.verifyUser(data.email, data.verificationCode),
+    mutationFn: (data: { email: string, verificationCode: string, licenseId?: string, organizationId?: string, }) =>
+      AuthApiService.verifyUser(data.email, data.verificationCode)
+    ,
     onSuccess: (data: { accessToken: string, refreshToken: string }) => {
       toast({
         title: "Success",
@@ -198,6 +185,10 @@ export const useVerifyUser = () => {
       });
 
       login(data.accessToken, data.refreshToken);
+
+      localStorage.removeItem("licenseId");
+      localStorage.removeItem("organizationId");
+
       router.push("/");
     },
     onError: (error) => {

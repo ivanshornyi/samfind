@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "license" ALTER COLUMN "licenseExpiresAt" SET DEFAULT DATE_ADD(LAST_DAY(NOW()), INTERVAL 1 DAY);
