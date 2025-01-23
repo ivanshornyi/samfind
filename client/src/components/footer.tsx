@@ -69,7 +69,7 @@ export const Footer = () => {
             <Button
               type="submit"
               variant="secondary"
-              className="py-[22.5px] rounded-[30px] border-none w-full mb-6"
+              className="rounded-[30px] border-none w-full mb-6"
             >
               Subscribe now
             </Button>
@@ -105,7 +105,7 @@ export const Footer = () => {
             <Button
               type="submit"
               variant="secondary"
-              className="py-[22.5px] w-fit rounded-[30px] border-none"
+              className="w-fit rounded-[30px] border-none"
             >
               Subscribe now
             </Button>

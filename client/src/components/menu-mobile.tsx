@@ -65,10 +65,10 @@ export const MenuMobile = () => {
             </nav>
 
             <div className="flex flex-col">
-              <Button variant="link" className="text-base py-[22px]">
+              <Button variant="link" className="text-base">
                 Log in
               </Button>
-              <Button variant="tetrary" className="text-base py-[22px]">
+              <Button variant="tetrary" className="text-base">
                 Sign up
               </Button>
             </div>

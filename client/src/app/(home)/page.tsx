@@ -1,4 +1,9 @@
-import { BeginJourney, Features, Intro, LicensingOptions } from "./_components";
+import {
+  BeginJourney,
+  Features,
+  Intro,
+  LicensingOptionList,
+} from "@app/(home)/_components";
 
 export default function Main() {
   return (
@@ -6,7 +11,7 @@ export default function Main() {
       <Intro />
       <Features />
       <BeginJourney />
-      <LicensingOptions />
+      <LicensingOptionList />
     </div>
   );
 }
