@@ -1,6 +1,7 @@
-import { IsOptional, IsString, IsNumber, IsBoolean, IsDate } from "class-validator";
+import { IsOptional, IsString, IsBoolean, IsDate, IsEnum } from "class-validator";
 
 import { UserStatus } from "../types/user";
+import { UserAccountType } from "@prisma/client";
 
 export class UpdateUserDto {
   @IsString()
@@ -26,22 +27,26 @@ export class UpdateUserDto {
   @IsString()
   @IsOptional()
   status?: UserStatus;
+
+  @IsEnum(UserAccountType)
+  @IsOptional()
+  accountType?: UserAccountType; 
   
   @IsOptional()
   @IsString()
   resetCode?: string;
 
   @IsOptional()
-  @IsNumber()
-  resetCodeExpiresAt?: number;
+  @IsDate()
+  resetCodeExpiresAt?: Date;
 
   @IsOptional()
   @IsString()
   emailResetCode?: string;
 
   @IsOptional()
-  @IsNumber()
-  emailResetCodeExpiresAt?: number;
+  @IsDate()
+  emailResetCodeExpiresAt?: Date;
 
   @IsBoolean()
   @IsOptional()

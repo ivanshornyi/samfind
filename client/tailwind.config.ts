@@ -57,6 +57,7 @@ export default {
         ring: "var(--ring)",
         disabled: "var(--disabled)",
         violet: {
+          50: "#CE9DF3",
           100: "#A64CE8",
           200: "#8F40E5",
           300: "#713FA5",

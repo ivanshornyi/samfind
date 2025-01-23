@@ -30,7 +30,7 @@ enum UserAccountType {
 
 model User {
   id                        String          @id @default(uuid())
-  email                     String          @unique()
+  email                     String
   password                  String          @db.VarChar
   firstName                 String          @db.VarChar
   lastName                  String          @db.VarChar
@@ -40,11 +40,11 @@ model User {
   role                      UserRole
   isVerified                Boolean         @default(false)
   registrationCode          String?
-  registrationCodeExpiresAt DateTime?       
+  registrationCodeExpiresAt DateTime?
   resetCode                 String?         @db.VarChar
-  resetCodeExpiresAt        BigInt?
+  resetCodeExpiresAt        DateTime?
   emailResetCode            String?         @db.VarChar
-  emailResetCodeExpiresAt   BigInt?
+  emailResetCodeExpiresAt   DateTime?
   discount                  Float           @default(0)
   discountPercent           Float           @default(0)
   referralCode              Float           @unique
@@ -68,15 +68,16 @@ enum LicenseTierType {
 }
 
 model License {
-  id        String          @id @default(uuid())
-  user      User            @relation(fields: [ownerId], references: [id])
-  status    LicenseStatus   @default(active)
-  ownerId   String
-  userIds   String[]        @default([])
-  count     Float           @default(0)
-  tierType  LicenseTierType @default(freemium)
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
+  id               String          @id @default(uuid())
+  user             User            @relation(fields: [ownerId], references: [id])
+  status           LicenseStatus   @default(active)
+  ownerId          String
+  userIds          String[]        @default([])
+  count            Float           @default(0)
+  tierType         LicenseTierType @default(freemium)
+  licenseExpiresAt DateTime        @default(dbgenerated("NOW() + interval '1 month'"))
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
 
   @@map("license")
 }

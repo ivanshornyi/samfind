@@ -80,7 +80,7 @@ export const Header = () => {
                 <span>Log in</span>
               </Link>
 
-              <Link href="/auth/sign-up">
+              <Link href="/auth/account-type">
                 <Button variant="tetrary" className="py-2 px-8 border-none">
                   <span>Sign up</span>
                 </Button>
