@@ -9,6 +9,9 @@ export default {
   ],
   theme: {
     extend: {
+      screens: {
+        ml: "896px",
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
@@ -42,10 +45,17 @@ export default {
         },
         tetrary: {
           DEFAULT: "var(--tetrary-background)",
+          foreground: "var(--tetrary-background)",
+        },
+        link: {
+          DEFAULT: "var(--primary)",
+          hover: "var(--link-hover)",
+          active: "var(--link-active)",
         },
         border: "hsl(var(--border))",
         input: "var(--input)",
         ring: "var(--ring)",
+        disabled: "var(--disabled)",
         violet: {
           50: "#CE9DF3",
           100: "#A64CE8",
@@ -54,6 +64,9 @@ export default {
           400: "#501A88",
           500: "#26123A",
         },
+      },
+      fontFamily: {
+        manrope: "var(--font-monrope)",
       },
     },
   },

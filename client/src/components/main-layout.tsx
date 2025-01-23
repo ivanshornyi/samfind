@@ -2,18 +2,19 @@
 
 import { usePathname } from "next/navigation";
 
-import { Header } from "@/components";
+import { Footer, Header } from "@/components";
 
 export const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
 
-  const hideHeader = pathname.startsWith("/auth");
+  const hideHeaderAndFooter = pathname.startsWith("/auth");
 
   return (
-    <div>
-      {!hideHeader && <Header />}
+    <div className="max-w-[1440px] mx-auto">
+      {!hideHeaderAndFooter && <Header />}
 
-      <main className={`${hideHeader ? "" : "pt-20"} px-5`}>{children}</main>
+      <main className={`${hideHeaderAndFooter ? "" : "pt-20"} px-4 sm:px-5`}>{children}</main>
+      {!hideHeaderAndFooter && <Footer />}
     </div>
   );
 };

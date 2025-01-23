@@ -198,11 +198,18 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
     resetPassword: "Password recovery",
   };
 
+  const formSubtitle = {
+    signIn: "Welcome back! Access your personalized experience",
+    signUp: "Join the innovation! You&apos;re almost there!",
+    resetPassword: "",
+  };
+
   const formDescription = {
     signIn: "Welcome back! Access your personalized experience",
     signUp: "Join the innovation! You’re almost there!",
     resetPassword: "Set a secure password to protect your account and ensure safe access.",
   }
+
 
   const disabledFormItems =
     isSignInPending || isSignUpPending || isResetPasswordPending;

@@ -20,8 +20,12 @@ body {
     --primary-foreground: #501a88;
     --secondary: #363637;
     --secondary-foreground: #26222b;
+    --secondary-active: #23192e;
     --tetrary-background: #363637;
+    --link-hover: #beb8ff;
+    --link-active: #8f40e5;
     --muted: 240 4.8% 95.9%;
+    --disabled: #a8a8a8;
     --muted-foreground: #ffffff1b;
     --accent: 240 4.8% 95.9%;
     --accent-foreground: 240 5.9% 10%;
@@ -79,11 +83,11 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: 9999px; 
-  padding: 1px; 
-  background: linear-gradient(91.31deg, #A8A8A8 -23.65%, #A64CE8 109.99%); 
-  mask: 
-    linear-gradient(#000 0 0) content-box, 
+  border-radius: 9999px;
+  padding: 1px;
+  background: linear-gradient(91.31deg, #a8a8a8 -23.65%, #a64ce8 109.99%);
+  mask:
+    linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
-  mask-composite: exclude; 
+  mask-composite: exclude;
 }

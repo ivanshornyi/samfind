@@ -10,7 +10,7 @@ import { Button, Card } from "@/components";
 
 import { Check } from "lucide-react";
 
-export const ACCOUNT_TYPE_CARD_ITEMS = [
+const ACCOUNT_TYPE_CARD_ITEMS = [
   {
     type: UserAccountType.Private,
     title: "Personal Account",

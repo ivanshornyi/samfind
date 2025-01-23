@@ -1,7 +1,12 @@
+import { BeginJourney, Features, Intro, LicensingOptions } from "./_components";
+
 export default function Main() {
   return (
-    <div className="container mx-auto">
-      <section>main page</section>
+    <div>
+      <Intro />
+      <Features />
+      <BeginJourney />
+      <LicensingOptions />
     </div>
   );
 }

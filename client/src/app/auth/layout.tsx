@@ -8,7 +8,8 @@ import Link from "next/link";
 
 import { AuthContext } from "@/context";
 
-import { Logo } from "../../../public";
+import { Logo } from "@public/images";
+import { Button } from "@/components";
 
 export default function AuthLayout({
   children,
@@ -26,15 +27,22 @@ export default function AuthLayout({
 
   return (
     <div className="container px-5 h-[100dvh] mx-auto flex flex-col gap-4 justify-between items-center">
-        <div className="pt-12">
-          <Link href="/">
-            <Image src={Logo} alt="logo" className="w-24 h-6" />
-          </Link>
-        </div>
-        <div className="flex items-center justify-center">{children}</div>
-        <div className="py-5">
-          <p>@ Osio2025. All rights reserved.</p>
-        </div>
+      <Button
+        variant="link"
+        className="absolute top-[24px] left-[22px] w-[300px]"
+        icon="left-arrow"
+      >
+        Back
+      </Button>
+      <div className="pt-12">
+        <Link href="/">
+          <Image src={Logo} alt="logo" className="w-24 h-6" />
+        </Link>
+      </div>
+      <div className="flex items-center justify-center">{children}</div>
+      <div className="py-5">
+        <p>@ Osio2025. All rights reserved.</p>
+      </div>
     </div>
   );
 }
