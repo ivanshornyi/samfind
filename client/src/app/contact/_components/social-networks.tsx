@@ -28,7 +28,7 @@ const networks = [
 
 export const SocialNetworks = () => {
   return (
-    <div className="relative overflow-hidden flex flex-col sm:flex-row mt-[60px] mb-[60px] sm:mb-[680px] justify-evenly align-center pt-[100px] pb-[32px] sm:py-[87px] rounded-[20px] bg-[#262525]">
+    <div className="relative overflow-hidden flex flex-col sm:flex-row mt-[60px] mb-[60px] sm:mb-[100px] justify-evenly align-center pt-[100px] pb-[32px] sm:py-[87px] rounded-[20px] bg-[#262525]">
       <div className="z-10 mt-4">
         <h2 className="font-semibold text-[32px] leading-[43px] w-full sm:max-w-[334px] text-center sm:text-start">
           Connect With Us
