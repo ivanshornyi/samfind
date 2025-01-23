@@ -7,7 +7,7 @@ import Image from "next/image";
 import { AuthContext } from "@/context";
 import { Button } from "@/components";
 
-import { Logo } from "../../public";
+import { Logo } from "@public/images";
 import { User } from "lucide-react";
 import { MenuMobile } from "./menu-mobile";
 
@@ -54,9 +54,9 @@ export const Header = () => {
           <Link href="/">
             <Image
               src={Logo}
-              alt="logo"
               width={110}
-              className="h-7 w-[110px] min-w-[110px]"
+              height={28}
+              alt="logo"
             />
           </Link>
 

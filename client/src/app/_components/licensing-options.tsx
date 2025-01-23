@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui";
+import { CheckOutline, DollarIcon } from "@public/home";
 import Image from "next/image";
 
 type LicensingOption = {
@@ -65,7 +66,7 @@ export const LicensingOptions = () => {
               <div className="mb-10 flex gap-2">
                 <div className="flex items-start justify-end">
                   <Image
-                    src="home/icons/dollar.svg"
+                    src={DollarIcon}
                     alt="dollar"
                     width={23}
                     height={49}
@@ -88,7 +89,7 @@ export const LicensingOptions = () => {
               {option.features.map((feature, index) => (
                 <li key={index} className="flex items-center gap-[20px]">
                   <Image
-                    src="home/icons/check-outline.svg"
+                    src={CheckOutline}
                     width={24}
                     height={24}
                     alt="Checkmark"

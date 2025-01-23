@@ -8,7 +8,7 @@ import Link from "next/link";
 
 import { AuthContext } from "@/context";
 
-import { Logo } from "../../../public";
+import { Logo } from "@public/images";
 import { Button } from "@/components";
 
 export default function AuthLayout({

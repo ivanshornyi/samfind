@@ -8,8 +8,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components";
+import { HeaderMenuIcon, HeaderMenuCloseIcon } from "@public/icons";
 import { Close as CloseSheet } from "@radix-ui/react-dialog";
-import { Logo } from "../../public";
+import { Logo } from "@public/images";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -18,12 +19,7 @@ export const MenuMobile = () => {
     <div className="lg:hidden">
       <Sheet>
         <SheetTrigger>
-          <Image
-            src="icons/header-menu.svg"
-            alt="menu"
-            width={44}
-            height={44}
-          />
+          <Image src={HeaderMenuIcon} alt="menu" width={44} height={44} />
         </SheetTrigger>
         <SheetContent
           side="bottom"
@@ -43,7 +39,7 @@ export const MenuMobile = () => {
               </Link>
               <CloseSheet>
                 <Image
-                  src="icons/header-menu-close.svg"
+                  src={HeaderMenuCloseIcon}
                   alt="menu"
                   width={44}
                   height={44}

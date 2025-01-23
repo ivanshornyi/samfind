@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button, Input } from "@/components/ui";
+import { Logo } from "@public/images";
 
 type Link = {
   label: string;
@@ -47,7 +48,7 @@ export const Footer = () => {
       <div className="mx-auto flex flex-col lg:flex-row justify-between gap-10">
         <div className="flex flex-col space-y-[30px] lg:space-y-[122px]">
           <Link href="/">
-            <Image src="/Logo.png" width={110} height={30} alt="" />
+            <Image src={Logo} width={110} height={28} alt="" />
           </Link>
           <div className="lg:hidden">
             <h3 className="text-xl font-bold mb-2">Stay Updated.</h3>

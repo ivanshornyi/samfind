@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { LinkedIn, GitHub, Twitter } from "@public/contact/icons";
 import { NetworkItem } from "./network-item";
+import { EllispeRedImage } from "@public/contact";
 
 const networks = [
   {
@@ -48,7 +49,7 @@ export const SocialNetworks = () => {
         ))}
       </div>
       <Image
-        src="/contact/ellipse-red.png"
+        src={EllispeRedImage}
         width={1200}
         height={400}
         alt="Background illustration"
