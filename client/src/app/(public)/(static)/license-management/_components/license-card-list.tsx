@@ -1,66 +1,12 @@
 import React from "react";
 import { LicenseCard } from "./license-card";
-import {
-  ActiveIcon,
-  EllipseBlueImage,
-  SettingsIcon,
-  StarsImage,
-  SupportIcon,
-} from "@public/license-management";
-import Image, { StaticImageData } from "next/image";
-
-export type LicenseManagement = {
-  id: number;
-  title: string;
-  description: string;
-  actions: string[];
-  icon: StaticImageData;
-};
-
-const cards: LicenseManagement[] = [
-  {
-    id: 1,
-    title: "Active Licenses",
-    description: "Stay in control of your subscriptions and payments.",
-    actions: [
-      "View and manage your subscription",
-      "Access billing history",
-      "Update payment details",
-    ],
-    icon: ActiveIcon,
-  },
-  {
-    id: 2,
-    title: "License Settings",
-    description: "Tailor your license preferences to fit your needs.",
-    actions: [
-      "Manage preferences",
-      "Configure access",
-      "Update organization details",
-    ],
-    icon: SettingsIcon,
-  },
-  {
-    id: 3,
-    title: "Support Options",
-    description: "Get help when you need it with top-tier support services.",
-    actions: [
-      "Access documentation",
-      "Contact priority support",
-      "Schedule consultations",
-    ],
-    icon: SupportIcon,
-  },
-];
+import { EllipseBlueImage, StarsImage } from "@public/license-management";
+import Image from "next/image";
+import { LicenseManagementConstants } from "../_lib";
 
 export const LicenseCardList = () => {
   const starsImage = (
-    <Image
-      src={StarsImage}
-      alt="icon"
-      width={130}
-      height={128}
-    />
+    <Image src={StarsImage} alt="icon" width={130} height={128} />
   );
 
   return (
@@ -74,7 +20,7 @@ export const LicenseCardList = () => {
         License Management
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-        {cards.map((card, index) => (
+        {LicenseManagementConstants.map((card, index) => (
           <React.Fragment key={index}>
             {index === 2 ? (
               <div className="hidden md:flex items-center md:justify-start">

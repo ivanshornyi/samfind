@@ -1,7 +1,7 @@
 import Image from "next/image";
-import { LicenseManagement } from "./license-card-list";
+import { LicenseManagementType } from "../_types";
 
-export const LicenseCard: React.FC<{ card: LicenseManagement }> = ({
+export const LicenseCard: React.FC<{ card: LicenseManagementType }> = ({
   card,
 }) => {
   return (
@@ -19,7 +19,10 @@ export const LicenseCard: React.FC<{ card: LicenseManagement }> = ({
       </div>
       <ul className="space-y-5">
         {card.actions.map((action, index) => (
-          <li key={index} className="font-medium text-xl md:text-2xl text-[#EFEBEB]">
+          <li
+            key={index}
+            className="font-medium text-xl md:text-2xl text-[#EFEBEB]"
+          >
             {action}
           </li>
         ))}
