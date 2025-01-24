@@ -5,6 +5,8 @@ import { AuthContext } from "@/context";
 import { useUpdateUser } from "@/hooks/api/user";
 import { Button, FullScreenLoader, Input } from "@/components";
 import { useToast } from "@/hooks";
+import { User } from "lucide-react";
+import { DeleteAccount } from "./_components";
 
 export default function Settings() {
   const { toast } = useToast();
@@ -136,21 +138,24 @@ export default function Settings() {
           <h2 className="text-[32px] leading-[44px] font-semibold">
             Profile settings
           </h2>
-          <p>Private account</p>
+          <p className="text-link-hover flex gap-2 items-center border-none border-r-[20px] p-[10px] px-[26px]">
+            <User style={{ width: "12px", height: "12px" }} />
+            <span>Private account</span>
+          </p>
         </div>
         <div className="mt-[77px]">
-          <h3 className="text-[20px] leading-[27px] font-semibold">
+          <h3 className="text-[20px] leading-[27px] font-semibold bg-[#242424]">
             Personal details
           </h3>
           <div className="w-full mt-6 pb-2 border-b border-[#444444]">
             <div className="flex justify-between items-start w-full">
               <div>
-                <div>
+                <div className="flex gap-2">
                   <div>
                     <p className="text-[16px] leading-[22px] font-semibold">
                       First Name
                     </p>
-                    <div className="w-[450px] mt-2">
+                    <div className="w-[220px] mt-2">
                       {editName ? (
                         <Input
                           name="firstName"
@@ -165,11 +170,11 @@ export default function Settings() {
                       )}
                     </div>
                   </div>
-                  <div className="mt-6">
+                  <div>
                     <p className="text-[16px] leading-[22px] font-semibold">
                       Last Name
                     </p>
-                    <div className="w-[450px] mt-2 ">
+                    <div className="w-[220px] mt-2 ">
                       {editName ? (
                         <Input
                           name="lastName"
@@ -265,13 +270,7 @@ export default function Settings() {
                 Permanenlty deactive the account
               </p>
             </div>
-            <Button
-              className="text-[#FF7676]"
-              variant="edit"
-              // onClick={() => setEditName(!editName)}
-            >
-              Delete
-            </Button>
+            <DeleteAccount />
           </div>
         </div>
       </div>
