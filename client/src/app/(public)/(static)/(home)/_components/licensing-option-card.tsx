@@ -1,4 +1,4 @@
-import { LicensingOptionType } from "@app/(home)/_lib";
+import { LicensingOptionType } from "../_types";
 import { Button } from "@/components/ui";
 import { CheckOutline, DollarIcon } from "@public/home";
 import Image from "next/image";

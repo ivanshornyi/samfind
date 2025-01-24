@@ -3,7 +3,7 @@ import {
   Features,
   Intro,
   LicensingOptionList,
-} from "@app/(home)/_components";
+} from "./_components";
 
 export default function Main() {
   return (
