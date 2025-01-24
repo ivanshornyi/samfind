@@ -34,8 +34,9 @@ export default function AccountLayout({
 
   return (
     <div className="container mx-auto">
-      <div className="flex gap-10">
-        <div>
+      {/* <div className="flex gap-10"> */}
+
+        {/* <div>
           <ul className="flex flex-col min-w-[220px]">
             {NAVIGATION_ITEMS.map((item) => {
               const isActive = pathname === item.path;
@@ -69,10 +70,11 @@ export default function AccountLayout({
               <span>Logout</span>
             </Button>
           </div>
-        </div>
+        </div> */}
 
         <div className="w-full">{children}</div>
-      </div>
+        
+      {/* </div> */}
     </div>
   );
 }
