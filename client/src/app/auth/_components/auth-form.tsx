@@ -216,8 +216,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
 
   useEffect(() => {
     const referralCode = searchParams.get("userReferralCode");
-    const organizationId = searchParams.get("organizationId");
-    const licenseId = searchParams.get("licenseId");
+    const organizationId = searchParams.get("orgId");
+    const licenseId = searchParams.get("lId");
     const token = localStorage.getItem("accessToken");
 
     if (referralCode && !token) {
@@ -225,6 +225,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
     }
 
     if (organizationId && !token) {
+      localStorage.removeItem("licenseId");
       localStorage.setItem("organizationId", organizationId);
       // check if organization has a domain
     }
@@ -403,9 +404,9 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
               <button className="py-2.5 bg-white text-black rounded-full">
                 Sign in with Google
               </button>
-              <button className="py-2.5 bg-white text-black rounded-full">
+              {/* <button className="py-2.5 bg-white text-black rounded-full">
                 Sign in with Github
-              </button>
+              </button> */}
             </div>
           )}
 

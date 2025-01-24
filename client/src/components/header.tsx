@@ -88,7 +88,7 @@ export const Header = () => {
             </div>
           ) : (
             <Link href="/account/license" className="flex items-center gap-2">
-              <Button variant="secondary" className="text-zinc-800 flex">
+              <Button variant="secondary" className="flex">
                 <User />
                 <span>Account</span>
               </Button>

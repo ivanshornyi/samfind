@@ -44,7 +44,7 @@ export class StripeService {
     let metadata: any = {
       userId,
       tierType,
-      count,
+      limit: count,
     };
 
     let intent = {
@@ -60,8 +60,6 @@ export class StripeService {
         referralDiscount,
       }
     }
-
-    console.log(intent);
 
     return this.stripe.paymentIntents.create(intent);
   }
@@ -93,7 +91,7 @@ export class StripeService {
     try {
       const { 
         userId, 
-        count,
+        limit,
         tierType,
         userReferralCode, 
         referralDiscount,
@@ -107,9 +105,8 @@ export class StripeService {
       await this.prisma.license.create({
         data: {
           ownerId: userId,
-          count: Number(count),
+          limit: Number(limit),
           tierType: tierType as LicenseTierType,
-          // purchasedAt: new Date(),
         },
       });
 

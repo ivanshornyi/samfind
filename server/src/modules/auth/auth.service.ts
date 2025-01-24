@@ -252,8 +252,39 @@ export class AuthService {
       registrationCodeExpiresAt: null,
     });
 
+    console.log(authVerificationDto);
+
     if (authVerificationDto.licenseId) {
-      // add user email to license
+      const license = await this.prisma.license.findUnique({
+        where: {
+          id: authVerificationDto.licenseId,
+        }
+      });
+
+      if (!license) {
+        throw new NotFoundException("License not found");
+      }
+
+      if (license.limit === 0) {
+        throw new ConflictException("License limit is reached");
+      }
+
+      const licenseUserIds = license.userIds;
+      licenseUserIds.push(user.id);
+      
+      console.log(
+        authVerificationDto,
+        license,
+        licenseUserIds,
+      );
+
+      await this.prisma.license.update({
+        where: { id: authVerificationDto.licenseId },
+        data: { 
+          userIds: licenseUserIds,
+          limit: license.limit - 1, 
+        }
+      });
     }
 
     if (authVerificationDto.organizationId) {
