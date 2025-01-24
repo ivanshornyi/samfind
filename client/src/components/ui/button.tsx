@@ -29,6 +29,7 @@ const buttonVariants = cva(
         link: "border-none text-primary text-2xl font-medium underline-offset-4 hover:underline [text-decoration-style:wavy] hover:text-link-hover active:text-link-active",
         tetrary:
           "border-none bg-tetrary-foreground text-primary active:shadow-[0_2px_20px_0_#B668F080] hover:bg-secondary-foreground disabled:text-disabled",
+        edit: "border-none text-primary text-[16px] hover:text-disabled active:text-[#302935]",
       },
       size: {
         default: "px-4 py-2.5",
