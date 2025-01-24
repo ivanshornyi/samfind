@@ -1,28 +1,41 @@
 "use client";
 
 import Image from "next/image";
-import { LinkedIn, GitHub, Twitter } from "@public/contact/icons";
+import {
+  LinkedIn,
+  Twitter,
+  Youtube,
+  Instagram,
+  Facebook,
+} from "@public/contact/icons";
 import { NetworkItem } from "./network-item";
 import { EllispeRedImage } from "@public/contact";
 
 const networks = [
   {
+    name: "Youtube:",
+    icon: Youtube,
+    link: "https://youtube.com/@OnsioAi",
+  },
+  {
     name: "Twitter:",
     icon: Twitter,
-    text: "@OnsioTech",
     link: "https://x.com/OnsioAI",
+  },
+  {
+    name: "Facebook:",
+    icon: Facebook,
+    link: "https://www.facebook.com/people/Onsio/61572172265173",
+  },
+  {
+    name: "Instagram:",
+    icon: Instagram,
+    link: "https://instagram.com/onsiotech",
   },
   {
     name: "LinkedIn:",
     icon: LinkedIn,
-    text: "Onsio Technologies",
     link: "https://linkedin.com/company/onsio/about",
-  },
-  {
-    name: "GitHub:",
-    icon: GitHub,
-    text: "github.com/onsio",
-    link: "https://github.com/onsio",
   },
 ];
 
@@ -37,15 +50,9 @@ export const SocialNetworks = () => {
           Join our growing community:
         </p>
       </div>
-      <div className="z-10 mt-[94px] sm:mt-0 grid grid-cols-2 sm:gap-x-10 max-w-[390px] sm:max-w-full ml-auto mr-auto sm:mx-0">
+      <div className="z-10 mt-[40px] sm:mt-0 flex gap-[24px] items-center max-w-full sm:max-w-[360px] ml-auto mr-auto sm:mx-0">
         {networks.map((n) => (
-          <NetworkItem
-            key={n.name}
-            name={n.name}
-            icon={n.icon}
-            text={n.text}
-            link={n.link}
-          />
+          <NetworkItem key={n.name} name={n.name} icon={n.icon} link={n.link} />
         ))}
       </div>
       <Image
