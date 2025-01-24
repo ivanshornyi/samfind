@@ -1,1 +1,1 @@
-export * from "./change-email-modal";
+export * from "./delete-account-modal";
