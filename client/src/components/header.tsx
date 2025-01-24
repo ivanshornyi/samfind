@@ -87,7 +87,7 @@ export const Header = () => {
               </Link>
             </div>
           ) : (
-            <Link href="/account/license" className="flex items-center gap-2">
+            <Link href="/account/home" className="flex items-center gap-2">
               <Button variant="secondary" className="flex">
                 <User />
                 <span>Account</span>

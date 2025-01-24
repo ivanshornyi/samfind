@@ -7,7 +7,6 @@ import { AuthContext } from "@/context";
 import { useUpdateUser } from "@/hooks/api/user";
 
 import { Button, Card, FullScreenLoader, Input } from "@/components";
-import { ChangeEmailModal } from "./_components";
 
 import { UserStatus } from "@/types";
 import { useToast } from "@/hooks";
@@ -24,8 +23,6 @@ export default function Settings() {
     firstName: "",
     lastName: "",
   });
-
-  const [email, setEmail] = useState("");
 
   const [userPasswordFormData, setUserPasswordFormData] = useState({
     newPassword: "",
@@ -64,16 +61,6 @@ export default function Settings() {
     }
 
     if (user) updateUserDataMutation({ id: user?.id, userData: userFormData });
-  };
-
-  const handleChangeEmailSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-
-    if (email === "") {
-      toast({
-        description: "Email can not be empty",
-      });
-    }
   };
 
   const handleChangePasswordSubmit = (event: React.FormEvent) => {
@@ -121,17 +108,6 @@ export default function Settings() {
   // };
 
   useEffect(() => {
-    if (user) {
-      setUserFormData({
-        firstName: user.firstName,
-        lastName: user.lastName,
-      });
-
-      setEmail(user.email);
-    }
-  }, [user]);
-
-  useEffect(() => {
     if (isUpdateUserSuccess) {
       setUserPasswordFormData({ newPassword: "", confirmPassword: "" });
     }
@@ -139,7 +115,7 @@ export default function Settings() {
 
   const onCopyReferralCode = () => {
     if (user) {
-      const link = `${frontendUrl}/auth/sign-up?userReferralCode=${user.referralCode}`;
+      const link = `${frontendUrl}/auth/sign-up?accountType=private&userReferralCode=${user.referralCode}`;
 
       navigator.clipboard.writeText(link);
     }
@@ -213,29 +189,6 @@ export default function Settings() {
                 </div>
 
                 <Button className="mt-3 w-full py-5">Save</Button>
-              </form>
-            </Card>
-
-            <Card className="min-w-[360px] px-8 py-7 rounded-2xl">
-              <p className="font-semibold text-[18px]">Change email</p>
-
-              <form onSubmit={handleChangeEmailSubmit} className="mt-3">
-                <div>
-                  <label id="email" htmlFor="email" className="text-sm">
-                    Email
-                  </label>
-                  <Input
-                    id="email"
-                    name="email"
-                    className="py-5 px-3 disabled:opacity-80"
-                    type="email"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    disabled={true}
-                  />
-                </div>
-
-                <ChangeEmailModal />
               </form>
             </Card>
           </div>

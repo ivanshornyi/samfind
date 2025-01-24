@@ -13,9 +13,9 @@ import { UserRoundCog, File, LogOut } from "lucide-react";
 
 const NAVIGATION_ITEMS = [
   {
-    title: "License",
-    path: "/account/license",
-    icon: <File />,
+    title: "Home",
+    path: "/account/home",
+    // icon: <File />,
   },
   {
     title: "Account settings",
@@ -33,7 +33,7 @@ export default function AccountLayout({
   const { logout } = useContext(AuthContext);
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto py-10">
       <div className="flex gap-10">
         <div>
           <ul className="flex flex-col min-w-[220px]">
