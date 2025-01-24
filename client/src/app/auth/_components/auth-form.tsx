@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 
-import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
 
 import { UserAccountType } from "@/types";
 
@@ -13,8 +14,10 @@ import { SignUpData, UserAuthType } from "@/services";
 
 import { Button, Input } from "@/components";
 import { SendResetPasswordCodeModal, VerifyUserModal } from "../_components";
+import { ACCOUNT_TYPE_CARD_ITEMS } from "../account-type/page";
 
 import { EyeIcon, EyeOff } from "lucide-react";
+import { GoogleIcon } from "@public/icons";
 
 interface AuthFormProps {
   authPageType: "signIn" | "signUp" | "resetPassword";
@@ -26,6 +29,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const accountType = searchParams.get("accountType") as UserAccountType;
+  const referralCode = searchParams.get("userReferralCode");
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -128,6 +132,13 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
         accountType,
       }
 
+      if (referralCode) {
+        signUpData = {
+          ...signUpData,
+          invitedReferralCode: Number(referralCode),
+        }
+      }
+
       if (accountType === UserAccountType.Business) {
         if (
           organizationFormData.name === "" ||
@@ -150,14 +161,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
           name: organizationFormData.name,
           VAT: organizationFormData.VAT,
           businessOrganizationNumber: organizationFormData.businessOrganizationNumber,
-        }
-
-        // TODO add validation
-        if (organizationFormData.domain !== "") {
-          organization = {
-            ...organization,
-            domain: organizationFormData.domain,
-          }
         }
 
         // add organization
@@ -198,12 +201,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
     resetPassword: "Password recovery",
   };
 
-  const formSubtitle = {
-    signIn: "Welcome back! Access your personalized experience",
-    signUp: "Join the innovation! You&apos;re almost there!",
-    resetPassword: "",
-  };
-
   const formDescription = {
     signIn: "Welcome back! Access your personalized experience",
     signUp: "Join the innovation! You’re almost there!",
@@ -216,22 +213,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
 
   useEffect(() => {
     const referralCode = searchParams.get("userReferralCode");
-    const organizationId = searchParams.get("orgId");
-    const licenseId = searchParams.get("lId");
     const token = localStorage.getItem("accessToken");
 
     if (referralCode && !token) {
       localStorage.setItem("userReferralCode", referralCode);
-    }
-
-    if (organizationId && !token) {
-      localStorage.removeItem("licenseId");
-      localStorage.setItem("organizationId", organizationId);
-      // check if organization has a domain
-    }
-
-    if (licenseId && !token) {
-      localStorage.setItem("licenseId", licenseId);
     }
 
     if (
@@ -249,10 +234,25 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
     <>
       <div className="w-[591px] border-[1px] border-violet-100 rounded-[30px] p-8">
         {authPageType === "signUp" && (
-          <div className="capitalize text-violet-50 font-semibold">
-            {accountType} Account
-          </div>
+          <ul>
+            {ACCOUNT_TYPE_CARD_ITEMS.map(item => {
+              return item.type === accountType ? (
+                <li
+                  key={item.type}
+                  className="
+                    capitalize text-violet-50 font-semibold bg-background
+                    rounded-full px-6 py-2 w-[208px] flex items-center justify-center gap-2
+                    [&>svg]:w-3.5 [&>svg]:h-3.5
+                  "
+                >
+                  {item.icon}
+                  <span>{accountType} Account</span>
+                </li>
+                ) : null
+              })}
+          </ul>
         )}
+
         <form onSubmit={handleAuthFormSubmit} className="mt-4">
           <h2 className="font-semibold text-3xl">{formTitle[authPageType]}</h2>
           <p className="mt-4 text-lg">{formDescription[authPageType]}</p>
@@ -260,7 +260,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
           <div className="mt-8 flex flex-col gap-2">
             {authPageType === "signUp" && (
               <>
-                <div>
+                <div className="flex gap-2">
                   <Input
                     id="firstName"
                     name="firstName"
@@ -268,8 +268,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                     value={formData.firstName}
                     onChange={handleFormInputChange}
                   />
-                </div>
-                <div>
                   <Input
                     id="lastName"
                     name="lastName"
@@ -370,12 +368,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                 value={organizationFormData.VAT}
                 onChange={handleOrganizationFormInputChange}
               />
-              <Input 
-                name="domain"
-                placeholder="domain.com(optional)" 
-                value={organizationFormData.domain}
-                onChange={handleOrganizationFormInputChange}
-              />
             </div>
           )}
 
@@ -397,17 +389,28 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
         <div className="pt-4">
           {authPageType === "signIn" && <SendResetPasswordCodeModal />}
 
-          {authPageType !== "resetPassword" && <p className="text-center my-5">Or</p>}
-
-          {authPageType !== "resetPassword" && (
-            <div className="flex flex-col gap-2">
-              <button className="py-2.5 bg-white text-black rounded-full">
-                Sign in with Google
-              </button>
-              {/* <button className="py-2.5 bg-white text-black rounded-full">
-                Sign in with Github
-              </button> */}
-            </div>
+          {((authPageType === "signUp" && accountType === UserAccountType.Private) || authPageType === "signIn") && (
+            <>
+              <p className="text-center mt-1 mb-5">Or</p>
+            
+              <div className="flex flex-col gap-2">
+                <button 
+                  className="py-2.5 bg-white flex items-center gap-2 justify-center text-black rounded-full"
+                >
+                  <Image 
+                    src={GoogleIcon} 
+                    width={20}
+                    height={20} 
+                    alt="google" 
+                    className="w-5 h-5" 
+                  />
+                  <span>Sign in with Google</span>
+                </button>
+                {/* <button className="py-2.5 bg-white text-black rounded-full">
+                  Sign in with Github
+                </button> */}
+              </div>
+            </>
           )}
 
           {authPageType === "signIn" && (

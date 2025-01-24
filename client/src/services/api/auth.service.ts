@@ -33,11 +33,11 @@ export type SignUpData = {
   password: string;
   authType: UserAuthType;
   accountType: UserAccountType;
+  invitedReferralCode?: number;
   organization?: {
     name: string;
     VAT: string;
     businessOrganizationNumber: string;
-    domain?: string;
   }
 };
 

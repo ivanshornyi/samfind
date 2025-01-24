@@ -72,14 +72,14 @@ model License {
   id               String          @id @default(uuid())
   user             User            @relation(fields: [ownerId], references: [id])
   status           LicenseStatus   @default(active)
-  ownerId          String
+  ownerId          String          @unique
   userIds          String[]        @default([])
   limit            Float           @default(0)
   tierType         LicenseTierType @default(freemium)
+  availableEmails  String[]        @default([])
   licenseExpiresAt DateTime        @default(now())
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
-  // includedEmails
 
   @@map("license")
 }
@@ -105,7 +105,7 @@ model Organization {
   User                       User[]
   ownerId                    String   @unique
   userIds                    String[] @default([])
-  // includeEmails/domains
+  availableEmails            String[] @default([])
 
   @@map("organization")
 }
