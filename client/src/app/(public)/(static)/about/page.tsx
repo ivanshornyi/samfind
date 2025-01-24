@@ -1,4 +1,4 @@
-import { Different, Info } from "@/app/(static)/about/_components";
+import { Different, Info } from "./_components";
 
 export default function About() {
   return (

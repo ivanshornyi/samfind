@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 
 import { AuthContextProvider } from "@/context";
 
-import { Toaster, MainLayout } from "@/components";
+import { Toaster } from "@/components";
 
 import { TanstackProvider } from "@/providers";
 
@@ -36,7 +36,7 @@ export default function RootLayout({
           <Toaster />
           <Suspense>
             <AuthContextProvider>
-              <MainLayout>{children}</MainLayout>
+              {children}
             </AuthContextProvider>
           </Suspense>
         </body>

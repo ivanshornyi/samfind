@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 
 import { Footer, Header } from "@/components";
 
-export const MainLayout = ({ children }: { children: React.ReactNode }) => {
+export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
 
   const hideHeaderAndFooter = pathname.startsWith("/auth") || pathname.startsWith("/account");

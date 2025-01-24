@@ -1,4 +1,4 @@
-import { licensingOptions } from "@app/(home)/_lib";
+import { licensingOptions } from "../_lib";
 import { LicensingOptionCard } from "./licensing-option-card";
 
 export const LicensingOptionList = () => {
