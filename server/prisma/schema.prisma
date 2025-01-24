@@ -48,6 +48,7 @@ model User {
   discount                  Float           @default(0)
   discountPercent           Float           @default(0)
   referralCode              Float           @unique
+  invitedReferralCode       Float?          @unique
   accountType               UserAccountType @default(private)
   organizationId            String?
   organization              Organization?   @relation(fields: [organizationId], references: [id])
@@ -73,11 +74,12 @@ model License {
   status           LicenseStatus   @default(active)
   ownerId          String
   userIds          String[]        @default([])
-  count            Float           @default(0)
+  limit            Float           @default(0)
   tierType         LicenseTierType @default(freemium)
-  licenseExpiresAt DateTime        @default(dbgenerated("NOW() + interval '1 month'"))
+  licenseExpiresAt DateTime        @default(now())
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
+  // includedEmails
 
   @@map("license")
 }
@@ -97,12 +99,13 @@ model UserReferral {
 model Organization {
   id                         String   @id @default(uuid())
   name                       String
-  domain                     String?
+  domains                    String[] @default([])
   VAT                        String
   businessOrganizationNumber String
   User                       User[]
   ownerId                    String   @unique
   userIds                    String[] @default([])
+  // includeEmails/domains
 
   @@map("organization")
 }
