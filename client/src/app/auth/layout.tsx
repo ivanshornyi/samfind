@@ -10,6 +10,7 @@ import { AuthContext } from "@/context";
 
 import { Logo } from "@public/images";
 import { Button } from "@/components";
+import { ArrowLeftIcon } from "lucide-react";
 
 export default function AuthLayout({
   children,
@@ -30,7 +31,7 @@ export default function AuthLayout({
       <Button
         variant="link"
         className="absolute top-[24px] left-[22px] w-[300px]"
-        icon="left-arrow"
+        leftIcon={<ArrowLeftIcon style={{ width: "30px", height: "30px" }} />}
       >
         Back
       </Button>

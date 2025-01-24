@@ -54,12 +54,14 @@ export function AppSidebar() {
             <SidebarMenu>
               {NAVIGATION_ITEMS.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <Button variant="secondary" className="w-full justify-start" leftIcon={<item.icon />}>
+                  {/* <SidebarMenuButton asChild> */}
                     <a href={item.path}>
-                      <item.icon />
+                      {/* <item.icon /> */}
                       <span>{item.title}</span>
                     </a>
-                  </SidebarMenuButton>
+                  {/* </SidebarMenuButton> */}
+                  </Button>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>

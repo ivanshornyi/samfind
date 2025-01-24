@@ -1,12 +1,5 @@
 import * as React from "react";
-import {
-  MoveUpRight,
-  MoveRight,
-  Plus,
-  Minus,
-  ArrowLeftIcon,
-  LoaderCircle,
-} from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
@@ -52,7 +45,8 @@ export interface ButtonProps
   asChild?: boolean;
   loading?: boolean;
   withLoader?: boolean;
-  icon?: "right" | "up-right" | "minus" | "plus" | "left-arrow";
+  leftIcon?: React.JSX.Element;
+  rightIcon?: React.JSX.Element;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -63,8 +57,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       size,
       asChild = false,
       loading,
-      icon,
-      // iconPosition,
+      leftIcon,
+      rightIcon,
       withLoader,
       ...props
     },
@@ -86,22 +80,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           </>
         ) : (
           <>
-            {icon === "left-arrow" && (
-              <ArrowLeftIcon style={{ width: "30px", height: "30px" }} />
-            )}
+            {leftIcon}
             {props.children}
-            {icon === "up-right" && (
-              <MoveUpRight style={{ width: "20px", height: "20px" }} />
-            )}
-            {icon === "right" && (
-              <MoveRight style={{ width: "20px", height: "20px" }} />
-            )}
-            {icon === "plus" && (
-              <Plus style={{ width: "20px", height: "20px" }} />
-            )}
-            {icon === "minus" && (
-              <Minus style={{ width: "20px", height: "20px" }} />
-            )}
+            {rightIcon}
           </>
         )}
       </Comp>
