@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <TanstackProvider>
       <html lang="en">
-        <body className={`${manrope.variable} dark antialiased bg-background`}>
+        <body className={`${manrope.variable} dark antialiased bg-background w-full max-w-[1440px] mx-auto`}>
           <Toaster />
           <Suspense>
             <AuthContextProvider>{children}</AuthContextProvider>

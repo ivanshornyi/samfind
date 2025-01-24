@@ -10,7 +10,7 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
   const hideHeaderAndFooter = pathname.startsWith("/auth") || pathname.startsWith("/account");
 
   return (
-    <div className="max-w-[1440px] mx-auto">
+    <div>
       {!hideHeaderAndFooter && <Header />}
 
       <main className={`${hideHeaderAndFooter ? "" : "pt-20"} px-4 sm:px-5`}>{children}</main>

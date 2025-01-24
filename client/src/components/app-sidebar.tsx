@@ -6,16 +6,18 @@ import {
   SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Logo } from "@public/images";
-import { Home, IdCard, Gift, CreditCard } from "lucide-react";
 import {
-  SidebarProfileIcon,
-  SidebarSupportIcon,
-  SidebarLogoutIcon,
-} from "@public/icons";
+  Home,
+  IdCard,
+  Gift,
+  CreditCard,
+  User,
+  Headset,
+  LogOut,
+} from "lucide-react";
 import Image from "next/image";
 import { Button } from "./ui";
 
@@ -44,23 +46,25 @@ const NAVIGATION_ITEMS = [
 
 export function AppSidebar() {
   return (
-    <Sidebar className="px-[20px] py-8 border-secondary">
-      <SidebarHeader>
+    <Sidebar className="py-8 border-secondary">
+      <SidebarHeader className="px-4 h-[60px] mb-6">
         <Image src={Logo} width={110} height={40} alt="Logo" />
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
+        <SidebarGroup className="">
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="space-y-4">
               {NAVIGATION_ITEMS.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <Button variant="secondary" className="w-full justify-start" leftIcon={<item.icon />}>
-                  {/* <SidebarMenuButton asChild> */}
+                  <Button
+                    variant="menuItem"
+                    leftIcon={
+                      <item.icon style={{ width: "24px", height: "24px" }} />
+                    }
+                  >
                     <a href={item.path}>
-                      {/* <item.icon /> */}
                       <span>{item.title}</span>
                     </a>
-                  {/* </SidebarMenuButton> */}
                   </Button>
                 </SidebarMenuItem>
               ))}
@@ -68,33 +72,24 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="space-y-4">
-        <Button variant="tetrary">
-          <Image
-            src={SidebarProfileIcon}
-            width={24}
-            height={24}
-            alt="profile icon"
-          />
-          <span>Profile settings</span>
+      <SidebarFooter className="space-y-4 px-4">
+        <Button
+          variant="menuItem"
+          leftIcon={<User style={{ width: "24px", height: "24px" }} />}
+        >
+          Profile settings
         </Button>
-        <Button variant="tetrary">
-          <Image
-            src={SidebarSupportIcon}
-            width={24}
-            height={24}
-            alt="profile icon"
-          />
-          <span>Support</span>
+        <Button
+          variant="menuItem"
+          leftIcon={<Headset style={{ width: "24px", height: "24px" }} />}
+        >
+          Support
         </Button>
-        <Button variant="tetrary">
-          <Image
-            src={SidebarLogoutIcon}
-            width={24}
-            height={24}
-            alt="profile icon"
-          />
-          <span>Logout</span>
+        <Button
+          variant="menuItem"
+          leftIcon={<LogOut style={{ width: "24px", height: "24px" }} />}
+        >
+          Logout
         </Button>
       </SidebarFooter>
     </Sidebar>

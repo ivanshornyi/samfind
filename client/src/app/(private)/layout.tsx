@@ -9,7 +9,7 @@ export default function Layout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      {children}
+      <div className="px-[60px] pt-8 w-full">{children}</div>
     </SidebarProvider>
   );
 }

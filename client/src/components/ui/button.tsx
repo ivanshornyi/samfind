@@ -24,6 +24,7 @@ const buttonVariants = cva(
         edit: "border-none text-primary text-[16px] hover:text-disabled active:text-[#302935]",
         saveProfile:
           "border-none bg-tetrary-foreground hover:bg-input active:bg-[#302935] text-primary text-[16px] hover:text-disabled",
+        menuItem: "transition-all bg-transparent text-base text-[#A8A8A8] hover:bg-card active:bg-[#302935] active:text-white w-full justify-start",
       },
       size: {
         default: "px-4 py-2.5",
