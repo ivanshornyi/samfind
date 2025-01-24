@@ -7,7 +7,7 @@ import { Footer, Header } from "@/components";
 export const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
 
-  const hideHeaderAndFooter = pathname.startsWith("/auth");
+  const hideHeaderAndFooter = pathname.startsWith("/auth") || pathname.startsWith("/account");
 
   return (
     <div className="max-w-[1440px] mx-auto">

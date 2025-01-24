@@ -4,9 +4,10 @@ import React, { useEffect, useState } from "react";
 
 import { useToast, useVerifyUser } from "@/hooks";
 
+import { VerifyData } from "@/services";
+
 import {
   AlertDialog,
-  AlertDialogTrigger,
   Button,
   AlertDialogContent,
   AlertDialogHeader,
@@ -41,9 +42,29 @@ export const VerifyUserModal: React.FC<VerifyUserModalProps> = ({ isOpen, email 
       return;
     } 
 
-    // if has a license or organization
+    let verifyData: VerifyData = {
+      email, 
+      verificationCode: code,
+    };
 
-    verifyUserMutation({ email, verificationCode: code });
+    const licenseId = localStorage.getItem("licenseId");
+    const organizationId = localStorage.getItem("organizationId");
+
+    if (licenseId) {
+      verifyData = {
+        ...verifyData,
+        licenseId,
+      }
+    }
+
+    if (organizationId) {
+      verifyData = {
+        ...verifyData,
+        organizationId,
+      }
+    }
+
+    verifyUserMutation(verifyData);
   };
 
   useEffect(() => {
