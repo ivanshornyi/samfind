@@ -9,7 +9,6 @@ import {
 } from "lucide-react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
-
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
@@ -30,6 +29,8 @@ const buttonVariants = cva(
         tetrary:
           "border-none bg-tetrary-foreground text-primary active:shadow-[0_2px_20px_0_#B668F080] hover:bg-secondary-foreground disabled:text-disabled",
         edit: "border-none text-primary text-[16px] hover:text-disabled active:text-[#302935]",
+        saveProfile:
+          "border-none bg-tetrary-foreground hover:bg-input active:bg-[#302935] text-primary text-[16px] hover:text-disabled",
       },
       size: {
         default: "px-4 py-2.5",
@@ -63,6 +64,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       asChild = false,
       loading,
       icon,
+      // iconPosition,
       withLoader,
       ...props
     },
