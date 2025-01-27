@@ -33,11 +33,11 @@ export type SignUpData = {
   password: string;
   authType: UserAuthType;
   accountType: UserAccountType;
+  invitedReferralCode?: number;
   organization?: {
     name: string;
     VAT: string;
     businessOrganizationNumber: string;
-    domain?: string;
   }
 };
 
@@ -111,18 +111,17 @@ const updateEmail = async (
   }
 };
 
-const verifyUser = async (
-  email: string, 
-  verificationCode: string,
-  licenseId?: string,
-  organizationId?: string,
-) => {
+export interface VerifyData {
+  email: string;
+  verificationCode: string;
+  licenseId?: string;
+  organizationId?: string;
+}
+
+const verifyUser = async (data: VerifyData) => {
   try {
     const response = await apiClient.post("/auth/verify", {
-      email,
-      verificationCode,
-      licenseId,
-      organizationId,
+      ...data,
     });
 
     return response.data;

@@ -15,7 +15,6 @@ import { MailService } from "../mail/mail.service";
 
 import { SignInDto, SignUpDto } from "./dto/auth-user-dto";
 import { SendCodeForEmailDto } from "./dto/send-code-for-email.dto";
-import { CheckEmailDto } from "./dto/check-email-dto";
 
 import { createHash } from "crypto";
 import { AuthVerificationDto } from "./dto/auth-verification-dto";
@@ -38,6 +37,7 @@ export class AuthService {
       authType,
       accountType,
       organization,
+      invitedReferralCode,
     } = signUpDto;
 
     // send verification code
@@ -54,11 +54,6 @@ export class AuthService {
 
     const hashedPassword = this.hashField(password);
 
-    // if user have a link (have licenseId or organizationId) =>
-    // with organization add to organization, add to license
-
-    // with user group add to license
-
     if (!existingUser) {
       const newUser = await this.userService.create({
         firstName,
@@ -69,6 +64,7 @@ export class AuthService {
         registrationCode,
         registrationCodeExpiresAt,
         accountType,
+        invitedReferralCode,
       });
 
       if (organization) {
@@ -245,21 +241,97 @@ export class AuthService {
     if (user.registrationCodeExpiresAt.getTime() < new Date().getTime()) {
       throw new UnauthorizedException("Verification code has expired");
     }
-  
+
+    if (authVerificationDto.licenseId) {
+      const license = await this.prisma.license.findUnique({
+        where: {
+          id: authVerificationDto.licenseId,
+        }
+      });
+
+      if (!license) {
+        throw new NotFoundException("License not found");
+      }
+
+      if (license.limit === 0) {
+        throw new ConflictException("License limit is reached");
+      }
+
+      if (license.availableEmails.includes(authVerificationDto.email)) {
+        throw new ConflictException("This email does not have access");
+      }
+
+      const licenseUserIds = license.userIds;
+      licenseUserIds.push(user.id);
+
+      await this.prisma.license.update({
+        where: { id: authVerificationDto.licenseId },
+        data: { 
+          userIds: licenseUserIds,
+          limit: license.limit - 1, 
+        }
+      });
+    }
+
+    if (authVerificationDto.organizationId) {
+      const organization = await this.prisma.organization.findUnique({
+        where: {
+          id: authVerificationDto.organizationId,
+        }
+      });
+
+      if (!organization) {
+        throw new NotFoundException("Organization not found");
+      }
+
+      const license = await this.prisma.license.findUnique({
+        where: {
+          ownerId: organization.ownerId,
+        }
+      });
+
+      if (license.limit === 0) {
+        throw new ConflictException("License limit is reached");
+      }
+
+      const organizationDomains = organization.domains;
+      const organizationEmails = organization.availableEmails;
+    
+      const emailDomainPart = authVerificationDto.email.split("@")[1];
+
+      if (!organizationEmails.includes(authVerificationDto.email) && !organizationDomains.includes(emailDomainPart)) {
+        throw new ConflictException("This email does not have access");
+      }
+
+      // add userId to license
+      const licenseUserIds = license.userIds;
+      licenseUserIds.push(user.id);
+
+      await this.prisma.license.update({
+        where: { id: license.id },
+        data: { 
+          userIds: licenseUserIds,
+          limit: license.limit - 1, 
+        }
+      });
+
+      // add userId to organization
+      const organizationUserIds = organization.userIds;
+      organizationUserIds.push(user.id);
+
+      await this.prisma.organization.update({
+        where: { id: authVerificationDto.organizationId },
+        data: {
+          userIds: organizationUserIds,
+        }
+      });
+    }
+
     await this.userService.updateUser(user.id, {
       isVerified: true,
       registrationCode: null,
       registrationCodeExpiresAt: null,
     });
-
-    if (authVerificationDto.licenseId) {
-      // add user email to license
-    }
-
-    if (authVerificationDto.organizationId) {
-      // add user email to organization
-      // add to license
-    }
 
     const tokens = await this.tokenService.generateTokens({
       sub: user.id,
@@ -271,29 +343,6 @@ export class AuthService {
       ...user,
       ...tokens,
     };
-  }
-
-  public async checkEmailForDomain(checkEmailDto: CheckEmailDto) {
-    const { email, organizationId } = checkEmailDto;
-
-    const organization = await this.prisma.organization.findUnique({
-      where: {
-        id: organizationId,
-      }
-    });
-
-    if (!organization) {
-      throw new NotFoundException("Organization not found");
-    }
-    
-    if (!organization.domain) {
-      throw new ConflictException("This organization does not have a domain");
-    }
-
-    const emailDomainPart = email.split("@")[1];
-
-    // find organization if organization has a domain check by second part of email
-    // check includes domain email or not
   }
 
   private hashField(password: string): string {

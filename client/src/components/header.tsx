@@ -1,36 +1,36 @@
 "use client";
 
 import React, { useContext } from "react";
-
 import Link from "next/link";
 import Image from "next/image";
 
 import { AuthContext } from "@/context";
-
 import { Button } from "@/components";
 
-import { Logo } from "../../public";
+import { Logo } from "@public/images";
+import { User } from "lucide-react";
+import { MenuMobile } from "./menu-mobile";
 
-const NAVIGATION_ITEMS = [
+export const NAVIGATION_ITEMS = [
   {
     title: "Pricing",
     path: "/",
   },
   {
     title: "About",
-    path: "/",
+    path: "/about",
   },
   {
     title: "FAQ",
-    path: "/",
+    path: "/faq",
   },
   {
     title: "Contact",
-    path: "/",
+    path: "/contact",
   },
   {
     title: "License Management",
-    path: "/",
+    path: "/license-management",
   },
 ];
 
@@ -46,20 +46,25 @@ export const Header = () => {
     >
       <div
         className="
-          container w-full mx-auto flex items-center justify-between
+          container w-full max-w-[1440px] mx-auto flex items-center justify-between
           py-4
         "
       >
         <div className="flex items-center gap-10">
           <Link href="/">
-            <Image src={Logo} alt="logo" className="h-7 w-[110px]" />
+            <Image
+              src={Logo}
+              width={110}
+              height={28}
+              alt="logo"
+            />
           </Link>
 
-          <nav>
+          <nav className="hidden lg:block">
             <ul className="flex items-center gap-8">
               {NAVIGATION_ITEMS.map((item) => (
                 <Link key={item.title} href={item.path}>
-                  <li className="font-medium text-sm hover:opacity-80">
+                  <li className="font-medium text-base transition-all hover:text-violet-50 hover:underline active:text-violet-200">
                     {item.title}
                   </li>
                 </Link>
@@ -68,7 +73,7 @@ export const Header = () => {
           </nav>
         </div>
 
-        <div className="flex gap-6 items-center">
+        <div className="hidden lg:flex gap-6 items-center">
           {!isLoggedIn ? (
             <div className="flex items-center gap-8">
               <Link href="/auth/sign-in">
@@ -82,13 +87,16 @@ export const Header = () => {
               </Link>
             </div>
           ) : (
-            <Link href="/account/license" className="flex items-center gap-2">
+            <Link href="/account/home" className="flex items-center gap-2">
               <Button variant="secondary" className="flex">
+                <User />
                 <span>Account</span>
               </Button>
             </Link>
           )}
         </div>
+
+        <MenuMobile />
       </div>
     </header>
   );

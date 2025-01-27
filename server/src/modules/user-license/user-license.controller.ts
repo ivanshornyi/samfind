@@ -1,10 +1,11 @@
-import { Get, Post, Controller, Param, Body } from "@nestjs/common";
+import { Get, Post, Patch, Controller, Param, Body } from "@nestjs/common";
 
 import { UserLicenseService } from "./user-license.service";
 
 import { ApiTags, ApiOperation } from "@nestjs/swagger";
 
 import { AddUserLicenseDto } from "./dto/add-user-license-dto";
+import { UpdateUserLicenseDto } from "./dto/update-user-license-dto";
 
 @ApiTags("User License")
 @Controller("user-license")
@@ -27,5 +28,14 @@ export class UserLicenseController {
   @Get("/find/:userId")
   async findLicenseByUserId(@Param("userId") userId: string) {
     return this.licenseService.findByUserId(userId);
+  }
+
+  @ApiOperation({ summary: "Update user license" })
+  @Patch("/:id")
+  async updateLicense(
+    @Param("id") id: string, 
+    @Body() updateUserLicenseDto: UpdateUserLicenseDto
+  ) {
+    return this.licenseService.update(id, updateUserLicenseDto);
   }
 }

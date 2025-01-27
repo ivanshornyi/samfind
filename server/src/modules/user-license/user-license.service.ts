@@ -4,6 +4,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { License, LicenseStatus } from "@prisma/client";
 
 import { AddUserLicenseDto } from "./dto/add-user-license-dto";
+import { UpdateUserLicenseDto } from "./dto/update-user-license-dto";
 
 @Injectable()
 export class UserLicenseService {
@@ -44,5 +45,14 @@ export class UserLicenseService {
     });
 
     return licenses;
+  }
+
+  async update(id: string, updateUserLicenseDto: UpdateUserLicenseDto) {
+    return await this.prisma.license.update({
+      where: { id },
+      data: {
+        ...updateUserLicenseDto,
+      }
+    });
   }
 }

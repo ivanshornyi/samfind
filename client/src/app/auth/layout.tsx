@@ -8,7 +8,14 @@ import Link from "next/link";
 
 import { AuthContext } from "@/context";
 
-import { Logo } from "../../../public";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+
+import { Button } from "@/components";
+import { ArrowLeftIcon } from "lucide-react";
+
+import { Logo, BgVioletEllipse } from "@public/images";
+
+const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string;
 
 export default function AuthLayout({
   children,
@@ -25,16 +32,34 @@ export default function AuthLayout({
   }, [isLoggedIn]);
 
   return (
-    <div className="container px-5 h-[100dvh] mx-auto flex flex-col gap-4 justify-between items-center">
-        <div className="pt-12">
-          <Link href="/">
-            <Image src={Logo} alt="logo" className="w-24 h-6" />
-          </Link>
-        </div>
-        <div className="flex items-center justify-center">{children}</div>
-        <div className="py-5">
-          <p>@ Osio2025. All rights reserved.</p>
-        </div>
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <div className="container px-5 h-[100dvh] mx-auto flex flex-col gap-4 justify-between items-center">
+      <Image 
+        src={BgVioletEllipse} 
+        alt="ellipse" 
+        priority
+        className="absolute left-0 top-0 z-0 w-[60%]"
+      />
+
+      <Link href="/" className="fixed top-6 left-5">
+        <Button
+          variant="link"
+          className="flex items-center gap-2"
+        >
+          <ArrowLeftIcon />
+          <span>Back</span>
+        </Button>
+      </Link>
+      <div className="pt-12">
+        <Link href="/">
+          <Image src={Logo} alt="logo" className="w-24 h-6.5" />
+        </Link>
+      </div>
+      <div className="flex items-center justify-center relative z-10">{children}</div>
+      <div className="py-5">
+        <p>@ Osio2025. All rights reserved.</p>
+      </div>
     </div>
+    </GoogleOAuthProvider>
   );
 }

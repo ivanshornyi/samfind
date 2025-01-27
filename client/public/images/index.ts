@@ -1,3 +1,4 @@
-import Logo from "./header-logo.png";
+import Logo from "./Logo.png";
+import BgVioletEllipse from "./bg-violet-ellipse.png";
 
-export { Logo };
+export { Logo, BgVioletEllipse };

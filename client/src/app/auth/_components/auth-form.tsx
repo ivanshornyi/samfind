@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 
-import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
 
 import { UserAccountType } from "@/types";
 
@@ -13,8 +14,13 @@ import { SignUpData, UserAuthType } from "@/services";
 
 import { Button, Input } from "@/components";
 import { SendResetPasswordCodeModal, VerifyUserModal } from "../_components";
+import { ACCOUNT_TYPE_CARD_ITEMS } from "../account-type/page";
+
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 
 import { EyeIcon, EyeOff } from "lucide-react";
+import { GoogleIcon } from "@public/icons";
 
 interface AuthFormProps {
   authPageType: "signIn" | "signUp" | "resetPassword";
@@ -26,6 +32,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const accountType = searchParams.get("accountType") as UserAccountType;
+  const referralCode = searchParams.get("userReferralCode");
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -128,6 +135,13 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
         accountType,
       }
 
+      if (referralCode) {
+        signUpData = {
+          ...signUpData,
+          invitedReferralCode: Number(referralCode),
+        }
+      }
+
       if (accountType === UserAccountType.Business) {
         if (
           organizationFormData.name === "" ||
@@ -150,14 +164,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
           name: organizationFormData.name,
           VAT: organizationFormData.VAT,
           businessOrganizationNumber: organizationFormData.businessOrganizationNumber,
-        }
-
-        // TODO add validation
-        if (organizationFormData.domain !== "") {
-          organization = {
-            ...organization,
-            domain: organizationFormData.domain,
-          }
         }
 
         // add organization
@@ -204,26 +210,16 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
     resetPassword: "Set a secure password to protect your account and ensure safe access.",
   }
 
+
   const disabledFormItems =
     isSignInPending || isSignUpPending || isResetPasswordPending;
 
   useEffect(() => {
     const referralCode = searchParams.get("userReferralCode");
-    const organizationId = searchParams.get("organizationId");
-    const licenseId = searchParams.get("licenseId");
     const token = localStorage.getItem("accessToken");
 
     if (referralCode && !token) {
       localStorage.setItem("userReferralCode", referralCode);
-    }
-
-    if (organizationId && !token) {
-      localStorage.setItem("organizationId", organizationId);
-      // check if organization has a domain
-    }
-
-    if (licenseId && !token) {
-      localStorage.setItem("licenseId", licenseId);
     }
 
     if (
@@ -237,14 +233,78 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
     }
   }, [searchParams, accountType]);
 
+  const googleSignUpSuccessHandler = async (credentialResponse: any) => {
+    const user: { email: string } = jwtDecode(credentialResponse?.credential as string);
+
+    console.log(user);
+    // await mutate({
+    //   email: user.email,
+    //   password: "",
+    //   school: currentSchoolName,
+    //   auth: UserAuthType.Google,
+    // });
+
+    // let signUpData: SignUpData = {
+    //   firstName: user.fir,
+    //   lastName: formData.lastName.trim(),
+    //   email: formData.email.trim(),
+    //   password: formData.password.trim(),
+    //   authType: UserAuthType.Email,
+    //   accountType,
+    // }
+
+    // if (referralCode) {
+    //   signUpData = {
+    //     ...signUpData,
+    //     invitedReferralCode: Number(referralCode),
+    //   }
+    // }
+
+    // signUpMutation(signUpData);
+  };
+
+  const googleSignUpErrorHandler = () => {
+    // toast.error("Something went wrong");
+  };
+
+  const googleSignInSuccessHandler = async (credentialResponse: any) => {
+    // const user: { email: string } = jwtDecode(credentialResponse?.credential as string);
+
+    // await mutate({
+    //   email: user.email,
+    //   password: "",
+    //   school: currentSchoolName,
+    //   auth: UserAuthType.Google,
+    // });
+  };
+
+  const googleSignInErrorHandler = () => {
+    // toast.error("Something went wrong");
+  };
+
   return (
     <>
       <div className="w-[591px] border-[1px] border-violet-100 rounded-[30px] p-8">
         {authPageType === "signUp" && (
-          <div className="capitalize text-violet-50 font-semibold">
-            {accountType} Account
-          </div>
+          <ul>
+            {ACCOUNT_TYPE_CARD_ITEMS.map(item => {
+              return item.type === accountType ? (
+                <li
+                  key={item.type}
+                  className="
+                    capitalize text-violet-50 font-semibold bg-background
+                    rounded-full px-6 py-2 w-[208px] flex items-center justify-center gap-2
+                    [&>svg]:w-3.5 [&>svg]:h-3.5
+                  "
+                >
+                  {item.icon}
+                  <span>{accountType} Account</span>
+                </li>
+                ) : null
+              })}
+          </ul>
         )}
+
         <form onSubmit={handleAuthFormSubmit} className="mt-4">
           <h2 className="font-semibold text-3xl">{formTitle[authPageType]}</h2>
           <p className="mt-4 text-lg">{formDescription[authPageType]}</p>
@@ -252,7 +312,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
           <div className="mt-8 flex flex-col gap-2">
             {authPageType === "signUp" && (
               <>
-                <div>
+                <div className="flex gap-2">
                   <Input
                     id="firstName"
                     name="firstName"
@@ -260,8 +320,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                     value={formData.firstName}
                     onChange={handleFormInputChange}
                   />
-                </div>
-                <div>
                   <Input
                     id="lastName"
                     name="lastName"
@@ -362,12 +420,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                 value={organizationFormData.VAT}
                 onChange={handleOrganizationFormInputChange}
               />
-              <Input 
-                name="domain"
-                placeholder="domain.com(optional)" 
-                value={organizationFormData.domain}
-                onChange={handleOrganizationFormInputChange}
-              />
             </div>
           )}
 
@@ -389,17 +441,38 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
         <div className="pt-4">
           {authPageType === "signIn" && <SendResetPasswordCodeModal />}
 
-          {authPageType !== "resetPassword" && <p className="text-center my-5">Or</p>}
-
-          {authPageType !== "resetPassword" && (
-            <div className="flex flex-col gap-2">
-              <button className="py-2.5 bg-white text-black rounded-full">
-                Sign in with Google
-              </button>
-              <button className="py-2.5 bg-white text-black rounded-full">
-                Sign in with Github
-              </button>
-            </div>
+          {((authPageType === "signUp" && accountType === UserAccountType.Private) || authPageType === "signIn") && (
+            <>
+              <p className="text-center mt-1 mb-5">Or</p>
+            
+              <div className="flex flex-col gap-2 relative">
+                <div className="opacity-0 absolute z-10 w-full mt-0.5 rounded-full overflow-hidden">
+                  <GoogleLogin onSuccess={googleSignInSuccessHandler} onError={googleSignInErrorHandler} />
+                </div>
+                <button 
+                  className="
+                    py-2.5 bg-white flex items-center gap-2 justify-center text-black 
+                    rounded-full relative z-0
+                  "
+                >
+                  <Image 
+                    src={GoogleIcon} 
+                    width={20}
+                    height={20} 
+                    alt="google" 
+                    className="w-5 h-5" 
+                  />
+                    <span>
+                      {authPageType === "signIn" && "Sign in "}
+                      {authPageType === "signUp" && "Sign up "}
+                      with Google
+                    </span>
+                </button>
+                {/* <button className="py-2.5 bg-white text-black rounded-full">
+                  Sign in with Github
+                </button> */}
+              </div>
+            </>
           )}
 
           {authPageType === "signIn" && (

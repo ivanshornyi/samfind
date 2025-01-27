@@ -4,20 +4,15 @@ import type { Metadata } from "next";
 
 import { AuthContextProvider } from "@/context";
 
-import { Toaster, MainLayout } from "@/components";
+import { Toaster } from "@/components";
 
 import { TanstackProvider } from "@/providers";
 
-import { Geist, Geist_Mono } from "next/font/google";
+import { Manrope } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const manrope = Manrope({
+  variable: "--font-monrope",
   subsets: ["latin"],
 });
 
@@ -34,14 +29,10 @@ export default function RootLayout({
   return (
     <TanstackProvider>
       <html lang="en">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background`}
-        >
+        <body className={`${manrope.variable} dark antialiased bg-background w-full max-w-[1440px] mx-auto`}>
           <Toaster />
           <Suspense>
-            <AuthContextProvider>
-              <MainLayout>{children}</MainLayout>
-            </AuthContextProvider>
+            <AuthContextProvider>{children}</AuthContextProvider>
           </Suspense>
         </body>
       </html>

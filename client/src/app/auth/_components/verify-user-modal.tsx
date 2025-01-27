@@ -2,11 +2,16 @@
 
 import React, { useEffect, useState } from "react";
 
+import { useSearchParams } from "next/navigation";
+
 import { useToast, useVerifyUser } from "@/hooks";
+
+import { VerifyData } from "@/services";
+
+import { UserAccountType } from "@/types";
 
 import {
   AlertDialog,
-  AlertDialogTrigger,
   Button,
   AlertDialogContent,
   AlertDialogHeader,
@@ -25,6 +30,7 @@ interface VerifyUserModalProps {
 
 export const VerifyUserModal: React.FC<VerifyUserModalProps> = ({ isOpen, email }) => {
   const { toast } = useToast();
+  const searchParams = useSearchParams();
   const [code, setCode] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -41,9 +47,38 @@ export const VerifyUserModal: React.FC<VerifyUserModalProps> = ({ isOpen, email 
       return;
     } 
 
-    // if has a license or organization
+    let verifyData: VerifyData = {
+      email, 
+      verificationCode: code,
+    };
 
-    verifyUserMutation({ email, verificationCode: code });
+    const licenseId = searchParams.get("lId");
+    const organizationId = searchParams.get("orgId");
+    const accountType = searchParams.get("accountType");
+
+    if (licenseId) {
+      verifyData = {
+        ...verifyData,
+        licenseId,
+      }
+    }
+
+    if (organizationId) {
+      if (accountType === UserAccountType.Business) {
+        toast({
+          description: "You can not add business account for this organization",
+        });
+  
+        return;
+      }
+
+      verifyData = {
+        ...verifyData,
+        organizationId,
+      }
+    }
+
+    verifyUserMutation(verifyData);
   };
 
   useEffect(() => {
