@@ -43,34 +43,87 @@ import {
 } from "lucide-react";
 import { License, LicenseStatus } from "@/types";
 
-const columns: ColumnDef<License>[] = [
+const mockData = [
   {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => (
-      <div
-        className={`${
-          row.getValue("status") === LicenseStatus.Active
-            ? "text-green-500"
-            : "text-orange-400"
-        } capitalize text-xs`}
-      >
-        {row.getValue("status")}
-      </div>
-    ),
+    name: "Name1",
+    email: "starttyping@gmail.com",
+    date: "02.02.2025",
+    access: "Owner",
+    licence: "4923882344",
   },
+  {
+    name: "Name2",
+    email: "starttyping@gmail.com",
+    date: "02.02.2025",
+    access: "Member",
+    licence: "4923882344",
+  },
+  {
+    name: "Name3",
+    email: "starttyping@gmail.com",
+    date: "02.02.2025",
+    access: "Member",
+    licence: "4923882344",
+  },
+];
+
+const headers = {
+  name: "name",
+  email: "email",
+  date: "date of activation",
+  access: "access rights",
+  licence: "licence key",
+};
+
+interface LicenseItem {
+  username: string;
+  date: string;
+  role: string;
+  phoneNumber: string;
+}
+
+const columns: ColumnDef<LicenseItem>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => (
       <Button
+        className="text-disabled uppercase"
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
-        Name
+        <div>{headers.name}</div>
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => <div className="lowercase">{row.getValue("name")}</div>,
+    cell: ({ row }) => <div>{row.getValue(headers.name)}</div>,
+  },
+  {
+    accessorKey: "email",
+    header: () => (
+      <div className="text-disabled uppercase">{headers.email}</div>
+    ),
+    cell: ({ row }) => <div>{row.getValue(headers.email)}</div>,
+  },
+  {
+    accessorKey: "date",
+    header: ({ column }) => (
+      <Button
+        className="text-disabled uppercase"
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        {headers.date}
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => <div>{row.getValue("date")}</div>,
+  },
+  {
+    accessorKey: "licence",
+    header: () => (
+      <div className="text-disabled uppercase">{headers.licence}</div>
+    ),
+    cell: ({ row }) => <div>{row.getValue("licence")}</div>,
   },
   {
     id: "actions",
@@ -84,9 +137,7 @@ const columns: ColumnDef<License>[] = [
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>View details</DropdownMenuItem>
+          <DropdownMenuItem>Delete user</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     ),
@@ -106,7 +157,7 @@ export default function LicenseList() {
     useGetUserLicenses();
 
   const table = useReactTable({
-    data: userLicenses,
+    data: mockData,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -125,19 +176,21 @@ export default function LicenseList() {
   });
 
   return (
-    <div className="mx-auto w-[732px]">
+    <div className="mx-auto">
       <div className="w-full">
-        <h2 className="text-[24px]">Your licenses</h2>
+        <h2 className="text-[32px] leading-[44px] font-semibold">
+          License management
+        </h2>
         <div className="flex items-center py-4">
           <Input
-            placeholder="Filter license names..."
+            placeholder="Search"
             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
               table.getColumn("name")?.setFilterValue(event.target.value)
             }
             className="max-w-sm bg-card"
           />
-          <DropdownMenu>
+          {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-auto">
                 Columns <ChevronDown />
@@ -162,91 +215,73 @@ export default function LicenseList() {
                   );
                 })}
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu> */}
         </div>
-        <div className="rounded-md border">
-          <Table className="bg-card rounded-md border-none">
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
-                    );
-                  })}
+        <Table
+          // className="bg-card rounded-md border-none"
+          className="max-w-full w-[1064px]"
+        >
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id} className="border-disabled">
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length !== 0 &&
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  className="border-none"
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
                 </TableRow>
               ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length !== 0 &&
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
 
-              {table.getRowModel().rows?.length === 0 &&
-                !isUserLicensesPending && (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      No results.
-                    </TableCell>
-                  </TableRow>
-                )}
-
-              {isUserLicensesPending && (
-                <TableRow>
+            {table.getRowModel().rows?.length === 0 &&
+              !isUserLicensesPending && (
+                <TableRow className="border-none">
                   <TableCell
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    <LoaderCircle size={18} className="mx-auto animate-spin" />
+                    No results.
                   </TableCell>
                 </TableRow>
               )}
-            </TableBody>
-          </Table>
-        </div>
-        <div className="flex items-center justify-end space-x-2 py-4">
-          <div className="space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
+
+            {/* {isUserLicensesPending && (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  <LoaderCircle size={18} className="mx-auto animate-spin" />
+                </TableCell>
+              </TableRow>
+            )} */}
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
