@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "./ui";
+import { LogoutModal } from "./logout-modal";
 
 const NAVIGATION_ITEMS = [
   {
@@ -85,12 +86,7 @@ export function AppSidebar() {
         >
           Support
         </Button>
-        <Button
-          variant="menuItem"
-          leftIcon={<LogOut style={{ width: "24px", height: "24px" }} />}
-        >
-          Logout
-        </Button>
+        <LogoutModal />
       </SidebarFooter>
     </Sidebar>
   );
