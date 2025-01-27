@@ -3,6 +3,7 @@ import {
   IsOptional,
   IsEmail,
   ValidateNested,
+  IsNumber,
 } from "class-validator";
 import { Type } from "class-transformer";
 
@@ -32,10 +33,6 @@ export class SignUpOrganizationDto {
 
   @IsString()
   VAT: string;
-
-  @IsString()
-  @IsOptional()
-  domain?: string;
 }
 
 export class SignUpDto extends SignInDto {
@@ -60,4 +57,8 @@ export class SignUpDto extends SignInDto {
   @Type(() => SignUpOrganizationDto)
   @IsOptional()
   organization?: SignUpOrganizationDto;
+
+  @IsNumber()
+  @IsOptional()
+  invitedReferralCode?: number;
 } 

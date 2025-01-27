@@ -1,4 +1,4 @@
-import { IsDate, IsString } from "class-validator";
+import { IsDate, IsNumber, IsOptional, IsString } from "class-validator";
 
 import { UserAccountType, UserAuthType } from "@prisma/client"; 
 
@@ -26,4 +26,8 @@ export class CreateUserDto {
 
   @IsString()
   accountType: UserAccountType;
+
+  @IsNumber()
+  @IsOptional()
+  invitedReferralCode?: number;
 }

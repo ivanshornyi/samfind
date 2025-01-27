@@ -9,7 +9,7 @@ import {
   Facebook,
 } from "@public/contact/icons";
 import { NetworkItem } from "./network-item";
-import { EllispeRedImage } from "@public/contact";
+import { EllipseVioletImage } from "@public/contact";
 
 const networks = [
   {
@@ -56,7 +56,7 @@ export const SocialNetworks = () => {
         ))}
       </div>
       <Image
-        src={EllispeRedImage}
+        src={EllipseVioletImage}
         width={1200}
         height={400}
         alt="Background illustration"
