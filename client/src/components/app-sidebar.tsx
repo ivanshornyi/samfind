@@ -62,7 +62,9 @@ export function AppSidebar() {
   return (
     <Sidebar className="py-8 border-secondary">
       <SidebarHeader className="px-4 h-[60px] mb-6">
-        <Image src={Logo} width={110} height={40} alt="Logo" />
+        <Link href="/">
+          <Image src={Logo} width={110} height={40} alt="Logo" />
+        </Link>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup className="">
@@ -96,12 +98,14 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="space-y-4 px-4">
-        <Button
-          variant="menuItem"
-          leftIcon={<User style={{ width: "24px", height: "24px" }} />}
-        >
-          Profile settings
-        </Button>
+        <Link href="/account/settings">
+          <Button
+            variant="menuItem"
+            leftIcon={<User style={{ width: "24px", height: "24px" }} />}
+          >
+            Profile settings
+          </Button>
+        </Link>
         <Button
           variant="menuItem"
           leftIcon={<Headset style={{ width: "24px", height: "24px" }} />}

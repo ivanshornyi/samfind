@@ -1,6 +1,8 @@
 import { LicensingOptionType } from "../_types";
-import { Button } from "@/components/ui";
+
+import { Button } from "@/components";
 import { CheckOutline, DollarIcon } from "@public/home";
+
 import Image from "next/image";
 
 export const LicensingOptionCard = ({
@@ -19,7 +21,7 @@ export const LicensingOptionCard = ({
       </h3>
       <p className="font-normal text-base mb-10">{option.description}</p>
 
-      {option.price ? (
+      {option.price !== 0 ? (
         <div className="mb-10 flex gap-2">
           <div className="flex items-start justify-end">
             <Image src={DollarIcon} alt="dollar" width={23} height={49} />
@@ -36,7 +38,15 @@ export const LicensingOptionCard = ({
         className={`w-full mb-10 border-none ${isLarge ? 'py-[13px]' : ''}`}
       >
         {option.buttonText}
+        {/* <PaymentsModal 
+          amount={option.price} 
+          currency="USD"
+          license={{
+            tierType: option.tierType,
+          }} 
+        /> */}
       </Button>
+
       <ul className="space-y-[10px]">
         {option.features.map((feature, index) => (
           <li key={index} className="flex items-center gap-[20px]">

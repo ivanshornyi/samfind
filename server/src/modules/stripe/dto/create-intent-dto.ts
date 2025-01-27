@@ -21,5 +21,5 @@ export class CreateIntentDto {
   tierType: LicenseTierType;
 
   @IsNumber()
-  count: number;
+  limit: number;
 }

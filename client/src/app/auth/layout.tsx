@@ -56,10 +56,10 @@ export default function AuthLayout({
         </Link>
       </div>
       <div className="flex items-center justify-center relative z-10">{children}</div>
-      <div className="py-5">
-        <p>@ Osio2025. All rights reserved.</p>
+        <div className="py-5">
+          <p>@ Osio2025. All rights reserved.</p>
+        </div>
       </div>
-    </div>
     </GoogleOAuthProvider>
   );
 }
