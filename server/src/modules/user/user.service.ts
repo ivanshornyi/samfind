@@ -123,8 +123,6 @@ export class UserService {
       }
     });
 
-    // if
-
     return user;
   }
 
@@ -152,7 +150,7 @@ export class UserService {
       updateUserDto.password = this.hashPassword(updateUserDto.password);
     }
 
-    const updatedUser = await this.prisma.user.update({
+    const updatedUser = await this.prisma.user.update({ 
       where: { id },
       data: updateUserDto,
     });
