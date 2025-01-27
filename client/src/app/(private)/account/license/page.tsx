@@ -167,6 +167,7 @@ export default function LicenseList() {
         <h2 className="text-[32px] leading-[44px] font-semibold">
           License management
         </h2>
+        <div className="mt-6"></div>
         <div className="flex items-center py-4">
           <Input
             placeholder="Search"
