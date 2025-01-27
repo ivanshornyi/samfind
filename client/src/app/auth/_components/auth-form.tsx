@@ -16,6 +16,9 @@ import { Button, Input } from "@/components";
 import { SendResetPasswordCodeModal, VerifyUserModal } from "../_components";
 import { ACCOUNT_TYPE_CARD_ITEMS } from "../account-type/page";
 
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
+
 import { EyeIcon, EyeOff } from "lucide-react";
 import { GoogleIcon } from "@public/icons";
 
@@ -230,6 +233,55 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
     }
   }, [searchParams, accountType]);
 
+  const googleSignUpSuccessHandler = async (credentialResponse: any) => {
+    const user: { email: string } = jwtDecode(credentialResponse?.credential as string);
+
+    console.log(user);
+    // await mutate({
+    //   email: user.email,
+    //   password: "",
+    //   school: currentSchoolName,
+    //   auth: UserAuthType.Google,
+    // });
+
+    // let signUpData: SignUpData = {
+    //   firstName: user.fir,
+    //   lastName: formData.lastName.trim(),
+    //   email: formData.email.trim(),
+    //   password: formData.password.trim(),
+    //   authType: UserAuthType.Email,
+    //   accountType,
+    // }
+
+    // if (referralCode) {
+    //   signUpData = {
+    //     ...signUpData,
+    //     invitedReferralCode: Number(referralCode),
+    //   }
+    // }
+
+    // signUpMutation(signUpData);
+  };
+
+  const googleSignUpErrorHandler = () => {
+    // toast.error("Something went wrong");
+  };
+
+  const googleSignInSuccessHandler = async (credentialResponse: any) => {
+    // const user: { email: string } = jwtDecode(credentialResponse?.credential as string);
+
+    // await mutate({
+    //   email: user.email,
+    //   password: "",
+    //   school: currentSchoolName,
+    //   auth: UserAuthType.Google,
+    // });
+  };
+
+  const googleSignInErrorHandler = () => {
+    // toast.error("Something went wrong");
+  };
+
   return (
     <>
       <div className="w-[591px] border-[1px] border-violet-100 rounded-[30px] p-8">
@@ -393,9 +445,15 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
             <>
               <p className="text-center mt-1 mb-5">Or</p>
             
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 relative">
+                <div className="opacity-0 absolute z-10 w-full mt-0.5 rounded-full overflow-hidden">
+                  <GoogleLogin onSuccess={googleSignInSuccessHandler} onError={googleSignInErrorHandler} />
+                </div>
                 <button 
-                  className="py-2.5 bg-white flex items-center gap-2 justify-center text-black rounded-full"
+                  className="
+                    py-2.5 bg-white flex items-center gap-2 justify-center text-black 
+                    rounded-full relative z-0
+                  "
                 >
                   <Image 
                     src={GoogleIcon} 
@@ -404,7 +462,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                     alt="google" 
                     className="w-5 h-5" 
                   />
-                  <span>Sign in with Google</span>
+                    <span>
+                      {authPageType === "signIn" && "Sign in "}
+                      {authPageType === "signUp" && "Sign up "}
+                      with Google
+                    </span>
                 </button>
                 {/* <button className="py-2.5 bg-white text-black rounded-full">
                   Sign in with Github
