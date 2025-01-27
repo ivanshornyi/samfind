@@ -40,17 +40,17 @@ const NAVIGATION_ITEMS = [
   },
   {
     title: "License management",
-    path: "/account/home",
+    path: "/",
     icon: IdCard,
   },
   {
     title: "Invite friends",
-    path: "/account/home",
+    path: "/",
     icon: Gift,
   },
   {
     title: "Billing data",
-    path: "/account/home",
+    path: "/",
     icon: CreditCard,
   },
 ];
