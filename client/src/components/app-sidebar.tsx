@@ -1,3 +1,12 @@
+"use client";
+
+import { useContext } from "react";
+
+import { AuthContext } from "@/context";
+
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+
 import {
   Sidebar,
   SidebarContent,
@@ -9,6 +18,10 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Logo } from "@public/images";
+
+import Image from "next/image";
+import { Button } from "./ui";
+
 import {
   Home,
   IdCard,
@@ -18,33 +31,34 @@ import {
   Headset,
   LogOut,
 } from "lucide-react";
-import Image from "next/image";
-import { Button } from "./ui";
 
 const NAVIGATION_ITEMS = [
   {
     title: "Home",
-    path: "/",
+    path: "/account/home",
     icon: Home,
   },
   {
     title: "License management",
-    path: "/",
+    path: "/account/home",
     icon: IdCard,
   },
   {
     title: "Invite friends",
-    path: "/",
+    path: "/account/home",
     icon: Gift,
   },
   {
     title: "Billing data",
-    path: "/",
+    path: "/account/home",
     icon: CreditCard,
   },
 ];
 
 export function AppSidebar() {
+  const pathname = usePathname();
+  const { logout } = useContext(AuthContext);
+
   return (
     <Sidebar className="py-8 border-secondary">
       <SidebarHeader className="px-4 h-[60px] mb-6">
@@ -54,20 +68,29 @@ export function AppSidebar() {
         <SidebarGroup className="">
           <SidebarGroupContent>
             <SidebarMenu className="space-y-4">
-              {NAVIGATION_ITEMS.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <Button
-                    variant="menuItem"
-                    leftIcon={
-                      <item.icon style={{ width: "24px", height: "24px" }} />
-                    }
-                  >
-                    <a href={item.path}>
+              {NAVIGATION_ITEMS.map((item) => {
+                const isActive = pathname === item.path;
+
+                return (
+                <SidebarMenuItem 
+                  key={item.title}
+                >
+                  <Link href={item.path}>
+                    <Button
+                      variant="menuItem"
+                      leftIcon={
+                        <item.icon style={{ width: "24px", height: "24px" }} />
+                      }
+                      className={`
+                        ${isActive && "bg-[#302935] text-white"}
+                        w-full flex justify-start items-center
+                      `}
+                    >
                       <span>{item.title}</span>
-                    </a>
-                  </Button>
+                    </Button>
+                  </Link>
                 </SidebarMenuItem>
-              ))}
+              )})}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -88,6 +111,7 @@ export function AppSidebar() {
         <Button
           variant="menuItem"
           leftIcon={<LogOut style={{ width: "24px", height: "24px" }} />}
+          onClick={logout}
         >
           Logout
         </Button>

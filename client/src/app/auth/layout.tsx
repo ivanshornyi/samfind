@@ -44,9 +44,10 @@ export default function AuthLayout({
       <Link href="/" className="fixed top-6 left-5">
         <Button
           variant="link"
-          icon="left-arrow"
+          className="flex items-center gap-2"
         >
-          Back
+          <ArrowLeftIcon />
+          <span>Back</span>
         </Button>
       </Link>
       <div className="pt-12">
