@@ -13,7 +13,7 @@ import {
 } from "@/components";
 
 import { X } from "lucide-react";
-
+//  linear-gradient(91.31deg, #a8a8a8 -23.65%, #a64ce8 109.99%)
 export const DeleteAccount = () => {
   return (
     <AlertDialog>
@@ -22,8 +22,8 @@ export const DeleteAccount = () => {
           Delete
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent className="w-[590px]">
-        <div className="absolute right-0 top-0">
+      <AlertDialogContent className="w-[590px] border gradient-border-modal">
+        <div className="absolute right-1 top-1">
           <AlertDialogCancel className="shadow-none border-none p-3">
             <X size={18} />
           </AlertDialogCancel>
