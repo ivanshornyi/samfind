@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui";
+import { Minus, Plus } from "lucide-react";
 import { useState } from "react";
 
 interface QuestionItemProps {
@@ -22,7 +23,13 @@ export function QuestionItem({ question, answer }: QuestionItemProps) {
 
         <Button
           variant="tetrary"
-          icon={isOpen ? "minus" : "plus"}
+          rightIcon={
+            isOpen ? (
+              <Minus style={{ width: "20px", height: "20px" }} />
+            ) : (
+              <Plus style={{ width: "20px", height: "20px" }} />
+            )
+          }
           onClick={toggle}
           className="w-10"
         ></Button>

@@ -11,6 +11,7 @@ import { AuthContext } from "@/context";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import { Button } from "@/components";
+import { ArrowLeftIcon } from "lucide-react";
 
 import { Logo, BgVioletEllipse } from "@public/images";
 

@@ -2,6 +2,7 @@
 
 import { Button, Input } from "@/components/ui";
 import { QuestionDataItem } from "./question-data-item";
+import { MoveRight } from "lucide-react";
 
 const questionsData = [
   {
@@ -75,7 +76,7 @@ export const Questions = () => {
           <Button
             type="submit"
             variant="secondary"
-            icon="right"
+            rightIcon={<MoveRight style={{ width: "20px", height: "20px" }} />}
             className="w-10"
           ></Button>
         </div>

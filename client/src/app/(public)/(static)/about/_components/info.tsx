@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { EllipseBlueImage } from "@public/about";
+import { MoveUpRight } from "lucide-react";
 
 export const Info = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -37,7 +38,7 @@ export const Info = () => {
       </p>
       <Button
         variant="link"
-        icon="up-right"
+        rightIcon={<MoveUpRight style={{ width: "20px", height: "20px" }} />}
         onClick={() => router.push("/contact")}
       >
         Contact us
