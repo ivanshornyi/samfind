@@ -1,6 +1,6 @@
 import { LicensingOptionType } from "../_types";
 
-import { Button } from "@/components";
+import { Button, PaymentsModal } from "@/components";
 import { CheckOutline, DollarIcon } from "@public/home";
 
 import Image from "next/image";
@@ -14,7 +14,7 @@ export const LicensingOptionCard = ({
 }) => {
   return (
     <div
-      className={`w-full h-fit ${isLarge ? "bg-[#302935]" : "bg-card"} px-6 py-8 rounded-[20px] transition-all hover:shadow-[0_2px_20px_0_#B668F080]`}
+      className={`h-fit flex-1 ${isLarge ? "bg-[#302935]" : "bg-card"} px-6 py-8 rounded-[20px] transition-all hover:shadow-[0_2px_20px_0_#B668F080]`}
     >
       <h3 className="font-semibold text-[32px] leading-[43px] mb-4">
         {option.title}
@@ -33,19 +33,21 @@ export const LicensingOptionCard = ({
         </div>
       ) : null}
 
-      <Button
+      {/* <Button
         variant={option.buttonVariant}
         className={`w-full mb-10 border-none ${isLarge ? 'py-[13px]' : ''}`}
-      >
-        {option.buttonText}
-        {/* <PaymentsModal 
-          amount={option.price} 
-          currency="USD"
-          license={{
-            tierType: option.tierType,
-          }} 
-        /> */}
-      </Button>
+      > */}
+        <div className="py-3">
+          <PaymentsModal 
+            amount={Number((Number(option.price.toFixed(2)) * 100).toFixed())} 
+            currency="USD"
+            license={{
+              tierType: option.tierType,
+            }} 
+            buttonText={option.buttonText}
+          />
+        </div>
+      {/* </Button> */}
 
       <ul className="space-y-[10px]">
         {option.features.map((feature, index) => (
