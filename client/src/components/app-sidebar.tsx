@@ -33,7 +33,7 @@ const NAVIGATION_ITEMS = [
   },
   {
     title: "Invite friends",
-    path: "/",
+    path: "/account/invite-friends",
     icon: Gift,
   },
   {
