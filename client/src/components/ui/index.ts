@@ -8,3 +8,4 @@ export * from "./table";
 export * from "./checkbox";
 export * from "./dropdown-menu";
 export * from "./sheet";
+export * from "./sidebar";

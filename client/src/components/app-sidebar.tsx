@@ -1,12 +1,5 @@
 "use client";
 
-import { useContext } from "react";
-
-import { AuthContext } from "@/context";
-
-import { usePathname } from "next/navigation";
-import Link from "next/link";
-
 import {
   Sidebar,
   SidebarContent,
@@ -16,21 +9,16 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
-} from "@/components/ui/sidebar";
+  Button,
+  LogoutModal,
+} from "@/components";
+import { useContext } from "react";
+import { AuthContext } from "@/context";
+import { usePathname } from "next/navigation";
+import { Home, IdCard, Gift, CreditCard, User, Headset } from "lucide-react";
 import { Logo } from "@public/images";
-
+import Link from "next/link";
 import Image from "next/image";
-import { Button } from "./ui";
-
-import {
-  Home,
-  IdCard,
-  Gift,
-  CreditCard,
-  User,
-  Headset,
-  LogOut,
-} from "lucide-react";
 
 const NAVIGATION_ITEMS = [
   {
@@ -74,25 +62,26 @@ export function AppSidebar() {
                 const isActive = pathname === item.path;
 
                 return (
-                <SidebarMenuItem 
-                  key={item.title}
-                >
-                  <Link href={item.path}>
-                    <Button
-                      variant="menuItem"
-                      leftIcon={
-                        <item.icon style={{ width: "24px", height: "24px" }} />
-                      }
-                      className={`
+                  <SidebarMenuItem key={item.title}>
+                    <Link href={item.path}>
+                      <Button
+                        variant="menuItem"
+                        leftIcon={
+                          <item.icon
+                            style={{ width: "24px", height: "24px" }}
+                          />
+                        }
+                        className={`
                         ${isActive && "bg-[#302935] text-white"}
                         w-full flex justify-start items-center
                       `}
-                    >
-                      <span>{item.title}</span>
-                    </Button>
-                  </Link>
-                </SidebarMenuItem>
-              )})}
+                      >
+                        <span>{item.title}</span>
+                      </Button>
+                    </Link>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -112,13 +101,7 @@ export function AppSidebar() {
         >
           Support
         </Button>
-        <Button
-          variant="menuItem"
-          leftIcon={<LogOut style={{ width: "24px", height: "24px" }} />}
-          onClick={logout}
-        >
-          Logout
-        </Button>
+        <LogoutModal />
       </SidebarFooter>
     </Sidebar>
   );
