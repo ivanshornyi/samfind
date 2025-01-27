@@ -4,4 +4,3 @@ export default function Home() {
       <p>Home page</p>
     </div>
   );
-}
