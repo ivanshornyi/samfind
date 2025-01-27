@@ -4,3 +4,4 @@ export * from "./full-screen-loader";
 export * from "./footer";
 export * from "./public-layout";
 export * from "./logout-modal";
+export * from "./payments-modal";

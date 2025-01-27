@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 
 import { AuthContext } from "@/context";
 
@@ -34,12 +34,13 @@ const stripePromise = loadStripe(stripePublishableKey as string);
 interface PaymentsModalProps {
   amount: number;
   currency: string;
-  license: { name: string };
+  license: { tierType: LicenseTierType; };
 }
 
 export const PaymentsModal: React.FC<PaymentsModalProps> = ({
   amount,
   currency,
+  license,
 }) => {
   const { user } = useContext(AuthContext);
 
@@ -56,8 +57,8 @@ export const PaymentsModal: React.FC<PaymentsModalProps> = ({
       let intent: CreateIntent = {
         amount,
         currency,
-        count: 10,
-        tierType: LicenseTierType.Freemium,
+        limit: 10,
+        tierType: license.tierType,
         userId: user.id,
       };
 
@@ -75,14 +76,13 @@ export const PaymentsModal: React.FC<PaymentsModalProps> = ({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button
-          variant="secondary"
+        <button
           className="text-sm w-full"
           onClick={handleIntent}
           disabled={!user}
         >
           Buy
-        </Button>
+        </button>
       </AlertDialogTrigger>
       <AlertDialogContent className="w-[700px] max-h-[90dvh] overflow-auto rounded-2xl bg-white">
         <div className="absolute right-0 top-0">
@@ -91,11 +91,16 @@ export const PaymentsModal: React.FC<PaymentsModalProps> = ({
           </AlertDialogCancel>
         </div>
 
-        <AlertDialogHeader>
-          <AlertDialogTitle className="text-black">Payments</AlertDialogTitle>
-          <AlertDialogDescription className="text-black">
-            Enter your credentials
-          </AlertDialogDescription>
+        <AlertDialogHeader className="flex justify-between items-center">
+          <div>
+            <AlertDialogTitle className="text-black">Payments</AlertDialogTitle>
+            <AlertDialogDescription className="text-black">
+              Enter your credentials
+            </AlertDialogDescription>
+          </div>
+          <div>
+            {license.tierType}
+          </div>
         </AlertDialogHeader>
 
         <div>

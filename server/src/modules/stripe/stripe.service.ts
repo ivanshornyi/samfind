@@ -35,7 +35,7 @@ export class StripeService {
       amount, 
       currency, 
       tierType,
-      count,
+      limit,
       userReferralCode,
     } = createPaymentDto;
 
@@ -44,7 +44,7 @@ export class StripeService {
     let metadata: any = {
       userId,
       tierType,
-      limit: count,
+      limit,
     };
 
     let intent = {
