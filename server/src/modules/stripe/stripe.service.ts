@@ -110,6 +110,22 @@ export class StripeService {
         },
       });
 
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: userId,
+        }
+      });
+
+      await this.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          discount: user.discount + Number(referralDiscount),
+          invitedReferralCode: null,
+        },
+      });
+
       this.logger.log(`License added for user ${userId}`);
     } catch (error) {
       this.logger.error('Error adding license to user', error);

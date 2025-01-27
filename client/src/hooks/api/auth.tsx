@@ -30,7 +30,7 @@ export const useSignIn = () => {
       });
 
       login(data.accessToken, data.refreshToken);
-      router.push("/");
+      router.push("/account/home");
     },
     onError: (error) => {
       handleToastError(error, toast);
@@ -189,7 +189,7 @@ export const useVerifyUser = () => {
       localStorage.removeItem("licenseId");
       localStorage.removeItem("organizationId");
 
-      router.push("/");
+      router.push("/account/home");
     },
     onError: (error) => {
       handleToastError(error, toast);

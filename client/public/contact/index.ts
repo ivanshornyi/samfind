@@ -1,4 +1,4 @@
 import EllipseBlueImage from "./ellipse-blue.png";
-import EllispeRedImage from "./Ellipse-red.png";
+import EllipseVioletImage from "./Ellipse-violet.png";
 
-export { EllipseBlueImage, EllispeRedImage };
+export { EllipseBlueImage, EllipseVioletImage };

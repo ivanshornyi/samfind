@@ -9,6 +9,7 @@ import {
   ColumnFiltersState,
   SortingState,
   VisibilityState,
+  flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
@@ -19,14 +20,28 @@ import {
 import {
   Button,
   Input,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components";
 
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
-import { ReusableTable } from "@/components/table";
+import {
+  ArrowUpDown,
+  ChevronDown,
+  LoaderCircle,
+  MoreHorizontal,
+} from "lucide-react";
+import { License, LicenseStatus } from "@/types";
 
 const mockData = [
   {
@@ -61,11 +76,10 @@ const headers = {
 };
 
 interface LicenseItem {
-  name: string;
-  email: string;
+  username: string;
   date: string;
-  access: string;
-  licence: string;
+  role: string;
+  phoneNumber: string;
 }
 
 const columns: ColumnDef<LicenseItem>[] = [
@@ -73,11 +87,11 @@ const columns: ColumnDef<LicenseItem>[] = [
     accessorKey: "name",
     header: ({ column }) => (
       <Button
-        className="text-disabled uppercase text-left pl-0"
+        className="text-disabled uppercase"
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
-        <span>{headers.name}</span>
+        <div>{headers.name}</div>
         <ArrowUpDown />
       </Button>
     ),
@@ -94,7 +108,7 @@ const columns: ColumnDef<LicenseItem>[] = [
     accessorKey: "date",
     header: ({ column }) => (
       <Button
-        className="text-disabled uppercase text-left pl-0"
+        className="text-disabled uppercase"
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
@@ -167,7 +181,6 @@ export default function LicenseList() {
         <h2 className="text-[32px] leading-[44px] font-semibold">
           License management
         </h2>
-        <div className="mt-6"></div>
         <div className="flex items-center py-4">
           <Input
             placeholder="Search"
@@ -177,15 +190,98 @@ export default function LicenseList() {
             }
             className="max-w-sm bg-card"
           />
+          {/* <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                Columns <ChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu> */}
         </div>
+        <Table
+          // className="bg-card rounded-md border-none"
+          className="max-w-full w-[1064px]"
+        >
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id} className="border-disabled">
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length !== 0 &&
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  className="border-none"
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
 
-        <ReusableTable
-          table={table}
-          isLoading={false}
-          onPageChange={(page: number) => console.log(page)}
-          pageCount={100}
-          noDataMessage="No licenses found."
-        />
+            {table.getRowModel().rows?.length === 0 &&
+              !isUserLicensesPending && (
+                <TableRow className="border-none">
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+
+            {/* {isUserLicensesPending && (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  <LoaderCircle size={18} className="mx-auto animate-spin" />
+                </TableCell>
+              </TableRow>
+            )} */}
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

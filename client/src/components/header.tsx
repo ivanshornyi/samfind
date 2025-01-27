@@ -64,7 +64,7 @@ export const Header = () => {
             <ul className="flex items-center gap-8">
               {NAVIGATION_ITEMS.map((item) => (
                 <Link key={item.title} href={item.path}>
-                  <li className="font-medium text-base transition-all hover:text-[#CE9DF3] hover:underline active:text-[#8F40E5]">
+                  <li className="font-medium text-base transition-all hover:text-violet-50 hover:underline active:text-violet-200">
                     {item.title}
                   </li>
                 </Link>
@@ -87,7 +87,7 @@ export const Header = () => {
               </Link>
             </div>
           ) : (
-            <Link href="/account/license" className="flex items-center gap-2">
+            <Link href="/account/home" className="flex items-center gap-2">
               <Button variant="secondary" className="flex">
                 <User />
                 <span>Account</span>
