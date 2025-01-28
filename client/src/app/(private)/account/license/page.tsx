@@ -25,8 +25,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components";
 
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, Search } from "lucide-react";
 import { ReusableTable } from "@/components/table";
+import { InviteMember, ProgressChart } from "./_components";
 
 const mockData = [
   {
@@ -167,16 +168,26 @@ export default function LicenseList() {
         <h2 className="text-[32px] leading-[44px] font-semibold">
           License management
         </h2>
-        <div className="mt-6"></div>
+        <div className="mt-6 flex justify-between items-end">
+          <ProgressChart currentMembers={3} maxMembers={10} />
+          <InviteMember allowedMembers={10} />
+        </div>
         <div className="flex items-center py-4">
-          <Input
-            placeholder="Search"
-            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn("name")?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm bg-card"
-          />
+          <div className="w-[308px] relative">
+            <Input
+              placeholder="Search"
+              value={
+                (table.getColumn("name")?.getFilterValue() as string) ?? ""
+              }
+              onChange={(event) =>
+                table.getColumn("name")?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm bg-card"
+            />
+            <div className="absolute right-6 top-0 h-full flex justify-center items-center">
+              <Search style={{ width: "24px", height: "24px" }} />
+            </div>
+          </div>
         </div>
 
         <ReusableTable

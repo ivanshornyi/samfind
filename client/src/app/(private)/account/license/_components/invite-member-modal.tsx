@@ -1,0 +1,129 @@
+import React, { useState } from "react";
+
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  Button,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogFooter,
+  Input,
+} from "@/components";
+
+import { Info, Send, X } from "lucide-react";
+
+interface InviteMemberProps {
+  allowedMembers: number;
+}
+
+export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
+  const [emails, setEmails] = useState<string[]>([]);
+  const [email, setEmail] = useState("");
+
+  const removeEmail = (emailToRemove: string) => {
+    setEmails((prevEmails) =>
+      prevEmails.filter((email) => email !== emailToRemove)
+    );
+  };
+
+  const addEmail = () => {
+    setEmails((prevEmails) => [...prevEmails, email]);
+    setEmail("");
+  };
+
+  const sentInvites = () => {
+    setEmails([]);
+  };
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="purple" className="" leftIcon={<Send />}>
+          Invite members
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent className="w-[590px]">
+        <div className="absolute right-1 top-1">
+          <AlertDialogCancel className="shadow-none border-none p-3">
+            <X size={18} />
+          </AlertDialogCancel>
+        </div>
+
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-[24px] leading-[33px] font-semibold">
+            Invite members
+          </AlertDialogTitle>
+          <AlertDialogDescription className="text-[16px] leading-[22px] p-[10px] px-6 text-link-hover flex gap-2 items-center">
+            <Info style={{ width: "14px", height: "14px" }} />
+            <span>{`You can add ${allowedMembers - emails.length} more members on your plan.`}</span>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+
+        <p className="mt-8 text-[16px] leading-[22px] text-disabled font-medium">
+          Users you add to your subscription will get full access to all
+          features covered by your license. How It Works:
+        </p>
+        <ol className="list-lower-alpha space-y-2 pl-6 mt-6 text-[16px] leading-[22px] text-disabled font-medium">
+          <li>a. Share the invitation link with the user.</li>
+          <li>b. They must register using this link.</li>
+          <li>c. Once registered, they will gain access.</li>
+        </ol>
+
+        {emails.length ? (
+          <div className="mt-8">
+            <p className="text-[16px] leading-[22px] text-link-hover">
+              Added emails
+            </p>
+            <div className="flex gap-2 flex-wrap">
+              {emails.map((email) => (
+                <div
+                  key={email}
+                  className="text-[14px] leading-[19px] font-medium p-2 px-4 flex gap-2 bg-input rounded-[30px]"
+                >
+                  <span>{email}</span>
+                  <X
+                    onClick={() => removeEmail(email)}
+                    className="cursor-pointer text-disabled hover:text-light"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        <div className="flex gap-2 mt-4">
+          <Input
+            placeholder="Enter email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            className="max-w-sm bg-card w-[340px]"
+          />
+          <Button
+            onClick={addEmail}
+            className="w-full"
+            variant="saveProfile"
+            disabled={!email.length || emails.length >= allowedMembers}
+          >
+            Add email
+          </Button>
+        </div>
+
+        <AlertDialogFooter className="flex gap-6 w-full">
+          <Button
+            onClick={sentInvites}
+            variant="purple"
+            className="w-full"
+            disabled={emails.length <= 0}
+          >
+            {emails.length
+              ? `Sent ${emails.length} Invite${emails.length > 1 ? "s" : ""}`
+              : "Sent Invite"}
+          </Button>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+};
