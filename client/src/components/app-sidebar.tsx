@@ -28,7 +28,7 @@ const NAVIGATION_ITEMS = [
   },
   {
     title: "License management",
-    path: "/",
+    path: "/account/license",
     icon: IdCard,
   },
   {

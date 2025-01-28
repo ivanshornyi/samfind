@@ -12,7 +12,7 @@ import {
   AlertDialogFooter,
   Input,
 } from "@/components";
-
+import { useToast } from "@/hooks";
 import { Info, Send, X } from "lucide-react";
 
 interface InviteMemberProps {
@@ -23,6 +23,8 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
   const [emails, setEmails] = useState<string[]>([]);
   const [email, setEmail] = useState("");
 
+  const { toast } = useToast();
+
   const removeEmail = (emailToRemove: string) => {
     setEmails((prevEmails) =>
       prevEmails.filter((email) => email !== emailToRemove)
@@ -30,6 +32,21 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
   };
 
   const addEmail = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast({
+        description: "Please enter a valid email address.",
+      });
+      return;
+    }
+
+    if (emails.some((e) => e === email)) {
+      toast({
+        description: "Email already in list.",
+      });
+      return;
+    }
+
     setEmails((prevEmails) => [...prevEmails, email]);
     setEmail("");
   };
@@ -92,6 +109,12 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
               ))}
             </div>
           </div>
+        ) : null}
+
+        {allowedMembers <= emails.length ? (
+          <p className="mt-4 text-[#FF7676] text-[12px] leading-[16px]">
+            You have reached the limit for adding new members
+          </p>
         ) : null}
 
         <div className="flex gap-2 mt-4">

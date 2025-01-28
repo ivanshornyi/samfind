@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 
 import { useGetUserLicenses } from "@/hooks";
 
@@ -23,9 +24,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Card,
 } from "@/components";
 
-import { ArrowUpDown, MoreHorizontal, Search } from "lucide-react";
+import { ArrowUpDown, Info, MoreHorizontal, Search } from "lucide-react";
 import { ReusableTable } from "@/components/table";
 import { InviteMember, ProgressChart } from "./_components";
 
@@ -82,7 +84,17 @@ const columns: ColumnDef<LicenseItem>[] = [
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => <div>{row.getValue(headers.name)}</div>,
+    cell: ({ row }) => {
+      const value: string = row.getValue(headers.name);
+      return (
+        <div className="flex gap-2 items-center">
+          <div className="flex justify-center items-center rounded-full w-10 h-10 bg-input text-[24px] leading-[33px] text-link-hover font-semibold">
+            <span>{value[0]}</span>
+          </div>
+          <span>{value}</span>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "email",
@@ -106,9 +118,33 @@ const columns: ColumnDef<LicenseItem>[] = [
     cell: ({ row }) => <div>{row.getValue("date")}</div>,
   },
   {
+    accessorKey: "access",
+    header: () => {
+      const [showInfo, setShowInfo] = useState(false);
+      return (
+        <div className="relative overflow-visible flex items-center gap-2 text-disabled uppercase">
+          <span>{headers.access}</span>
+          <Info
+            onMouseLeave={() => setShowInfo(false)}
+            onMouseEnter={() => setShowInfo(true)}
+            className="cursor-pointer"
+            style={{ width: "14px", height: "14px" }}
+          />
+          {showInfo ? (
+            <Card className="absolute top-5 w-[300px] h-[100px] text-disabled lowercase p-4">
+              As an Owner, you can add other users to your group. You’ll be
+              responsible for covering their license fees.
+            </Card>
+          ) : null}
+        </div>
+      );
+    },
+    cell: ({ row }) => <div>{row.getValue("access")}</div>,
+  },
+  {
     accessorKey: "licence",
     header: () => (
-      <div className="text-disabled uppercase">{headers.licence}</div>
+      <div className=" text-disabled uppercase">{headers.licence}</div>
     ),
     cell: ({ row }) => <div>{row.getValue("licence")}</div>,
   },
@@ -123,8 +159,15 @@ const columns: ColumnDef<LicenseItem>[] = [
             <MoreHorizontal />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem>Delete user</DropdownMenuItem>
+        <DropdownMenuContent className="bg-input border-none" align="end">
+          <DropdownMenuItem>
+            <Button
+              variant={"edit"}
+              className="text-[#FF6C6C] hover:text-[#D23535] active:text-[#302935]"
+            >
+              Delete user
+            </Button>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     ),
@@ -172,7 +215,7 @@ export default function LicenseList() {
           <ProgressChart currentMembers={3} maxMembers={10} />
           <InviteMember allowedMembers={10} />
         </div>
-        <div className="flex items-center py-4">
+        <div className="flex items-center justify-end py-4">
           <div className="w-[308px] relative">
             <Input
               placeholder="Search"

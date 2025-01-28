@@ -72,7 +72,7 @@ export default function AccountLayout({
           </div>
         </div> */}
 
-      <div className="w-[742px]">{children}</div>
+      <div className="w-[980px]">{children}</div>
 
       {/* </div> */}
     </div>
