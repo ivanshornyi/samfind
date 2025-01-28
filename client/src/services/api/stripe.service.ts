@@ -8,7 +8,7 @@ export interface CreateIntent {
   userId: string;
   amount: number;
   currency: string;
-  count: number;
+  limit: number;
   tierType: LicenseTierType;
   userReferralCode?: number;
 }

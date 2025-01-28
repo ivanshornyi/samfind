@@ -69,7 +69,7 @@ const FooterNetworks = () => {
           href={n.link}
           target="_blank"
           rel="noopener noreferrer"
-          className="p-[10px] sm:p-[6px] w-[44px] h-[44px] lg:w-[24px] lg:h-[24px]"
+          className="p-[10px] sm:p-[6px] w-[44px] h-[44px] lg:w-[30px] lg:h-[30px]"
         >
           <Image src={n.icon} alt={n.name} width={24} height={24} />
         </a>

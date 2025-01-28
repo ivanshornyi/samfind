@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 
 import { AuthContext } from "@/context";
 
@@ -34,12 +34,15 @@ const stripePromise = loadStripe(stripePublishableKey as string);
 interface PaymentsModalProps {
   amount: number;
   currency: string;
-  license: { name: string };
+  license: { tierType: LicenseTierType; };
+  buttonText: string;
 }
 
 export const PaymentsModal: React.FC<PaymentsModalProps> = ({
   amount,
   currency,
+  license,
+  buttonText,
 }) => {
   const { user } = useContext(AuthContext);
 
@@ -56,8 +59,8 @@ export const PaymentsModal: React.FC<PaymentsModalProps> = ({
       let intent: CreateIntent = {
         amount,
         currency,
-        count: 10,
-        tierType: LicenseTierType.Freemium,
+        limit: 10,
+        tierType: license.tierType,
         userId: user.id,
       };
 
@@ -76,26 +79,31 @@ export const PaymentsModal: React.FC<PaymentsModalProps> = ({
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button
-          variant="secondary"
-          className="text-sm w-full"
+          className="w-full"
           onClick={handleIntent}
-          disabled={!user}
+          disabled={!user || amount === 0}
         >
-          Buy
+          {buttonText}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="w-[700px] max-h-[90dvh] overflow-auto rounded-2xl bg-white">
-        <div className="absolute right-0 top-0">
+        <div className="absolute right-0 top-1">
           <AlertDialogCancel className="rounded-1 bg-transparent shadow-none border-none text-black hover:text-black">
             <X size={18} />
           </AlertDialogCancel>
         </div>
 
-        <AlertDialogHeader>
-          <AlertDialogTitle className="text-black">Payments</AlertDialogTitle>
-          <AlertDialogDescription className="text-black">
-            Enter your credentials
-          </AlertDialogDescription>
+        <AlertDialogHeader className="flex">
+          <div>
+            <AlertDialogTitle className="text-black text-xl">Payments</AlertDialogTitle>
+            <AlertDialogDescription className="text-black">
+              Enter your credentials
+            </AlertDialogDescription>
+          </div>
+          <div className="text-black">
+            <p className="font-semibold text-lg">{amount / 100}$</p>
+            <p className="capitalize">{license.tierType} tier</p>
+          </div>
         </AlertDialogHeader>
 
         <div>

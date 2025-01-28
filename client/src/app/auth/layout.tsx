@@ -44,9 +44,10 @@ export default function AuthLayout({
       <Link href="/" className="fixed top-6 left-5">
         <Button
           variant="link"
-          icon="left-arrow"
+          className="flex items-center gap-2"
         >
-          Back
+          <ArrowLeftIcon />
+          <span>Back</span>
         </Button>
       </Link>
       <div className="pt-12">
@@ -55,10 +56,10 @@ export default function AuthLayout({
         </Link>
       </div>
       <div className="flex items-center justify-center relative z-10">{children}</div>
-      <div className="py-5">
-        <p>@ Osio2025. All rights reserved.</p>
+        <div className="py-5">
+          <p>@ Osio2025. All rights reserved.</p>
+        </div>
       </div>
-    </div>
     </GoogleOAuthProvider>
   );
 }
