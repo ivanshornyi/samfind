@@ -30,7 +30,7 @@ enum UserAccountType {
 
 model User {
   id                        String          @id @default(uuid())
-  email                     String
+  email                     String          @unique
   password                  String          @db.VarChar
   firstName                 String          @db.VarChar
   lastName                  String          @db.VarChar
@@ -51,6 +51,7 @@ model User {
   invitedReferralCode       Float?          @unique
   accountType               UserAccountType @default(private)
   organizationId            String?
+  licenseId                 String?
   organization              Organization?   @relation(fields: [organizationId], references: [id])
   UserReferral              UserReferral[]
   License                   License[]

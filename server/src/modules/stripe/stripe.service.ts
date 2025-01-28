@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { ConflictException, Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
 import Stripe from "stripe";
@@ -35,7 +35,7 @@ export class StripeService {
       amount, 
       currency, 
       tierType,
-      count,
+      limit,
       userReferralCode,
     } = createPaymentDto;
 
@@ -44,7 +44,7 @@ export class StripeService {
     let metadata: any = {
       userId,
       tierType,
-      limit: count,
+      limit,
     };
 
     let intent = {
@@ -100,29 +100,36 @@ export class StripeService {
       if (userReferralCode) {
         // find user and update user discount
         this.userService.findAndUpdateUserByReferralCode(Number(userReferralCode), userId, Number(referralDiscount));
+
+        const user = await this.prisma.user.findUnique({
+          where: {
+            id: userId,
+          }
+        });
+  
+        await this.prisma.user.update({
+          where: {
+            id: userId,
+          },
+          data: {
+            discount: user.discount + Number(referralDiscount),
+            invitedReferralCode: null,
+          },
+        });
       }
 
-      await this.prisma.license.create({
+      // update license
+      const license = await this.prisma.license.findUnique({
+        where: { ownerId: userId }
+      });
+
+      await this.prisma.license.update({
+        where: {
+          id: license.id,
+        },
         data: {
-          ownerId: userId,
           limit: Number(limit),
           tierType: tierType as LicenseTierType,
-        },
-      });
-
-      const user = await this.prisma.user.findUnique({
-        where: {
-          id: userId,
-        }
-      });
-
-      await this.prisma.user.update({
-        where: {
-          id: userId,
-        },
-        data: {
-          discount: user.discount + Number(referralDiscount),
-          invitedReferralCode: null,
         },
       });
 

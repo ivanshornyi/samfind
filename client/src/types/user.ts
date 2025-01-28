@@ -29,4 +29,6 @@ export interface User {
   status: UserStatus;
   discount: number;
   referralCode: string;
+  licenseId?: string;
+  organizationId?: string;
 }

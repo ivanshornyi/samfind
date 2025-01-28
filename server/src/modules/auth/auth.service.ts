@@ -6,7 +6,7 @@ import {
   ConflictException,
 } from "@nestjs/common";
 
-import { UserAuthType } from "@prisma/client";
+import { LicenseStatus, LicenseTierType, UserAccountType, UserAuthType } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 
 import { UserService } from "../user/user.service";
@@ -68,10 +68,42 @@ export class AuthService {
       });
 
       if (organization) {
-        await this.prisma.organization.create({
+        const userOrganization = await this.prisma.organization.create({
           data: {
             ...organization,
             ownerId: newUser.id,
+          }
+        });
+
+        // add to user organizationId
+        await this.prisma.user.update({
+          where: {
+            id: newUser.id,
+          },
+          data: {
+            organizationId: userOrganization.id,
+          }
+        });
+      }
+
+      // add license
+      if (accountType === UserAccountType.private) {
+        const userLicense = await this.prisma.license.create({
+          data: {
+            ownerId: newUser.id,
+            status: LicenseStatus.active,
+            limit: 0,
+            tierType: LicenseTierType.freemium,
+          }
+        });
+
+        // add to user licenseId
+        await this.prisma.user.update({
+          where: {
+            id: newUser.id,
+          },
+          data: {
+            licenseId: userLicense.id,
           }
         });
       }

@@ -14,7 +14,7 @@ import { SignUpData, UserAuthType } from "@/services";
 
 import { Button, Input } from "@/components";
 import { SendResetPasswordCodeModal, VerifyUserModal } from "../_components";
-import { ACCOUNT_TYPE_CARD_ITEMS } from "../account-type/page";
+import { ACCOUNT_TYPE_CARD_ITEMS } from "../account-type/data";
 
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
@@ -72,7 +72,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
 
   const handleResetPasswordFormInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  ) => {``
     const name = event.target.name;
     const value = event.target.value;
 
@@ -301,7 +301,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                   <span>{accountType} Account</span>
                 </li>
                 ) : null
-              })}
+              })
+            }
           </ul>
         )}
 

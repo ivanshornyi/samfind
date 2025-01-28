@@ -33,10 +33,10 @@ export default function AccountLayout({
   const { logout } = useContext(AuthContext);
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto w-full">
       {/* <div className="flex gap-10"> */}
 
-        {/* <div>
+      {/* <div>
           <ul className="flex flex-col min-w-[220px]">
             {NAVIGATION_ITEMS.map((item) => {
               const isActive = pathname === item.path;
@@ -72,8 +72,8 @@ export default function AccountLayout({
           </div>
         </div> */}
 
-        <div className="w-full">{children}</div>
-        
+      <div className="w-[742px]">{children}</div>
+
       {/* </div> */}
     </div>
   );

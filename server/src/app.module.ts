@@ -17,6 +17,7 @@ import { UserLicenseModule } from "./modules/user-license/user-license.module";
 import { UserReferralModule } from "./modules/user-referral/user-referral.module";
 import { StripeModule } from "./modules/stripe/stripe.module";
 import { OrganizationModule } from "./modules/organization/organization.module";
+import { LicenseVerificationModule } from "./modules/license-verification/license-verification.module";
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { OrganizationModule } from "./modules/organization/organization.module";
     UserReferralModule,
     StripeModule,
     OrganizationModule,
+    LicenseVerificationModule,
   ],
   controllers: [],
   providers: [],

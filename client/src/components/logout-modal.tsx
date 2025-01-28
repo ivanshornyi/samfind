@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
 import {
   AlertDialog,
@@ -13,57 +13,49 @@ import {
   AlertDialogFooter,
 } from "@/components";
 
-import { X } from "lucide-react";
-//  linear-gradient(91.31deg, #a8a8a8 -23.65%, #a64ce8 109.99%)
-export const DeleteAccount = () => {
+import { LogOut, X } from "lucide-react";
+import { AuthContext } from "@/context";
+
+export const LogoutModal = () => {
   const [open, setOpen] = useState<boolean>(false);
+  const { logout } = useContext(AuthContext);
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <Button
-        className="text-[#FF7676]"
-        variant="edit"
+        variant="menuItem"
+        leftIcon={<LogOut style={{ width: "24px", height: "24px" }} />}
         onClick={() => setOpen(true)}
       >
-        Delete
+        Logout
       </Button>
-      <AlertDialogContent className="w-[590px] border gradient-border-modal">
+      <AlertDialogContent className="w-[590px] border gradient-border-modal p-8">
         <div className="absolute right-1 top-1">
           <AlertDialogCancel className="shadow-none border-none p-3">
             <X size={18} />
           </AlertDialogCancel>
         </div>
 
-        <AlertDialogHeader>
+        <AlertDialogHeader className="space-y-4">
           <AlertDialogTitle className="text-[32px] leading-[44px] font-semibold">
-            Delete Account?
+            Are you sure you want to log out?
           </AlertDialogTitle>
           <AlertDialogDescription className="text-[20px] leading-[27px]">
-            Are you sure you want to delete your account? Please note:
+            Any unsaved changes will be lost.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
-        <ul className="list-disc list-inside space-y-2 text-[16px] leading-[22px] text-disabled">
-          <li>This action is permanent and cannot be undone.</li>
-          <li>All your data will be lost.</li>
-          <li>Your subscription will be canceled.</li>
-          <li>All participants in your group will lose access.</li>
-        </ul>
-
         <AlertDialogFooter className="flex gap-6 w-full">
-          <Button
-            className="w-full"
-            variant="saveProfile"
-            onClick={() => setOpen(false)}
-          >
+          <Button className="w-full" variant="tetrary" onClick={() => setOpen(false)}>
             Cancel
           </Button>
           <Button
-            className="w-full bg-[#FF6C6C] hover:bg-[#D23535] active:bg-[#302935]"
-            variant="saveProfile"
+            className="w-full"
+            variant="secondary"
             withLoader={true}
+            onClick={logout}
           >
-            Delete account
+            Log out
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

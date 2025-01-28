@@ -1,6 +1,12 @@
+"use client";
+
+import { useState } from "react";
+
 import { LicensingOptionType } from "../_types";
-import { Button } from "@/components/ui";
+
+import { Input, PaymentsModal } from "@/components";
 import { CheckOutline, DollarIcon } from "@public/home";
+
 import Image from "next/image";
 
 export const LicensingOptionCard = ({
@@ -10,33 +16,62 @@ export const LicensingOptionCard = ({
   option: LicensingOptionType;
   isLarge: boolean;
 }) => {
+  const [usersLimit, setUsersLimit] = useState(1);
+
   return (
     <div
-      className={`w-full h-fit ${isLarge ? "bg-[#302935]" : "bg-card"} px-6 py-8 rounded-[20px] transition-all hover:shadow-[0_2px_20px_0_#B668F080]`}
+      className={`h-fit flex-1 ${isLarge ? "bg-[#302935]" : "bg-card"} px-6 py-8 rounded-[20px] transition-all hover:shadow-[0_2px_20px_0_#B668F080]`}
     >
       <h3 className="font-semibold text-[32px] leading-[43px] mb-4">
         {option.title}
       </h3>
       <p className="font-normal text-base mb-10">{option.description}</p>
 
-      {option.price ? (
-        <div className="mb-10 flex gap-2">
-          <div className="flex items-start justify-end">
-            <Image src={DollarIcon} alt="dollar" width={23} height={49} />
+      {option.price !== 0 ? (
+        <div className="mb-10 flex gap-2 items-center justify-between">
+          <div className="flex items-center">
+            <div className="flex items-start justify-end">
+              <Image src={DollarIcon} alt="dollar" width={23} height={49} />
+            </div>
+            <p className="font-semibold text-5xl text-[#DCDCDC] leading-[52px]">
+              {option.price}
+              <span className="text-[32px]">/month</span>
+            </p>
           </div>
-          <p className="font-semibold text-5xl text-[#DCDCDC] leading-[52px]">
-            {option.price}
-            <span className="text-[32px]">/month</span>
-          </p>
+          <div className="w-[90px] flex flex-col gap-1">
+            <label>Users limit</label>
+            <Input 
+              type="number"
+              step="1"
+              min={1}
+              value={usersLimit}
+              onChange={(event) => {
+                const value = Math.floor(Number(event.target.value));
+
+                setUsersLimit(value);
+              }}
+            />
+          </div>
         </div>
       ) : null}
 
-      <Button
+      {/* <Button
         variant={option.buttonVariant}
         className={`w-full mb-10 border-none ${isLarge ? 'py-[13px]' : ''}`}
-      >
-        {option.buttonText}
-      </Button>
+      > */}
+        <div className="py-3">
+          <PaymentsModal 
+            amount={Number((Number(option.price.toFixed(2)) * 100).toFixed())} 
+            currency="USD"
+            license={{
+              tierType: option.tierType,
+              usersLimit,
+            }} 
+            buttonText={option.buttonText}
+          />
+        </div>
+      {/* </Button> */}
+
       <ul className="space-y-[10px]">
         {option.features.map((feature, index) => (
           <li key={index} className="flex items-center gap-[20px]">
