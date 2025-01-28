@@ -72,7 +72,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
 
   const handleResetPasswordFormInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  ) => {``
     const name = event.target.name;
     const value = event.target.value;
 
@@ -301,7 +301,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                   <span>{accountType} Account</span>
                 </li>
                 ) : null
-              })}
+              })
+            }
           </ul>
         )}
 

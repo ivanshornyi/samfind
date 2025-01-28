@@ -28,7 +28,7 @@ const NAVIGATION_ITEMS = [
   },
   {
     title: "License management",
-    path: "/",
+    path: "/account/license",
     icon: IdCard,
   },
   {
@@ -45,7 +45,6 @@ const NAVIGATION_ITEMS = [
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const { logout } = useContext(AuthContext);
 
   return (
     <Sidebar className="py-8 border-secondary">

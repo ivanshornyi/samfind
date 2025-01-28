@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { ConflictException, Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
 import Stripe from "stripe";
@@ -100,31 +100,50 @@ export class StripeService {
       if (userReferralCode) {
         // find user and update user discount
         this.userService.findAndUpdateUserByReferralCode(Number(userReferralCode), userId, Number(referralDiscount));
+
+        const user = await this.prisma.user.findUnique({
+          where: {
+            id: userId,
+          }
+        });
+  
+        await this.prisma.user.update({
+          where: {
+            id: userId,
+          },
+          data: {
+            discount: user.discount + Number(referralDiscount),
+            invitedReferralCode: null,
+          },
+        });
       }
 
-      await this.prisma.license.create({
+      // update license
+      const license = await this.prisma.license.findUnique({
+        where: { ownerId: userId }
+      });
+
+      await this.prisma.license.update({
+        where: {
+          id: license.id,
+        },
         data: {
-          ownerId: userId,
           limit: Number(limit),
           tierType: tierType as LicenseTierType,
         },
       });
 
-      const user = await this.prisma.user.findUnique({
-        where: {
-          id: userId,
-        }
-      });
-
-      await this.prisma.user.update({
-        where: {
-          id: userId,
-        },
-        data: {
-          discount: user.discount + Number(referralDiscount),
-          invitedReferralCode: null,
-        },
-      });
+      // if (license) {
+      //   throw new ConflictException("This user already has a license");
+      // } else {
+      //   await this.prisma.license.create({
+      //     data: {
+      //       ownerId: userId,
+      //       limit: Number(limit),
+      //       tierType: tierType as LicenseTierType,
+      //     },
+      //   });
+      // }
 
       this.logger.log(`License added for user ${userId}`);
     } catch (error) {
