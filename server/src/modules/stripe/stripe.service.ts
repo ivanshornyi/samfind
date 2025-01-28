@@ -133,18 +133,6 @@ export class StripeService {
         },
       });
 
-      // if (license) {
-      //   throw new ConflictException("This user already has a license");
-      // } else {
-      //   await this.prisma.license.create({
-      //     data: {
-      //       ownerId: userId,
-      //       limit: Number(limit),
-      //       tierType: tierType as LicenseTierType,
-      //     },
-      //   });
-      // }
-
       this.logger.log(`License added for user ${userId}`);
     } catch (error) {
       this.logger.error('Error adding license to user', error);
