@@ -88,22 +88,24 @@ export const ReusableTable = <T extends RowData>({
           )}
         </TableBody>
       </Table>
-      <ReactPaginate
-        breakLabel="..."
-        nextLabel={<ChevronRight />}
-        previousLabel={<ChevronLeft />}
-        onPageChange={(e) => onPageChange(e.selected)}
-        pageRangeDisplayed={2}
-        marginPagesDisplayed={2}
-        pageCount={pageCount}
-        containerClassName="flex space-x-2 mt-[50px]"
-        pageClassName="px-3 py-1 bg-g text-[#A8A8A8] bg-transparent rounded-md"
-        activeClassName="text-white bg-slate-800 font-semibold"
-        previousClassName="px-3 py-1 bg-transparent text-[#A8A8A8] rounded-md"
-        nextClassName="px-3 py-1 bg-transparent text-[#A8A8A8] rounded-md"
-        breakClassName="px-3 py-1 bg-transparent text-[#A8A8A8] rounded-md"
-        disabledClassName="bg-transparent text-slate-600 cursor-not-allowed"
-      />
+      {pageCount > 1 && (
+        <ReactPaginate
+          breakLabel="..."
+          nextLabel={<ChevronRight />}
+          previousLabel={<ChevronLeft />}
+          onPageChange={(e) => onPageChange(e.selected)}
+          pageRangeDisplayed={2}
+          marginPagesDisplayed={2}
+          pageCount={pageCount}
+          containerClassName="flex space-x-2 mt-[50px]"
+          pageClassName="px-3 py-1 bg-g text-[#A8A8A8] bg-transparent rounded-md"
+          activeClassName="text-white bg-slate-800 font-semibold"
+          previousClassName="px-3 py-1 bg-transparent text-[#A8A8A8] rounded-md"
+          nextClassName="px-3 py-1 bg-transparent text-[#A8A8A8] rounded-md"
+          breakClassName="px-3 py-1 bg-transparent text-[#A8A8A8] rounded-md"
+          disabledClassName="bg-transparent text-slate-600 cursor-not-allowed"
+        />
+      )}
     </div>
   );
 };

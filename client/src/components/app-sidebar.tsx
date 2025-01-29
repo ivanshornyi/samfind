@@ -23,7 +23,7 @@ import Image from "next/image";
 const NAVIGATION_ITEMS = [
   {
     title: "Home",
-    path: "/account/home",
+    path: "/",
     icon: Home,
   },
   {

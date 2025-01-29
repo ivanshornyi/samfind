@@ -12,4 +12,4 @@ import { UserLicenseController } from "./user-license.controller";
   controllers: [UserLicenseController],
   exports: [],
 })
-export class UserLicenseModule{}
+export class UserLicenseModule {}

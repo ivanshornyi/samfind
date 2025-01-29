@@ -16,3 +16,14 @@ export interface License {
   count: number;
   userIds: [];
 }
+
+export interface LicenseList {
+  id: string;
+  limit: number;
+  users: {
+    name: string;
+    email: string;
+    date: Date;
+    license: string;
+  }[];
+}
