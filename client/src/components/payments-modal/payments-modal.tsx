@@ -34,7 +34,7 @@ const stripePromise = loadStripe(stripePublishableKey as string);
 interface PaymentsModalProps {
   amount: number;
   currency: string;
-  license: { tierType: LicenseTierType; };
+  license: { tierType: LicenseTierType; usersLimit: number; };
   buttonText: string;
 }
 
@@ -59,7 +59,7 @@ export const PaymentsModal: React.FC<PaymentsModalProps> = ({
       let intent: CreateIntent = {
         amount,
         currency,
-        limit: 10,
+        limit: license.usersLimit,
         tierType: license.tierType,
         userId: user.id,
       };
@@ -102,6 +102,7 @@ export const PaymentsModal: React.FC<PaymentsModalProps> = ({
           </div>
           <div className="text-black">
             <p className="font-semibold text-lg">{amount / 100}$</p>
+            <p>Users limit: {license.usersLimit}</p>
             <p className="capitalize">{license.tierType} tier</p>
           </div>
         </AlertDialogHeader>

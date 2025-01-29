@@ -1,6 +1,10 @@
+"use client";
+
+import { useState } from "react";
+
 import { LicensingOptionType } from "../_types";
 
-import { Button, PaymentsModal } from "@/components";
+import { Input, PaymentsModal } from "@/components";
 import { CheckOutline, DollarIcon } from "@public/home";
 
 import Image from "next/image";
@@ -12,6 +16,8 @@ export const LicensingOptionCard = ({
   option: LicensingOptionType;
   isLarge: boolean;
 }) => {
+  const [usersLimit, setUsersLimit] = useState(1);
+
   return (
     <div
       className={`h-fit flex-1 ${isLarge ? "bg-[#302935]" : "bg-card"} px-6 py-8 rounded-[20px] transition-all hover:shadow-[0_2px_20px_0_#B668F080]`}
@@ -22,14 +28,30 @@ export const LicensingOptionCard = ({
       <p className="font-normal text-base mb-10">{option.description}</p>
 
       {option.price !== 0 ? (
-        <div className="mb-10 flex gap-2">
-          <div className="flex items-start justify-end">
-            <Image src={DollarIcon} alt="dollar" width={23} height={49} />
+        <div className="mb-10 flex gap-2 items-center justify-between">
+          <div className="flex items-center">
+            <div className="flex items-start justify-end">
+              <Image src={DollarIcon} alt="dollar" width={23} height={49} />
+            </div>
+            <p className="font-semibold text-5xl text-[#DCDCDC] leading-[52px]">
+              {option.price}
+              <span className="text-[32px]">/month</span>
+            </p>
           </div>
-          <p className="font-semibold text-5xl text-[#DCDCDC] leading-[52px]">
-            {option.price}
-            <span className="text-[32px]">/month</span>
-          </p>
+          <div className="w-[90px] flex flex-col gap-1">
+            <label>Users limit</label>
+            <Input 
+              type="number"
+              step="1"
+              min={1}
+              value={usersLimit}
+              onChange={(event) => {
+                const value = Math.floor(Number(event.target.value));
+
+                setUsersLimit(value);
+              }}
+            />
+          </div>
         </div>
       ) : null}
 
@@ -43,6 +65,7 @@ export const LicensingOptionCard = ({
             currency="USD"
             license={{
               tierType: option.tierType,
+              usersLimit,
             }} 
             buttonText={option.buttonText}
           />
