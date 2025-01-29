@@ -12,6 +12,30 @@ import { UserService } from "../user/user.service";
 
 import { CreateIntentDto } from "./dto/create-intent-dto";
 
+interface ICreatePaymentSession {
+  customerId: string;
+  priceId: string;
+  quantity: number;
+  description?: string;
+  discountId?: string;
+}
+
+interface ICreateInvoiceItem {
+  customerId: string;
+  invoiceId: string;
+  priceId: string;
+  quantity: number;
+  description: string;
+}
+
+interface ICreateAndPayInvoice {
+  customerId: string;
+  priceId: string;
+  quantity: number;
+  description: string;
+  couponId?: string;
+}
+
 @Injectable()
 export class StripeService {
   private readonly logger = new Logger(StripeService.name);
@@ -54,12 +78,19 @@ export class StripeService {
     });
   }
 
-  createPaymentSession = async (
-    customerId: string,
-    priceId: string,
-    quantity: number,
-    discountId?: string,
-  ) => {
+  createPaymentSession = async ({
+    customerId,
+    priceId,
+    quantity,
+    description,
+    discountId,
+  }: ICreatePaymentSession) => {
+    if (discountId) {
+      await this.stripe.customers.update(customerId, {
+        coupon: discountId,
+      });
+    }
+
     const session = await this.stripe.checkout.sessions.create({
       line_items: [
         {
@@ -67,17 +98,15 @@ export class StripeService {
           quantity,
         },
       ],
-      discounts: discountId
-        ? [
-            {
-              coupon: discountId,
-            },
-          ]
-        : undefined,
+      allow_promotion_codes: discountId ? true : undefined,
+      // discounts: discountId
+      //   ? [{ coupon: discountId }]
+      //   : undefined,
       customer: customerId,
       mode: "payment",
       payment_intent_data: {
-        setup_future_usage: "on_session",
+        setup_future_usage: "off_session",
+        description,
       },
       success_url: "http://localhost:3000/",
       cancel_url: "http://localhost:3000/",
@@ -85,13 +114,13 @@ export class StripeService {
     return { url: session.url };
   };
 
-  async createInvoiceItem(
-    customerId: string,
-    invoiceId: string,
-    priceId: string,
-    quantity: number,
-    description: string,
-  ): Promise<Stripe.InvoiceItem> {
+  async createInvoiceItem({
+    customerId,
+    invoiceId,
+    priceId,
+    quantity,
+    description,
+  }: ICreateInvoiceItem): Promise<Stripe.InvoiceItem> {
     return await this.stripe.invoiceItems.create({
       customer: customerId,
       invoice: invoiceId,
@@ -101,27 +130,26 @@ export class StripeService {
     });
   }
 
-  async createAndPayInvoice(
-    customerId: string,
-    priceId: string,
-    quantity: number,
-    description: string,
-    couponId?: string,
-  ) {
+  async createAndPayInvoice({
+    customerId,
+    priceId,
+    quantity,
+    description,
+    couponId,
+  }: ICreateAndPayInvoice) {
     const invoice = await this.stripe.invoices.create({
       customer: customerId,
-      auto_advance: true,
       description,
       collection_method: "charge_automatically",
     });
 
-    await this.createInvoiceItem(
+    await this.createInvoiceItem({
       customerId,
-      invoice.id,
+      invoiceId: invoice.id,
       priceId,
       quantity,
       description,
-    );
+    });
 
     if (couponId)
       await this.stripe.invoices.update(invoice.id, {
