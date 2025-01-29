@@ -6,7 +6,12 @@ import {
   ConflictException,
 } from "@nestjs/common";
 
-import { LicenseStatus, LicenseTierType, UserAccountType, UserAuthType } from "@prisma/client";
+import {
+  LicenseStatus,
+  LicenseTierType,
+  UserAccountType,
+  UserAuthType,
+} from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 
 import { UserService } from "../user/user.service";
@@ -87,7 +92,7 @@ export class AuthService {
           },
           data: {
             organizationId: userOrganization.id,
-          }
+          },
         });
       }
 
@@ -99,17 +104,14 @@ export class AuthService {
             status: LicenseStatus.active,
             limit: 0,
             tierType: LicenseTierType.freemium,
-          }
+          },
         });
 
-        // add to user licenseId
-        await this.prisma.user.update({
-          where: {
-            id: newUser.id,
-          },
+        await this.prisma.activeLicense.create({
           data: {
+            userId: newUser.id,
             licenseId: userLicense.id,
-          }
+          },
         });
       }
 
