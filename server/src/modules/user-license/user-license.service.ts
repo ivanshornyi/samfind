@@ -5,6 +5,7 @@ import { License, LicenseStatus } from "@prisma/client";
 
 import { AddUserLicenseDto } from "./dto/add-user-license-dto";
 import { UpdateUserLicenseDto } from "./dto/update-user-license-dto";
+import { CheckDeviceDto } from "./dto/check-device-dto";
 
 @Injectable()
 export class UserLicenseService {
@@ -75,5 +76,35 @@ export class UserLicenseService {
         ...updateUserLicenseDto,
       },
     });
+  }
+
+  async checkDevice({ email, computer_id: deviceId }: CheckDeviceDto) {
+    const user = await this.prisma.user.findFirst({
+      where: { email },
+      include: {
+        activeLicenses: true,
+      },
+    });
+    if (!user || !user.activeLicenses.length)
+      return {
+        error: "email has no paid license",
+      };
+    if (
+      user.activeLicenses[0].deviceId &&
+      user.activeLicenses[0].deviceId !== deviceId
+    )
+      return {
+        error: "email has been registered",
+      };
+    if (!user.activeLicenses[0].deviceId)
+      await this.prisma.activeLicense.update({
+        where: { id: user.activeLicenses[0].id },
+        data: {
+          deviceId,
+        },
+      });
+    return {
+      error: null,
+    };
   }
 }

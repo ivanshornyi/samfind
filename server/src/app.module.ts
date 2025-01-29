@@ -1,6 +1,6 @@
-import { 
-  Module, 
-  NestModule, 
+import {
+  Module,
+  NestModule,
   MiddlewareConsumer,
   RequestMethod,
 } from "@nestjs/common";
@@ -45,6 +45,10 @@ export class AppModule implements NestModule {
         },
         {
           path: "/stripe/webhook",
+          method: RequestMethod.POST,
+        },
+        {
+          path: "/user-license/device",
           method: RequestMethod.POST,
         },
       )

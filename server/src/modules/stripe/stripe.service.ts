@@ -24,20 +24,122 @@ export class StripeService {
   }
 
   async createCustomer(email: string, name: string): Promise<Stripe.Customer> {
-    return this.stripe.customers.create({ email, name });
+    return await this.stripe.customers.create({ email, name });
+  }
+
+  async createProduct(
+    name: string,
+    description: string,
+  ): Promise<Stripe.Product> {
+    return await this.stripe.products.create({ name, description });
+  }
+
+  async createPrice(productId: string, amount: number): Promise<Stripe.Price> {
+    return await this.stripe.prices.create({
+      unit_amount: amount,
+      currency: "usd",
+      product: productId,
+    });
+  }
+
+  async createCoupon(amount: number): Promise<Stripe.Coupon> {
+    return await this.stripe.coupons.create({
+      amount_off: amount,
+      currency: "usd",
+      duration: "once",
+    });
+  }
+
+  createPaymentSession = async (
+    customerId: string,
+    priceId: string,
+    quantity: number,
+    discountId?: string,
+  ) => {
+    const session = await this.stripe.checkout.sessions.create({
+      line_items: [
+        {
+          price: priceId,
+          quantity,
+        },
+      ],
+      discounts: discountId
+        ? [
+            {
+              coupon: discountId,
+            },
+          ]
+        : undefined,
+      customer: customerId,
+      mode: "payment",
+      payment_intent_data: {
+        setup_future_usage: "on_session",
+      },
+      success_url: "http://localhost:3000/",
+      cancel_url: "http://localhost:3000/",
+    });
+    return { url: session.url };
+  };
+
+  async createInvoiceItem(
+    customerId: string,
+    invoiceId: string,
+    priceId: string,
+    quantity: number,
+    description: string,
+  ): Promise<Stripe.InvoiceItem> {
+    return await this.stripe.invoiceItems.create({
+      customer: customerId,
+      invoice: invoiceId,
+      price: priceId,
+      quantity,
+      description,
+    });
+  }
+
+  async createAndPayInvoice(
+    customerId: string,
+    priceId: string,
+    quantity: number,
+    description: string,
+    couponId?: string,
+  ) {
+    const invoice = await this.stripe.invoices.create({
+      customer: customerId,
+      auto_advance: true,
+      description,
+      collection_method: "charge_automatically",
+    });
+
+    await this.createInvoiceItem(
+      customerId,
+      invoice.id,
+      priceId,
+      quantity,
+      description,
+    );
+
+    if (couponId)
+      await this.stripe.invoices.update(invoice.id, {
+        discounts: [
+          {
+            coupon: couponId,
+          },
+        ],
+      });
+
+    await this.stripe.invoices.finalizeInvoice(invoice.id);
+
+    const invoiceStatus = await this.stripe.invoices.retrieve(invoice.id);
+
+    console.log(invoiceStatus.status);
   }
 
   async createPaymentIntent(
     createPaymentDto: CreateIntentDto,
   ): Promise<Stripe.PaymentIntent> {
-    const { 
-      userId, 
-      amount, 
-      currency, 
-      tierType,
-      limit,
-      userReferralCode,
-    } = createPaymentDto;
+    const { userId, amount, currency, tierType, limit, userReferralCode } =
+      createPaymentDto;
 
     const referralDiscount = amount / 10;
 
@@ -58,7 +160,7 @@ export class StripeService {
         ...metadata,
         userReferralCode,
         referralDiscount,
-      }
+      };
     }
 
     return this.stripe.paymentIntents.create(intent);
@@ -89,24 +191,23 @@ export class StripeService {
 
   private async handleSuccessfulPayment(paymentIntent: Stripe.PaymentIntent) {
     try {
-      const { 
-        userId, 
-        limit,
-        tierType,
-        userReferralCode, 
-        referralDiscount,
-      } = paymentIntent.metadata;
+      const { userId, limit, tierType, userReferralCode, referralDiscount } =
+        paymentIntent.metadata;
 
       if (userReferralCode) {
         // find user and update user discount
-        this.userService.findAndUpdateUserByReferralCode(Number(userReferralCode), userId, Number(referralDiscount));
+        this.userService.findAndUpdateUserByReferralCode(
+          Number(userReferralCode),
+          userId,
+          Number(referralDiscount),
+        );
 
         const user = await this.prisma.user.findUnique({
           where: {
             id: userId,
-          }
+          },
         });
-  
+
         await this.prisma.user.update({
           where: {
             id: userId,
@@ -120,7 +221,7 @@ export class StripeService {
 
       // update license
       const license = await this.prisma.license.findUnique({
-        where: { ownerId: userId }
+        where: { ownerId: userId },
       });
 
       await this.prisma.license.update({
@@ -135,7 +236,7 @@ export class StripeService {
 
       this.logger.log(`License added for user ${userId}`);
     } catch (error) {
-      this.logger.error('Error adding license to user', error);
+      this.logger.error("Error adding license to user", error);
     }
   }
 }
