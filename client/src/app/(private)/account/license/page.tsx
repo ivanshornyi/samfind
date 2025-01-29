@@ -1,9 +1,14 @@
 "use client";
 
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import { useGetUserLicenses } from "@/hooks";
-
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@radix-ui/react-tooltip";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -25,8 +30,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components";
 
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, Info, MoreHorizontal, Search } from "lucide-react";
 import { ReusableTable } from "@/components/table";
+import { InviteMember, ProgressChart } from "./_components";
+import { AuthContext } from "@/context";
 
 const mockData = [
   {
@@ -34,21 +41,21 @@ const mockData = [
     email: "starttyping@gmail.com",
     date: "02.02.2025",
     access: "Owner",
-    licence: "4923882344",
+    license: "4923882344",
   },
   {
     name: "Name2",
     email: "starttyping@gmail.com",
     date: "02.02.2025",
     access: "Member",
-    licence: "4923882344",
+    license: "4923882344",
   },
   {
     name: "Name3",
     email: "starttyping@gmail.com",
     date: "02.02.2025",
     access: "Member",
-    licence: "4923882344",
+    license: "4923882344",
   },
 ];
 
@@ -57,7 +64,7 @@ const headers = {
   email: "email",
   date: "date of activation",
   access: "access rights",
-  licence: "licence key",
+  license: "license key",
 };
 
 interface LicenseItem {
@@ -65,7 +72,7 @@ interface LicenseItem {
   email: string;
   date: string;
   access: string;
-  licence: string;
+  license: string;
 }
 
 const columns: ColumnDef<LicenseItem>[] = [
@@ -81,7 +88,17 @@ const columns: ColumnDef<LicenseItem>[] = [
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => <div>{row.getValue(headers.name)}</div>,
+    cell: ({ row }) => {
+      const value: string = row.getValue(headers.name);
+      return (
+        <div className="flex gap-2 items-center">
+          <div className="flex justify-center items-center rounded-full w-10 h-10 bg-input text-[24px] leading-[33px] text-link-hover font-semibold">
+            <span>{value[0]}</span>
+          </div>
+          <span>{value}</span>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "email",
@@ -105,11 +122,33 @@ const columns: ColumnDef<LicenseItem>[] = [
     cell: ({ row }) => <div>{row.getValue("date")}</div>,
   },
   {
-    accessorKey: "licence",
+    accessorKey: "access",
+    header: () => {
+      return (
+        <div className="relative overflow-visible flex items-center gap-2 text-disabled uppercase">
+          <span>{headers.access}</span>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info style={{ width: "14px", height: "14px" }} />
+              </TooltipTrigger>
+              <TooltipContent className="p-4 bg-[#232323] max-w-[300px] rounded-[30px] text-xs font-medium text-[#A8A8A8] normal-case">
+                As an Owner, you can add other users to your group. You’ll be
+                responsible for covering their license fees.
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      );
+    },
+    cell: ({ row }) => <div>{row.getValue("access")}</div>,
+  },
+  {
+    accessorKey: "license",
     header: () => (
-      <div className="text-disabled uppercase">{headers.licence}</div>
+      <div className=" text-disabled uppercase">{headers.license}</div>
     ),
-    cell: ({ row }) => <div>{row.getValue("licence")}</div>,
+    cell: ({ row }) => <div>{row.getValue("license")}</div>,
   },
   {
     id: "actions",
@@ -122,8 +161,15 @@ const columns: ColumnDef<LicenseItem>[] = [
             <MoreHorizontal />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem>Delete user</DropdownMenuItem>
+        <DropdownMenuContent className="bg-input border-none" align="end">
+          <DropdownMenuItem>
+            <Button
+              variant={"edit"}
+              className="text-[#FF6C6C] hover:text-[#D23535] active:text-[#302935]"
+            >
+              Delete user
+            </Button>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     ),
@@ -131,19 +177,39 @@ const columns: ColumnDef<LicenseItem>[] = [
 ];
 
 export default function LicenseList() {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
-
-  const { data: userLicenses = [], isPending: isUserLicensesPending } =
+  const [users, setUsers] = useState<LicenseItem[]>(mockData);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
+  const { user } = useContext(AuthContext);
+  const { data: userLicense, isPending: isUserLicensesPending } =
     useGetUserLicenses();
+  const itemsPerPage = 10;
+  const pageCount = Math.ceil(userLicense?.users.length || 0 / itemsPerPage);
+
+  useEffect(() => {
+    if (userLicense?.users) {
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const selectedUsers = userLicense.users
+        .slice(startIndex, endIndex)
+        .map((u) => ({
+          name: u.name,
+          email: u.email,
+          date: new Intl.DateTimeFormat("ru-RU").format(new Date(u.date)),
+          access: u.email === user?.email ? "Owner" : "Member",
+          license: u.license,
+        }));
+
+      setUsers(selectedUsers);
+    }
+  }, [userLicense, currentPage, user?.email]);
+  console.log("userLicenses", userLicense);
 
   const table = useReactTable({
-    data: mockData,
+    data: users,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -167,23 +233,33 @@ export default function LicenseList() {
         <h2 className="text-[32px] leading-[44px] font-semibold">
           License management
         </h2>
-        <div className="mt-6"></div>
-        <div className="flex items-center py-4">
-          <Input
-            placeholder="Search"
-            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn("name")?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm bg-card"
-          />
+        <div className="mt-6 flex justify-between items-end">
+          <ProgressChart currentMembers={3} maxMembers={10} />
+          <InviteMember allowedMembers={10} />
+        </div>
+        <div className="flex items-center justify-end py-4">
+          <div className="w-[308px] relative">
+            <Input
+              placeholder="Search"
+              value={
+                (table.getColumn("name")?.getFilterValue() as string) ?? ""
+              }
+              onChange={(event) =>
+                table.getColumn("name")?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm bg-card"
+            />
+            <div className="absolute right-6 top-0 h-full flex justify-center items-center">
+              <Search style={{ width: "24px", height: "24px" }} />
+            </div>
+          </div>
         </div>
 
         <ReusableTable
           table={table}
-          isLoading={false}
-          onPageChange={(page: number) => console.log(page)}
-          pageCount={100}
+          isLoading={isUserLicensesPending}
+          onPageChange={(page: number) => setCurrentPage(page)}
+          pageCount={pageCount}
           noDataMessage="No licenses found."
         />
       </div>

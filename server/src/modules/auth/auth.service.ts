@@ -6,7 +6,12 @@ import {
   ConflictException,
 } from "@nestjs/common";
 
-import { LicenseStatus, LicenseTierType, UserAccountType, UserAuthType } from "@prisma/client";
+import {
+  LicenseStatus,
+  LicenseTierType,
+  UserAccountType,
+  UserAuthType,
+} from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 
 import { UserService } from "../user/user.service";
@@ -29,11 +34,11 @@ export class AuthService {
   ) {}
 
   public async signUp(signUpDto: SignUpDto) {
-    const { 
-      firstName, 
-      lastName, 
-      email, 
-      password, 
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
       authType,
       accountType,
       organization,
@@ -46,10 +51,15 @@ export class AuthService {
 
     await this.mailService.sendRegistrationCode(email, registrationCode);
 
-    const existingUser = await this.userService.findUserByEmail(email, authType);
+    const existingUser = await this.userService.findUserByEmail(
+      email,
+      authType,
+    );
 
     if (existingUser && existingUser.isVerified) {
-      throw new ConflictException("User with this email already exists and verified");
+      throw new ConflictException(
+        "User with this email already exists and verified",
+      );
     }
 
     const hashedPassword = this.hashField(password);
@@ -72,7 +82,7 @@ export class AuthService {
           data: {
             ...organization,
             ownerId: newUser.id,
-          }
+          },
         });
 
         // add to user organizationId
@@ -82,7 +92,7 @@ export class AuthService {
           },
           data: {
             organizationId: userOrganization.id,
-          }
+          },
         });
       }
 
@@ -94,23 +104,24 @@ export class AuthService {
             status: LicenseStatus.active,
             limit: 0,
             tierType: LicenseTierType.freemium,
-          }
+          },
         });
 
-        // add to user licenseId
-        await this.prisma.user.update({
-          where: {
-            id: newUser.id,
-          },
+        await this.prisma.activeLicense.create({
           data: {
+            userId: newUser.id,
             licenseId: userLicense.id,
-          }
+          },
         });
       }
 
       return newUser;
     } else {
-      await this.userService.updateUser(existingUser.id, { registrationCode, registrationCodeExpiresAt, accountType });
+      await this.userService.updateUser(existingUser.id, {
+        registrationCode,
+        registrationCodeExpiresAt,
+        accountType,
+      });
 
       return existingUser;
     }
@@ -120,11 +131,11 @@ export class AuthService {
     const { email, password, authType } = signInDto;
 
     const user = await this.userService.findUserByEmail(email, authType);
-  
+
     if (!user) {
       throw new NotFoundException("User not found");
     }
-  
+
     if (!user.isVerified) {
       throw new UnauthorizedException("User is not verified");
     }
@@ -134,16 +145,16 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new UnauthorizedException("Invalid password");
     }
-  
+
     const tokens = await this.tokenService.generateTokens({
       sub: user.id,
     });
-  
+
     await this.tokenService.updateRefreshToken(user.id, tokens.refreshToken);
-  
+
     delete user.password;
     delete user.refreshToken;
-  
+
     return {
       ...user,
       ...tokens,
@@ -151,7 +162,10 @@ export class AuthService {
   }
 
   public async sendResetPasswordVerificationCode(email: string) {
-    const user = await this.userService.findUserByEmail(email, UserAuthType.email);
+    const user = await this.userService.findUserByEmail(
+      email,
+      UserAuthType.email,
+    );
 
     if (!user) {
       throw new NotFoundException(
@@ -166,24 +180,35 @@ export class AuthService {
     const resetCode = this.generateCode().code;
     const resetCodeExpiresAt = this.generateCode().codeExpiresAt;
 
-    await this.userService.updateUser(user.id, { resetCode, resetCodeExpiresAt });
+    await this.userService.updateUser(user.id, {
+      resetCode,
+      resetCodeExpiresAt,
+    });
 
     await this.mailService.sendResetCode(user.email, resetCode);
 
     return { message: "Reset code sent successfully" };
   }
 
-  public async sendResetEmailVerificationCode(sendCodeForEmailDto: SendCodeForEmailDto) {
+  public async sendResetEmailVerificationCode(
+    sendCodeForEmailDto: SendCodeForEmailDto,
+  ) {
     const user = await this.userService.findOne(sendCodeForEmailDto.userId);
 
-    const isUserWithSameEmailExist = await this.userService.findUserByEmail(sendCodeForEmailDto.email, UserAuthType.email);
+    const isUserWithSameEmailExist = await this.userService.findUserByEmail(
+      sendCodeForEmailDto.email,
+      UserAuthType.email,
+    );
 
     if (isUserWithSameEmailExist) {
       throw new UnauthorizedException("User with this email already exist");
     }
 
-    const isPasswordValid = this.isPasswordValid(sendCodeForEmailDto.password, user.password);
-  
+    const isPasswordValid = this.isPasswordValid(
+      sendCodeForEmailDto.password,
+      user.password,
+    );
+
     if (!isPasswordValid) {
       throw new UnauthorizedException("Invalid password");
     }
@@ -191,9 +216,15 @@ export class AuthService {
     const emailResetCode = this.generateCode().code;
     const emailResetCodeExpiresAt = this.generateCode().codeExpiresAt;
 
-    await this.userService.updateUser(user.id, { emailResetCode, emailResetCodeExpiresAt });
+    await this.userService.updateUser(user.id, {
+      emailResetCode,
+      emailResetCodeExpiresAt,
+    });
 
-    await this.mailService.sendResetCodeForEmailUpdate(user.email, emailResetCode);
+    await this.mailService.sendResetCodeForEmailUpdate(
+      user.email,
+      emailResetCode,
+    );
   }
 
   public async resetPassword(resetPasswordDto: ResetPasswordDto) {
@@ -201,19 +232,19 @@ export class AuthService {
       resetPasswordDto.email,
       UserAuthType.email,
     );
-  
+
     if (!user) {
       throw new NotFoundException("User not found");
     }
-  
+
     if (resetPasswordDto.verificationCode !== user?.resetCode) {
       throw new NotFoundException("Verification code is not correct");
     }
-  
+
     if (user.resetCodeExpiresAt.getTime() < new Date().getTime()) {
       throw new NotFoundException("Verification code has expired");
     }
-  
+
     if (
       resetPasswordDto.verificationCode === user?.resetCode &&
       user.resetCodeExpiresAt.getTime() > new Date().getTime()
@@ -221,26 +252,32 @@ export class AuthService {
       const hashedNewPassword = this.hashField(resetPasswordDto.newPassword);
 
       await this.userService.updateUser(
-        user.id, { password: hashedNewPassword }, true
+        user.id,
+        { password: hashedNewPassword },
+        true,
       );
-  
+
       return { message: "Password reset successfully" };
     }
-  
+
     throw new UnauthorizedException("Password reset failed");
   }
 
-  public async resetEmail(emailUpdateDto: { userId: string, verificationCode: string, newEmail: string }) {
+  public async resetEmail(emailUpdateDto: {
+    userId: string;
+    verificationCode: string;
+    newEmail: string;
+  }) {
     const user = await this.userService.findOne(emailUpdateDto.userId);
-  
+
     if (!user) {
       throw new NotFoundException("User not found");
     }
-  
+
     if (emailUpdateDto.verificationCode !== user?.emailResetCode) {
       throw new NotFoundException("Verification code is not correct");
     }
-  
+
     if (user.emailResetCodeExpiresAt.getTime() < new Date().getTime()) {
       throw new NotFoundException("Verification code has expired");
     }
@@ -249,27 +286,30 @@ export class AuthService {
       emailUpdateDto.verificationCode === user?.emailResetCode &&
       user.emailResetCodeExpiresAt.getTime() > new Date().getTime()
     ) {
-      await this.userService.updateUser(
-        user.id, { email: emailUpdateDto.newEmail }
-      );
+      await this.userService.updateUser(user.id, {
+        email: emailUpdateDto.newEmail,
+      });
     }
   }
 
   public async verifyUserCode(authVerificationDto: AuthVerificationDto) {
-    const user = await this.userService.findUserByEmail(authVerificationDto.email, UserAuthType.email);
-  
+    const user = await this.userService.findUserByEmail(
+      authVerificationDto.email,
+      UserAuthType.email,
+    );
+
     if (!user) {
       throw new NotFoundException("User not found");
     }
-  
+
     if (user.isVerified) {
       throw new ConflictException("User is already verified");
     }
-  
+
     if (authVerificationDto.verificationCode !== user.registrationCode) {
       throw new UnauthorizedException("Invalid verification code");
     }
-  
+
     if (user.registrationCodeExpiresAt.getTime() < new Date().getTime()) {
       throw new UnauthorizedException("Verification code has expired");
     }
@@ -278,11 +318,19 @@ export class AuthService {
       const license = await this.prisma.license.findUnique({
         where: {
           id: authVerificationDto.licenseId,
-        }
+        },
       });
 
       if (!license) {
         throw new NotFoundException("License not found");
+      }
+
+      const activeLicense = await this.prisma.activeLicense.findFirst({
+        where: { licenseId: authVerificationDto.licenseId, userId: user.id },
+      });
+
+      if (activeLicense) {
+        throw new NotFoundException("License already active");
       }
 
       if (license.limit === 0) {
@@ -293,15 +341,11 @@ export class AuthService {
         throw new ConflictException("This email does not have access");
       }
 
-      const licenseUserIds = license.userIds;
-      licenseUserIds.push(user.id);
-
-      await this.prisma.license.update({
-        where: { id: authVerificationDto.licenseId },
-        data: { 
-          userIds: licenseUserIds,
-          limit: license.limit - 1, 
-        }
+      await this.prisma.activeLicense.create({
+        data: {
+          licenseId: authVerificationDto.licenseId,
+          userId: user.id,
+        },
       });
     }
 
@@ -309,7 +353,7 @@ export class AuthService {
       const organization = await this.prisma.organization.findUnique({
         where: {
           id: authVerificationDto.organizationId,
-        }
+        },
       });
 
       if (!organization) {
@@ -319,8 +363,20 @@ export class AuthService {
       const license = await this.prisma.license.findUnique({
         where: {
           ownerId: organization.ownerId,
-        }
+        },
       });
+
+      if (!license) {
+        throw new NotFoundException("License not found");
+      }
+
+      const activeLicense = await this.prisma.activeLicense.findFirst({
+        where: { licenseId: license.id, userId: user.id },
+      });
+
+      if (activeLicense) {
+        throw new NotFoundException("License already active");
+      }
 
       if (license.limit === 0) {
         throw new ConflictException("License limit is reached");
@@ -328,23 +384,22 @@ export class AuthService {
 
       const organizationDomains = organization.domains;
       const organizationEmails = organization.availableEmails;
-    
+
       const emailDomainPart = authVerificationDto.email.split("@")[1];
 
-      if (!organizationEmails.includes(authVerificationDto.email) && !organizationDomains.includes(emailDomainPart)) {
+      if (
+        !organizationEmails.includes(authVerificationDto.email) &&
+        !organizationDomains.includes(emailDomainPart)
+      ) {
         throw new ConflictException("This email does not have access");
       }
 
-      // add userId to license
-      const licenseUserIds = license.userIds;
-      licenseUserIds.push(user.id);
-
-      await this.prisma.license.update({
-        where: { id: license.id },
-        data: { 
-          userIds: licenseUserIds,
-          limit: license.limit - 1, 
-        }
+      // create active license
+      await this.prisma.activeLicense.create({
+        data: {
+          licenseId: authVerificationDto.licenseId,
+          userId: user.id,
+        },
       });
 
       // add userId to organization
@@ -355,7 +410,7 @@ export class AuthService {
         where: { id: authVerificationDto.organizationId },
         data: {
           userIds: organizationUserIds,
-        }
+        },
       });
     }
 
@@ -394,6 +449,6 @@ export class AuthService {
     return {
       code,
       codeExpiresAt,
-    }
+    };
   }
 }

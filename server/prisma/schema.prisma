@@ -55,6 +55,7 @@ model User {
   organization              Organization?   @relation(fields: [organizationId], references: [id])
   UserReferral              UserReferral[]
   License                   License[]
+  activeLicenses             ActiveLicense[]
 
   @@map("user")
 }
@@ -74,7 +75,7 @@ model License {
   user             User            @relation(fields: [ownerId], references: [id])
   status           LicenseStatus   @default(active)
   ownerId          String          @unique
-  userIds          String[]        @default([])
+  activeLicenses   ActiveLicense[]
   limit            Float           @default(0)
   tierType         LicenseTierType @default(freemium)
   availableEmails  String[]        @default([])
@@ -83,6 +84,18 @@ model License {
   updatedAt        DateTime        @updatedAt
 
   @@map("license")
+}
+
+model ActiveLicense {
+  id               String          @id @default(uuid())
+  user             User            @relation(fields: [userId], references: [id])
+  userId          String          
+  license          License         @relation(fields: [licenseId], references: [id])
+  licenseId        String
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  @@map("active_license")
 }
 
 model UserReferral {

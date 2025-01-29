@@ -8,7 +8,7 @@ import { UpdateUserLicenseDto } from "./dto/update-user-license-dto";
 
 @Injectable()
 export class UserLicenseService {
-   constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async addLicense(createUserLicenseDto: AddUserLicenseDto) {
     const userLicense = await this.prisma.license.create({
@@ -25,7 +25,7 @@ export class UserLicenseService {
     const license = await this.prisma.license.findUnique({
       where: {
         id,
-      }
+      },
     });
 
     if (!license) {
@@ -35,16 +35,37 @@ export class UserLicenseService {
     return license;
   }
 
-  async findByUserId(id: string): Promise<License[]> {
-    const licenses = await this.prisma.license.findMany({
+  async findByUserId(id: string) {
+    const license = await this.prisma.license.findFirst({
       where: {
         ownerId: id,
       },
-      // take: limit,
-      // skip: offset,
+      include: {
+        activeLicenses: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
     });
-
-    return licenses;
+    if (!license) return null;
+    return {
+      id: license.id,
+      limit: license.limit,
+      users: license.activeLicenses.map((i) => ({
+        name: i.user.firstName + "  " + i.user.lastName,
+        email: i.user.email,
+        date: i.createdAt,
+        license: i.id,
+      })),
+    };
   }
 
   async update(id: string, updateUserLicenseDto: UpdateUserLicenseDto) {
@@ -52,7 +73,7 @@ export class UserLicenseService {
       where: { id },
       data: {
         ...updateUserLicenseDto,
-      }
+      },
     });
   }
 }

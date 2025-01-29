@@ -23,7 +23,7 @@ import Image from "next/image";
 const NAVIGATION_ITEMS = [
   {
     title: "Home",
-    path: "/account/home",
+    path: "/",
     icon: Home,
   },
   {
@@ -33,7 +33,7 @@ const NAVIGATION_ITEMS = [
   },
   {
     title: "Invite friends",
-    path: "/",
+    path: "/account/invite-friends",
     icon: Gift,
   },
   {
