@@ -1,0 +1,18 @@
+import { Controller, Post, Body } from "@nestjs/common";
+
+import { PlanService } from "./plan.service";
+
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { CreatePlanDto } from "./dto/create-plan-dto";
+
+@ApiTags("Plan")
+@Controller("plan")
+export class PlanController {
+  constructor(private readonly planService: PlanService) {}
+
+  @ApiOperation({ summary: "Add Plan" })
+  @Post("/")
+  async addLicense(@Body() addPlanDto: CreatePlanDto) {
+    return this.planService.addPlan(addPlanDto);
+  }
+}

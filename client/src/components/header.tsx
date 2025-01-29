@@ -52,12 +52,7 @@ export const Header = () => {
       >
         <div className="flex items-center gap-10">
           <Link href="/">
-            <Image
-              src={Logo}
-              width={110}
-              height={28}
-              alt="logo"
-            />
+            <Image src={Logo} width={110} height={28} alt="logo" />
           </Link>
 
           <nav className="hidden lg:block">
@@ -87,7 +82,7 @@ export const Header = () => {
               </Link>
             </div>
           ) : (
-            <Link href="/account/home" className="flex items-center gap-2">
+            <Link href="/account/settings" className="flex items-center gap-2">
               <Button variant="secondary" className="flex">
                 <User />
                 <span>Account</span>

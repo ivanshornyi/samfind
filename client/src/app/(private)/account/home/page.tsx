@@ -16,7 +16,7 @@ export default function Home() {
     if (user) {
       const link = `${frontendDomain}/auth/sign-up?accountType=private&referralCode=${user.referralCode}`;
 
-      navigator.clipboard.writeText(link); 
+      navigator.clipboard.writeText(link);
 
       toast({
         description: "Copied",
@@ -35,8 +35,8 @@ export default function Home() {
       if (user.licenseId) {
         link = `${link}&lId=${user.licenseId}`;
       }
- 
-      navigator.clipboard.writeText(link); 
+
+      navigator.clipboard.writeText(link);
 
       toast({
         description: "Copied",

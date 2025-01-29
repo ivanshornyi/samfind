@@ -5,11 +5,12 @@ import { PrismaService } from "../prisma/prisma.service";
 
 import { UserLicenseService } from "./user-license.service";
 import { UserLicenseController } from "./user-license.controller";
+import { ConfigModule } from "@nestjs/config";
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, ConfigModule.forRoot()],
   providers: [UserLicenseService, PrismaService],
   controllers: [UserLicenseController],
   exports: [],
 })
-export class UserLicenseModule{}
+export class UserLicenseModule {}

@@ -1,6 +1,6 @@
-import { 
-  Module, 
-  NestModule, 
+import {
+  Module,
+  NestModule,
   MiddlewareConsumer,
   RequestMethod,
 } from "@nestjs/common";
@@ -18,6 +18,7 @@ import { UserReferralModule } from "./modules/user-referral/user-referral.module
 import { StripeModule } from "./modules/stripe/stripe.module";
 import { OrganizationModule } from "./modules/organization/organization.module";
 import { LicenseVerificationModule } from "./modules/license-verification/license-verification.module";
+import { PlanModule } from "./modules/plan/plan.module";
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { LicenseVerificationModule } from "./modules/license-verification/licens
     StripeModule,
     OrganizationModule,
     LicenseVerificationModule,
+    PlanModule,
   ],
   controllers: [],
   providers: [],
@@ -47,7 +49,11 @@ export class AppModule implements NestModule {
           path: "/stripe/webhook",
           method: RequestMethod.POST,
         },
+        {
+          path: "/user-license/device",
+          method: RequestMethod.POST,
+        },
       )
-      .forRoutes("user", "user-license", "user-referral", "stripe");
+      .forRoutes("user", "user-license", "user-referral", "stripe", "plan");
   }
 }

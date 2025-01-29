@@ -35,7 +35,10 @@ export const ReusableTable = <T extends RowData>({
       <Table className="max-w-full w-[1064px]">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow className="hover:bg-transparent" key={headerGroup.id}>
+            <TableRow
+              className="hover:bg-transparent border-disabled"
+              key={headerGroup.id}
+            >
               {headerGroup.headers.map((header) => (
                 <TableHead className="text-left" key={header.id}>
                   {header.isPlaceholder
@@ -77,7 +80,7 @@ export const ReusableTable = <T extends RowData>({
             <TableRow>
               <TableCell
                 colSpan={table.getAllColumns().length}
-                className="text-center"
+                className="text-center "
               >
                 <div>Loading...</div>
               </TableCell>
@@ -85,22 +88,24 @@ export const ReusableTable = <T extends RowData>({
           )}
         </TableBody>
       </Table>
-      <ReactPaginate
-        breakLabel="..."
-        nextLabel={<ChevronRight />}
-        previousLabel={<ChevronLeft />}
-        onPageChange={(e) => onPageChange(e.selected)}
-        pageRangeDisplayed={2}
-        marginPagesDisplayed={2}
-        pageCount={pageCount}
-        containerClassName="flex space-x-2 mt-4"
-        pageClassName="px-3 py-1 bg-g text-disabled bg-[#242424] rounded-md"
-        activeClassName="text-light"
-        previousClassName="px-3 py-1 bg-[#242424] text-disabled rounded-md"
-        nextClassName="px-3 py-1 bg-[#242424] text-disabled rounded-md"
-        breakClassName="px-3 py-1 bg-[#242424] text-disabled rounded-md"
-        disabledClassName="bg-[#1F1E1F] cursor-not-allowed"
-      />
+      {pageCount > 1 && (
+        <ReactPaginate
+          breakLabel="..."
+          nextLabel={<ChevronRight />}
+          previousLabel={<ChevronLeft />}
+          onPageChange={(e) => onPageChange(e.selected)}
+          pageRangeDisplayed={2}
+          marginPagesDisplayed={2}
+          pageCount={pageCount}
+          containerClassName="flex space-x-2 mt-[50px]"
+          pageClassName="px-3 py-1 bg-g text-[#A8A8A8] bg-transparent rounded-md"
+          activeClassName="text-white bg-slate-800 font-semibold"
+          previousClassName="px-3 py-1 bg-transparent text-[#A8A8A8] rounded-md"
+          nextClassName="px-3 py-1 bg-transparent text-[#A8A8A8] rounded-md"
+          breakClassName="px-3 py-1 bg-transparent text-[#A8A8A8] rounded-md"
+          disabledClassName="bg-transparent text-slate-600 cursor-not-allowed"
+        />
+      )}
     </div>
   );
 };

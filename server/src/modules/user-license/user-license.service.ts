@@ -5,10 +5,11 @@ import { License, LicenseStatus } from "@prisma/client";
 
 import { AddUserLicenseDto } from "./dto/add-user-license-dto";
 import { UpdateUserLicenseDto } from "./dto/update-user-license-dto";
+import { CheckDeviceDto } from "./dto/check-device-dto";
 
 @Injectable()
 export class UserLicenseService {
-   constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async addLicense(createUserLicenseDto: AddUserLicenseDto) {
     const userLicense = await this.prisma.license.create({
@@ -25,7 +26,7 @@ export class UserLicenseService {
     const license = await this.prisma.license.findUnique({
       where: {
         id,
-      }
+      },
     });
 
     if (!license) {
@@ -35,16 +36,37 @@ export class UserLicenseService {
     return license;
   }
 
-  async findByUserId(id: string): Promise<License[]> {
-    const licenses = await this.prisma.license.findMany({
+  async findByUserId(id: string) {
+    const license = await this.prisma.license.findFirst({
       where: {
         ownerId: id,
       },
-      // take: limit,
-      // skip: offset,
+      include: {
+        activeLicenses: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
     });
-
-    return licenses;
+    if (!license) return null;
+    return {
+      id: license.id,
+      limit: license.limit,
+      users: license.activeLicenses.map((i) => ({
+        name: i.user.firstName + "  " + i.user.lastName,
+        email: i.user.email,
+        date: i.createdAt,
+        license: i.id,
+      })),
+    };
   }
 
   async update(id: string, updateUserLicenseDto: UpdateUserLicenseDto) {
@@ -52,7 +74,37 @@ export class UserLicenseService {
       where: { id },
       data: {
         ...updateUserLicenseDto,
-      }
+      },
     });
+  }
+
+  async checkDevice({ email, computer_id: deviceId }: CheckDeviceDto) {
+    const user = await this.prisma.user.findFirst({
+      where: { email },
+      include: {
+        activeLicenses: true,
+      },
+    });
+    if (!user || !user.activeLicenses.length)
+      return {
+        error: "email has no paid license",
+      };
+    if (
+      user.activeLicenses[0].deviceId &&
+      user.activeLicenses[0].deviceId !== deviceId
+    )
+      return {
+        error: "email has been registered",
+      };
+    if (!user.activeLicenses[0].deviceId)
+      await this.prisma.activeLicense.update({
+        where: { id: user.activeLicenses[0].id },
+        data: {
+          deviceId,
+        },
+      });
+    return {
+      error: null,
+    };
   }
 }

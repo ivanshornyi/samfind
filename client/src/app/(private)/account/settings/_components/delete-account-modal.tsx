@@ -14,7 +14,7 @@ import {
 } from "@/components";
 
 import { X } from "lucide-react";
-//  linear-gradient(91.31deg, #a8a8a8 -23.65%, #a64ce8 109.99%)
+
 export const DeleteAccount = () => {
   const [open, setOpen] = useState<boolean>(false);
 

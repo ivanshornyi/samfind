@@ -4,13 +4,13 @@ import { PrismaService } from "../prisma/prisma.service";
 
 @Injectable()
 export class LicenseVerificationService {
-  constructor (private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   public async checkUserByEmail(email: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { 
+    const user = await this.prisma.user.findFirst({
+      where: {
         email: email,
-      }
+      },
     });
 
     if (!user) {
@@ -34,7 +34,7 @@ export class LicenseVerificationService {
         domains: {
           has: domain,
         },
-      }
+      },
     });
 
     if (!organization) {
@@ -73,6 +73,6 @@ export class LicenseVerificationService {
       user,
       organization,
       license,
-    }
+    };
   }
 }
