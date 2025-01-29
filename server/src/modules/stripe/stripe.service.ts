@@ -2,7 +2,11 @@ import { ConflictException, Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
 import Stripe from "stripe";
-import { LicenseTierType } from "@prisma/client";
+import {
+  LicenseTierType,
+  UserAccountType,
+  LicenseStatus,
+} from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { UserService } from "../user/user.service";
 
@@ -219,20 +223,36 @@ export class StripeService {
         });
       }
 
-      // update license
-      const license = await this.prisma.license.findUnique({
-        where: { ownerId: userId },
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
       });
 
-      await this.prisma.license.update({
-        where: {
-          id: license.id,
-        },
-        data: {
-          limit: Number(limit),
-          tierType: tierType as LicenseTierType,
-        },
-      });
+      if (user.accountType === UserAccountType.private) {
+        const license = await this.prisma.license.findUnique({
+          where: { ownerId: userId },
+        });
+
+        await this.prisma.license.update({
+          where: {
+            id: license.id,
+          },
+          data: {
+            limit: Number(limit),
+            tierType: tierType as LicenseTierType,
+          },
+        });
+      } else if (user.accountType === UserAccountType.business) {
+        await this.prisma.license.create({
+          data: {
+            ownerId: userId,
+            status: LicenseStatus.active,
+            limit: Number(limit),
+            tierType: LicenseTierType.standard,
+          },
+        });
+      }
 
       this.logger.log(`License added for user ${userId}`);
     } catch (error) {
