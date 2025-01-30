@@ -83,7 +83,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ./admin
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/arm64
           push: true
           tags: nazarii2314/samfind-admin:latest
 
@@ -92,7 +92,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ./client
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/arm64
           push: true
           tags: nazarii2314/samfind-client:latest
 
@@ -101,7 +101,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ./server
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/arm64
           push: true
           tags: nazarii2314/samfind-server:latest
           build-args: |
