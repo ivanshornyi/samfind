@@ -35,7 +35,7 @@ export const NAVIGATION_ITEMS = [
 ];
 
 export const Header = () => {
-  const { isLoggedIn } = useContext(AuthContext);
+  const { isLoggedIn, user } = useContext(AuthContext);
 
   return (
     <header
@@ -82,12 +82,19 @@ export const Header = () => {
               </Link>
             </div>
           ) : (
-            <Link href="/account/settings" className="flex items-center gap-2">
-              <Button variant="secondary" className="flex">
-                <User />
-                <span>Account</span>
-              </Button>
-            </Link>
+            <>
+              {user && (
+                <Link 
+                  href={(user.licenseId || user.organizationId) ? "/account/license" : "/account/settings"} 
+                  className="flex items-center gap-2"
+                >
+                  <Button variant="tetrary" className="flex">
+                    <User />
+                    <span>Account</span>
+                  </Button>
+                </Link>
+              )}
+            </>
           )}
         </div>
 

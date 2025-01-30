@@ -138,13 +138,13 @@ export default function Settings() {
           <h2 className="text-[32px] leading-[44px] font-semibold">
             Profile settings
           </h2>
-          <p className="text-link-hover flex gap-2 items-center border-none border-r-[20px] p-[10px] px-[26px]">
-            <User style={{ width: "12px", height: "12px" }} />
-            <span>Private account</span>
-          </p>
+          <div className="text-link-hover flex gap-2 items-center border-none border-r-[20px] p-[10px] px-[26px]">
+            <User size={17} />
+            <span className="capitalize">{user?.accountType} Account</span>
+          </div>
         </div>
         <div className="mt-[77px]">
-          <h3 className="text-[20px] leading-[27px] font-semibold bg-[#242424]">
+          <h3 className="text-[20px] leading-[27px] font-semibold">
             Personal details
           </h3>
           <div className="w-full mt-6 pb-2 border-b border-[#444444]">

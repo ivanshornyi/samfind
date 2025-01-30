@@ -10,7 +10,6 @@ import { AuthContext } from "@/context";
 
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
-import { Button } from "@/components";
 import { ArrowLeftIcon } from "lucide-react";
 
 import { Logo, BgVioletEllipse } from "@public/images";
@@ -41,14 +40,9 @@ export default function AuthLayout({
         className="absolute left-0 top-0 z-0 w-[60%]"
       />
 
-      <Link href="/" className="fixed top-6 left-5">
-        <Button
-          variant="link"
-          className="flex items-center gap-2"
-        >
-          <ArrowLeftIcon />
-          <span>Back</span>
-        </Button>
+      <Link href="/" className="fixed top-6 left-5 flex items-center gap-3">
+        <ArrowLeftIcon size={30} />
+        <span>Back</span>
       </Link>
       <div className="pt-12">
         <Link href="/">

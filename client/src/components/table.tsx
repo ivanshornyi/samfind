@@ -67,10 +67,10 @@ export const ReusableTable = <T extends RowData>({
               </TableRow>
             ))}
           {table.getRowModel().rows.length === 0 && !isLoading && (
-            <TableRow>
+            <TableRow className="hover:bg-transparent">
               <TableCell
                 colSpan={table.getAllColumns().length}
-                className="text-center"
+                className="text-center py-20"
               >
                 {noDataMessage}
               </TableCell>

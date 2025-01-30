@@ -2,7 +2,7 @@
 
 import React, { useContext, useEffect, useState } from "react";
 
-import { useGetUserLicenses } from "@/hooks";
+import { useGetUserLicenses, useToast } from "@/hooks";
 import {
   Tooltip,
   TooltipContent,
@@ -30,34 +30,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components";
 
-import { ArrowUpDown, Info, MoreHorizontal, Search } from "lucide-react";
 import { ReusableTable } from "@/components/table";
 import { InviteMember, ProgressChart } from "./_components";
 import { AuthContext } from "@/context";
 
-const mockData = [
-  {
-    name: "Name1",
-    email: "starttyping@gmail.com",
-    date: "02.02.2025",
-    access: "Owner",
-    license: "4923882344",
-  },
-  {
-    name: "Name2",
-    email: "starttyping@gmail.com",
-    date: "02.02.2025",
-    access: "Member",
-    license: "4923882344",
-  },
-  {
-    name: "Name3",
-    email: "starttyping@gmail.com",
-    date: "02.02.2025",
-    access: "Member",
-    license: "4923882344",
-  },
-];
+import { ArrowUpDown, Copy, Info, MoreHorizontal, Search } from "lucide-react";
+
+const frontendDomain = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN;
 
 const headers = {
   name: "name",
@@ -77,6 +56,27 @@ interface LicenseItem {
 
 const columns: ColumnDef<LicenseItem>[] = [
   {
+    accessorKey: "icon",
+    header: ({ column }) => {
+      <div></div>
+    },
+    cell: ({ row }) => {
+      const value: string = row.getValue(headers.name);
+      
+      return (
+        <div 
+          className="
+            flex justify-center items-center rounded-full 
+            w-10 h-10 bg-input text-[24px] leading-[33px] 
+            text-link-hover font-semibold
+          "
+        >
+          {value[0]}
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: "name",
     header: ({ column }) => (
       <Button
@@ -88,17 +88,6 @@ const columns: ColumnDef<LicenseItem>[] = [
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => {
-      const value: string = row.getValue(headers.name);
-      return (
-        <div className="flex gap-2 items-center">
-          <div className="flex justify-center items-center rounded-full w-10 h-10 bg-input text-[24px] leading-[33px] text-link-hover font-semibold">
-            <span>{value[0]}</span>
-          </div>
-          <span>{value}</span>
-        </div>
-      );
-    },
   },
   {
     accessorKey: "email",
@@ -144,13 +133,6 @@ const columns: ColumnDef<LicenseItem>[] = [
     cell: ({ row }) => <div>{row.getValue("access")}</div>,
   },
   {
-    accessorKey: "license",
-    header: () => (
-      <div className=" text-disabled uppercase">{headers.license}</div>
-    ),
-    cell: ({ row }) => <div>{row.getValue("license")}</div>,
-  },
-  {
     id: "actions",
     enableHiding: false,
     cell: () => (
@@ -176,23 +158,48 @@ const columns: ColumnDef<LicenseItem>[] = [
   },
 ];
 
-export default function LicenseList() {
-  const [users, setUsers] = useState<LicenseItem[]>(mockData);
+export default function License() {
+  const { user } = useContext(AuthContext);
+  const { toast } = useToast();
+
+  const [users, setUsers] = useState<LicenseItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const { user } = useContext(AuthContext);
+
   const { data: userLicense, isPending: isUserLicensesPending } =
     useGetUserLicenses();
+
   const itemsPerPage = 10;
-  const pageCount = Math.ceil(userLicense?.users.length || 0 / itemsPerPage);
+  const pageCount = Math.ceil(userLicense?.users?.length ?? 0 / itemsPerPage);
+
+  const handleCopyInvitation = () => {
+    if (user) {
+      let link = `${frontendDomain}/auth/sign-up?accountType=private`;
+
+      if (user.organizationId) {
+        link = `${link}&orgId=${user.organizationId}`;
+      }
+
+      if (user.licenseId) {
+        link = `${link}&lId=${user.licenseId}`;
+      }
+
+      navigator.clipboard.writeText(link);
+
+      toast({
+        description: "Copied",
+      });
+    }
+  };
 
   useEffect(() => {
     if (userLicense?.users) {
       const startIndex = (currentPage - 1) * itemsPerPage;
       const endIndex = startIndex + itemsPerPage;
+
       const selectedUsers = userLicense.users
         .slice(startIndex, endIndex)
         .map((u) => ({
@@ -206,7 +213,6 @@ export default function LicenseList() {
       setUsers(selectedUsers);
     }
   }, [userLicense, currentPage, user?.email]);
-  console.log("userLicenses", userLicense);
 
   const table = useReactTable({
     data: users,
@@ -233,35 +239,51 @@ export default function LicenseList() {
         <h2 className="text-[32px] leading-[44px] font-semibold">
           License management
         </h2>
-        <div className="mt-6 flex justify-between items-end">
-          <ProgressChart currentMembers={3} maxMembers={10} />
-          <InviteMember allowedMembers={10} />
-        </div>
-        <div className="flex items-center justify-end py-4">
-          <div className="w-[308px] relative">
-            <Input
-              placeholder="Search"
-              value={
-                (table.getColumn("name")?.getFilterValue() as string) ?? ""
-              }
-              onChange={(event) =>
-                table.getColumn("name")?.setFilterValue(event.target.value)
-              }
-              className="max-w-sm bg-card"
-            />
-            <div className="absolute right-6 top-0 h-full flex justify-center items-center">
-              <Search style={{ width: "24px", height: "24px" }} />
+        {userLicense && !isUserLicensesPending && (
+          <>
+            <div className="mt-6 flex justify-between items-end">
+              <ProgressChart currentMembers={userLicense.users.length} maxMembers={userLicense.limit} />
+              <div className="flex items-center gap-6">
+                <button
+                  onClick={handleCopyInvitation}
+                  className="text-violet-50 bg-card p-2 rounded-full"
+                >
+                  <Copy size={24} />
+                </button>
+                <InviteMember allowedMembers={userLicense.limit} />
+              </div>
             </div>
-          </div>
-        </div>
+            <div className="flex items-center justify-end py-4">
+              <div className="w-[308px] relative">
+                <Input
+                  placeholder="Search"
+                  value={
+                    (table.getColumn("name")?.getFilterValue() as string) ?? ""
+                  }
+                  onChange={(event) =>
+                    table.getColumn("name")?.setFilterValue(event.target.value)
+                  }
+                  className="max-w-sm bg-card"
+                />
+                <div className="absolute right-6 top-0 h-full flex justify-center items-center">
+                  <Search size={24} />
+                </div>
+              </div>
+            </div>
 
-        <ReusableTable
-          table={table}
-          isLoading={isUserLicensesPending}
-          onPageChange={(page: number) => setCurrentPage(page)}
-          pageCount={pageCount}
-          noDataMessage="No licenses found."
-        />
+            <ReusableTable
+              table={table}
+              isLoading={isUserLicensesPending}
+              onPageChange={(page: number) => setCurrentPage(page)}
+              pageCount={pageCount}
+              noDataMessage="No licenses found."
+            />
+          </>
+        )}
+
+        {!userLicense && !isUserLicensesPending && (
+          <div>You do not have a license</div>
+        )}
       </div>
     </div>
   );

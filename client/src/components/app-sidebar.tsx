@@ -38,12 +38,13 @@ const NAVIGATION_ITEMS = [
   },
   {
     title: "Billing data",
-    path: "/",
+    path: "/account/billing-data",
     icon: CreditCard,
   },
 ];
 
 export function AppSidebar() {
+  const { user } = useContext(AuthContext);
   const pathname = usePathname();
 
   return (
@@ -57,10 +58,11 @@ export function AppSidebar() {
         <SidebarGroup className="">
           <SidebarGroupContent>
             <SidebarMenu className="space-y-4">
-              {NAVIGATION_ITEMS.map((item) => {
+              {NAVIGATION_ITEMS.map((item, index) => {
                 const isActive = pathname === item.path;
+                const condition = user && (user.licenseId || user?.organizationId);
 
-                return (
+                return (condition || index === 0) ? (
                   <SidebarMenuItem key={item.title}>
                     <Link href={item.path}>
                       <Button
@@ -71,15 +73,15 @@ export function AppSidebar() {
                           />
                         }
                         className={`
-                        ${isActive && "bg-[#302935] text-white"}
-                        w-full flex justify-start items-center
-                      `}
+                          ${isActive && "bg-[#302935] text-white"}
+                          w-full flex justify-start items-center
+                        `}
                       >
                         <span>{item.title}</span>
                       </Button>
                     </Link>
                   </SidebarMenuItem>
-                );
+                ) : null
               })}
             </SidebarMenu>
           </SidebarGroupContent>
