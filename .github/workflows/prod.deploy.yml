@@ -1,0 +1,145 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  # 1️⃣ Detect Modified Services
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      admin_changed: ${{ steps.check_admin.outputs.changed }}
+      client_changed: ${{ steps.check_client.outputs.changed }}
+      server_changed: ${{ steps.check_server.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Determine previous commit
+        id: prev_commit
+        run: echo "BEFORE_SHA=$(git rev-parse HEAD~1)" >> $GITHUB_ENV
+
+      - name: Check for Admin Changes
+        id: check_admin
+        run: |
+          if git diff --name-only $BEFORE_SHA ${{ github.sha }} | grep -q "^admin/"; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check for Client Changes
+        id: check_client
+        run: |
+          if git diff --name-only $BEFORE_SHA ${{ github.sha }} | grep -q "^client/"; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check for Server Changes
+        id: check_server
+        run: |
+          if git diff --name-only $BEFORE_SHA ${{ github.sha }} | grep -q "^server/"; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+  # 2️⃣ Build and Push Multi-Platform Docker Images
+  build-and-push:
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Create .env files from GitHub Secrets
+        run: |
+          echo "${{ secrets.ADMIN_ENV }}" > admin/.env
+          echo "${{ secrets.CLIENT_ENV }}" > client/.env
+          echo "${{ secrets.SERVER_ENV }}" > server/.env
+
+      - name: Build and Push Admin (Multi-Platform)
+        if: needs.detect-changes.outputs.admin_changed == 'true'
+        uses: docker/build-push-action@v4
+        with:
+          context: ./admin
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: nazarii2314/samfind-admin:latest
+
+      - name: Build and Push Client (Multi-Platform)
+        if: needs.detect-changes.outputs.client_changed == 'true'
+        uses: docker/build-push-action@v4
+        with:
+          context: ./client
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: nazarii2314/samfind-client:latest
+
+      - name: Build and Push Server (Multi-Platform)
+        if: needs.detect-changes.outputs.server_changed == 'true'
+        uses: docker/build-push-action@v4
+        with:
+          context: ./server
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: nazarii2314/samfind-server:latest
+          build-args: |
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+
+  # 3️⃣ Deploy to VPS
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    steps:
+      - name: SSH Deploy to VPS
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: root
+          password: ${{ secrets.DEPLOY_SSH_PASSWORD }}
+          port: 22
+          script: |
+            cd /root/samfind
+            git pull
+            docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}"
+
+            # Save .env files
+            echo "${{ secrets.ADMIN_ENV }}" > /root/samfind/admin/.env
+            echo "${{ secrets.CLIENT_ENV }}" > /root/samfind/client/.env
+            echo "${{ secrets.SERVER_ENV }}" > /root/samfind/server/.env
+
+            # Create traefik network if it doesn't exist
+            docker network create traefik || true
+
+            # Pull latest multi-platform images
+            docker-compose pull
+
+            # Restart containers
+            docker-compose up -d --force-recreate
+
+            # Cleanup old images and containers
+            docker system prune -af
+
+            # Check running containers
+            docker ps
