@@ -49,7 +49,7 @@ services:
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.services.admin.loadbalancer.server.port=4000'
-      - 'traefik.http.routers.admin.rule=Host(`www.admin.onsio.io`)'
+      - 'traefik.http.routers.admin.rule=Host(`admin.onsio.io`)'
       - 'traefik.http.routers.admin.entrypoints=websecure'
       - 'traefik.http.routers.admin.tls.certresolver=myresolver'
     networks:
@@ -106,7 +106,7 @@ services:
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.services.server.loadbalancer.server.port=4000'
-      - 'traefik.http.routers.server.rule=Host(`www.api.onsio.io`)'
+      - 'traefik.http.routers.server.rule=Host(`api.onsio.io`)'
       - 'traefik.http.routers.server.entrypoints=websecure'
       - 'traefik.http.routers.server.tls.certresolver=myresolver'
     networks:
