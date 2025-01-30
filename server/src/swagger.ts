@@ -1,5 +1,5 @@
-import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { INestApplication } from "@nestjs/common";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { SchemaObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
 
 export function setupSwagger(app: INestApplication) {

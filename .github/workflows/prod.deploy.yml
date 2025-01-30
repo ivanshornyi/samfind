@@ -132,14 +132,21 @@ jobs:
             # Create traefik network if it doesn't exist
             docker network create traefik || true
 
+            # Run database migrations first
+            docker-compose run --rm server npx prisma migrate deploy
+
             # Pull latest multi-platform images
             docker-compose pull
 
-            # Restart containers
-            docker-compose up -d --force-recreate
+            # Restart containers with zero downtime
+            docker-compose up -d --force-recreate --remove-orphans
+
+            # Wait for services to be healthy
+            sleep 30
 
             # Cleanup old images and containers
-            docker system prune -af
+            docker system prune -af --volumes
 
-            # Check running containers
+            # Check running containers and their health
             docker ps
+            docker-compose ps
