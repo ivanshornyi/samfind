@@ -35,17 +35,29 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
 
   const { toast } = useToast();
 
-  const { mutate: updateUserLicenseMutation, isPending: isUserLicenseUpdatePending } = useUpdateUserLicense();
-  const { mutate: updateOrganizationMutation, isPending: isUpdateOrganizationPending } = useUpdateOrganization();
+  const {
+    mutate: updateUserLicenseMutation,
+    isPending: isUserLicenseUpdatePending,
+  } = useUpdateUserLicense();
+  const {
+    mutate: updateOrganizationMutation,
+    isPending: isUpdateOrganizationPending,
+  } = useUpdateOrganization();
 
   const { data: userLicense } = useQuery({
-    queryFn: () => user?.licenseId ? UserLicenseApiService.getUserLicense(user.licenseId) : null,
+    queryFn: () =>
+      user?.licenseId
+        ? UserLicenseApiService.getUserLicense(user.licenseId)
+        : null,
     queryKey: ["user-license"],
     enabled: !!user?.licenseId,
   });
 
   const { data: userOrganization } = useQuery({
-    queryFn: () => user?.organizationId ? OrganizationApiService.getOrganization(user.organizationId) : null,
+    queryFn: () =>
+      user?.organizationId
+        ? OrganizationApiService.getOrganization(user.organizationId)
+        : null,
     queryKey: ["organization"],
     enabled: !!user?.organizationId,
   });
@@ -83,12 +95,18 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
     if (user) {
       // business
       if (user.organizationId) {
-        updateOrganizationMutation({ id: user.organizationId, organizationData: { availableEmails: emails } });
+        updateOrganizationMutation({
+          id: user.organizationId,
+          organizationData: { availableEmails: emails },
+        });
       }
 
       // private
       if (user.licenseId) {
-        updateUserLicenseMutation({ id: user.licenseId, licenseData: { availableEmails: emails } });
+        updateUserLicenseMutation({
+          id: user.licenseId,
+          licenseData: { availableEmails: emails },
+        });
       }
     }
   };
@@ -125,7 +143,10 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
           </AlertDialogTitle>
           <AlertDialogDescription className="text-[16px] leading-[22px] p-[10px] px-6 text-link-hover flex gap-2 items-center">
             <Info size={14} />
-            <span>You can add {allowedMembers - emails.length} more members on your plan.</span>
+            <span>
+              You can add {allowedMembers - emails.length} more members on your
+              plan.
+            </span>
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -193,7 +214,7 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
             loading={isUpdateOrganizationPending || isUserLicenseUpdatePending}
             disabled={emails.length <= 0}
           >
-            Update available emails
+            Send invitations
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

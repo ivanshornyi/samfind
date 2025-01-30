@@ -28,13 +28,17 @@ interface VerifyUserModalProps {
   email: string;
 }
 
-export const VerifyUserModal: React.FC<VerifyUserModalProps> = ({ isOpen, email }) => {
+export const VerifyUserModal: React.FC<VerifyUserModalProps> = ({
+  isOpen,
+  email,
+}) => {
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const [code, setCode] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { mutate: verifyUserMutation, isPending: isVerifyingPending } = useVerifyUser();
+  const { mutate: verifyUserMutation, isPending: isVerifyingPending } =
+    useVerifyUser();
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -45,10 +49,10 @@ export const VerifyUserModal: React.FC<VerifyUserModalProps> = ({ isOpen, email 
       });
 
       return;
-    } 
+    }
 
     let verifyData: VerifyData = {
-      email, 
+      email,
       verificationCode: code,
     };
 
@@ -60,7 +64,7 @@ export const VerifyUserModal: React.FC<VerifyUserModalProps> = ({ isOpen, email 
       verifyData = {
         ...verifyData,
         licenseId,
-      }
+      };
     }
 
     if (organizationId) {
@@ -68,14 +72,14 @@ export const VerifyUserModal: React.FC<VerifyUserModalProps> = ({ isOpen, email 
         toast({
           description: "You can not add business account for this organization",
         });
-  
+
         return;
       }
 
       verifyData = {
         ...verifyData,
         organizationId,
-      }
+      };
     }
 
     verifyUserMutation(verifyData);
@@ -89,7 +93,7 @@ export const VerifyUserModal: React.FC<VerifyUserModalProps> = ({ isOpen, email 
     <AlertDialog open={isModalOpen}>
       <AlertDialogContent className="w-[591px] p-8">
         <div className="absolute right-5 top-5">
-          <AlertDialogCancel 
+          <AlertDialogCancel
             className="shadow-none border-none p-1 rounded-full bg-card"
             onClick={() => setIsModalOpen(false)}
           >
@@ -98,7 +102,9 @@ export const VerifyUserModal: React.FC<VerifyUserModalProps> = ({ isOpen, email 
         </div>
 
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-xl">Verify your email</AlertDialogTitle>
+          <AlertDialogTitle className="text-xl">
+            Verify your email
+          </AlertDialogTitle>
           <AlertDialogDescription>
             Enter your verification code
           </AlertDialogDescription>

@@ -84,8 +84,12 @@ export const Header = () => {
           ) : (
             <>
               {user && (
-                <Link 
-                  href={(user.licenseId || user.organizationId) ? "/account/license" : "/account/settings"} 
+                <Link
+                  href={
+                    user.licenseId || user.organizationId
+                      ? "/account/license"
+                      : "/account/settings"
+                  }
                   className="flex items-center gap-2"
                 >
                   <Button variant="tetrary" className="flex">

@@ -9,13 +9,17 @@ export const useUpdateOrganization = () => {
   const { toast } = useToast();
 
   const { ...mutationProps } = useMutation({
-    mutationFn: (data: { id: string, organizationData: UpdateOrganizationData}) => OrganizationApiService.updateOrganization(data.id, data.organizationData),
+    mutationFn: (data: {
+      id: string;
+      organizationData: UpdateOrganizationData;
+    }) =>
+      OrganizationApiService.updateOrganization(data.id, data.organizationData),
     onSuccess: () => {
       toast({
         title: "Success",
         description: "Successfully updated",
       });
-    }, 
+    },
     onError: (error) => {
       handleToastError(error, toast);
     },

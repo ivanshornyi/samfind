@@ -13,7 +13,7 @@ export interface CreateIntent {
   userReferralCode?: number;
 }
 
-const getStripeClient = async (data: CreateIntent) => { 
+const getStripeClient = async (data: CreateIntent) => {
   try {
     const response = await apiClient.post("/stripe/create-payment-intent", {
       ...data,

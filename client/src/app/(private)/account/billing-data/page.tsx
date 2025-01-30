@@ -1,5 +1,3 @@
 export default function BillingData() {
-  return (
-    <div>account billing data</div>
-  );
+  return <div>account billing data</div>;
 }
