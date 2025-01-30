@@ -21,7 +21,7 @@ export class OrganizationController {
   @ApiOperation({ summary: "Find organization" })
   @Get("/:id")
   async findOrganization(@Param("id") id: string) {
-    console.log(id);
+    return await this.organizationService.findOrganization(id);
   }
 
   @ApiOperation({ summary: "Update organization" })

@@ -66,4 +66,19 @@ export class MailService {
       throw error;
     }
   }
+
+  async sendInvitation(to: string, link: string) {
+    try {
+      const mailOptions = {
+        from: configService.get("MAIL_USER"),
+        to,
+        subject: "Invitation from Onsio",
+        html: `<p>Invitation link<a href="${link}">${link}</a></p>`,
+      };
+
+      await this.transporter.sendMail(mailOptions);
+    } catch (error) {
+      throw error;
+    }
+  }
 };
