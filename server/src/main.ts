@@ -1,8 +1,8 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 
-import { ConfigService } from "@nestjs/config";
 import { ValidationPipe } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 
 import { setupSwagger } from "./swagger";
 
@@ -19,10 +19,12 @@ async function bootstrap() {
     origin: [
       "http://localhost:3000",
       "http://localhost:5173",
-      configService.get("FRONTEND_DOMAIN"),
-      configService.get("ADMIN_FRONTEND_DOMAIN"),
+      "https://www.onsio.io",
+      "https://onsio.io",
     ],
+    credentials: true,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+    allowedHeaders: ["Content-Type", "Authorization"],
   });
   app.setGlobalPrefix("api");
   app.useGlobalPipes(
