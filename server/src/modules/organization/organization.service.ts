@@ -37,8 +37,19 @@ export class OrganizationService {
     if (updateOrganizationDto.availableEmails) {
       const invitationLink = `${this.configService.get("FRONTEND_DOMAIN")}/auth/sign-up?accountType=private&orgId=${id}`;
 
+      const currentEmails = organization.availableEmails;
+      const newEmails = [];
+  
       for (const email of updateOrganizationDto.availableEmails) {
-        await this.mailService.sendInvitation(email, invitationLink);
+        if (!currentEmails.includes(email)) {
+          newEmails.push(email);
+        }
+      }
+
+      if (newEmails.length > 0) {
+        for (const email of updateOrganizationDto.availableEmails) {
+          await this.mailService.sendInvitation(email, invitationLink);
+        }
       }
     }
 

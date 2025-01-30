@@ -85,6 +85,8 @@ export class UserLicenseService {
     // send invitations if available emails
     // send for new emails
     if (updateUserLicenseDto.availableEmails) {
+      const invitationLink = `${this.configService.get("FRONTEND_DOMAIN")}/auth/sign-up?accountType=private&lId=${id}`;
+
       const currentEmails = license.availableEmails;
       const newEmails = [];
   
@@ -94,9 +96,7 @@ export class UserLicenseService {
         }
       }
       
-      const invitationLink = `${this.configService.get("FRONTEND_DOMAIN")}/auth/sign-up?accountType=private&lId=${id}`;
-      
-      if (newEmails.length !== 0) {
+      if (newEmails.length > 0) {
         for (const email of newEmails) {
           await this.mailService.sendInvitation(email, invitationLink);
         }
