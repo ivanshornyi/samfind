@@ -176,7 +176,7 @@ model Discount {
   startAmount      Float            @default(0)
   endAmount        Float            @default(0)
   used             Boolean          @default(false)
-  stripeCouponId   String
+  stripeCouponId   String?
   discountsIncomes DiscountIncome[]
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt

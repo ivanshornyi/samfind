@@ -3,9 +3,9 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-
+import { addMonths, addYears, startOfMonth } from "date-fns";
 import { PrismaService } from "../prisma/prisma.service";
-import { PlanType, LicenseStatus } from "@prisma/client";
+import { PlanPeriod } from "@prisma/client";
 import { StripeService } from "../stripe/stripe.service";
 import { AddSubscriptionDto } from "./dto/add-subscription-dto";
 
@@ -42,9 +42,86 @@ export class SubscriptionService {
 
     if (!license || !plan) throw new NotFoundException("License not found");
 
+    let discountId = undefined;
+
     const stripeCustomer = await this.stripeService.createCustomer(
       user.email,
       user.firstName + " " + user.lastName,
     );
+
+    if (discount) {
+      const stripeDiscount = await this.stripeService.createCoupon(
+        discount.amount,
+      );
+      discountId = stripeDiscount.id;
+      await this.addDiscount(
+        userId,
+        discount.amount,
+        discount.description,
+        discountId,
+      );
+    }
+
+    const nextDate =
+      plan.period === PlanPeriod.monthly
+        ? startOfMonth(addMonths(new Date(), 1))
+        : startOfMonth(addYears(new Date(), 1));
+
+    const subscription = await this.prisma.subscription.create({
+      data: {
+        userId,
+        licenseId: license.id,
+        planId: plan.id,
+        isActive: false,
+        isInTrial: false,
+        nextDate,
+      },
+    });
+
+    const invoice = await this.stripeService.createAndPayInvoice({
+      customerId: stripeCustomer.id,
+      priceId: plan.stripePriceId,
+      quantity,
+      couponId: discountId,
+      description: "Description rdfgfdgfgdfsgfdg",
+      subscriptionId: subscription.id,
+    });
+
+    // const session = await this.stripeService.createPaymentSession({
+    //   customerId: stripeCustomer.id,
+    //   priceId: plan.stripePriceId,
+    //   quantity,
+    //   discountId,
+    //   description: "Description rdfgfdgfgdfsgfdg",
+    //   subscriptionId: subscription.id,
+    // });
+
+    // console.log("session", session);
+
+    return { url: invoice.hosted_invoice_url };
+  }
+
+  async addDiscount(
+    userId: string,
+    amount: number,
+    description: string,
+    discountId?: string,
+  ) {
+    const discount = await this.prisma.discount.create({
+      data: {
+        userId,
+        endAmount: amount,
+        stripeCouponId: discountId,
+      },
+    });
+
+    await this.prisma.discountIncome.create({
+      data: {
+        userId,
+        amount,
+        discountId: discount.id,
+        description,
+      },
+    });
   }
 }

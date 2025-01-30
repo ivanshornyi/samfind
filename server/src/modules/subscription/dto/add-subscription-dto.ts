@@ -24,7 +24,7 @@ export class AddSubscriptionDto {
   @IsString()
   licenseId: string;
 
-  @IsString()
+  @IsNumber()
   quantity: number;
 
   @IsOptional()

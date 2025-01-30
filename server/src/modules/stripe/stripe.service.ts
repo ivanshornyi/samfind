@@ -16,6 +16,7 @@ interface ICreatePaymentSession {
   customerId: string;
   priceId: string;
   quantity: number;
+  subscriptionId: string;
   description?: string;
   discountId?: string;
 }
@@ -33,6 +34,7 @@ interface ICreateAndPayInvoice {
   priceId: string;
   quantity: number;
   description: string;
+  subscriptionId: string;
   couponId?: string;
 }
 
@@ -83,6 +85,7 @@ export class StripeService {
     priceId,
     quantity,
     description,
+    subscriptionId,
     discountId,
   }: ICreatePaymentSession) => {
     if (discountId) {
@@ -98,13 +101,16 @@ export class StripeService {
           quantity,
         },
       ],
-      allow_promotion_codes: discountId ? true : undefined,
+      // allow_promotion_codes: discountId ? true : undefined,
       invoice_creation: {
         enabled: true,
+        invoice_data: {
+          metadata: {
+            subscriptionId,
+          },
+        },
       },
-      // discounts: discountId
-      //   ? [{ coupon: discountId }]
-      //   : undefined,
+      discounts: discountId ? [{ coupon: discountId }] : undefined,
       customer: customerId,
       mode: "payment",
       payment_intent_data: {
@@ -114,7 +120,7 @@ export class StripeService {
       success_url: "http://localhost:3000/",
       cancel_url: "http://localhost:3000/",
     });
-    return { url: session.url };
+    return session;
   };
 
   async createInvoiceItem({
@@ -139,10 +145,13 @@ export class StripeService {
     quantity,
     description,
     couponId,
+    subscriptionId,
   }: ICreateAndPayInvoice) {
     const invoice = await this.stripe.invoices.create({
       customer: customerId,
       description,
+      metadata: { subscriptionId },
+      currency: "usd",
       collection_method: "charge_automatically",
     });
 
@@ -165,9 +174,11 @@ export class StripeService {
 
     await this.stripe.invoices.finalizeInvoice(invoice.id);
 
-    const invoiceStatus = await this.stripe.invoices.retrieve(invoice.id);
+    const retrieveInvoice = await this.stripe.invoices.retrieve(invoice.id);
 
-    console.log(invoiceStatus.status);
+    console.log(retrieveInvoice);
+
+    return retrieveInvoice;
   }
 
   async createPaymentIntent(
