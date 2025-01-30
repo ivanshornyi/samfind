@@ -8,13 +8,13 @@ services:
       - '--api.insecure=true'
       - '--providers.docker=true'
       - '--providers.docker.exposedbydefault=false'
+      - '--entryPoints.web.address=:80'
       - '--entryPoints.websecure.address=:443'
-      - '--certificatesresolvers.myresolver.acme.tlschallenge=true'
+      - '--certificatesresolvers.myresolver.acme.httpchallenge=true'
+      - '--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web'
       - '--certificatesresolvers.myresolver.acme.email=nazarii2314@gmail.com'
       - '--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json'
-      - '--entrypoints.web.address=:80'
-      - '--entrypoints.web.http.redirections.entrypoint.to=websecure'
-      - '--entrypoints.web.http.redirections.entrypoint.scheme=https'
+      - '--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory'
     ports:
       - '80:80'
       - '443:443'
@@ -36,7 +36,7 @@ services:
     image: nazarii2314/samfind-admin:latest
     platform: linux/arm64
     deploy:
-      replicas: 3
+      # replicas: 3
       restart_policy:
         condition: on-failure
         max_attempts: 3
@@ -64,7 +64,7 @@ services:
     image: nazarii2314/samfind-client:latest
     platform: linux/arm64
     deploy:
-      replicas: 3
+      # replicas: 3
       restart_policy:
         condition: on-failure
         max_attempts: 3
@@ -93,7 +93,7 @@ services:
     image: nazarii2314/samfind-server:latest
     platform: linux/arm64
     deploy:
-      replicas: 3
+      # replicas: 3
       restart_policy:
         condition: on-failure
         max_attempts: 3
@@ -106,7 +106,7 @@ services:
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.services.server.loadbalancer.server.port=4000'
-      - 'traefik.http.routers.server.rule=Host(`api.onsio.io`)'
+      - 'traefik.http.routers.server.rule=Host(`www.onsio.io`) && PathPrefix(`/api`)'
       - 'traefik.http.routers.server.entrypoints=websecure'
       - 'traefik.http.routers.server.tls.certresolver=myresolver'
     networks:
