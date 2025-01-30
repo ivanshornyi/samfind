@@ -17,7 +17,7 @@ export class PlanService {
     let stripeProductId = undefined;
 
     if (type !== PlanType.free) {
-      const planName = "plan" + type + "-" + period;
+      const planName = "plan-" + type + "-" + period;
       const description = "price" + price / 100 + "$";
       const product = await this.stripeService.createProduct(
         planName,

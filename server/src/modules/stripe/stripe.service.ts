@@ -99,6 +99,9 @@ export class StripeService {
         },
       ],
       allow_promotion_codes: discountId ? true : undefined,
+      invoice_creation: {
+        enabled: true,
+      },
       // discounts: discountId
       //   ? [{ coupon: discountId }]
       //   : undefined,

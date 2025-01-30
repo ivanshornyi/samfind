@@ -4,7 +4,7 @@ import {
   MiddlewareConsumer,
   RequestMethod,
 } from "@nestjs/common";
-
+import { ScheduleModule } from "@nestjs/schedule";
 import { PrismaModule } from "nestjs-prisma";
 
 import { ConfigModule } from "@nestjs/config";
@@ -19,10 +19,12 @@ import { StripeModule } from "./modules/stripe/stripe.module";
 import { OrganizationModule } from "./modules/organization/organization.module";
 import { LicenseVerificationModule } from "./modules/license-verification/license-verification.module";
 import { PlanModule } from "./modules/plan/plan.module";
+import { SubscriptionModule } from "./modules/subscription/subscription.module";
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ScheduleModule.forRoot(),
     PrismaModule,
     AuthModule,
     UserModule,
@@ -32,6 +34,7 @@ import { PlanModule } from "./modules/plan/plan.module";
     OrganizationModule,
     LicenseVerificationModule,
     PlanModule,
+    SubscriptionModule,
   ],
   controllers: [],
   providers: [],

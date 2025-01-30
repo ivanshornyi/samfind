@@ -56,7 +56,9 @@ export class UserLicenseService {
         },
       },
     });
-    if (!license) return null;
+
+    if (!license) throw new NotFoundException("User not found");
+
     return {
       id: license.id,
       limit: license.limit,
