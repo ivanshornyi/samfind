@@ -100,7 +100,8 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=4000
-    command: ['node', 'dist/main']
+      - DATABASE_URL=${DATABASE_URL}
+    command: ['npm', 'run', 'start:migrate:prod']
     env_file:
       - ./server/.env
     labels:

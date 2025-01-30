@@ -6,6 +6,7 @@ RUN npm install --legacy-peer-deps
 
 COPY . .
 
+# Generate Prisma Client
 RUN npx prisma generate
 
 # Build the project
@@ -19,6 +20,11 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/package.json ./package.json
 
+# Add a script to handle database migrations and startup
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 EXPOSE 3000
 
-CMD ["node", "dist/main.js"]
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["npm", "run", "start:prod"]
