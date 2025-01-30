@@ -1,4 +1,13 @@
-import { Get, Post, Patch, Controller, Param, Body } from "@nestjs/common";
+import {
+  Get,
+  Post,
+  Patch,
+  Controller,
+  Param,
+  Body,
+  Headers,
+  UnauthorizedException,
+} from "@nestjs/common";
 
 import { UserLicenseService } from "./user-license.service";
 
@@ -6,11 +15,17 @@ import { ApiTags, ApiOperation } from "@nestjs/swagger";
 
 import { AddUserLicenseDto } from "./dto/add-user-license-dto";
 import { UpdateUserLicenseDto } from "./dto/update-user-license-dto";
+import { CheckDeviceDto } from "./dto/check-device-dto";
+import { ConfigService } from "@nestjs/config";
+import { EXCEPTION } from "src/common/constants/exception.constant";
 
 @ApiTags("User License")
 @Controller("user-license")
 export class UserLicenseController {
-  constructor (private readonly licenseService: UserLicenseService) {}
+  constructor(
+    private readonly licenseService: UserLicenseService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @ApiOperation({ summary: "Add license to user" })
   @Post("/")
@@ -33,9 +48,21 @@ export class UserLicenseController {
   @ApiOperation({ summary: "Update user license" })
   @Patch("/:id")
   async updateLicense(
-    @Param("id") id: string, 
-    @Body() updateUserLicenseDto: UpdateUserLicenseDto
+    @Param("id") id: string,
+    @Body() updateUserLicenseDto: UpdateUserLicenseDto,
   ) {
     return this.licenseService.update(id, updateUserLicenseDto);
+  }
+
+  @ApiOperation({ summary: "Check the device for license connected" })
+  @Post("/device")
+  async checkDevice(
+    @Headers("authorization") authHeader: string,
+    @Body() checkDeviceDto: CheckDeviceDto,
+  ) {
+    const secret = this.configService.get("DEVICE_SECRET");
+    if ("Bearer " + secret !== authHeader)
+      throw new UnauthorizedException(EXCEPTION.INVALID_TOKEN);
+    return await this.licenseService.checkDevice(checkDeviceDto);
   }
 }
