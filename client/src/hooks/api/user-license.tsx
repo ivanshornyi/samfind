@@ -32,6 +32,7 @@ export const useGetUserLicense = (id: string) => {
   return useQuery({
     queryFn: () => UserLicenseApiService.getUserLicense(id),
     queryKey: ["user-license"],
+    enabled: !!id,
   });
 };
 
