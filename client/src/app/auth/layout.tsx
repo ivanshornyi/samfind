@@ -2,9 +2,9 @@
 
 import React, { useContext, useEffect } from "react";
 
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { AuthContext } from "@/context";
 
@@ -12,7 +12,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import { ArrowLeftIcon } from "lucide-react";
 
-import { Logo, BgVioletEllipse } from "@public/images";
+import { BgVioletEllipse, Logo } from "@public/images";
 
 const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string;
 
@@ -37,7 +37,7 @@ export default function AuthLayout({
           src={BgVioletEllipse}
           alt="ellipse"
           priority
-          className="absolute left-0 top-0 z-0 w-[60%]"
+          className="absolute left-0 top-0 z-[-1] w-[60%]"
         />
 
         <Link href="/" className="fixed top-6 left-5 flex items-center gap-3">
@@ -45,11 +45,9 @@ export default function AuthLayout({
           <span>Back</span>
         </Link>
 
-        <div className="pt-12">
-          <Link href="/">
-            <Image src={Logo} alt="logo" className="w-24 h-6.5" />
-          </Link>
-        </div>
+        <Link href="/" className="py-12 cursor-pointer">
+          <Image src={Logo} alt="logo" className="w-24 h-6.5" />
+        </Link>
 
         <div className="flex items-center justify-center relative z-10">
           {children}

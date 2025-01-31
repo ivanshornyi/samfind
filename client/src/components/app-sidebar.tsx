@@ -60,8 +60,7 @@ export const AppSidebar = () => {
             <SidebarMenu className="space-y-4">
               {NAVIGATION_ITEMS.map((item, index) => {
                 const isActive = pathname === item.path;
-                const condition =
-                  user && (user.licenseId || user?.organizationId);
+                const condition = user;
 
                 return condition || index === 0 ? (
                   <SidebarMenuItem key={item.title}>

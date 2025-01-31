@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { useGetUserLicenses, useToast } from "@/hooks";
 import {
@@ -23,16 +23,16 @@ import {
 
 import {
   Button,
-  Input,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Input,
 } from "@/components";
 
 import { ReusableTable } from "@/components/table";
-import { InviteMember, ProgressChart } from "./_components";
 import { AuthContext } from "@/context";
+import { InviteMember, ProgressChart } from "./_components";
 
 import { ArrowUpDown, Copy, Info, MoreHorizontal, Search } from "lucide-react";
 
