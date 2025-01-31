@@ -255,9 +255,9 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
     // });
 
     // let signUpData: SignUpData = {
-    //   firstName: user.fir,
-    //   lastName: formData.lastName.trim(),
-    //   email: formData.email.trim(),
+    //   firstName: user.first_name,
+    //   lastName: user.last_name,
+    //   email: user.email,
     //   password: formData.password.trim(),
     //   authType: UserAuthType.Email,
     //   accountType,
@@ -265,7 +265,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
 
     // if (referralCode) {
     //   signUpData = {
-    //     ...signUpData,
+    //     ...signUpData, 
     //     invitedReferralCode: Number(referralCode),
     //   }
     // }

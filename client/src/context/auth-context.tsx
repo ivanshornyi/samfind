@@ -4,6 +4,8 @@ import React, { useState, useCallback, useEffect } from "react";
 
 import { useRouter } from "next/navigation";
 
+import { useQueryClient } from "@tanstack/react-query";
+
 import { User } from "@/types";
 
 import { UserApiService } from "@/services";
@@ -38,6 +40,7 @@ export const AuthContextProvider = ({
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [userLoading, setUserLoading] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const queryClient = useQueryClient();
 
   const logout = useCallback(() => {
     setAccessToken(null);
@@ -45,6 +48,8 @@ export const AuthContextProvider = ({
     localStorage.removeItem("accessToken");
     localStorage.removeItem("expirationTime");
     localStorage.removeItem("refreshToken");
+
+    queryClient.clear();
 
     if (logoutTimer) {
       clearTimeout(logoutTimer);

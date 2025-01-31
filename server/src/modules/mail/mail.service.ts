@@ -73,7 +73,7 @@ export class MailService {
         from: configService.get("MAIL_USER"),
         to,
         subject: "Invitation from Onsio",
-        html: `<p>Invitation link<a href="${link}">${link}</a></p>`,
+        html: `<p>Invitation link <a href="${link}">${link}</a></p>`,
       };
 
       await this.transporter.sendMail(mailOptions);
