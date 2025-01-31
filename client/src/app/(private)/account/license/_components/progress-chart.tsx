@@ -15,8 +15,8 @@ export const ProgressChart = ({
   const percentage = (currentMembers / maxMembers) * 100;
 
   return (
-    <div className="flex w-[330px] h-[100px] items-center gap-4 bg-[#242424] p-4 rounded-[30px]">
-      <div className="w-[64px] h-[64px] flex items-center">
+    <div className="flex w-[330px] h-[100px] items-center gap-4 bg-[#242424] p-4 rounded-xl">
+      <div className="w-[80px] h-[80px] flex items-center">
         <CircularProgressbar
           value={percentage}
           text={`${currentMembers}/${maxMembers}`}

@@ -175,10 +175,13 @@ export const useVerifyUser = () => {
   const { toast } = useToast();
 
   const { ...mutationProps } = useMutation({
-    mutationFn: (data: { email: string, verificationCode: string, licenseId?: string, organizationId?: string, }) =>
-      AuthApiService.verifyUser(data)
-    ,
-    onSuccess: (data: { accessToken: string, refreshToken: string }) => {
+    mutationFn: (data: {
+      email: string;
+      verificationCode: string;
+      licenseId?: string;
+      organizationId?: string;
+    }) => AuthApiService.verifyUser(data),
+    onSuccess: (data: { accessToken: string; refreshToken: string }) => {
       toast({
         title: "Success",
         description: "Successfully logged in",

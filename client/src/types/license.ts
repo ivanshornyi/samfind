@@ -15,6 +15,7 @@ export interface License {
   tierType: LicenseTierType;
   count: number;
   userIds: [];
+  availableEmails: string[];
 }
 
 export interface LicenseList {

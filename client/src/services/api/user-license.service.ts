@@ -40,8 +40,25 @@ const getUserLicenses = async (userId: string) => {
   }
 };
 
+export interface UpdateUserLicenseData {
+  availableEmails: string[];
+}
+
+const updateUserLicense = async (id: string, data: UpdateUserLicenseData) => {
+  try {
+    const response = await apiClient.patch(`/user-license/${id}`, {
+      ...data,
+    });
+
+    return response;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 export const UserLicenseApiService = {
   addUserLicense,
   getUserLicense,
   getUserLicenses,
+  updateUserLicense,
 };

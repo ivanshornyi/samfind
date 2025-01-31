@@ -337,7 +337,7 @@ export class AuthService {
         throw new ConflictException("License limit is reached");
       }
 
-      if (license.availableEmails.includes(authVerificationDto.email)) {
+      if (!license.availableEmails.includes(authVerificationDto.email)) {
         throw new ConflictException("This email does not have access");
       }
 
@@ -397,7 +397,7 @@ export class AuthService {
       // create active license
       await this.prisma.activeLicense.create({
         data: {
-          licenseId: authVerificationDto.licenseId,
+          licenseId: license.id,
           userId: user.id,
         },
       });

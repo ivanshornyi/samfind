@@ -40,7 +40,7 @@ export const LicensingOptionCard = ({
           </div>
           <div className="w-[90px] flex flex-col gap-1">
             <label>Users limit</label>
-            <Input 
+            <Input
               type="number"
               step="1"
               min={1}
@@ -59,17 +59,17 @@ export const LicensingOptionCard = ({
         variant={option.buttonVariant}
         className={`w-full mb-10 border-none ${isLarge ? 'py-[13px]' : ''}`}
       > */}
-        <div className="py-3">
-          <PaymentsModal 
-            amount={Number((Number(option.price.toFixed(2)) * 100).toFixed())} 
-            currency="USD"
-            license={{
-              tierType: option.tierType,
-              usersLimit,
-            }} 
-            buttonText={option.buttonText}
-          />
-        </div>
+      <div className="py-3">
+        <PaymentsModal
+          amount={Number((Number(option.price.toFixed(2)) * 100).toFixed())}
+          currency="USD"
+          license={{
+            tierType: option.tierType,
+            usersLimit,
+          }}
+          buttonText={option.buttonText}
+        />
+      </div>
       {/* </Button> */}
 
       <ul className="space-y-[10px]">

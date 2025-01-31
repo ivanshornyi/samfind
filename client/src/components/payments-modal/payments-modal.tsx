@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 
 import { AuthContext } from "@/context";
 
@@ -12,12 +12,12 @@ import { LicenseTierType } from "@/types";
 
 import {
   AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
   AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogDescription,
+  AlertDialogTrigger,
   Button,
 } from "@/components";
 import { PaymentsForm } from "./payments-form";
@@ -34,7 +34,7 @@ const stripePromise = loadStripe(stripePublishableKey as string);
 interface PaymentsModalProps {
   amount: number;
   currency: string;
-  license: { tierType: LicenseTierType; usersLimit: number; };
+  license: { tierType: LicenseTierType; usersLimit: number };
   buttonText: string;
 }
 
@@ -95,7 +95,9 @@ export const PaymentsModal: React.FC<PaymentsModalProps> = ({
 
         <AlertDialogHeader className="flex">
           <div>
-            <AlertDialogTitle className="text-black text-xl">Payments</AlertDialogTitle>
+            <AlertDialogTitle className="text-black text-xl">
+              Payments
+            </AlertDialogTitle>
             <AlertDialogDescription className="text-black">
               Enter your credentials
             </AlertDialogDescription>

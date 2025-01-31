@@ -11,5 +11,5 @@ export class UpdateOrganizationDto {
 
   @IsArray()
   @IsOptional()
-  availableEmails?: string[]; 
+  availableEmails?: string[];
 }

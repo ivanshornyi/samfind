@@ -52,6 +52,7 @@ model User {
   accountType               UserAccountType  @default(private)
   organizationId            String?
   licenseId                 String?
+  createdAt                 DateTime         @default(now())
   organization              Organization?    @relation(fields: [organizationId], references: [id])
   UserReferral              UserReferral[]
   License                   License[]
@@ -105,7 +106,7 @@ model ActiveLicense {
 
 model UserReferral {
   id             String   @id @default(uuid())
-  user           User     @relation(fields: [userId], references: [id])
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   invitedUserIds String[] @default([])
   referralCode   Float    @unique
   createdAt      DateTime @default(now())

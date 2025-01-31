@@ -38,29 +38,32 @@ const NAVIGATION_ITEMS = [
   },
   {
     title: "Billing data",
-    path: "/",
+    path: "/account/billing-data",
     icon: CreditCard,
   },
 ];
 
-export function AppSidebar() {
+export const AppSidebar = () => {
+  const { user } = useContext(AuthContext);
   const pathname = usePathname();
 
   return (
-    <Sidebar className="py-8 border-secondary">
-      <SidebarHeader className="px-4 h-[60px] mb-6">
+    <Sidebar className="py-8 border-secondary bg-background">
+      <SidebarHeader className="px-4 h-[60px] bg-background">
         <Link href="/">
           <Image src={Logo} width={110} height={40} alt="Logo" />
         </Link>
       </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup className="">
+      <SidebarContent className="bg-background">
+        <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-4">
-              {NAVIGATION_ITEMS.map((item) => {
+              {NAVIGATION_ITEMS.map((item, index) => {
                 const isActive = pathname === item.path;
+                const condition =
+                  user && (user.licenseId || user?.organizationId);
 
-                return (
+                return condition || index === 0 ? (
                   <SidebarMenuItem key={item.title}>
                     <Link href={item.path}>
                       <Button
@@ -71,21 +74,21 @@ export function AppSidebar() {
                           />
                         }
                         className={`
-                        ${isActive && "bg-[#302935] text-white"}
-                        w-full flex justify-start items-center
-                      `}
+                          ${isActive && "bg-[#302935] text-white"}
+                          w-full flex justify-start items-center
+                        `}
                       >
                         <span>{item.title}</span>
                       </Button>
                     </Link>
                   </SidebarMenuItem>
-                );
+                ) : null;
               })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="space-y-4 px-4">
+      <SidebarFooter className="space-y-4 px-4 bg-background">
         <Link href="/account/settings">
           <Button
             variant="menuItem"
@@ -104,4 +107,4 @@ export function AppSidebar() {
       </SidebarFooter>
     </Sidebar>
   );
-}
+};

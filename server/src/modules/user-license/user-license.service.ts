@@ -1,7 +1,9 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 
 import { PrismaService } from "../prisma/prisma.service";
 import { License, LicenseStatus } from "@prisma/client";
+import { MailService } from "../mail/mail.service";
 
 import { AddUserLicenseDto } from "./dto/add-user-license-dto";
 import { UpdateUserLicenseDto } from "./dto/update-user-license-dto";
@@ -9,7 +11,11 @@ import { CheckDeviceDto } from "./dto/check-device-dto";
 
 @Injectable()
 export class UserLicenseService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mailService: MailService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async addLicense(createUserLicenseDto: AddUserLicenseDto) {
     const userLicense = await this.prisma.license.create({
@@ -58,7 +64,7 @@ export class UserLicenseService {
     });
 
     if (!license) throw new NotFoundException("User not found");
-
+    
     return {
       id: license.id,
       limit: license.limit,
@@ -72,12 +78,39 @@ export class UserLicenseService {
   }
 
   async update(id: string, updateUserLicenseDto: UpdateUserLicenseDto) {
-    return await this.prisma.license.update({
-      where: { id },
+    const license = await this.prisma.license.findUnique({
+      where: { id },  
+    });
+
+    // send invitations if available emails
+    // send for new emails
+    if (updateUserLicenseDto.availableEmails) {
+      const invitationLink = `${this.configService.get("FRONTEND_DOMAIN")}/auth/sign-up?accountType=private&lId=${id}`;
+
+      const currentEmails = license.availableEmails;
+      const newEmails = [];
+  
+      for (const email of updateUserLicenseDto.availableEmails) {
+        if (!currentEmails.includes(email)) {
+          newEmails.push(email);
+        }
+      }
+      
+      if (newEmails.length > 0) {
+        for (const email of newEmails) {
+          await this.mailService.sendInvitation(email, invitationLink);
+        }
+      }
+    }
+
+    const newLicense = await this.prisma.license.update({
+      where: { id },  
       data: {
         ...updateUserLicenseDto,
       },
     });
+    
+    return newLicense;
   }
 
   async checkDevice({ email, computer_id: deviceId }: CheckDeviceDto) {

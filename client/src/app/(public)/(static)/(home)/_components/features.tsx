@@ -35,7 +35,9 @@ const features = [
 export const Features = () => {
   return (
     <div className="mt-20 sm:mt-[120px]">
-      <h2 className="text-2xl lg:text-[40px] font-semibold mb-[30px] sm:mb-[50px]">Unlock Features</h2>
+      <h2 className="text-2xl lg:text-[40px] font-semibold mb-[30px] sm:mb-[50px]">
+        Unlock Features
+      </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-[20px]">
         {features.map((feature, index) => (
