@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 
 import { AuthContext } from "@/context";
 
@@ -12,12 +12,12 @@ import { LicenseTierType } from "@/types";
 
 import {
   AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
   AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogDescription,
+  AlertDialogTrigger,
   Button,
 } from "@/components";
 import { PaymentsForm } from "./payments-form";
