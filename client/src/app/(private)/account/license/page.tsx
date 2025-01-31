@@ -249,7 +249,7 @@ export default function License() {
   });
 
   return (
-    <div className="mx-auto w-[1000px]">
+    <div className="mx-auto max-w-[1000px]">
       <div className="w-full">
         <h2 className="text-[32px] leading-[44px] font-semibold">
           License management

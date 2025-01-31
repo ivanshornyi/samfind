@@ -20,7 +20,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 
 import { GoogleIcon } from "@public/icons";
-import { EyeIcon, EyeOff } from "lucide-react";
+import { EyeIcon, EyeOff, Info } from "lucide-react";
 
 interface AuthFormProps {
   authPageType: "signIn" | "signUp" | "resetPassword";
@@ -292,7 +292,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
 
   return (
     <>
-      <div className="w-full max-w-[591px] mx-auto border-[1px] border-violet-100 rounded-[30px] p-4 sm:p-8">
+      <div className="w-[591px] border-[1px] border-violet-100 rounded-[30px] p-8">
         {authPageType === "signUp" && (
           <ul>
             {ACCOUNT_TYPE_CARD_ITEMS.map((item) => {
@@ -300,10 +300,9 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                 <li
                   key={item.type}
                   className="
-                    capitalize text-violet-50 font-semibold bg-background 
-                    rounded-full px-4 sm:px-6 py-2 w-full sm:w-[208px] 
-                    flex items-center justify-center gap-2
-                    [&>svg]:w-3 sm:[&>svg]:w-3.5 [&>svg]:h-3 sm:[&>svg]:h-3.5
+                    capitalize text-violet-50 font-semibold bg-background
+                    rounded-full px-6 py-2 w-[208px] flex items-center justify-center gap-2
+                    [&>svg]:w-3.5 [&>svg]:h-3.5
                   "
                 >
                   {item.icon}
@@ -315,17 +314,21 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
         )}
 
         <form onSubmit={handleAuthFormSubmit} className="mt-4">
-          <h2 className="font-semibold text-2xl sm:text-3xl">
-            {formTitle[authPageType]}
-          </h2>
-          <p className="mt-2 sm:mt-4 text-base sm:text-lg">
-            {formDescription[authPageType]}
-          </p>
+          <h2 className="font-semibold text-3xl">{formTitle[authPageType]}</h2>
+          <p className="mt-4 text-lg">{formDescription[authPageType]}</p>
+          {authPageType === "signUp" && referralCode && (
+            <div className="my-4 flex items-center gap-2 bg-[#363637] rounded-2xl px-4 py-2">
+              <Info color="#BEB8FF" />
+              <p className="text-[#BEB8FF]">
+                You&apos;ve got a 10% discount via referral link!
+              </p>
+            </div>
+          )}
 
-          <div className="mt-6 sm:mt-8 flex flex-col gap-2">
+          <div className="mt-8 flex flex-col gap-2">
             {authPageType === "signUp" && (
               <>
-                <div className="flex flex-col sm:flex-row gap-2">
+                <div className="flex gap-2">
                   <Input
                     id="firstName"
                     name="firstName"
@@ -473,7 +476,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                 </div>
                 <button
                   className="
-                    py-2.5 sm:py-3 bg-white flex items-center gap-2 justify-center text-black 
+                    py-2.5 bg-white flex items-center gap-2 justify-center text-black 
                     rounded-full relative z-0
                   "
                 >
@@ -498,7 +501,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
           )}
 
           {authPageType === "signIn" && (
-            <p className="text-xs sm:text-sm text-center mt-3">
+            <p className="text-sm text-center mt-3">
               <span>Not a member yet? </span>
               <Link
                 href="/auth/account-type"
@@ -510,7 +513,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
           )}
 
           {authPageType === "signUp" && (
-            <p className="text-xs sm:text-sm text-center mt-3">
+            <p className="text-sm text-center mt-3">
               <span>Already have an account? </span>
               <Link
                 href="/auth/sign-in"

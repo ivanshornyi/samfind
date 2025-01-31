@@ -45,7 +45,7 @@ export default function AuthLayout({
           <span>Back</span>
         </Link>
 
-        <Link href="/" className="py-12 cursor-pointer">
+        <Link href="/" className="pt-12 cursor-pointer">
           <Image src={Logo} alt="logo" className="w-24 h-6.5" />
         </Link>
 
