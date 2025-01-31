@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 
 import { PrismaService } from "../prisma/prisma.service";
-import { PlanType, LicenseStatus } from "@prisma/client";
+import { LicenseStatus, LicenseTierType } from "@prisma/client";
 import { StripeService } from "../stripe/stripe.service";
 import { CreatePlanDto } from "./dto/create-plan-dto";
 
@@ -16,7 +16,7 @@ export class PlanService {
     let stripePriceId = undefined;
     let stripeProductId = undefined;
 
-    if (type !== PlanType.free) {
+    if (type !== LicenseTierType.freemium) {
       const planName = "plan-" + type + "-" + period;
       const description = "price" + price / 100 + "$";
       const product = await this.stripeService.createProduct(

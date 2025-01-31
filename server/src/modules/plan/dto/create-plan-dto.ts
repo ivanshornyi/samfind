@@ -1,14 +1,14 @@
 import { IsNumber, IsString, IsEnum } from "class-validator";
 
-import { PlanType, PlanPeriod } from "@prisma/client";
+import { LicenseTierType, PlanPeriod } from "@prisma/client";
 
 export class CreatePlanDto {
   @IsNumber()
   price: number;
 
-  @IsEnum(PlanType)
+  @IsEnum(LicenseTierType)
   @IsString()
-  type: PlanType;
+  type: LicenseTierType;
 
   @IsEnum(PlanPeriod)
   @IsString()

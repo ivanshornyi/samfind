@@ -24,8 +24,12 @@ export class AddSubscriptionDto {
   @IsString()
   licenseId: string;
 
-  @IsString()
+  @IsNumber()
   quantity: number;
+
+  @IsNumber()
+  @IsOptional()
+  userReferralCode?: number;
 
   @IsOptional()
   @ValidateNested()

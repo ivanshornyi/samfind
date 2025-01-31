@@ -11,7 +11,13 @@ export class SubscriptionController {
 
   @ApiOperation({ summary: "Add Subscription" })
   @Post("/")
-  async addLicense(@Body() addSubscriptionDto: AddSubscriptionDto) {
+  async addSubscription(@Body() addSubscriptionDto: AddSubscriptionDto) {
     return this.subscriptionService.addSubscription(addSubscriptionDto);
+  }
+
+  @ApiOperation({ summary: "Test Pay Invoice" })
+  @Post("/invoice")
+  async payInvoice() {
+    return this.subscriptionService.payInvoice();
   }
 }

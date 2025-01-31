@@ -44,8 +44,8 @@ export class UserService {
   }
 
   async findAndUpdateUserByReferralCode(
-    referralCode: number, 
-    newUserId: string,
+    referralCode: number,
+    newUser: User,
     discountNumber: number,
   ) {
     const user = await this.prisma.user.findUnique({
@@ -56,24 +56,51 @@ export class UserService {
       throw new NotFoundException("User not found");
     }
 
-    if (user.discount < 50) {
-      await this.prisma.user.update({
-        where: { id: user.id },
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        discount: user.discount + discountNumber,
+      },
+    });
+
+    let discount = await this.prisma.discount.findFirst({
+      where: { userId: user.id, used: false, stripeCouponId: null },
+    });
+
+    if (discount) {
+      await this.prisma.discount.update({
+        where: { id: discount.id },
         data: {
-          discount: user.discount + discountNumber,
+          endAmount: discountNumber + discountNumber,
+        },
+      });
+    } else {
+      discount = await this.prisma.discount.create({
+        data: {
+          userId: user.id,
+          endAmount: discountNumber,
         },
       });
     }
+
+    await this.prisma.discountIncome.create({
+      data: {
+        userId: user.id,
+        amount: discountNumber,
+        discountId: discount.id,
+        description: `Income from referral Registration on email ${newUser.email}`,
+      },
+    });
 
     const userReferral = await this.prisma.userReferral.findUnique({
       where: { userId: user.id },
     });
 
     const referralUserIds = userReferral.invitedUserIds;
-    referralUserIds.push(newUserId);
+    referralUserIds.push(newUser.id);
 
     await this.prisma.userReferral.update({
-      where: { 
+      where: {
         userId: user.id,
       },
       data: {
@@ -87,7 +114,7 @@ export class UserService {
       where: {
         id: {
           in: ids,
-        }
+        },
       },
       select: {
         id: true,
@@ -120,13 +147,16 @@ export class UserService {
       data: {
         userId: user.id,
         referralCode,
-      }
+      },
     });
 
     return user;
   }
 
-  async findUserByEmail(email: string, authType: UserAuthType): Promise<User | null> {
+  async findUserByEmail(
+    email: string,
+    authType: UserAuthType,
+  ): Promise<User | null> {
     const user = await this.prisma.user.findFirst({
       where: {
         email,
@@ -137,7 +167,11 @@ export class UserService {
     return user;
   }
 
-  async updateUser(id: string, updateUserDto: UpdateUserDto, resetPassword?: boolean): Promise<User> {
+  async updateUser(
+    id: string,
+    updateUserDto: UpdateUserDto,
+    resetPassword?: boolean,
+  ): Promise<User> {
     const user = await this.prisma.user.findUnique({
       where: { id },
     });
@@ -150,7 +184,7 @@ export class UserService {
       updateUserDto.password = this.hashPassword(updateUserDto.password);
     }
 
-    const updatedUser = await this.prisma.user.update({ 
+    const updatedUser = await this.prisma.user.update({
       where: { id },
       data: updateUserDto,
     });

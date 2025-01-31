@@ -6,16 +6,19 @@ import {
   LicenseTierType,
   UserAccountType,
   LicenseStatus,
+  PlanPeriod,
 } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { UserService } from "../user/user.service";
 
 import { CreateIntentDto } from "./dto/create-intent-dto";
+import { addMonths, addYears, startOfMonth } from "date-fns";
 
 interface ICreatePaymentSession {
   customerId: string;
   priceId: string;
   quantity: number;
+  subscriptionId: string;
   description?: string;
   discountId?: string;
 }
@@ -33,7 +36,9 @@ interface ICreateAndPayInvoice {
   priceId: string;
   quantity: number;
   description: string;
+  metadata: { [key: string]: string | number };
   couponId?: string;
+  pay?: boolean;
 }
 
 @Injectable()
@@ -83,6 +88,7 @@ export class StripeService {
     priceId,
     quantity,
     description,
+    subscriptionId,
     discountId,
   }: ICreatePaymentSession) => {
     if (discountId) {
@@ -98,13 +104,16 @@ export class StripeService {
           quantity,
         },
       ],
-      allow_promotion_codes: discountId ? true : undefined,
+      // allow_promotion_codes: discountId ? true : undefined,
       invoice_creation: {
         enabled: true,
+        invoice_data: {
+          metadata: {
+            subscriptionId,
+          },
+        },
       },
-      // discounts: discountId
-      //   ? [{ coupon: discountId }]
-      //   : undefined,
+      discounts: discountId ? [{ coupon: discountId }] : undefined,
       customer: customerId,
       mode: "payment",
       payment_intent_data: {
@@ -114,7 +123,7 @@ export class StripeService {
       success_url: "http://localhost:3000/",
       cancel_url: "http://localhost:3000/",
     });
-    return { url: session.url };
+    return session;
   };
 
   async createInvoiceItem({
@@ -139,10 +148,14 @@ export class StripeService {
     quantity,
     description,
     couponId,
+    metadata,
+    pay,
   }: ICreateAndPayInvoice) {
     const invoice = await this.stripe.invoices.create({
       customer: customerId,
       description,
+      metadata,
+      currency: "usd",
       collection_method: "charge_automatically",
     });
 
@@ -164,10 +177,13 @@ export class StripeService {
       });
 
     await this.stripe.invoices.finalizeInvoice(invoice.id);
+    if (pay) {
+      await this.stripe.invoices.pay(invoice.id);
+    }
 
-    const invoiceStatus = await this.stripe.invoices.retrieve(invoice.id);
+    const retrieveInvoice = await this.stripe.invoices.retrieve(invoice.id);
 
-    console.log(invoiceStatus.status);
+    return retrieveInvoice;
   }
 
   async createPaymentIntent(
@@ -211,16 +227,98 @@ export class StripeService {
 
   async handleEvent(event: Stripe.Event) {
     switch (event.type) {
-      case "payment_intent.succeeded":
-        const paymentIntent = event.data.object;
+      case "invoice.payment_succeeded":
+        const invoice = event.data.object as Stripe.Invoice;
+        this.handleSuccessfulInvoicePayment(invoice);
+        break;
+      // case "payment_intent.succeeded":
+      //   const paymentIntent = event.data.object;
 
-        this.handleSuccessfulPayment(paymentIntent);
-        break;
-      case "identity.verification_session.created":
-        // const verificationCreated = event.data.object;
-        break;
+      //   this.handleSuccessfulPayment(paymentIntent);
+      //   break;
+      // case "identity.verification_session.created":
+      //   // const verificationCreated = event.data.object;
+      //   break;
       default:
         console.log(`Unhandled event type ${event.type}`);
+    }
+  }
+
+  private async handleSuccessfulInvoicePayment(invoice: Stripe.Invoice) {
+    try {
+      const { quantity, userReferralCode, subscriptionId, stripeCouponId } =
+        invoice.metadata;
+
+      const subscription = await this.prisma.subscription.findUnique({
+        where: { id: subscriptionId },
+        include: { plan: true, user: true },
+      });
+
+      if (!subscription) return;
+
+      if (userReferralCode) {
+        // find user and update user discount
+        this.userService.findAndUpdateUserByReferralCode(
+          Number(userReferralCode),
+          subscription.user,
+          Math.round(subscription.plan.price / 10),
+        );
+      }
+
+      if (subscription.user.accountType === UserAccountType.private) {
+        const license = await this.prisma.license.findUnique({
+          where: { ownerId: subscription.userId },
+        });
+
+        await this.prisma.license.update({
+          where: {
+            id: license.id,
+          },
+          data: {
+            limit: Number(quantity),
+            tierType: subscription.plan.type,
+          },
+        });
+      } else if (
+        subscription.user.accountType === UserAccountType.business &&
+        !subscription.licenseId
+      ) {
+        await this.prisma.license.create({
+          data: {
+            ownerId: subscription.userId,
+            status: LicenseStatus.active,
+            limit: Number(quantity),
+            tierType: subscription.plan.type,
+          },
+        });
+      }
+
+      const nextDate =
+        subscription.plan.period === PlanPeriod.monthly
+          ? startOfMonth(addMonths(new Date(), 1))
+          : startOfMonth(addYears(new Date(), 1));
+
+      if (stripeCouponId) {
+        await this.prisma.discount.updateMany({
+          where: { stripeCouponId },
+          data: {
+            used: true,
+          },
+        });
+      }
+      await this.prisma.subscription.update({
+        where: { id: subscription.id },
+        data: {
+          isActive: true,
+          isInTrial: false,
+          nextDate,
+          stripeInvoiceIds: [...subscription.stripeInvoiceIds, invoice.id],
+        },
+      });
+
+      this.logger.log(`License added for user ${subscription?.userId}`);
+    } catch (error) {
+      this.logger.error("Error adding license to user", error);
     }
   }
 
@@ -229,19 +327,21 @@ export class StripeService {
       const { userId, limit, tierType, userReferralCode, referralDiscount } =
         paymentIntent.metadata;
 
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+
+      if (!user) return;
+
       if (userReferralCode) {
         // find user and update user discount
         this.userService.findAndUpdateUserByReferralCode(
           Number(userReferralCode),
-          userId,
+          user,
           Number(referralDiscount),
         );
-
-        const user = await this.prisma.user.findUnique({
-          where: {
-            id: userId,
-          },
-        });
 
         await this.prisma.user.update({
           where: {
@@ -253,12 +353,6 @@ export class StripeService {
           },
         });
       }
-
-      const user = await this.prisma.user.findUnique({
-        where: {
-          id: userId,
-        },
-      });
 
       if (user.accountType === UserAccountType.private) {
         const license = await this.prisma.license.findUnique({
