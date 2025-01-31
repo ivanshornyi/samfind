@@ -27,6 +27,10 @@ export class AddSubscriptionDto {
   @IsNumber()
   quantity: number;
 
+  @IsNumber()
+  @IsOptional()
+  userReferralCode?: number;
+
   @IsOptional()
   @ValidateNested()
   @Type(() => DiscountDto)

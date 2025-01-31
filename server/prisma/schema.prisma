@@ -134,14 +134,9 @@ enum PlanPeriod {
   yearly
 }
 
-enum PlanType {
-  free
-  standard
-}
-
 model Plan {
   id              String         @id @default(uuid())
-  type            PlanType
+  type            LicenseTierType
   period          PlanPeriod
   price           Float
   stripeProductId String?
@@ -155,8 +150,8 @@ model Subscription {
   id               String   @id @default(uuid())
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId           String   @unique
-  license          License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
-  licenseId        String   @unique
+  license          License?  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  licenseId        String?   @unique
   plan             Plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
   planId           String   @unique
   isActive         Boolean
@@ -176,7 +171,7 @@ model Discount {
   startAmount      Float            @default(0)
   endAmount        Float            @default(0)
   used             Boolean          @default(false)
-  stripeCouponId   String?
+  stripeCouponId   String?          
   discountsIncomes DiscountIncome[]
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt

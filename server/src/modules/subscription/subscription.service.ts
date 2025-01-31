@@ -22,15 +22,16 @@ export class SubscriptionService {
     planId,
     quantity,
     discount,
+    userReferralCode,
   }: AddSubscriptionDto) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
 
     if (!user) throw new NotFoundException("User not found");
 
-    const subscriptionDb = await this.prisma.subscription.findUnique({
+    let subscription = await this.prisma.subscription.findUnique({
       where: { licenseId, userId },
     });
-    if (subscriptionDb)
+    if (subscription && subscription.isActive)
       throw new BadRequestException("Subscription already exists");
 
     const license = await this.prisma.license.findUnique({
@@ -40,7 +41,7 @@ export class SubscriptionService {
       where: { id: planId },
     });
 
-    if (!license || !plan) throw new NotFoundException("License not found");
+    if (!plan) throw new NotFoundException("Plan not found");
 
     let discountId = undefined;
 
@@ -67,36 +68,46 @@ export class SubscriptionService {
         ? startOfMonth(addMonths(new Date(), 1))
         : startOfMonth(addYears(new Date(), 1));
 
-    const subscription = await this.prisma.subscription.create({
-      data: {
-        userId,
-        licenseId: license.id,
-        planId: plan.id,
-        isActive: false,
-        isInTrial: false,
-        nextDate,
-      },
-    });
+    if (!subscription) {
+      subscription = await this.prisma.subscription.create({
+        data: {
+          userId,
+          licenseId: license?.id,
+          planId: plan.id,
+          isActive: false,
+          isInTrial: false,
+          nextDate,
+        },
+      });
+    } else {
+      subscription = await this.prisma.subscription.update({
+        where: { id: subscription.id },
+        data: {
+          userId,
+          licenseId: license?.id,
+          planId: plan.id,
+          isActive: false,
+          isInTrial: false,
+          nextDate,
+        },
+      });
+    }
+
+    const metadata = {
+      quantity,
+      userReferralCode,
+      subscriptionId: subscription.id,
+      stripeCouponId: discountId,
+    };
 
     const invoice = await this.stripeService.createAndPayInvoice({
       customerId: stripeCustomer.id,
       priceId: plan.stripePriceId,
       quantity,
       couponId: discountId,
-      description: "Description rdfgfdgfgdfsgfdg",
-      subscriptionId: subscription.id,
+      description: `Plan - ${plan.type} - ${plan.period}. Quantity - ${quantity}. ${discount ? `Discount: ${discount.amount / 100}$ - ${discount.description}.` : ""}`,
+      metadata,
     });
-
-    // const session = await this.stripeService.createPaymentSession({
-    //   customerId: stripeCustomer.id,
-    //   priceId: plan.stripePriceId,
-    //   quantity,
-    //   discountId,
-    //   description: "Description rdfgfdgfgdfsgfdg",
-    //   subscriptionId: subscription.id,
-    // });
-
-    // console.log("session", session);
 
     return { url: invoice.hosted_invoice_url };
   }
@@ -123,5 +134,19 @@ export class SubscriptionService {
         description,
       },
     });
+  }
+
+  async payInvoice() {
+    const invoice = await this.stripeService.createAndPayInvoice({
+      customerId: "cus_RgJCv0aVvMKOWq",
+      priceId: "price_1QmdQoIQ0ONDLa6i86RGvcWo",
+      quantity: 1,
+      // couponId: discountId,
+      description: "Description rdfgfdgfgdfsgfdg",
+      metadata: { subscriptionId: "cd07bf65-57be-4334-b831-e1f30b60a0b1" },
+      pay: true,
+    });
+
+    return { url: invoice.hosted_invoice_url };
   }
 }
