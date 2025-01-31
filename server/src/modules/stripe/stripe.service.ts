@@ -13,6 +13,7 @@ import { UserService } from "../user/user.service";
 
 import { CreateIntentDto } from "./dto/create-intent-dto";
 import { addMonths, addYears, startOfMonth } from "date-fns";
+import { MailService } from "../mail/mail.service";
 
 interface ICreatePaymentSession {
   customerId: string;
@@ -50,6 +51,7 @@ export class StripeService {
     private readonly configService: ConfigService,
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
+    private readonly mailService: MailService,
   ) {
     this.stripe = new Stripe(this.configService.get("STRIPE_SECRET_KEY"), {
       apiVersion: "2024-12-18.acacia",
@@ -80,6 +82,16 @@ export class StripeService {
       amount_off: amount,
       currency: "usd",
       duration: "once",
+    });
+  }
+
+  async getUserInvoices(
+    customerId: string,
+    limit: number,
+  ): Promise<Stripe.Response<Stripe.ApiList<Stripe.Invoice>>> {
+    return await this.stripe.invoices.list({
+      customer: customerId,
+      limit,
     });
   }
 
@@ -226,10 +238,14 @@ export class StripeService {
   }
 
   async handleEvent(event: Stripe.Event) {
+    const invoice = event.data.object as Stripe.Invoice;
+
     switch (event.type) {
       case "invoice.payment_succeeded":
-        const invoice = event.data.object as Stripe.Invoice;
         this.handleSuccessfulInvoicePayment(invoice);
+        break;
+      case "invoice.payment_failed":
+        this.handleFailedInvoicePayment(invoice);
         break;
       // case "payment_intent.succeeded":
       //   const paymentIntent = event.data.object;
@@ -244,10 +260,28 @@ export class StripeService {
     }
   }
 
+  private async handleFailedInvoicePayment(invoice: Stripe.Invoice) {
+    const invoiceLink = invoice.hosted_invoice_url;
+    const { subscriptionId } = invoice.metadata;
+
+    const subscription = await this.prisma.subscription.findUnique({
+      where: { id: subscriptionId },
+      include: { user: true },
+    });
+
+    await this.mailService.sendInvitation(subscription.user.email, invoiceLink);
+  }
+
   private async handleSuccessfulInvoicePayment(invoice: Stripe.Invoice) {
     try {
-      const { quantity, userReferralCode, subscriptionId, stripeCouponId } =
-        invoice.metadata;
+      const {
+        quantity,
+        userReferralCode,
+        subscriptionId,
+        stripeCouponId,
+        discountAmount,
+        memberId,
+      } = invoice.metadata;
 
       const subscription = await this.prisma.subscription.findUnique({
         where: { id: subscriptionId },
@@ -265,7 +299,14 @@ export class StripeService {
         );
       }
 
-      if (subscription.user.accountType === UserAccountType.private) {
+      if (subscription.licenseId && memberId) {
+        await this.prisma.activeLicense.create({
+          data: {
+            userId: memberId,
+            licenseId: subscription.licenseId,
+          },
+        });
+      } else if (subscription.user.accountType === UserAccountType.private) {
         const license = await this.prisma.license.findUnique({
           where: { ownerId: subscription.userId },
         });
@@ -299,28 +340,37 @@ export class StripeService {
         });
       }
 
-      const nextDate =
-        subscription.plan.period === PlanPeriod.monthly
-          ? startOfMonth(addMonths(new Date(), 1))
-          : startOfMonth(addYears(new Date(), 1));
-
-      if (stripeCouponId) {
+      if (stripeCouponId && discountAmount) {
         await this.prisma.discount.updateMany({
           where: { stripeCouponId },
           data: {
             used: true,
           },
         });
+
+        await this.prisma.user.update({
+          where: { id: subscription.user.id },
+          data: {
+            discount: subscription.user.discount - Number(discountAmount),
+          },
+        });
       }
-      await this.prisma.subscription.update({
-        where: { id: subscription.id },
-        data: {
-          isActive: true,
-          isInTrial: false,
-          nextDate,
-          stripeInvoiceIds: [...subscription.stripeInvoiceIds, invoice.id],
-        },
-      });
+
+      if (!memberId) {
+        const nextDate =
+          subscription.plan.period === PlanPeriod.monthly
+            ? startOfMonth(addMonths(new Date(), 1))
+            : startOfMonth(addYears(new Date(), 1));
+        await this.prisma.subscription.update({
+          where: { id: subscription.id },
+          data: {
+            isActive: true,
+            isInTrial: false,
+            nextDate,
+            stripeInvoiceIds: [...subscription.stripeInvoiceIds, invoice.id],
+          },
+        });
+      }
 
       this.logger.log(`License added for user ${subscription?.userId}`);
     } catch (error) {
