@@ -46,12 +46,12 @@ export default function InvitedFriends() {
   };
 
   return (
-    <div className="flex items-end gap-[55px]">
+    <div className="flex items-end gap-[55px] w-[1000px] mx-auto">
       <div className="flex flex-col">
         <h2 className="text-[32px] leading-[44px] font-semibold mb-6">
           Invite a Friend
         </h2>
-        <div className="flex gap-2 bg-[#242424] px-6 py-4 text-[#BEB8FF] font-medium text-base rounded-2xl mb-8">
+        <div className="flex gap-2 bg-[#242424] px-6 py-4 text-blue-50 font-medium text-base rounded-2xl mb-8">
           <Info />
           <div className="space-y-2">
             <p>
@@ -74,9 +74,9 @@ export default function InvitedFriends() {
             rewards!
           </h4>
           <div className="flex items-center w-full gap-4">
-            <button 
+            <button
               onClick={handleCopyReferralCodeLink}
-              className="w-full bg-[#242424] px-6 py-2 rounded-2xl flex gap-2 text-[#CE9DF3]"
+              className="w-full bg-[#242424] px-6 py-2 rounded-2xl flex gap-2 text-violet-50"
             >
               <Copy />
               <span className="text-base">http:link</span>
@@ -85,7 +85,7 @@ export default function InvitedFriends() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <SquareArrowOutUpRight className="text-[#CE9DF3]" />
+                  <SquareArrowOutUpRight className="text-violet-50" />
                 </TooltipTrigger>
                 <TooltipContent className="p-4 bg-[#232323] max-w-[300px] rounded-[30px] space-y-3 z-[1]">
                   <p className="font-medium text-base">Share your link</p>

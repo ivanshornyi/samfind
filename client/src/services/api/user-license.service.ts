@@ -51,7 +51,7 @@ const updateUserLicense = async (id: string, data: UpdateUserLicenseData) => {
     });
 
     return response;
-  } catch(error) {
+  } catch (error) {
     handleApiError(error);
   }
 };

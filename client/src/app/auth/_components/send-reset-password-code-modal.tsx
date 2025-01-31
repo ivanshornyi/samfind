@@ -59,7 +59,9 @@ export const SendResetPasswordCodeModal = () => {
         </div>
 
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-xl">Forgot your password?</AlertDialogTitle>
+          <AlertDialogTitle className="text-xl">
+            Forgot your password?
+          </AlertDialogTitle>
           <AlertDialogDescription>
             Enter your email address to receive a recovery code.
           </AlertDialogDescription>

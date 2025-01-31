@@ -46,7 +46,11 @@ export const LogoutModal = () => {
         </AlertDialogHeader>
 
         <AlertDialogFooter className="flex gap-6 w-full">
-          <Button className="w-full" variant="tetrary" onClick={() => setOpen(false)}>
+          <Button
+            className="w-full"
+            variant="tetrary"
+            onClick={() => setOpen(false)}
+          >
             Cancel
           </Button>
           <Button

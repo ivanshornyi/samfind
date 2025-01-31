@@ -47,24 +47,22 @@ const headers = {
 };
 
 interface LicenseItem {
+  icon?: string;
   name: string;
   email: string;
-  date: string;
+  date?: string;
   access: string;
-  license: string;
 }
 
 const columns: ColumnDef<LicenseItem>[] = [
   {
     accessorKey: "icon",
-    header: ({ column }) => {
-      <div></div>
-    },
+    header: () => <div className="w-[50px]" />,
     cell: ({ row }) => {
       const value: string = row.getValue(headers.name);
-      
+
       return (
-        <div 
+        <div
           className="
             flex justify-center items-center rounded-full 
             w-10 h-10 bg-input text-[24px] leading-[33px] 
@@ -130,7 +128,15 @@ const columns: ColumnDef<LicenseItem>[] = [
         </div>
       );
     },
-    cell: ({ row }) => <div>{row.getValue("access")}</div>,
+    cell: ({ row }) => (
+      <div>
+        {row.getValue("access") === "Owner" ? (
+          <span className="text-blue-50">Owner</span>
+        ) : (
+          <span>Member</span>
+        )}
+      </div>
+    ),
   },
   {
     id: "actions",
@@ -157,6 +163,8 @@ const columns: ColumnDef<LicenseItem>[] = [
     ),
   },
 ];
+
+// enum User
 
 export default function License() {
   const { user } = useContext(AuthContext);
@@ -196,7 +204,7 @@ export default function License() {
   };
 
   useEffect(() => {
-    if (userLicense?.users) {
+    if (userLicense?.users && user) {
       const startIndex = (currentPage - 1) * itemsPerPage;
       const endIndex = startIndex + itemsPerPage;
 
@@ -210,9 +218,16 @@ export default function License() {
           license: u.license,
         }));
 
-      setUsers(selectedUsers);
+      setUsers([
+        {
+          name: `${user.firstName} ${user.lastName}`,
+          email: user.email,
+          access: "Owner",
+        },
+        ...selectedUsers,
+      ]);
     }
-  }, [userLicense, currentPage, user?.email]);
+  }, [userLicense, currentPage, user]);
 
   const table = useReactTable({
     data: users,
@@ -234,7 +249,7 @@ export default function License() {
   });
 
   return (
-    <div className="mx-auto">
+    <div className="mx-auto w-[1000px]">
       <div className="w-full">
         <h2 className="text-[32px] leading-[44px] font-semibold">
           License management
@@ -242,11 +257,14 @@ export default function License() {
         {userLicense && !isUserLicensesPending && (
           <>
             <div className="mt-6 flex justify-between items-end">
-              <ProgressChart currentMembers={userLicense.users.length} maxMembers={userLicense.limit} />
+              <ProgressChart
+                currentMembers={userLicense.users.length}
+                maxMembers={userLicense.limit}
+              />
               <div className="flex items-center gap-6">
                 <button
                   onClick={handleCopyInvitation}
-                  className="text-violet-50 bg-card p-2 rounded-full"
+                  className="text-blue-50 bg-card p-2 rounded-full"
                 >
                   <Copy size={24} />
                 </button>

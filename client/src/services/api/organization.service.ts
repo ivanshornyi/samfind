@@ -22,7 +22,7 @@ const updateOrganization = async (id: string, data: UpdateOrganizationData) => {
   } catch (error) {
     handleApiError(error);
   }
-}
+};
 
 const getOrganization = async (id: string) => {
   try {
@@ -37,4 +37,4 @@ const getOrganization = async (id: string) => {
 export const OrganizationApiService = {
   updateOrganization,
   getOrganization,
-}
+};

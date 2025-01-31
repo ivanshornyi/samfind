@@ -2,7 +2,11 @@ import { useContext } from "react";
 
 import { AuthContext } from "@/context";
 
-import { UserLicenseApiService, CreateUserLicense, UpdateUserLicenseData } from "@/services";
+import {
+  UserLicenseApiService,
+  CreateUserLicense,
+  UpdateUserLicenseData,
+} from "@/services";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -45,7 +49,8 @@ export const useUpdateUserLicense = () => {
   const { toast } = useToast();
 
   const { ...mutationProps } = useMutation({
-    mutationFn: (data: { id: string, licenseData: UpdateUserLicenseData }) => UserLicenseApiService.updateUserLicense(data.id, data.licenseData),
+    mutationFn: (data: { id: string; licenseData: UpdateUserLicenseData }) =>
+      UserLicenseApiService.updateUserLicense(data.id, data.licenseData),
     onSuccess: () => {
       toast({
         title: "Success",

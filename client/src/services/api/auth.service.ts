@@ -38,7 +38,7 @@ export type SignUpData = {
     name: string;
     VAT: string;
     businessOrganizationNumber: string;
-  }
+  };
 };
 
 const signUp = async (data: SignUpData) => {
