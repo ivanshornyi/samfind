@@ -283,12 +283,18 @@ export class StripeService {
         subscription.user.accountType === UserAccountType.business &&
         !subscription.licenseId
       ) {
-        await this.prisma.license.create({
+        const license = await this.prisma.license.create({
           data: {
             ownerId: subscription.userId,
             status: LicenseStatus.active,
             limit: Number(quantity),
             tierType: subscription.plan.type,
+          },
+        });
+        await this.prisma.activeLicense.create({
+          data: {
+            userId: subscription.userId,
+            licenseId: license.id,
           },
         });
       }
