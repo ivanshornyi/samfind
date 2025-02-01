@@ -65,12 +65,16 @@ export const MenuMobile = () => {
             </nav>
 
             <div className="flex flex-col">
-              <Button variant="link" className="text-base">
-                Log in
-              </Button>
-              <Button variant="tetrary" className="text-base">
-                Sign up
-              </Button>
+              <Link href="/auth/sign-in">
+                <Button variant="link" className="text-base w-full">
+                  Log in
+                </Button>
+              </Link>
+              <Link href="/auth/account-type">
+                <Button variant="tetrary" className="text-base w-full">
+                  Sign up
+                </Button>
+              </Link>
             </div>
 
             <div className="absolute flex justify-center right-0 left-0 bottom-10">
