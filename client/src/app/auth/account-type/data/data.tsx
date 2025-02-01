@@ -6,6 +6,7 @@ export interface AccountCard {
   description: string;
   icon: React.ReactNode;
   active: boolean;
+  features: string[];
 }
 
 export const ACCOUNT_TYPE_CARD_ITEMS: AccountCard[] = [
@@ -26,6 +27,11 @@ export const ACCOUNT_TYPE_CARD_ITEMS: AccountCard[] = [
       </svg>
     ),
     active: false,
+    features: [
+      "Share your subscription and split the benefits.",
+      "Earn bonuses by inviting others.",
+      "Manage your licenses",
+    ],
   },
   {
     type: UserAccountType.Business,
@@ -64,5 +70,10 @@ export const ACCOUNT_TYPE_CARD_ITEMS: AccountCard[] = [
       </svg>
     ),
     active: false,
+    features: [
+      "License Sharing Under Your Domain",
+      "Consolidated payments for multiple licenses with transparent tracking.",
+      "Priority customer service",
+    ],
   },
 ];
