@@ -52,6 +52,7 @@ model User {
   accountType               UserAccountType  @default(private)
   organizationId            String?
   licenseId                 String?
+  stripeCustomerId          String?          @unique
   createdAt                 DateTime         @default(now())
   organization              Organization?    @relation(fields: [organizationId], references: [id])
   UserReferral              UserReferral[]

@@ -21,9 +21,6 @@ export class AddSubscriptionDto {
   @IsString()
   planId: string;
 
-  @IsString()
-  licenseId: string;
-
   @IsNumber()
   quantity: number;
 

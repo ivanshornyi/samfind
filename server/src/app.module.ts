@@ -20,6 +20,7 @@ import { OrganizationModule } from "./modules/organization/organization.module";
 import { LicenseVerificationModule } from "./modules/license-verification/license-verification.module";
 import { PlanModule } from "./modules/plan/plan.module";
 import { SubscriptionModule } from "./modules/subscription/subscription.module";
+import { CronModule } from "./modules/cron/cron.module";
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { SubscriptionModule } from "./modules/subscription/subscription.module";
     LicenseVerificationModule,
     PlanModule,
     SubscriptionModule,
+    CronModule,
   ],
   controllers: [],
   providers: [],
