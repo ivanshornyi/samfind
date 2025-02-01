@@ -27,7 +27,7 @@ export const DeleteAccount = () => {
       >
         Delete
       </Button>
-      <AlertDialogContent className="w-[590px] border gradient-border-modal">
+      <AlertDialogContent className="w-full max-w-[590px] border gradient-border-modal">
         <div className="absolute right-1 top-1">
           <AlertDialogCancel className="shadow-none border-none p-3">
             <X size={18} />
