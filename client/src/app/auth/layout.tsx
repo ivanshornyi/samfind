@@ -42,7 +42,7 @@ export default function AuthLayout({
 
         <Link href="/" className="fixed top-6 left-5 flex items-center gap-3">
           <ArrowLeftIcon size={30} />
-          <span>Back</span>
+          <span className="hidden sm:block">Back</span>
         </Link>
 
         <div className="pt-12">
@@ -51,7 +51,7 @@ export default function AuthLayout({
           </Link>
         </div>
 
-        <div className="flex items-center justify-center relative z-10">
+        <div className="w-full flex items-center justify-center relative z-10">
           {children}
         </div>
 
