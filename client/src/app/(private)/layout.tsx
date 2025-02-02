@@ -22,7 +22,7 @@ export default function Layout({
       {user ? (
         <SidebarProvider>
           <AppSidebar />
-          <div className="px-[60px] pt-[68px] sm:pt-8 w-full">
+          <div className="px-4 md:px-[60px] pt-[68px] md:pt-8 w-full">
             <MobileHeader />
             {children}
           </div>
@@ -44,7 +44,7 @@ function MobileHeader() {
         />
         <Link
           href="/"
-          className="absolute left-[calc(50%-80px)] transform -translate-x-1/2"
+          className="absolute left-1/2 transform -translate-x-1/2"
         >
           <Image src={Logo} width={80} height={44} alt="logo" />
         </Link>
