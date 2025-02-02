@@ -13,8 +13,12 @@ import { Close as CloseSheet } from "@radix-ui/react-dialog";
 import { Logo } from "@public/images";
 import Image from "next/image";
 import Link from "next/link";
+import { useContext } from "react";
+import { AuthContext } from "@/context";
+import { User } from "lucide-react";
 
 export const MenuMobile = () => {
+  const { isLoggedIn, user } = useContext(AuthContext);
   return (
     <div className="lg:hidden">
       <Sheet>
@@ -64,18 +68,39 @@ export const MenuMobile = () => {
               </ul>
             </nav>
 
-            <div className="flex flex-col">
-              <Link href="/auth/sign-in">
-                <Button variant="link" className="text-base w-full">
-                  Log in
-                </Button>
-              </Link>
-              <Link href="/auth/account-type">
-                <Button variant="tetrary" className="text-base w-full">
-                  Sign up
-                </Button>
-              </Link>
-            </div>
+            {!isLoggedIn ? (
+              <div className="flex flex-col">
+                <Link href="/auth/sign-in">
+                  <Button variant="link" className="text-base w-full">
+                    Log in
+                  </Button>
+                </Link>
+                <Link href="/auth/account-type">
+                  <Button variant="tetrary" className="text-base w-full">
+                    Sign up
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              user && (
+                <Link
+                  href={
+                    user.licenseId || user.organizationId
+                      ? "/account/license"
+                      : "/account/settings"
+                  }
+                  className="flex items-center gap-2"
+                >
+                  <Button
+                    variant="tetrary"
+                    className="flex w-full max-w-96 mx-auto"
+                  >
+                    <User />
+                    <span>Account</span>
+                  </Button>
+                </Link>
+              )
+            )}
 
             <div className="absolute flex justify-center right-0 left-0 bottom-10">
               <p className="text-sm font-normal">
