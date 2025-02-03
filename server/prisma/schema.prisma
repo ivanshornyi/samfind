@@ -98,7 +98,8 @@ model ActiveLicense {
   userId    String
   license   License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
   licenseId String
-  deviceId  String?
+  desktopId  String?
+  mobileId  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

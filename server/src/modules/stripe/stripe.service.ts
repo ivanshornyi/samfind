@@ -208,6 +208,10 @@ export class StripeService {
     return retrieveInvoice;
   }
 
+  async getPaymentIntention(paymentIntentId: string) {
+    return this.stripe.paymentIntents.retrieve(paymentIntentId);
+  }
+
   async createPaymentIntent(
     createPaymentDto: CreateIntentDto,
   ): Promise<Stripe.PaymentIntent> {
@@ -279,7 +283,10 @@ export class StripeService {
       include: { user: true },
     });
 
-    await this.mailService.sendInvitation(subscription.user.email, invoiceLink);
+    await this.mailService.sendWarningPaymentFailed(
+      subscription.user.email,
+      invoiceLink,
+    );
   }
 
   private async handleSuccessfulInvoicePayment(invoice: Stripe.Invoice) {
