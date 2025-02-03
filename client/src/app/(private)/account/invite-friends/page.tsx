@@ -7,24 +7,24 @@ import { AuthContext } from "@/context";
 import { useToast } from "@/hooks";
 
 import {
+  FacebookIcon,
+  InstagramIcon,
+  LinkedinIcon,
+  TwitterIcon,
+  YoutubeIcon,
+} from "@public/icons";
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@radix-ui/react-tooltip";
-import {
-  YoutubeIcon,
-  TwitterIcon,
-  FacebookIcon,
-  InstagramIcon,
-  LinkedinIcon,
-} from "@public/icons";
 import { Copy, Info, SquareArrowOutUpRight } from "lucide-react";
 import Image from "next/image";
 import {
-  TwitterShareButton,
   FacebookShareButton,
   LinkedinShareButton,
+  TwitterShareButton,
 } from "react-share";
 
 const frontendDomain = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN;
@@ -35,7 +35,7 @@ export default function InvitedFriends() {
 
   const handleCopyReferralCodeLink = () => {
     if (user) {
-      const link = `${frontendDomain}/auth/sign-up?accountType=private&referralCode=${user.referralCode}`;
+      const link = `${frontendDomain}/auth/referal-account?referralCode=${user.referralCode}`;
 
       navigator.clipboard.writeText(link);
 
@@ -46,7 +46,7 @@ export default function InvitedFriends() {
   };
 
   return (
-    <div className="flex items-end gap-[55px] w-[1000px] mx-auto">
+    <div className="flex items-end gap-[55px] w-full max-w-[1000px] mx-auto">
       <div className="flex flex-col">
         <h2 className="text-[32px] leading-[44px] font-semibold mb-6">
           Invite a Friend
