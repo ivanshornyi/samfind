@@ -1,8 +1,11 @@
 "use client";
 
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
-import { useGetUserLicenses, useToast } from "@/hooks";
+import { useGetUserLicense, useGetUserLicenses, useToast } from "@/hooks";
+
+import Link from "next/link";
+
 import {
   Tooltip,
   TooltipContent,
@@ -23,18 +26,19 @@ import {
 
 import {
   Button,
-  Input,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Input,
 } from "@/components";
 
 import { ReusableTable } from "@/components/table";
-import { InviteMember, ProgressChart } from "./_components";
 import { AuthContext } from "@/context";
+import { InviteMember, ProgressChart } from "./_components";
 
-import { ArrowUpDown, Copy, Info, MoreHorizontal, Search } from "lucide-react";
+import { ArrowUpDown, Check, Copy, Info, MoreHorizontal, Search, User } from "lucide-react";
+import { LicenseTierType } from "@/types";
 
 const frontendDomain = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN;
 
@@ -164,7 +168,17 @@ const columns: ColumnDef<LicenseItem>[] = [
   },
 ];
 
-// enum User
+const FREEMIUM_FEATURES = [
+  {
+    title: "Essential features"
+  },
+  {
+    title: "Community access",
+  },
+  {
+    title: "Basic support",
+  }
+];
 
 export default function License() {
   const { user } = useContext(AuthContext);
@@ -179,6 +193,8 @@ export default function License() {
 
   const { data: userLicense, isPending: isUserLicensesPending } =
     useGetUserLicenses();
+  
+  const { data: license, isPending: isLicensePending } = useGetUserLicense(userLicense?.id ?? "");  
 
   const itemsPerPage = 10;
   const pageCount = Math.ceil(userLicense?.users?.length ?? 0 / itemsPerPage);
@@ -219,11 +235,6 @@ export default function License() {
         }));
 
       setUsers([
-        {
-          name: `${user.firstName} ${user.lastName}`,
-          email: user.email,
-          access: "Owner",
-        },
         ...selectedUsers,
       ]);
     }
@@ -249,53 +260,112 @@ export default function License() {
   });
 
   return (
-    <div className="mx-auto w-[1000px]">
+    <div className="mx-auto max-w-[1000px]">
       <div className="w-full">
         <h2 className="text-[32px] leading-[44px] font-semibold">
           License management
         </h2>
-        {userLicense && !isUserLicensesPending && (
-          <>
-            <div className="mt-6 flex justify-between items-end">
-              <ProgressChart
-                currentMembers={userLicense.users.length}
-                maxMembers={userLicense.limit}
-              />
-              <div className="flex items-center gap-6">
-                <button
-                  onClick={handleCopyInvitation}
-                  className="text-blue-50 bg-card p-2 rounded-full"
-                >
-                  <Copy size={24} />
-                </button>
-                <InviteMember allowedMembers={userLicense.limit} />
-              </div>
-            </div>
-            <div className="flex items-center justify-end py-4">
-              <div className="w-[308px] relative">
-                <Input
-                  placeholder="Search"
-                  value={
-                    (table.getColumn("name")?.getFilterValue() as string) ?? ""
-                  }
-                  onChange={(event) =>
-                    table.getColumn("name")?.setFilterValue(event.target.value)
-                  }
-                  className="max-w-sm bg-card"
+
+        {!license && <p>You do not have any license</p>}
+
+        {license?.tierType !== LicenseTierType.Freemium && (<>
+          {userLicense && !isUserLicensesPending && !isLicensePending && (
+            <>
+              <div className="mt-6 flex justify-between items-end">
+                <ProgressChart
+                  currentMembers={userLicense.users.length}
+                  maxMembers={userLicense.limit}
                 />
-                <div className="absolute right-6 top-0 h-full flex justify-center items-center">
-                  <Search size={24} />
+                <div className="flex items-center gap-6">
+                  <button
+                    onClick={handleCopyInvitation}
+                    className="text-blue-50 bg-card p-2 rounded-full"
+                  >
+                    <Copy size={24} />
+                  </button>
+                  <InviteMember allowedMembers={userLicense.limit} />
                 </div>
               </div>
-            </div>
+              <div className="flex items-center justify-end py-4">
+                <div className="w-[308px] relative">
+                  <Input
+                    placeholder="Search"
+                    value={
+                      (table.getColumn("name")?.getFilterValue() as string) ?? ""
+                    }
+                    onChange={(event) =>
+                      table.getColumn("name")?.setFilterValue(event.target.value)
+                    }
+                    className="max-w-sm bg-card"
+                  />
+                  <div className="absolute right-6 top-0 h-full flex justify-center items-center">
+                    <Search size={24} />
+                  </div>
+                </div>
+              </div>
 
-            <ReusableTable
-              table={table}
-              isLoading={isUserLicensesPending}
-              onPageChange={(page: number) => setCurrentPage(page)}
-              pageCount={pageCount}
-              noDataMessage="No licenses found."
-            />
+              <ReusableTable
+                table={table}
+                isLoading={isUserLicensesPending}
+                onPageChange={(page: number) => setCurrentPage(page)}
+                pageCount={pageCount}
+                noDataMessage="No licenses found."
+              />
+            </>
+          )}
+        </>)}
+
+        {license?.tierType === LicenseTierType.Freemium && (
+          <>
+            <div className="flex flex-col gap-[32px] mt-[60px] w-[742px]">
+              <div 
+                className="
+                  flex justify-between items-center rounded-[20px] 
+                  p-6 bg-violet-400/10
+                "
+              >
+                <div>
+                  <h2 className="text-xl font-semibold">Upgrade your subscription and unlock more features!</h2>
+                  <p>Boost your capabilities with premium features and priority support.</p>
+                </div>
+                <Link href="/account/billing-data">
+                  <Button
+                    variant="tetrary"
+                  >
+                    Get started
+                  </Button>
+                </Link>
+              </div>
+
+              <div className="capitalize text-blue-50 flex items-center justify-center gap-2 bg-card rounded-full p-3 w-[200px]">
+                <User size={18} />
+                {user?.accountType} Account
+              </div>
+
+              <div>
+                <p className="text-xl">Plan</p>
+
+                <div className="border-b border-card py-3 flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <p>Freemium</p>
+                    <span className="bg-green-500/5 p-2 px-4 text-xs text-green-600 rounded-full">Active subscription</span>
+                  </div>
+                  <Link href="/account/billing-data" className="underline">Upgrade</Link>
+                </div>
+
+                <ul className="flex items-center gap-5 mt-8">
+                  {FREEMIUM_FEATURES.map((item, index) => (
+                    <li 
+                      key={index}
+                      className="flex items-center gap-3"
+                    >
+                      <Check size={16} className="text-violet-50" />
+                      <span>{item.title}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </>
         )}
 

@@ -21,6 +21,7 @@ import { LicenseVerificationModule } from "./modules/license-verification/licens
 import { PlanModule } from "./modules/plan/plan.module";
 import { SubscriptionModule } from "./modules/subscription/subscription.module";
 import { CronModule } from "./modules/cron/cron.module";
+import { DiscountModule } from "./modules/user-discount/user-discount.module";
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { CronModule } from "./modules/cron/cron.module";
     PlanModule,
     SubscriptionModule,
     CronModule,
+    DiscountModule,
   ],
   controllers: [],
   providers: [],

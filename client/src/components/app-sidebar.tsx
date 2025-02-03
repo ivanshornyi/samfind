@@ -58,12 +58,9 @@ export const AppSidebar = () => {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-4">
-              {NAVIGATION_ITEMS.map((item, index) => {
+              {NAVIGATION_ITEMS.map(item => {
                 const isActive = pathname === item.path;
-                const condition =
-                  user && (user.licenseId || user?.organizationId);
-
-                return condition || index === 0 ? (
+                return (
                   <SidebarMenuItem key={item.title}>
                     <Link href={item.path}>
                       <Button
@@ -82,7 +79,7 @@ export const AppSidebar = () => {
                       </Button>
                     </Link>
                   </SidebarMenuItem>
-                ) : null;
+                )
               })}
             </SidebarMenu>
           </SidebarGroupContent>

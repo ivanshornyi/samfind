@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
-import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { UserAccountType } from "@/types";
 
@@ -19,8 +19,8 @@ import { ACCOUNT_TYPE_CARD_ITEMS } from "../account-type/data";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 
-import { EyeIcon, EyeOff } from "lucide-react";
 import { GoogleIcon } from "@public/icons";
+import { EyeIcon, EyeOff, Info } from "lucide-react";
 
 interface AuthFormProps {
   authPageType: "signIn" | "signUp" | "resetPassword";
@@ -77,7 +77,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
   const handleResetPasswordFormInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    ``;
     const name = event.target.name;
     const value = event.target.value;
 
@@ -162,7 +161,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
           return;
         }
 
-        let organization: {
+        const organization: {
           name: string;
           VAT: string;
           businessOrganizationNumber: string;
@@ -214,7 +213,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
 
   const formDescription = {
     signIn: "Welcome back! Access your personalized experience",
-    signUp: "Join the innovation! You’re almost there!",
+    signUp: "Join the innovation! You're almost there!",
     resetPassword:
       "Set a secure password to protect your account and ensure safe access.",
   };
@@ -255,9 +254,9 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
     // });
 
     // let signUpData: SignUpData = {
-    //   firstName: user.fir,
-    //   lastName: formData.lastName.trim(),
-    //   email: formData.email.trim(),
+    //   firstName: user.first_name,
+    //   lastName: user.last_name,
+    //   email: user.email,
     //   password: formData.password.trim(),
     //   authType: UserAuthType.Email,
     //   accountType,
@@ -265,7 +264,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
 
     // if (referralCode) {
     //   signUpData = {
-    //     ...signUpData,
+    //     ...signUpData, 
     //     invitedReferralCode: Number(referralCode),
     //   }
     // }
@@ -317,6 +316,14 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
         <form onSubmit={handleAuthFormSubmit} className="mt-4">
           <h2 className="font-semibold text-3xl">{formTitle[authPageType]}</h2>
           <p className="mt-4 text-lg">{formDescription[authPageType]}</p>
+          {authPageType === "signUp" && referralCode && (
+            <div className="my-4 flex items-center gap-2 bg-[#363637] rounded-2xl px-4 py-2">
+              <Info color="#BEB8FF" />
+              <p className="text-[#BEB8FF]">
+                You&apos;ve got a 10% discount via referral link!
+              </p>
+            </div>
+          )}
 
           <div className="mt-8 flex flex-col gap-2">
             {authPageType === "signUp" && (
