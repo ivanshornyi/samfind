@@ -32,7 +32,7 @@ export const ReusableTable = <T extends RowData>({
 }: ReusableTableProps<T>) => {
   return (
     <div>
-      <Table className="max-w-full w-[1064px]">
+      <Table className="w-full max-w-[1064px]">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow
