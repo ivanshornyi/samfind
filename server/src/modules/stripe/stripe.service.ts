@@ -208,6 +208,10 @@ export class StripeService {
     return retrieveInvoice;
   }
 
+  async getPaymentIntention(paymentIntentId: string) {
+    return this.stripe.paymentIntents.retrieve(paymentIntentId);
+  }
+
   async createPaymentIntent(
     createPaymentDto: CreateIntentDto,
   ): Promise<Stripe.PaymentIntent> {

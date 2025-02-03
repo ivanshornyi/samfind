@@ -125,7 +125,13 @@ export class SubscriptionService {
       metadata,
     });
 
-    return { url: invoice.hosted_invoice_url };
+    const paymentIntent = await this.stripeService.getPaymentIntention(
+      invoice.payment_intent as string,
+    );
+
+    return { clientSecret: paymentIntent.client_secret };
+
+    // return { url: invoice.hosted_invoice_url };
   }
 
   async addDiscount(
@@ -192,7 +198,7 @@ export class SubscriptionService {
       memberId: member.id,
     };
 
-    await this.stripeService.createAndPayInvoice({
+    return await this.stripeService.createAndPayInvoice({
       customerId: subscription.user.stripeCustomerId,
       priceId: subscription.plan.stripePriceId,
       quantity: 1,
