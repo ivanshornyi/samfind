@@ -79,8 +79,8 @@ export class SubscriptionService {
 
     const nextDate =
       plan.period === PlanPeriod.monthly
-        ? startOfMonth(addMonths(new Date(), 1))
-        : startOfMonth(addYears(new Date(), 1));
+        ? startOfMonth(addMonths(new Date(), 1)).toISOString()
+        : startOfMonth(addYears(new Date(), 1)).toISOString();
 
     if (!subscription) {
       subscription = await this.prisma.subscription.create({
@@ -113,6 +113,7 @@ export class SubscriptionService {
       subscriptionId: subscription.id,
       stripeCouponId: discountId,
       discountAmount: discount?.amount,
+      firstInvoice: "true",
     };
 
     const invoice = await this.stripeService.createAndPayInvoice({
@@ -228,6 +229,7 @@ export class SubscriptionService {
 
     const invoices = allInvoices.map((invoice) => ({
       id: invoice.id,
+      number: invoice.number,
       url: invoice.hosted_invoice_url,
       pdf: invoice.invoice_pdf,
       status: invoice.status,
