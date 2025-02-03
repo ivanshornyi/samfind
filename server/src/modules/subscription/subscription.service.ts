@@ -125,13 +125,13 @@ export class SubscriptionService {
       metadata,
     });
 
-    const paymentIntent = await this.stripeService.getPaymentIntention(
-      invoice.payment_intent as string,
-    );
+    // const paymentIntent = await this.stripeService.getPaymentIntention(
+    //   invoice.payment_intent as string,
+    // );
 
-    return { clientSecret: paymentIntent.client_secret };
+    // return { clientSecret: paymentIntent.client_secret };
 
-    // return { url: invoice.hosted_invoice_url };
+    return { url: invoice.hosted_invoice_url };
   }
 
   async addDiscount(
