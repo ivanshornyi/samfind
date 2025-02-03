@@ -8,11 +8,19 @@ import { PlanController } from "./plan.controller";
 import { UserModule } from "../user/user.module";
 import { StripeService } from "../stripe/stripe.service";
 import { UserService } from "../user/user.service";
+import { MailService } from "../mail/mail.service";
+import { MailModule } from "../mail/mail.module";
 
 @Module({
-  imports: [PrismaModule, UserModule],
+  imports: [PrismaModule, UserModule, MailModule],
   controllers: [PlanController],
-  providers: [PlanService, StripeService, PrismaService, UserService],
+  providers: [
+    PlanService,
+    StripeService,
+    PrismaService,
+    UserService,
+    MailService,
+  ],
   exports: [PlanService],
 })
 export class PlanModule {}

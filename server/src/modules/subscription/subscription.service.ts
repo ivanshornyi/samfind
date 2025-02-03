@@ -8,6 +8,8 @@ import { PrismaService } from "../prisma/prisma.service";
 import { PlanPeriod } from "@prisma/client";
 import { StripeService } from "../stripe/stripe.service";
 import { AddSubscriptionDto } from "./dto/add-subscription-dto";
+import { CreateMemberInvoiceDto } from "./dto/create-member-invoice-dto";
+import Stripe from "stripe";
 
 @Injectable()
 export class SubscriptionService {
@@ -18,7 +20,6 @@ export class SubscriptionService {
 
   async addSubscription({
     userId,
-    licenseId,
     planId,
     quantity,
     discount,
@@ -29,13 +30,13 @@ export class SubscriptionService {
     if (!user) throw new NotFoundException("User not found");
 
     let subscription = await this.prisma.subscription.findUnique({
-      where: { licenseId, userId },
+      where: { userId },
     });
     if (subscription && subscription.isActive)
       throw new BadRequestException("Subscription already exists");
 
     const license = await this.prisma.license.findUnique({
-      where: { id: licenseId, ownerId: userId },
+      where: { ownerId: userId },
     });
     const plan = await this.prisma.plan.findUnique({
       where: { id: planId },
@@ -50,7 +51,20 @@ export class SubscriptionService {
       user.firstName + " " + user.lastName,
     );
 
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        stripeCustomerId: stripeCustomer.id,
+      },
+    });
+
     if (discount) {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          discount: user.discount + discount.amount,
+        },
+      });
       const stripeDiscount = await this.stripeService.createCoupon(
         discount.amount,
       );
@@ -98,6 +112,7 @@ export class SubscriptionService {
       userReferralCode,
       subscriptionId: subscription.id,
       stripeCouponId: discountId,
+      discountAmount: discount?.amount,
     };
 
     const invoice = await this.stripeService.createAndPayInvoice({
@@ -148,5 +163,81 @@ export class SubscriptionService {
     });
 
     return { url: invoice.hosted_invoice_url };
+  }
+
+  async payMemberInvoice({ memberId, ownerId }: CreateMemberInvoiceDto) {
+    const subscription = await this.prisma.subscription.findFirst({
+      where: {
+        userId: ownerId,
+      },
+      include: {
+        user: true,
+        plan: true,
+      },
+    });
+
+    if (!subscription || !subscription.user.stripeCustomerId)
+      throw new NotFoundException("Subscription not found");
+
+    const member = await this.prisma.user.findUnique({
+      where: { id: memberId },
+    });
+
+    if (!member) throw new NotFoundException("User not found");
+
+    const metadata = {
+      quantity: 1,
+      subscriptionId: subscription.id,
+      memberId: member.id,
+    };
+
+    await this.stripeService.createAndPayInvoice({
+      customerId: subscription.user.stripeCustomerId,
+      priceId: subscription.plan.stripePriceId,
+      quantity: 1,
+      description: `Member License: ${member.email}`,
+      metadata,
+      pay: true,
+    });
+  }
+
+  async getBalingHistory(userId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+
+    if (!user || !user.stripeCustomerId)
+      throw new NotFoundException("User not found");
+
+    let allInvoices: Stripe.Invoice[] = [];
+    let hasMore = true;
+    let lastInvoiceId = undefined;
+
+    while (hasMore) {
+      const response = await this.stripeService.getUserInvoices(
+        user.stripeCustomerId,
+        100,
+        lastInvoiceId,
+      );
+
+      allInvoices.push(...response.data);
+      hasMore = response.has_more;
+
+      if (response.data.length > 0) {
+        lastInvoiceId = response.data[response.data.length - 1].id;
+      }
+    }
+
+    const invoices = allInvoices.map((invoice) => ({
+      id: invoice.id,
+      url: invoice.hosted_invoice_url,
+      pdf: invoice.invoice_pdf,
+      status: invoice.status,
+      price: invoice.subtotal,
+      afterDiscount: invoice.total,
+      description: invoice.description,
+      date: invoice.status_transitions.finalized_at,
+      payDate: invoice.status_transitions.paid_at,
+    }));
+
+    return invoices;
   }
 }
