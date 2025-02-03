@@ -27,6 +27,7 @@ export class CronService {
           gte: startOfDay(today),
           lt: endOfDay(today),
         },
+        isActive: true,
       },
       include: {
         plan: true,

@@ -9,6 +9,7 @@ import { PlanPeriod } from "@prisma/client";
 import { StripeService } from "../stripe/stripe.service";
 import { AddSubscriptionDto } from "./dto/add-subscription-dto";
 import { CreateMemberInvoiceDto } from "./dto/create-member-invoice-dto";
+import Stripe from "stripe";
 
 @Injectable()
 export class SubscriptionService {
@@ -206,10 +207,37 @@ export class SubscriptionService {
     if (!user || !user.stripeCustomerId)
       throw new NotFoundException("User not found");
 
-    const invoices = await this.stripeService.getUserInvoices(
-      user.stripeCustomerId,
-      100,
-    );
+    let allInvoices: Stripe.Invoice[] = [];
+    let hasMore = true;
+    let lastInvoiceId = undefined;
+
+    while (hasMore) {
+      const response = await this.stripeService.getUserInvoices(
+        user.stripeCustomerId,
+        100,
+        lastInvoiceId,
+      );
+
+      allInvoices.push(...response.data);
+      hasMore = response.has_more;
+
+      if (response.data.length > 0) {
+        lastInvoiceId = response.data[response.data.length - 1].id;
+      }
+    }
+
+    const invoices = allInvoices.map((invoice) => ({
+      id: invoice.id,
+      url: invoice.hosted_invoice_url,
+      pdf: invoice.invoice_pdf,
+      status: invoice.status,
+      price: invoice.subtotal,
+      afterDiscount: invoice.total,
+      description: invoice.description,
+      date: invoice.status_transitions.finalized_at,
+      payDate: invoice.status_transitions.paid_at,
+    }));
+
     return invoices;
   }
 }

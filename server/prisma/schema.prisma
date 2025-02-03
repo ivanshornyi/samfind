@@ -169,7 +169,7 @@ model Subscription {
 model Discount {
   id               String           @id @default(uuid())
   user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId           String
+  userId           String           @unique
   startAmount      Float            @default(0)
   endAmount        Float            @default(0)
   used             Boolean          @default(false)

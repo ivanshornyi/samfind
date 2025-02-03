@@ -88,10 +88,12 @@ export class StripeService {
   async getUserInvoices(
     customerId: string,
     limit: number,
+    startingAfter?: string,
   ): Promise<Stripe.Response<Stripe.ApiList<Stripe.Invoice>>> {
     return await this.stripe.invoices.list({
       customer: customerId,
       limit,
+      starting_after: startingAfter,
     });
   }
 
