@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { useGetUserLicense, useGetUserLicenses, useToast } from "@/hooks";
 
@@ -26,16 +26,16 @@ import {
 
 import {
   Button,
-  Input,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Input,
 } from "@/components";
 
 import { ReusableTable } from "@/components/table";
-import { InviteMember, ProgressChart } from "./_components";
 import { AuthContext } from "@/context";
+import { InviteMember, ProgressChart } from "./_components";
 
 import { ArrowUpDown, Check, Copy, Info, MoreHorizontal, Search, User } from "lucide-react";
 import { LicenseTierType } from "@/types";
@@ -260,7 +260,7 @@ export default function License() {
   });
 
   return (
-    <div className="mx-auto w-[1000px]">
+    <div className="mx-auto max-w-[1000px]">
       <div className="w-full">
         <h2 className="text-[32px] leading-[44px] font-semibold">
           License management

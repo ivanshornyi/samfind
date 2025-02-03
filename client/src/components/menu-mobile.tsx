@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Button,
   NAVIGATION_ITEMS,
@@ -8,18 +10,24 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components";
-import { HeaderMenuIcon, HeaderMenuCloseIcon } from "@public/icons";
-import { Close as CloseSheet } from "@radix-ui/react-dialog";
+import { AuthContext } from "@/context";
+import { HeaderMenuCloseIcon, HeaderMenuIcon } from "@public/icons";
 import { Logo } from "@public/images";
+import { Close as CloseSheet } from "@radix-ui/react-dialog";
 import Image from "next/image";
 import Link from "next/link";
+import { useContext } from "react";
 
 export const MenuMobile = () => {
+  const { isLoggedIn, user } = useContext(AuthContext);
+
   return (
     <div className="lg:hidden">
       <Sheet>
-        <SheetTrigger>
-          <Image src={HeaderMenuIcon} alt="menu" width={44} height={44} />
+        <SheetTrigger asChild>
+          <button>
+            <Image src={HeaderMenuIcon} alt="menu" width={44} height={44} />
+          </button>
         </SheetTrigger>
         <SheetContent
           side="bottom"
@@ -37,7 +45,7 @@ export const MenuMobile = () => {
                   className="h-7 w-[110px] min-w-[110px]"
                 />
               </Link>
-              <CloseSheet>
+              <CloseSheet asChild>
                 <Image
                   src={HeaderMenuCloseIcon}
                   alt="menu"
@@ -53,24 +61,55 @@ export const MenuMobile = () => {
               </SheetTitle>
               <ul className="flex items-center flex-col gap-5">
                 {NAVIGATION_ITEMS.map((item) => (
-                  <Link key={item.title} href={item.path}>
-                    <SheetClose>
-                      <li className="font-medium text-sm transition-all hover:text-[#CE9DF3] hover:underline active:text-[#8F40E5]">
+                  <li key={item.title}>
+                    <SheetClose asChild>
+                      <Link
+                        href={item.path}
+                        className="font-medium text-sm transition-all hover:text-[#CE9DF3] hover:underline active:text-[#8F40E5]"
+                      >
                         {item.title}
-                      </li>
+                      </Link>
                     </SheetClose>
-                  </Link>
+                  </li>
                 ))}
               </ul>
             </nav>
 
-            <div className="flex flex-col">
-              <Button variant="link" className="text-base">
-                Log in
-              </Button>
-              <Button variant="tetrary" className="text-base">
-                Sign up
-              </Button>
+            <div className="flex flex-col gap-4">
+              {!isLoggedIn ? (
+                <>
+                  <SheetClose asChild>
+                    <Link href="/auth/sign-in">
+                      <Button variant="link" className="text-base w-full">
+                        Log in
+                      </Button>
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link href="/auth/account-type">
+                      <Button variant="tetrary" className="text-base w-full">
+                        Sign up
+                      </Button>
+                    </Link>
+                  </SheetClose>
+                </>
+              ) : (
+                user && (
+                  <SheetClose asChild>
+                    <Link
+                      href={
+                        user.licenseId || user.organizationId
+                          ? "/account/license"
+                          : "/account/settings"
+                      }
+                    >
+                      <Button variant="tetrary" className="text-base w-full">
+                        Account
+                      </Button>
+                    </Link>
+                  </SheetClose>
+                )
+              )}
             </div>
 
             <div className="absolute flex justify-center right-0 left-0 bottom-10">

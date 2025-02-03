@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Table,
   TableBody,
@@ -9,11 +8,11 @@ import {
 } from "@/components";
 import {
   flexRender,
-  RowData,
   Table as ReactTable,
+  RowData,
 } from "@tanstack/react-table";
-import ReactPaginate from "react-paginate";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import ReactPaginate from "react-paginate";
 
 interface ReusableTableProps<T extends RowData> {
   table: ReactTable<T>;
@@ -32,7 +31,7 @@ export const ReusableTable = <T extends RowData>({
 }: ReusableTableProps<T>) => {
   return (
     <div>
-      <Table className="max-w-full w-[1064px]">
+      <Table className="w-full max-w-[1064px]">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow

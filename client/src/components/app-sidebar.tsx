@@ -60,7 +60,6 @@ export const AppSidebar = () => {
             <SidebarMenu className="space-y-4">
               {NAVIGATION_ITEMS.map(item => {
                 const isActive = pathname === item.path;
-
                 return (
                   <SidebarMenuItem key={item.title}>
                     <Link href={item.path}>
