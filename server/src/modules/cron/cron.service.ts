@@ -4,6 +4,7 @@ import { startOfDay, endOfDay } from "date-fns";
 import { PrismaService } from "nestjs-prisma";
 import { StripeService } from "../stripe/stripe.service";
 import { LicenseStatus } from "@prisma/client";
+import { MailService } from "../mail/mail.service";
 
 @Injectable()
 export class CronService {
@@ -12,6 +13,7 @@ export class CronService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly stripeService: StripeService,
+    private readonly mailService: MailService,
   ) {}
 
   @Cron("0 8 1 * *")
@@ -128,6 +130,7 @@ export class CronService {
   }
 
   @Cron("0 8 6 * *")
+  //   @Cron("40 15 * * *")
   async handleSixthDayOfMonth() {
     this.logger.log(
       "Running on the 6th day of the month at 08:00 AM Check Unpaid Subscriptions - start",
@@ -137,6 +140,7 @@ export class CronService {
       where: {
         isInTrial: true,
       },
+      include: { user: true },
     });
 
     const subscriptionIds = subscriptions.map((sub) => sub.id);
@@ -161,6 +165,20 @@ export class CronService {
           status: LicenseStatus.inactive,
         },
       });
+    }
+
+    for (let i = 0; i < subscriptions.length; i++) {
+      const subscription = subscriptions[i];
+      const response = await this.stripeService.getUserInvoices(
+        subscription.user.stripeCustomerId,
+        1,
+      );
+      if (!response.data.length) continue;
+
+      await this.mailService.sendWarningLicenseDeactivated(
+        subscription.user.email,
+        response.data[0].hosted_invoice_url,
+      );
     }
 
     this.logger.log(

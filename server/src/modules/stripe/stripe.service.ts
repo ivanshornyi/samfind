@@ -279,7 +279,10 @@ export class StripeService {
       include: { user: true },
     });
 
-    await this.mailService.sendInvitation(subscription.user.email, invoiceLink);
+    await this.mailService.sendWarningPaymentFailed(
+      subscription.user.email,
+      invoiceLink,
+    );
   }
 
   private async handleSuccessfulInvoicePayment(invoice: Stripe.Invoice) {
