@@ -6,7 +6,7 @@ import { useToast } from "@/hooks";
 
 import { Copy } from "lucide-react";
 
-import { BalanceInfo, ReferralInfo, ShareTooltip } from "./_components";
+import { BalanceInfo, ReferralInfo, SharePopover } from "./_components";
 
 const frontendDomain = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN;
 
@@ -62,7 +62,7 @@ export default function InvitedFriends() {
                 Copy the referral link
               </span>
             </button>
-            <ShareTooltip url={referralLink} />
+            <SharePopover url={referralLink} />
           </div>
         </div>
       </div>
