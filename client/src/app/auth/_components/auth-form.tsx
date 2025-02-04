@@ -20,11 +20,29 @@ import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 
 import { GoogleIcon } from "@public/icons";
-import { EyeIcon, EyeOff, Info } from "lucide-react";
+import { Check, EyeIcon, EyeOff, Info, X } from "lucide-react";
 
 interface AuthFormProps {
   authPageType: "signIn" | "signUp" | "resetPassword";
 }
+
+const validatePassword = (password: string) => {
+  const minLength = password.length >= 8;
+  const hasNumber = /\d/.test(password);
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+  return {
+    minLength,
+    hasNumber,
+    hasUpperCase,
+    hasLowerCase,
+    hasSpecialChar,
+    isValid:
+      minLength && hasNumber && hasUpperCase && hasLowerCase && hasSpecialChar,
+  };
+};
 
 export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
   const { toast } = useToast();
@@ -56,6 +74,16 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
     domain: "",
   });
 
+  const [showPasswordError, setShowPasswordError] = useState<boolean>(false);
+  const [passwordValidation, setPasswordValidation] = useState({
+    minLength: false,
+    hasNumber: false,
+    hasUpperCase: false,
+    hasLowerCase: false,
+    hasSpecialChar: false,
+    isValid: false,
+  });
+
   const { mutate: signInMutation, isPending: isSignInPending } = useSignIn();
   const {
     mutate: signUpMutation,
@@ -68,10 +96,12 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
   const handleFormInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const name = event.target.name;
-    const value = event.target.value;
-
+    const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
+
+    if (name === "password") {
+      setPasswordValidation(validatePassword(value));
+    }
   };
 
   const handleResetPasswordFormInputChange = (
@@ -129,6 +159,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
           description: "Some fields are empty",
         });
 
+        return;
+      }
+
+      if (!passwordValidation.isValid) {
+        setShowPasswordError(true);
         return;
       }
 
@@ -264,7 +299,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
 
     // if (referralCode) {
     //   signUpData = {
-    //     ...signUpData, 
+    //     ...signUpData,
     //     invitedReferralCode: Number(referralCode),
     //   }
     // }
@@ -409,6 +444,77 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                       )}
                     </button>
                   </div>
+                  {showPasswordError ? (
+                    <div className="text-xs mt-2">
+                      <p className="font-normal">
+                        Your password must include:.
+                      </p>
+                      <ul className="text-xs">
+                        <li
+                          className={`flex items-center gap-2 ${passwordValidation.minLength ? "text-green-500" : "text-red-500"}`}
+                        >
+                          {passwordValidation.minLength ? (
+                            <Check style={{ width: "10px", height: "10px" }} />
+                          ) : (
+                            <X style={{ width: "10px", height: "10px" }} />
+                          )}{" "}
+                          Password strenghts:{" "}
+                          {passwordValidation.isValid ? "strong" : "weak"}
+                        </li>
+                        <li
+                          className={`flex items-center gap-2 ${passwordValidation.minLength ? "text-green-500" : "text-red-500"}`}
+                        >
+                          {passwordValidation.minLength ? (
+                            <Check style={{ width: "10px", height: "10px" }} />
+                          ) : (
+                            <X style={{ width: "10px", height: "10px" }} />
+                          )}{" "}
+                          At least 8 characters
+                        </li>
+                        <li
+                          className={`flex items-center gap-2 ${passwordValidation.hasNumber ? "text-green-500" : "text-red-500"}`}
+                        >
+                          {passwordValidation.hasNumber ? (
+                            <Check style={{ width: "10px", height: "10px" }} />
+                          ) : (
+                            <X style={{ width: "10px", height: "10px" }} />
+                          )}{" "}
+                          At least one number (0-9).
+                        </li>
+                        <li
+                          className={`flex items-center gap-2 ${passwordValidation.hasUpperCase ? "text-green-500" : "text-red-500"}`}
+                        >
+                          {passwordValidation.hasUpperCase ? (
+                            <Check style={{ width: "10px", height: "10px" }} />
+                          ) : (
+                            <X style={{ width: "10px", height: "10px" }} />
+                          )}{" "}
+                          At least one uppercase letter (A-Z).
+                        </li>
+                        <li
+                          className={`flex items-center gap-2 ${passwordValidation.hasLowerCase ? "text-green-500" : "text-red-500"}`}
+                        >
+                          {passwordValidation.hasLowerCase ? (
+                            <Check style={{ width: "10px", height: "10px" }} />
+                          ) : (
+                            <X style={{ width: "10px", height: "10px" }} />
+                          )}{" "}
+                          At least one lowercase letter (a-z).
+                        </li>
+                        <li
+                          className={`flex items-center gap-2 ${passwordValidation.hasSpecialChar ? "text-green-500" : "text-red-500"}`}
+                        >
+                          {passwordValidation.hasSpecialChar ? (
+                            <Check style={{ width: "10px", height: "10px" }} />
+                          ) : (
+                            <X style={{ width: "10px", height: "10px" }} />
+                          )}{" "}
+                          At least one special character (e.g., @, #, $, %,
+                          etc.)
+                        </li>
+                      </ul>
+                    </div>
+                  ) : null}
                 </div>
               </>
             )}
