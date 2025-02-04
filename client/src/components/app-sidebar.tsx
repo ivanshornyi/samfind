@@ -1,5 +1,7 @@
 "use client";
 
+import { useGetUserSubscriptionInfo } from "@/hooks";
+
 import {
   Sidebar,
   SidebarContent,
@@ -12,8 +14,7 @@ import {
   Button,
   LogoutModal,
 } from "@/components";
-import { useContext } from "react";
-import { AuthContext } from "@/context";
+
 import { usePathname } from "next/navigation";
 import { Home, IdCard, Gift, CreditCard, User, Headset } from "lucide-react";
 import { Logo } from "@public/images";
@@ -44,8 +45,11 @@ const NAVIGATION_ITEMS = [
 ];
 
 export const AppSidebar = () => {
-  const { user } = useContext(AuthContext);
   const pathname = usePathname();
+
+  const { data: userSubscriptionInfo } = useGetUserSubscriptionInfo();
+
+  console.log(userSubscriptionInfo);
 
   return (
     <Sidebar className="py-8 border-secondary bg-background">
@@ -58,29 +62,52 @@ export const AppSidebar = () => {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-4">
-              {NAVIGATION_ITEMS.map(item => {
-                const isActive = pathname === item.path;
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <Link href={item.path}>
-                      <Button
-                        variant="menuItem"
-                        leftIcon={
-                          <item.icon
-                            style={{ width: "24px", height: "24px" }}
-                          />
-                        }
-                        className={`
-                          ${isActive && "bg-[#302935] text-white"}
-                          w-full flex justify-start items-center
-                        `}
-                      >
-                        <span>{item.title}</span>
-                      </Button>
-                    </Link>
-                  </SidebarMenuItem>
-                )
-              })}
+            {!userSubscriptionInfo?.defaultUser && NAVIGATION_ITEMS.map(item => {
+              const isActive = pathname === item.path;
+            
+              return (
+                <SidebarMenuItem key={item.title}>
+                  <Link href={item.path}>
+                    <Button
+                      variant="menuItem"
+                      leftIcon={
+                        <item.icon
+                          style={{ width: "24px", height: "24px" }}
+                        />
+                      }
+                      className={`
+                        ${isActive && "bg-[#302935] text-white"}
+                        w-full flex justify-start items-center
+                      `}
+                    >
+                      <span>{item.title}</span>
+                    </Button>
+                  </Link>
+                </SidebarMenuItem>
+              );
+            })}
+
+            {userSubscriptionInfo?.defaultUser && (
+              <SidebarMenuItem>
+              <Link href="/account/license">
+                <Button
+                  variant="menuItem"
+                  leftIcon={
+                    <IdCard
+                      style={{ width: "24px", height: "24px" }}
+                    />
+                  }
+                  className={`
+                    ${pathname === "/account/license" && "bg-[#302935] text-white"}
+                    w-full flex justify-start items-center
+                  `}
+                >
+                  <span>License management</span>
+                </Button>
+              </Link>
+            </SidebarMenuItem>
+            )}
+
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

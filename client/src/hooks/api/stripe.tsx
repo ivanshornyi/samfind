@@ -30,8 +30,6 @@ export const useConfirmPayment = () => {
   const confirmPayment = async () => {
     if (stripe && elements && successRedirectUrl && user) {
       try {
-        localStorage.removeItem("userReferralCode");
-
         const response = await stripe.confirmPayment({
           elements,
           confirmParams: {

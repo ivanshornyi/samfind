@@ -9,6 +9,7 @@ import {
 } from "@nestjs/common";
 
 import { User } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 import { UserService } from "./user.service";
 
@@ -82,6 +83,7 @@ export class UserController {
     @Body() dto: { newUserId: string; discount: number },
   ) {
     const user = await this.userService.findOne(dto.newUserId);
+    
     return this.userService.findAndUpdateUserByReferralCode(
       referralCode,
       user,
@@ -95,6 +97,10 @@ export class UserController {
     // find license and users by this domain and email
   }
 
-  // @ApiOperation({ summary: "" })
-  // async
+  @ApiOperation({ summary: "Find user subscription info" })
+  @Get("/subscription-info/:userId")
+  async findUserSubscriptionInfo(@Param("userId") userId: string) {
+    // find user information, where he has subscription, type of subscription, in other license and organization or not
+    return this.userService.findUserSubscriptionInfo(userId);
+  }
 }

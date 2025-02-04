@@ -96,25 +96,6 @@ export class AuthService {
         });
       }
 
-      // add license
-      if (accountType === UserAccountType.private) {
-        const userLicense = await this.prisma.license.create({
-          data: {
-            ownerId: newUser.id,
-            status: LicenseStatus.active,
-            limit: 0,
-            tierType: LicenseTierType.freemium,
-          },
-        });
-
-        await this.prisma.activeLicense.create({
-          data: {
-            userId: newUser.id,
-            licenseId: userLicense.id,
-          },
-        });
-      }
-
       return newUser;
     } else {
       await this.userService.updateUser(existingUser.id, {
@@ -314,6 +295,28 @@ export class AuthService {
       throw new UnauthorizedException("Verification code has expired");
     }
 
+    // if user private and without license id => add freemium
+    if (
+      !authVerificationDto.licenseId && !authVerificationDto.organizationId && 
+      user.accountType === UserAccountType.private
+    ) {
+      const userLicense = await this.prisma.license.create({
+        data: {
+          ownerId: user.id,
+          status: LicenseStatus.active,
+          limit: 0,
+          tierType: LicenseTierType.freemium,
+        },
+      });
+
+      await this.prisma.activeLicense.create({
+        data: {
+          userId: user.id,
+          licenseId: userLicense.id,
+        },
+      });
+    }
+
     if (authVerificationDto.licenseId) {
       const license = await this.prisma.license.findUnique({
         where: {
@@ -336,6 +339,8 @@ export class AuthService {
       if (license.limit === 0) {
         throw new ConflictException("License limit is reached");
       }
+
+      console.log(license);
 
       if (!license.availableEmails.includes(authVerificationDto.email)) {
         throw new ConflictException("This email does not have access");

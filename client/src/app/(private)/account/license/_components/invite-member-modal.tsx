@@ -102,9 +102,9 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
       }
 
       // private
-      if (user.licenseId) {
+      if (userLicense) {
         updateUserLicenseMutation({
-          id: user.licenseId,
+          id: userLicense.id,
           licenseData: { availableEmails: emails },
         });
       }
@@ -115,6 +115,8 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
     if (userLicense) {
       setEmails([...userLicense.availableEmails]);
     }
+
+    console.log(userLicense);
   }, [userLicense]);
 
   useEffect(() => {

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation"; 
 
 import { LicensingOptionType } from "../_types";
 
-import { Input, PaymentsModal } from "@/components";
+import { Button } from "@/components";
 import { CheckOutline, DollarIcon } from "@public/home";
 
 import Image from "next/image";
@@ -16,7 +16,7 @@ export const LicensingOptionCard = ({
   option: LicensingOptionType;
   isLarge: boolean;
 }) => {
-  const [usersLimit, setUsersLimit] = useState(1);
+  const router = useRouter();
 
   return (
     <div
@@ -38,39 +38,16 @@ export const LicensingOptionCard = ({
               <span className="text-[32px]">/month</span>
             </p>
           </div>
-          <div className="w-[90px] flex flex-col gap-1">
-            <label>Users limit</label>
-            <Input
-              type="number"
-              step="1"
-              min={1}
-              value={usersLimit}
-              onChange={(event) => {
-                const value = Math.floor(Number(event.target.value));
-
-                setUsersLimit(value);
-              }}
-            />
-          </div>
         </div>
       ) : null}
 
-      {/* <Button
+      <Button
         variant={option.buttonVariant}
         className={`w-full mb-10 border-none ${isLarge ? 'py-[13px]' : ''}`}
-      > */}
-      <div className="py-3">
-        <PaymentsModal
-          amount={Number((Number(option.price.toFixed(2)) * 100).toFixed())}
-          currency="USD"
-          license={{
-            tierType: option.tierType,
-            usersLimit,
-          }}
-          buttonText={option.buttonText}
-        />
-      </div>
-      {/* </Button> */}
+        onClick={() => router.push("/auth/account-type")}
+      >
+        {option.buttonText}
+      </Button>
 
       <ul className="space-y-[10px]">
         {option.features.map((feature, index) => (

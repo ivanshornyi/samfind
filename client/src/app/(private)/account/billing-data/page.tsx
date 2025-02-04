@@ -1,15 +1,26 @@
-import { PaymentHistory } from "./_components/payment-history";
-import { PricingPlans } from "./_components/pricing-plans";
-import { SubscriptionDetails } from "./_components/subscription-details";
+"use client";
+
+import { useGetPlans, useGetUserLicenses, useGetUserSubscriptionInfo } from "@/hooks";
+
+import { PaymentHistory, SubscriptionDetails, PlanCard } from "./_components";
+import { useEffect } from "react";
 
 export default function BillingData() {
-  const userLicense = true;
+  const { data: plans } = useGetPlans();
+
+  const { data: userLicense, isPending: isUserLicensePending } = useGetUserLicenses();
+
+  const { data: userSubscriptionInfo } = useGetUserSubscriptionInfo();
 
   return (
     <div className="w-full text-white">
       <div className="space-y-8">
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-4xl font-semibold">Plans and Billing</h1>
+        </div>
+
         <div>
-          {userLicense ? (
+          {userLicense && !isUserLicensePending && !userSubscriptionInfo?.freemiumUser && (
             <SubscriptionDetails
               plan="Standart Monthly"
               status="Active subscription"
@@ -18,8 +29,14 @@ export default function BillingData() {
               billingPeriod="month, billed monthly"
               members={{ admin: 1, regular: 0 }}
             />
-          ) : (
-            <PricingPlans />
+          )}
+
+          {(!userLicense || userSubscriptionInfo?.freemiumUser) && (
+            <div className="flex gap-2">
+              {plans?.map(plan => (
+                <PlanCard key={plan.id} plan={plan} />
+              ))}
+            </div>
           )}
         </div>
 
