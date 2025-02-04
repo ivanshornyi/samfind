@@ -121,6 +121,10 @@ export class AuthService {
       throw new UnauthorizedException("User is not verified");
     }
 
+    if (!user.isDeleted) {
+      throw new UnauthorizedException("User is deleted");
+    }
+
     const isPasswordValid = this.isPasswordValid(password, user.password);
 
     if (!isPasswordValid) {

@@ -39,6 +39,7 @@ model User {
   status                    UserStatus
   role                      UserRole
   isVerified                Boolean          @default(false)
+  isDeleted                 Boolean          @default(false)
   registrationCode          String?
   registrationCodeExpiresAt DateTime?
   resetCode                 String?          @db.VarChar

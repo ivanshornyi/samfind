@@ -17,7 +17,7 @@ export class SubscriptionController {
   }
 
   @ApiOperation({ summary: "Create Invoice to Pay Member License" })
-  @Post("/")
+  @Post("/invoice")
   async payMemberInvoice(
     @Body() createMemberInvoiceDto: CreateMemberInvoiceDto,
   ) {
