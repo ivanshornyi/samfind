@@ -153,7 +153,7 @@ model Plan {
 model Subscription {
   id               String   @id @default(uuid())
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId           String   
+  userId           String   @unique
   license          License?  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
   licenseId        String?   @unique
   plan             Plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
