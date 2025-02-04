@@ -33,7 +33,6 @@ const items = [
 
 export function AppSidebar() {
   const { isLoggedIn } = useContext(AuthContext);
-console.log("test log");
 
   if (!isLoggedIn) return null;
 
