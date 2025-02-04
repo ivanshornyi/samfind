@@ -43,4 +43,10 @@ export class PlanService {
 
     return plan;
   }
+
+  async getAllPlans() {
+    const plans = await this.prisma.plan.findMany();
+
+    return plans;
+  }
 }

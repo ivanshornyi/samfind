@@ -1,6 +1,13 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 
-import { User, UserAuthType, UserRole, UserStatus } from "@prisma/client";
+import {
+  LicenseTierType,
+  LicenseStatus,
+  User,
+  UserAuthType,
+  UserRole,
+  UserStatus,
+} from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 
 import { UpdateUserDto } from "./dto/update-user-dto";
@@ -192,7 +199,93 @@ export class UserService {
     return updatedUser;
   }
 
+  async findUserSubscriptionInfo(userId: string) {
+    const userInfo = {
+      organizationOwner: false, // with organization
+      standardUser: false, // private with license, (standard tier)
+      freemiumUser: false, // private with freemium tier (without active license)
+      invitedUser: false, // added by invitation (with active license)
+    };
+
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    if (user.organizationId) {
+      userInfo.organizationOwner = true;
+    }
+
+    if (!user.organizationId) {
+      const license = await this.prisma.license.findUnique({
+        where: {
+          ownerId: userId,
+        },
+      });
+
+      if (license) {
+        if (license.tierType === LicenseTierType.freemium) {
+          userInfo.freemiumUser = true;
+        } else if (license.tierType === LicenseTierType.standard) {
+          userInfo.standardUser = true;
+        }
+      } else {
+        const activeLicense = await this.prisma.activeLicense.findFirst({
+          where: {
+            userId,
+          },
+        });
+
+        if (activeLicense) {
+          userInfo.invitedUser = true;
+        }
+      }
+    }
+
+    return userInfo;
+  }
+
   private hashPassword(password: string): string {
     return createHash("sha256").update(password).digest("hex");
+  }
+
+  async deleteUser(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: { License: true, subscription: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    if (user.License.length) {
+      const licenseIds = user.License.map((l) => l.id);
+      await this.prisma.license.updateMany({
+        where: {
+          id: { in: licenseIds },
+        },
+        data: {
+          status: LicenseStatus.inactive,
+        },
+      });
+    }
+
+    if (user.subscription) {
+      await this.prisma.subscription.update({
+        where: { id: user.subscription.id },
+        data: { isActive: false },
+      });
+    }
+
+    await this.prisma.user.update({
+      where: { id },
+      data: { isDeleted: true },
+    });
   }
 }

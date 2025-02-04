@@ -79,8 +79,8 @@ export class SubscriptionService {
 
     const nextDate =
       plan.period === PlanPeriod.monthly
-        ? startOfMonth(addMonths(new Date(), 1))
-        : startOfMonth(addYears(new Date(), 1));
+        ? startOfMonth(addMonths(new Date(), 1)).toISOString()
+        : startOfMonth(addYears(new Date(), 1)).toISOString();
 
     if (!subscription) {
       subscription = await this.prisma.subscription.create({
@@ -113,6 +113,7 @@ export class SubscriptionService {
       subscriptionId: subscription.id,
       stripeCouponId: discountId,
       discountAmount: discount?.amount,
+      firstInvoice: "true",
     };
 
     const invoice = await this.stripeService.createAndPayInvoice({
@@ -123,6 +124,12 @@ export class SubscriptionService {
       description: `Plan - ${plan.type} - ${plan.period}. Quantity - ${quantity}. ${discount ? `Discount: ${discount.amount / 100}$ - ${discount.description}.` : ""}`,
       metadata,
     });
+
+    // const paymentIntent = await this.stripeService.getPaymentIntention(
+    //   invoice.payment_intent as string,
+    // );
+
+    // return { clientSecret: paymentIntent.client_secret };
 
     return { url: invoice.hosted_invoice_url };
   }
@@ -153,12 +160,16 @@ export class SubscriptionService {
 
   async payInvoice() {
     const invoice = await this.stripeService.createAndPayInvoice({
-      customerId: "cus_RgJCv0aVvMKOWq",
-      priceId: "price_1QmdQoIQ0ONDLa6i86RGvcWo",
+      customerId: "cus_Ri6j3QX47oJao7",
+      priceId: "price_1QogLRIQ0ONDLa6iiO7AZxI5",
       quantity: 1,
       // couponId: discountId,
       description: "Description rdfgfdgfgdfsgfdg",
-      metadata: { subscriptionId: "cd07bf65-57be-4334-b831-e1f30b60a0b1" },
+      metadata: {
+        quantity: 1,
+        subscriptionId: "15d1ec94-61ec-4dee-a8f0-492242d32536",
+        // memberId: member.id,
+      },
       pay: true,
     });
 
@@ -191,7 +202,7 @@ export class SubscriptionService {
       memberId: member.id,
     };
 
-    await this.stripeService.createAndPayInvoice({
+    return await this.stripeService.createAndPayInvoice({
       customerId: subscription.user.stripeCustomerId,
       priceId: subscription.plan.stripePriceId,
       quantity: 1,
@@ -228,6 +239,7 @@ export class SubscriptionService {
 
     const invoices = allInvoices.map((invoice) => ({
       id: invoice.id,
+      number: invoice.number,
       url: invoice.hosted_invoice_url,
       pdf: invoice.invoice_pdf,
       status: invoice.status,

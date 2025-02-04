@@ -7,12 +7,20 @@ import {
   UserAccountType,
   LicenseStatus,
   PlanPeriod,
+  User,
 } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { UserService } from "../user/user.service";
 
 import { CreateIntentDto } from "./dto/create-intent-dto";
-import { addMonths, addYears, startOfMonth } from "date-fns";
+import {
+  addMonths,
+  addYears,
+  getDate,
+  getDaysInMonth,
+  getMonth,
+  startOfMonth,
+} from "date-fns";
 import { MailService } from "../mail/mail.service";
 
 interface ICreatePaymentSession {
@@ -200,6 +208,10 @@ export class StripeService {
     return retrieveInvoice;
   }
 
+  async getPaymentIntention(paymentIntentId: string) {
+    return this.stripe.paymentIntents.retrieve(paymentIntentId);
+  }
+
   async createPaymentIntent(
     createPaymentDto: CreateIntentDto,
   ): Promise<Stripe.PaymentIntent> {
@@ -271,7 +283,12 @@ export class StripeService {
       include: { user: true },
     });
 
-    await this.mailService.sendInvitation(subscription.user.email, invoiceLink);
+    if (!subscription) return;
+
+    await this.mailService.sendWarningPaymentFailed(
+      subscription.user.email,
+      invoiceLink,
+    );
   }
 
   private async handleSuccessfulInvoicePayment(invoice: Stripe.Invoice) {
@@ -283,6 +300,7 @@ export class StripeService {
         stripeCouponId,
         discountAmount,
         memberId,
+        firstInvoice,
       } = invoice.metadata;
 
       const subscription = await this.prisma.subscription.findUnique({
@@ -302,12 +320,28 @@ export class StripeService {
       }
 
       if (subscription.licenseId && memberId) {
+        const member = await this.prisma.user.findUnique({
+          where: { id: memberId },
+        });
+        if (!member) return;
+
         await this.prisma.activeLicense.create({
           data: {
             userId: memberId,
             licenseId: subscription.licenseId,
           },
         });
+
+        const discountAmount = this.calculateDiscount(
+          subscription.plan.price,
+          subscription.plan.period === PlanPeriod.yearly
+            ? new Date(subscription.nextDate)
+            : undefined,
+        );
+
+        if (discountAmount === 0) return;
+
+        await this.addDiscount(subscription.user, discountAmount, member.email);
       } else if (subscription.user.accountType === UserAccountType.private) {
         const license = await this.prisma.license.findUnique({
           where: { ownerId: subscription.userId },
@@ -358,11 +392,28 @@ export class StripeService {
         });
       }
 
+      if (firstInvoice) {
+        const discountAmount = this.calculateDiscount(
+          subscription.plan.price * Number(quantity),
+          subscription.plan.period === PlanPeriod.yearly
+            ? new Date(subscription.nextDate)
+            : undefined,
+        );
+
+        if (discountAmount === 0) return;
+
+        await this.addDiscount(
+          subscription.user,
+          discountAmount,
+          subscription.user.email,
+        );
+      }
+
       if (!memberId) {
         const nextDate =
           subscription.plan.period === PlanPeriod.monthly
-            ? startOfMonth(addMonths(new Date(), 1))
-            : startOfMonth(addYears(new Date(), 1));
+            ? startOfMonth(addMonths(new Date(), 1)).toISOString()
+            : startOfMonth(addYears(new Date(), 1)).toISOString();
         await this.prisma.subscription.update({
           where: { id: subscription.id },
           data: {
@@ -378,6 +429,74 @@ export class StripeService {
     } catch (error) {
       this.logger.error("Error adding license to user", error);
     }
+  }
+
+  calculateDiscount(totalAmount: number, nextDate?: Date): number {
+    const today = new Date();
+    const currentDay = getDate(today);
+    const currentMonth = getMonth(today);
+    const totalDaysInMonth = getDaysInMonth(today);
+
+    if (nextDate) {
+      const renewalMonth = getMonth(nextDate);
+      let monthsPassed = ((currentMonth - renewalMonth + 12) % 12) - 1;
+      if (monthsPassed < 0) monthsPassed = 0;
+
+      const monthlyRate = totalAmount / 12;
+      const pastMonthsAmount = monthlyRate * monthsPassed;
+
+      const dailyRate = monthlyRate / totalDaysInMonth;
+      const currentMonthDiscount = dailyRate * (currentDay - 1);
+
+      return Math.round(pastMonthsAmount + currentMonthDiscount);
+    } else {
+      const dailyRate = Math.round(totalAmount / totalDaysInMonth);
+      return dailyRate * (currentDay - 1);
+    }
+  }
+
+  async addDiscount(user: User, discountAmount: number, email: string) {
+    let discount = await this.prisma.discount.findFirst({
+      where: {
+        userId: user.id,
+        stripeCouponId: null,
+        used: false,
+      },
+    });
+
+    if (!discount) {
+      discount = await this.prisma.discount.create({
+        data: {
+          userId: user.id,
+          stripeCouponId: null,
+          used: false,
+          endAmount: discountAmount,
+        },
+      });
+    } else {
+      await this.prisma.discount.update({
+        where: { id: discount.id },
+        data: {
+          endAmount: discount.endAmount + discountAmount,
+        },
+      });
+    }
+
+    await this.prisma.discountIncome.create({
+      data: {
+        userId: user.id,
+        discountId: discount.id,
+        amount: discountAmount,
+        description: `Discount for unused user period user with email - ${email}`,
+      },
+    });
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        discount: user.discount + discountAmount,
+      },
+    });
   }
 
   private async handleSuccessfulPayment(paymentIntent: Stripe.PaymentIntent) {

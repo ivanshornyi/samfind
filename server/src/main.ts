@@ -12,15 +12,15 @@ async function bootstrap() {
   const configService = new ConfigService();
 
   const PORT = configService.get("SERVER_PORT") || 4000;
-
+  const FRONTEND_DOMAIN =
+    configService.get("FRONTEND_DOMAIN") || "http://localhost:3000";
   const app = await NestFactory.create(AppModule, { rawBody: true });
 
   app.enableCors({
     origin: [
-      "http://localhost:3000",
       "http://localhost:5173",
+      FRONTEND_DOMAIN,
       configService.get("FRONTEND_DOMAIN"),
-      configService.get("ADMIN_FRONTEND_DOMAIN"),
     ],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
   });

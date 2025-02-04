@@ -23,6 +23,7 @@ import { SendCodeForEmailDto } from "./dto/send-code-for-email.dto";
 
 import { createHash } from "crypto";
 import { AuthVerificationDto } from "./dto/auth-verification-dto";
+import { SubscriptionService } from "../subscription/subscription.service";
 
 @Injectable()
 export class AuthService {
@@ -31,6 +32,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly tokenService: TokenService,
     private readonly mailService: MailService,
+    private readonly subscriptionService: SubscriptionService,
   ) {}
 
   public async signUp(signUpDto: SignUpDto) {
@@ -96,25 +98,6 @@ export class AuthService {
         });
       }
 
-      // add license
-      if (accountType === UserAccountType.private) {
-        const userLicense = await this.prisma.license.create({
-          data: {
-            ownerId: newUser.id,
-            status: LicenseStatus.active,
-            limit: 0,
-            tierType: LicenseTierType.freemium,
-          },
-        });
-
-        await this.prisma.activeLicense.create({
-          data: {
-            userId: newUser.id,
-            licenseId: userLicense.id,
-          },
-        });
-      }
-
       return newUser;
     } else {
       await this.userService.updateUser(existingUser.id, {
@@ -138,6 +121,10 @@ export class AuthService {
 
     if (!user.isVerified) {
       throw new UnauthorizedException("User is not verified");
+    }
+
+    if (user.isDeleted) {
+      throw new UnauthorizedException("User is deleted");
     }
 
     const isPasswordValid = this.isPasswordValid(password, user.password);
@@ -314,6 +301,29 @@ export class AuthService {
       throw new UnauthorizedException("Verification code has expired");
     }
 
+    // if user private and without license id => add freemium
+    if (
+      !authVerificationDto.licenseId &&
+      !authVerificationDto.organizationId &&
+      user.accountType === UserAccountType.private
+    ) {
+      const userLicense = await this.prisma.license.create({
+        data: {
+          ownerId: user.id,
+          status: LicenseStatus.active,
+          limit: 0,
+          tierType: LicenseTierType.freemium,
+        },
+      });
+
+      await this.prisma.activeLicense.create({
+        data: {
+          userId: user.id,
+          licenseId: userLicense.id,
+        },
+      });
+    }
+
     if (authVerificationDto.licenseId) {
       const license = await this.prisma.license.findUnique({
         where: {
@@ -337,15 +347,16 @@ export class AuthService {
         throw new ConflictException("License limit is reached");
       }
 
+      console.log(license);
+
       if (!license.availableEmails.includes(authVerificationDto.email)) {
         throw new ConflictException("This email does not have access");
       }
 
-      await this.prisma.activeLicense.create({
-        data: {
-          licenseId: authVerificationDto.licenseId,
-          userId: user.id,
-        },
+      // Create and pay Invoice for License of invited user
+      await this.subscriptionService.payMemberInvoice({
+        memberId: user.id,
+        ownerId: license.ownerId,
       });
     }
 
@@ -394,12 +405,10 @@ export class AuthService {
         throw new ConflictException("This email does not have access");
       }
 
-      // create active license
-      await this.prisma.activeLicense.create({
-        data: {
-          licenseId: license.id,
-          userId: user.id,
-        },
+      // Create and pay Invoice for License of invited user
+      await this.subscriptionService.payMemberInvoice({
+        memberId: user.id,
+        ownerId: license.ownerId,
       });
 
       // add userId to organization

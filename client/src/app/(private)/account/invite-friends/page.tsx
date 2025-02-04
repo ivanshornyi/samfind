@@ -21,7 +21,7 @@ export default function InvitedFriends() {
 
   const handleCopyReferralCodeLink = () => {
     if (user) {
-      const link = `${frontendDomain}/auth/sign-up?accountType=private&referralCode=${user.referralCode}`;
+      const link = `${frontendDomain}/auth/referal-account?referralCode=${user.referralCode}`;
 
       navigator.clipboard.writeText(link);
 

@@ -18,9 +18,7 @@ const getStripeClient = async (data: CreateIntent) => {
     const response = await apiClient.post("/stripe/create-payment-intent", {
       ...data,
     });
-
-    console.log(response.data);
-
+    
     return response.data as { client_secret: string };
   } catch (error) {
     handleApiError(error);

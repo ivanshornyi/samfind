@@ -1,9 +1,14 @@
-import { IsString } from "class-validator";
+import { IsString, IsOptional } from "class-validator";
 
 export class CheckDeviceDto {
   @IsString()
-  email?: string;
+  email: string;
 
+  @IsOptional()
   @IsString()
-  computer_id: string;
+  computer_id?: string;
+
+  @IsOptional()
+  @IsString()
+  mobile_id?: string;
 }

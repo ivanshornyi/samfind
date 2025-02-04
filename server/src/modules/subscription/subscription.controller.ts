@@ -17,7 +17,7 @@ export class SubscriptionController {
   }
 
   @ApiOperation({ summary: "Create Invoice to Pay Member License" })
-  @Post("/")
+  @Post("/invoice")
   async payMemberInvoice(
     @Body() createMemberInvoiceDto: CreateMemberInvoiceDto,
   ) {
@@ -31,7 +31,7 @@ export class SubscriptionController {
   }
 
   @ApiOperation({ summary: "Test Pay Invoice" })
-  @Post("/invoice")
+  @Post("/invoice-test")
   async payInvoice() {
     return this.subscriptionService.payInvoice();
   }

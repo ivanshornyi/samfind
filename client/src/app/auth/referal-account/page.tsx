@@ -2,12 +2,13 @@
 
 import { Button, Card } from "@/components";
 import type { UserAccountType } from "@/types";
-import { Check } from "lucide-react";
+import { Check, Gift } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { type AccountCard, ACCOUNT_TYPE_CARD_ITEMS } from "./data";
+import { ACCOUNT_TYPE_CARD_ITEMS, AccountCard } from "../account-type/data";
 
-export default function AccountType() {
+export default function AccountReferalType() {
   const [accountCards, setAccountCards] = useState<AccountCard[]>(
     ACCOUNT_TYPE_CARD_ITEMS
   );
@@ -15,6 +16,11 @@ export default function AccountType() {
   const [accountType, setAccountType] = useState<UserAccountType>(
     ACCOUNT_TYPE_CARD_ITEMS[0].type
   );
+
+  const searchParams = useSearchParams();
+  const referralCode = searchParams.get("referralCode");
+
+  console.log(referralCode);
 
   const handleChooseAccountType = (type: UserAccountType) => {
     setAccountCards(
@@ -40,7 +46,8 @@ export default function AccountType() {
         <div className="flex flex-col gap-10">
           <div>
             <h1 className="text-4xl font-bold flex items-center gap-4">
-              Choose your account type
+              <Gift size={48} color="#CE9DF3" />
+              You&apos;ve got a 10% discount!
             </h1>
             <p className="mt-4 text-lg">
               Let us know how you&apos;ll be using the platform so we can set
@@ -112,7 +119,7 @@ export default function AccountType() {
 
           <div className="flex justify-end mt-4">
             <Link
-              href={`/auth/sign-up?accountType=${accountType}`}
+              href={`/auth/sign-up?accountType=${accountType}&userReferralCode=${referralCode}`}
               className={`${isNextButtonVisible ? "visible" : "invisible"}`}
             >
               <Button className="bg-white hover:bg-gray-100 text-[#8F40E5] px-8 py-3 rounded-full font-medium">

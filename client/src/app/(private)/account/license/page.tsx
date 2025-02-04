@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
-import { useGetUserLicense, useGetUserLicenses, useToast } from "@/hooks";
+import { useGetUserLicense, useGetUserLicenses, useGetUserSubscriptionInfo, useToast } from "@/hooks";
 
 import Link from "next/link";
 
@@ -26,16 +26,16 @@ import {
 
 import {
   Button,
-  Input,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Input,
 } from "@/components";
 
 import { ReusableTable } from "@/components/table";
-import { InviteMember, ProgressChart } from "./_components";
 import { AuthContext } from "@/context";
+import { InviteMember, ProgressChart } from "./_components";
 
 import { ArrowUpDown, Check, Copy, Info, MoreHorizontal, Search, User } from "lucide-react";
 import { LicenseTierType } from "@/types";
@@ -196,6 +196,8 @@ export default function License() {
   
   const { data: license, isPending: isLicensePending } = useGetUserLicense(userLicense?.id ?? "");  
 
+  const { data: userSubscriptionInfo } = useGetUserSubscriptionInfo();
+
   const itemsPerPage = 10;
   const pageCount = Math.ceil(userLicense?.users?.length ?? 0 / itemsPerPage);
 
@@ -260,13 +262,11 @@ export default function License() {
   });
 
   return (
-    <div className="mx-auto w-[1000px]">
+    <div className="mx-auto max-w-[1000px]">
       <div className="w-full">
         <h2 className="text-[32px] leading-[44px] font-semibold">
           License management
         </h2>
-
-        {!license && <p>You do not have any license</p>}
 
         {license?.tierType !== LicenseTierType.Freemium && (<>
           {userLicense && !isUserLicensesPending && !isLicensePending && (
@@ -315,7 +315,7 @@ export default function License() {
           )}
         </>)}
 
-        {license?.tierType === LicenseTierType.Freemium && (
+        {userSubscriptionInfo?.freemiumUser && (
           <>
             <div className="flex flex-col gap-[32px] mt-[60px] w-[742px]">
               <div 
@@ -369,8 +369,22 @@ export default function License() {
           </>
         )}
 
-        {!userLicense && !isUserLicensesPending && (
-          <div>You do not have a license</div>
+        {userSubscriptionInfo?.invitedUser && (
+          <div className="mt-4">
+            <div className="capitalize text-blue-50 flex items-center justify-center gap-2 bg-card rounded-full p-3 w-[200px]">
+              <User size={18} />
+              {user?.accountType} Account
+            </div>
+
+            <div>
+              <div>
+                <p>You have joined the workspace of the user {} and use access to the license.</p>
+              </div>
+              <ul>
+
+              </ul>
+            </div>
+          </div>
         )}
       </div>
     </div>

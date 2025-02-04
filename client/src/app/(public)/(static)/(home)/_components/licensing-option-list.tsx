@@ -1,3 +1,7 @@
+"use client";
+
+
+
 import { licensingOptions } from "../_lib";
 import { LicensingOptionCard } from "./licensing-option-card";
 

@@ -39,6 +39,7 @@ model User {
   status                    UserStatus
   role                      UserRole
   isVerified                Boolean          @default(false)
+  isDeleted                 Boolean          @default(false)
   registrationCode          String?
   registrationCodeExpiresAt DateTime?
   resetCode                 String?          @db.VarChar
@@ -95,10 +96,11 @@ model License {
 model ActiveLicense {
   id        String   @id @default(uuid())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
+  userId    String  
   license   License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
   licenseId String
-  deviceId  String?
+  desktopId String?
+  mobileId  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
