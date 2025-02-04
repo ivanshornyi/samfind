@@ -44,6 +44,11 @@ const validatePassword = (password: string) => {
   };
 };
 
+const validateEmail = (email: string) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
 export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
   const { toast } = useToast();
 
@@ -159,6 +164,13 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
           description: "Some fields are empty",
         });
 
+        return;
+      }
+
+      if (!validateEmail(formData.email)) {
+        toast({
+          description: "Invalid email address",
+        });
         return;
       }
 
