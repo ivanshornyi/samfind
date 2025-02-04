@@ -56,9 +56,22 @@ const updateUserLicense = async (id: string, data: UpdateUserLicenseData) => {
   }
 };
 
+const deleteMemberFromLicense = async (licenseId: string, memberId: string) => {
+  try {
+    const response = await apiClient.delete(
+      `/user-license/${licenseId}/member/${memberId}`
+    );
+
+    return response;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 export const UserLicenseApiService = {
   addUserLicense,
   getUserLicense,
   getUserLicenses,
   updateUserLicense,
+  deleteMemberFromLicense,
 };

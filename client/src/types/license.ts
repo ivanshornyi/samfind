@@ -21,7 +21,9 @@ export interface License {
 export interface LicenseList {
   id: string;
   limit: number;
+  tierType: LicenseTierType;
   users: {
+    id: string;
     name: string;
     email: string;
     date: Date;
