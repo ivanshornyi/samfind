@@ -49,8 +49,6 @@ export const AppSidebar = () => {
 
   const { data: userSubscriptionInfo } = useGetUserSubscriptionInfo();
 
-  console.log(userSubscriptionInfo);
-
   return (
     <Sidebar className="py-8 border-secondary bg-background">
       <SidebarHeader className="px-4 h-[60px] bg-background">
@@ -62,7 +60,7 @@ export const AppSidebar = () => {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-4">
-            {!userSubscriptionInfo?.defaultUser && NAVIGATION_ITEMS.map(item => {
+            {!userSubscriptionInfo?.invitedUser && NAVIGATION_ITEMS.map(item => {
               const isActive = pathname === item.path;
             
               return (
@@ -87,7 +85,7 @@ export const AppSidebar = () => {
               );
             })}
 
-            {userSubscriptionInfo?.defaultUser && (
+            {userSubscriptionInfo?.invitedUser && (
               <SidebarMenuItem>
               <Link href="/account/license">
                 <Button
@@ -121,12 +119,12 @@ export const AppSidebar = () => {
             Profile settings
           </Button>
         </Link>
-        <Button
+        {/* <Button
           variant="menuItem"
           leftIcon={<Headset style={{ width: "24px", height: "24px" }} />}
         >
           Support
-        </Button>
+        </Button> */}
         <LogoutModal />
       </SidebarFooter>
     </Sidebar>

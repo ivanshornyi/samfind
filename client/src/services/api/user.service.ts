@@ -46,7 +46,7 @@ export interface UserInfo {
   organizationOwner: boolean; // with organization
   standardUser: boolean; // private with license, (standard tier) 
   freemiumUser: boolean; // private with freemium tier (without ActiveLicense bu with License)
-  defaultUser: boolean; // added by invitation (with ActiveLicense)
+  invitedUser: boolean; // added by invitation (with ActiveLicense)
 }
 
 const getUserSubscriptionInfo = async (id: string) => {

@@ -115,8 +115,6 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
     if (userLicense) {
       setEmails([...userLicense.availableEmails]);
     }
-
-    console.log(userLicense);
   }, [userLicense]);
 
   useEffect(() => {

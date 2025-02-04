@@ -197,7 +197,7 @@ export class UserService {
       organizationOwner: false, // with organization
       standardUser: false, // private with license, (standard tier) 
       freemiumUser: false, // private with freemium tier (without active license)
-      defaultUser: false, // added by invitation (with active license)
+      invitedUser: false, // added by invitation (with active license)
     }
 
     const user = await this.prisma.user.findUnique({
@@ -235,7 +235,7 @@ export class UserService {
         });
   
         if (activeLicense) {
-          userInfo.defaultUser = true;
+          userInfo.invitedUser = true;
         }
       }
     }

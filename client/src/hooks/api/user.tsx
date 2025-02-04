@@ -37,5 +37,6 @@ export const useGetUserSubscriptionInfo = () => {
     queryFn: () => UserApiService.getUserSubscriptionInfo(user?.id ?? ""),
     queryKey: ["user-subscription-info"],
     enabled: !!user?.id,
+    staleTime: 5_000_000,
   });
 };
