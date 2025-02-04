@@ -28,7 +28,7 @@ const items = [
 
 export default function DownloadSoftware() {
   return (
-    <div className="w-full space-y-6 sm:space-y-[68px]">
+    <div className="w-full space-y-6 sm:space-y-[68px] py-14">
       <h1 className="font-semibold text-[24px] leading-[32px] sm:text-[32px] sm:leading-[43px] text-start sm:text-center">
         Download and install our Software
       </h1>
