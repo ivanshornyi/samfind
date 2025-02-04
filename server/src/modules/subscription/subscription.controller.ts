@@ -31,7 +31,7 @@ export class SubscriptionController {
   }
 
   @ApiOperation({ summary: "Test Pay Invoice" })
-  @Post("/invoice")
+  @Post("/invoice-test")
   async payInvoice() {
     return this.subscriptionService.payInvoice();
   }

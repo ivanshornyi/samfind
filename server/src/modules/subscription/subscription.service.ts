@@ -160,12 +160,16 @@ export class SubscriptionService {
 
   async payInvoice() {
     const invoice = await this.stripeService.createAndPayInvoice({
-      customerId: "cus_RgJCv0aVvMKOWq",
-      priceId: "price_1QmdQoIQ0ONDLa6i86RGvcWo",
+      customerId: "cus_Ri6j3QX47oJao7",
+      priceId: "price_1QogLRIQ0ONDLa6iiO7AZxI5",
       quantity: 1,
       // couponId: discountId,
       description: "Description rdfgfdgfgdfsgfdg",
-      metadata: { subscriptionId: "cd07bf65-57be-4334-b831-e1f30b60a0b1" },
+      metadata: {
+        quantity: 1,
+        subscriptionId: "15d1ec94-61ec-4dee-a8f0-492242d32536",
+        // memberId: member.id,
+      },
       pay: true,
     });
 
