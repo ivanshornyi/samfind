@@ -42,12 +42,12 @@ export const useGetUserSubscriptionInfo = () => {
 };
 
 export const useDeleteUser = () => {
-  const { user } = useContext(AuthContext);
-
-  return useQuery({
-    queryFn: () => UserApiService.getUserSubscriptionInfo(user?.id ?? ""),
-    queryKey: ["user-subscription-info"],
-    enabled: !!user?.id,
-    staleTime: 5_000_000,
+  const { user, logout } = useContext(AuthContext);
+  return useMutation({
+    mutationFn: () => UserApiService.deleteUser(user?.id ?? ""),
+    mutationKey: ["delete-user"],
+    onSuccess: () => {
+      logout();
+    },
   });
 };

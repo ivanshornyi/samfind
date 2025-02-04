@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
 import {
   AlertDialog,
@@ -12,11 +12,13 @@ import {
   AlertDialogCancel,
   AlertDialogFooter,
 } from "@/components";
-
+import { useDeleteUser } from "@/hooks/api/user";
 import { X } from "lucide-react";
+import { AuthContext } from "@/context";
 
 export const DeleteAccount = () => {
   const [open, setOpen] = useState<boolean>(false);
+  const { mutate: deleteUser } = useDeleteUser();
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -59,6 +61,7 @@ export const DeleteAccount = () => {
             Cancel
           </Button>
           <Button
+            onClick={() => deleteUser()}
             className="w-full bg-[#FF6C6C] hover:bg-[#D23535] active:bg-[#302935]"
             variant="saveProfile"
             withLoader={true}

@@ -61,7 +61,7 @@ const getUserSubscriptionInfo = async (id: string) => {
 
 const deleteUser = async (id: string) => {
   try {
-    const response = await apiClient.get(`/user/subscription-info/${id}`);
+    const response = await apiClient.delete(`/user/${id}`);
 
     return response.data as UserInfo;
   } catch (error) {

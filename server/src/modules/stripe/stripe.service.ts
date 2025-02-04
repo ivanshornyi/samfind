@@ -283,6 +283,8 @@ export class StripeService {
       include: { user: true },
     });
 
+    if (!subscription) return;
+
     await this.mailService.sendWarningPaymentFailed(
       subscription.user.email,
       invoiceLink,
