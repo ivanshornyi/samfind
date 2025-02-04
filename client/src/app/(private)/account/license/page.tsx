@@ -310,7 +310,7 @@ export default function License() {
           License management
         </h2>
 
-        {userLicense?.tierType !== LicenseTierType.Freemium && (
+        {!userSubscriptionInfo?.freemiumUser && (
           <>
             {userLicense &&
               !isUserLicensesPending &&
