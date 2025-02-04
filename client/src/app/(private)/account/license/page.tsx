@@ -369,10 +369,22 @@ export default function License() {
           </>
         )}
 
-        {}
+        {userSubscriptionInfo?.invitedUser && (
+          <div className="mt-4">
+            <div className="capitalize text-blue-50 flex items-center justify-center gap-2 bg-card rounded-full p-3 w-[200px]">
+              <User size={18} />
+              {user?.accountType} Account
+            </div>
 
-        {!userLicense && !isUserLicensesPending && (
-          <div>You do not have a license</div>
+            <div>
+              <div>
+                <p>You have joined the workspace of the user {} and use access to the license.</p>
+              </div>
+              <ul>
+
+              </ul>
+            </div>
+          </div>
         )}
       </div>
     </div>

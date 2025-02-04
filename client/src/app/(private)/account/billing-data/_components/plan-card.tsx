@@ -49,10 +49,21 @@ export const PlanCard = ({ plan } : { plan: Plan }) => {
     >
       <p className="capitalize font-semibold text-xl">{plan.period}</p> 
       <p>Boost your capabilities with premium features and priority support.</p>
+
       <p>
         <span className="text-[36px]">{plan.price}</span>
         <span>/month, billed monthly{plan.period === PlanPeriod.Monthly}</span>
       </p>
+
+      <div className="flex items-center gap-2"> 
+        <label>License quantity</label>
+        <input 
+          className="bg-transparent border-none w-[50px] text-lg bg-white text-black rounded-[5px] px-2"
+          type="number"
+          value={quantity}
+          onChange={(event) => setQuantity(Number(event.target.value))}
+        />
+      </div>
 
       <ul>
 

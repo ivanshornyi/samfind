@@ -123,7 +123,7 @@ export class AuthService {
       throw new UnauthorizedException("User is not verified");
     }
 
-    if (!user.isDeleted) {
+    if (user.isDeleted) {
       throw new UnauthorizedException("User is deleted");
     }
 
@@ -354,14 +354,10 @@ export class AuthService {
       }
 
       // Create and pay Invoice for License of invited user
-      const invoice = await this.subscriptionService.payMemberInvoice({
+      await this.subscriptionService.payMemberInvoice({
         memberId: user.id,
         ownerId: license.ownerId,
       });
-
-      if (invoice.status !== "paid") {
-        throw new ConflictException("An error occurred during payment Invoice");
-      }
     }
 
     if (authVerificationDto.organizationId) {
@@ -410,14 +406,10 @@ export class AuthService {
       }
 
       // Create and pay Invoice for License of invited user
-      const invoice = await this.subscriptionService.payMemberInvoice({
+      await this.subscriptionService.payMemberInvoice({
         memberId: user.id,
         ownerId: license.ownerId,
       });
-
-      if (invoice.status !== "paid") {
-        throw new ConflictException("An error occurred during payment Invoice");
-      }
 
       // add userId to organization
       const organizationUserIds = organization.userIds;
