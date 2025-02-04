@@ -34,7 +34,7 @@ const getUserLicense = async (id: string) => {
 const getUserLicenses = async (userId: string) => {
   try {
     const response = await apiClient.get(`/user-license/find/${userId}`);
-    
+
     return response.data as LicenseList | null;
   } catch (error) {
     handleApiError(error);
