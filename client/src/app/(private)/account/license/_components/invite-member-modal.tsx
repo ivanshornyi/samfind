@@ -130,7 +130,7 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
           Invite members
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent className="w-[590px]">
+      <AlertDialogContent className="w-full max-w-[590px]">
         <div className="absolute right-1 top-1">
           <AlertDialogCancel className="shadow-none border-none p-3">
             <X size={18} />
