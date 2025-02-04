@@ -3,6 +3,7 @@
 import { useContext, useEffect, useState } from "react";
 
 import {
+  useGetInvitedUserInfo,
   useGetUserLicenses,
   useGetUserSubscriptionInfo,
   useToast,
@@ -49,6 +50,7 @@ import {
   MoreHorizontal,
   Search,
   User,
+  Download,
 } from "lucide-react";
 import { LicenseTierType } from "@/types";
 
@@ -199,18 +201,6 @@ const FREEMIUM_FEATURES = [
   },
   {
     title: "Basic support",
-  },
-];
-
-const INVITED_USER_FEATURES = [
-  {
-    title: "Enhanced capabilities",
-  },
-  {
-    title: "Priority updates",
-  },
-  {
-    title: "Premium support",
   },
 ];
 

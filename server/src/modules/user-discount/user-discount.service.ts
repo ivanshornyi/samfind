@@ -2,18 +2,18 @@ import { Injectable } from "@nestjs/common";
 
 import { PrismaService } from "../prisma/prisma.service";
 
-Injectable()
+Injectable();
 export class UserDiscountService {
-  constructor (private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async getUserDiscount(userId: string) {
-    const discount = await this.prisma.discount.findUnique({
+    const discount = await this.prisma.discount.findFirst({
       where: {
         userId,
-      }
+        used: false,
+        stripeCouponId: null,
+      },
     });
-
-    console.log(discount);
 
     return discount;
   }
