@@ -40,3 +40,14 @@ export const useGetUserSubscriptionInfo = () => {
     staleTime: 5_000_000,
   });
 };
+
+export const useDeleteUser = () => {
+  const { user } = useContext(AuthContext);
+
+  return useQuery({
+    queryFn: () => UserApiService.getUserSubscriptionInfo(user?.id ?? ""),
+    queryKey: ["user-subscription-info"],
+    enabled: !!user?.id,
+    staleTime: 5_000_000,
+  });
+};
