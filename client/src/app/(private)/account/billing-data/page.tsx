@@ -10,8 +10,6 @@ export default function BillingData() {
   const { data: userLicense, isPending: isUserLicensePending } =
     useGetUserLicenses();
 
-  console.log(userLicense);
-
   return (
     <div className="w-full text-white">
       <div className="space-y-8">
