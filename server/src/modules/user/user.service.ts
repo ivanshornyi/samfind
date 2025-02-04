@@ -250,6 +250,48 @@ export class UserService {
     return userInfo;
   }
 
+  async findInvitedUserInfo(userId: string) {
+    const activeLicense = await this.prisma.activeLicense.findFirst({
+      where: {
+        userId,
+      }
+    });
+
+    const license = await this.prisma.license.findUnique({
+      where: {
+        id: activeLicense.licenseId,
+      },
+      select: {
+        id: true,
+        ownerId: true,
+        tierType: true,
+        updatedAt: true,
+      }
+    });
+
+    const licenseOwner = await this.prisma.user.findUnique({
+      where: {
+        id: license.ownerId,
+      },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        organizationId: true,
+      }
+    });
+
+    return {
+      license: {
+        ...license,
+      },
+      licenseOwner: {
+        ...licenseOwner,
+      },
+    }
+  }
+
   private hashPassword(password: string): string {
     return createHash("sha256").update(password).digest("hex");
   }

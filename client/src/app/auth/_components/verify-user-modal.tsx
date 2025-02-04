@@ -91,7 +91,7 @@ export const VerifyUserModal: React.FC<VerifyUserModalProps> = ({
 
   return (
     <AlertDialog open={isModalOpen}>
-      <AlertDialogContent className="w-[591px] p-8">
+      <AlertDialogContent className="w-full max-w-[591px] p-8">
         <div className="absolute right-5 top-5">
           <AlertDialogCancel
             className="shadow-none border-none p-1 rounded-full bg-card"

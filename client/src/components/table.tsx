@@ -87,7 +87,7 @@ export const ReusableTable = <T extends RowData>({
           )}
         </TableBody>
       </Table>
-      {pageCount > 1 && (
+      {/* {pageCount > 1 && (
         <ReactPaginate
           breakLabel="..."
           nextLabel={<ChevronRight />}
@@ -104,7 +104,7 @@ export const ReusableTable = <T extends RowData>({
           breakClassName="px-3 py-1 bg-transparent text-[#A8A8A8] rounded-md"
           disabledClassName="bg-transparent text-slate-600 cursor-not-allowed"
         />
-      )}
+      )} */}
     </div>
   );
 };

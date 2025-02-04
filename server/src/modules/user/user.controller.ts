@@ -110,4 +110,10 @@ export class UserController {
     // find user information, where he has subscription, type of subscription, in other license and organization or not
     return this.userService.findUserSubscriptionInfo(userId);
   }
+
+  @ApiOperation({ summary: "Find user invited user info" })
+  @Get("/find-invited-user/info/:userId")
+  async getInvitedUserInfo(@Param("userId") userId: string) {
+    return this.userService.findInvitedUserInfo(userId);
+  }
 }

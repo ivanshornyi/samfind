@@ -86,7 +86,7 @@ export const PaymentsModal: React.FC<PaymentsModalProps> = ({
           {buttonText}
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent className="w-[700px] max-h-[90dvh] overflow-auto rounded-2xl bg-white">
+      <AlertDialogContent className="w-full max-w-[700px] max-h-[90dvh] overflow-auto rounded-2xl bg-white">
         <div className="absolute right-0 top-1">
           <AlertDialogCancel className="rounded-1 bg-transparent shadow-none border-none text-black hover:text-black">
             <X size={18} />

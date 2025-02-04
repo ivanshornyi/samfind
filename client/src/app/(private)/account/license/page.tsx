@@ -52,6 +52,8 @@ import {
 } from "lucide-react";
 import { LicenseTierType } from "@/types";
 
+import { format } from "date-fns";
+
 const frontendDomain = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN;
 
 const headers = {
@@ -200,6 +202,30 @@ const FREEMIUM_FEATURES = [
   },
 ];
 
+const INVITED_USER_FEATURES = [
+  {
+    title: "Enhanced capabilities",
+  },
+  {
+    title: "Priority updates",
+  },
+  {
+    title: "Premium support",
+  },
+];
+
+const INVITED_USER_FEATURES = [
+  {
+    title: "Enhanced capabilities",
+  },
+  {
+    title: "Priority updates",
+  },
+  {
+    title: "Premium support",
+  },
+];
+
 export default function License() {
   const { user } = useContext(AuthContext);
   const { toast } = useToast();
@@ -215,6 +241,8 @@ export default function License() {
     useGetUserLicenses();
 
   const { data: userSubscriptionInfo } = useGetUserSubscriptionInfo();
+
+  const { data: invitedUserData } = useGetInvitedUserInfo();
 
   const itemsPerPage = 10;
   const pageCount = Math.ceil(userLicense?.users?.length ?? 0 / itemsPerPage);
@@ -238,6 +266,12 @@ export default function License() {
       });
     }
   };
+
+  function formatDate(dateString: string): string {
+    const date = new Date(dateString);
+
+    return format(date, "MMMM dd, yyyy");
+  }
 
   useEffect(() => {
     if (userLicense?.users && user) {
@@ -341,6 +375,30 @@ export default function License() {
           </>
         )}
 
+        {userSubscriptionInfo?.organizationOwner && !userLicense && (
+          <>
+            <div
+              className="
+                flex justify-between items-center rounded-[20px] 
+                p-6 bg-violet-400/10 mt-4
+              "
+            >
+              <div>
+                <h2 className="text-xl font-semibold">
+                  Upgrade your subscription and unlock more features!
+                </h2>
+                <p>
+                  Boost your capabilities with premium features and priority
+                  support.
+                </p>
+              </div>
+              <Link href="/account/billing-data">
+                <Button variant="tetrary">Get started</Button>
+              </Link>
+            </div>
+          </>
+        )}
+
         {userSubscriptionInfo?.freemiumUser && (
           <>
             <div className="flex flex-col gap-[32px] mt-[60px] w-[742px]">
@@ -364,7 +422,7 @@ export default function License() {
                 </Link>
               </div>
 
-              <div className="capitalize text-blue-50 flex items-center justify-center gap-2 bg-card rounded-full p-3 w-[200px]">
+              <div className="capitalize text-blue-50 flex items-center justify-center gap-2 bg-card rounded-full px-3 py-2  w-[200px]">
                 <User size={18} />
                 {user?.accountType} Account
               </div>
@@ -397,10 +455,58 @@ export default function License() {
           </>
         )}
 
-        {}
+        {userSubscriptionInfo?.invitedUser && (
+          <div className="mt-4">
+            <div className="capitalize text-blue-50 flex items-center justify-center gap-2 bg-card rounded-full px-3 py-2 w-[200px]">
+              <User size={18} />
+              {user?.accountType} Account
+            </div>
 
-        {!userLicense && !isUserLicensesPending && (
-          <div>You do not have a license</div>
+            <div className="flex justify-between items-start mt-4">
+              <div className="p-4 rounded-lg bg-card w-[330px]">
+                <p>
+                  You have joined the workspace of the user{" "}
+                  <span className="capitalize text-blue-50">{`${invitedUserData?.licenseOwner.firstName} ${invitedUserData?.licenseOwner.lastName}`}</span>
+                  and use access to the license.
+                </p>
+              </div>
+              <ul className="flex flex-col gap-2">
+                {INVITED_USER_FEATURES.map((item, index) => (
+                  <li key={index} className="flex gap-3">
+                    <Check size={20} className="text-violet-50" />
+                    <span>{item.title}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="mt-4">
+              <p className="text-2xl">Plan</p>
+              <div className="mt-3">
+                <div className="flex items-center gap-3">
+                  <p className="capitalize text-lg">
+                    {invitedUserData?.license.tierType}
+                  </p>
+                  <span className="bg-green-500/5 p-2 px-4 text-xs text-green-600 rounded-full">
+                    Active subscription
+                  </span>
+                </div>
+
+                {/* <p className="opacity-50 mt-2">Renews {invitedUserData?.license?.updatedAt && formatDate(invitedUserData.license.updatedAt)}</p> */}
+                <Link
+                  href="/download-app"
+                  className="
+                    bg-violet-100 flex gap-2 items-center w-[200px] 
+                    justify-center mt-4 text-white rounded-full px-3 
+                    py-2 capitalize hover:opacity-70
+                  "
+                >
+                  <Download size={24} />
+                  <span>Download app</span>
+                </Link>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>

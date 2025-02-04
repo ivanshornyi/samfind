@@ -134,28 +134,28 @@ export default function Settings() {
     <div className="pb-[50px] flex justify-center">
       {(isUpdateUserPending || userLoading) && <FullScreenLoader />}
       <div className="w-full">
-        <div className="flex justify-between items-center w-full">
-          <h2 className="text-[32px] leading-[44px] font-semibold">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full">
+          <h2 className="text-2xl sm:text-[32px] leading-[44px] font-semibold mb-4 sm:mb-0">
             Profile settings
           </h2>
-          <div className="text-link-hover flex gap-2 items-center border-none border-r-[20px] p-[10px] px-[26px]">
+          <div className="text-link-hover flex gap-2 items-center border-none border-r-[20px] p-[10px] px-[26px] rounded-3xl bg-[#242424]">
             <User size={17} />
             <span className="capitalize">{user?.accountType} Account</span>
           </div>
         </div>
-        <div className="mt-[77px]">
+        <div className="mt-8 sm:mt-[77px]">
           <h3 className="text-[20px] leading-[27px] font-semibold">
             Personal details
           </h3>
           <div className="w-full mt-6 pb-2 border-b border-[#444444]">
             <div className="flex justify-between items-start w-full">
-              <div>
+              <div className="w-full">
                 <div className="flex gap-2">
-                  <div>
+                  <div className="w-full">
                     <p className="text-[16px] leading-[22px] font-semibold">
                       First Name
                     </p>
-                    <div className="w-[220px] mt-2">
+                    <div className="w-full max-w-[220px] mt-2">
                       {editName ? (
                         <Input
                           name="firstName"
@@ -170,11 +170,11 @@ export default function Settings() {
                       )}
                     </div>
                   </div>
-                  <div>
+                  <div className="w-full">
                     <p className="text-[16px] leading-[22px] font-semibold">
                       Last Name
                     </p>
-                    <div className="w-[220px] mt-2 ">
+                    <div className="w-full max-w-[220px] mt-2 ">
                       {editName ? (
                         <Input
                           name="lastName"
@@ -213,11 +213,11 @@ export default function Settings() {
           </div>
           <div className="w-full mt-6 pb-2 border-b border-[#444444]">
             <div className="flex justify-between items-start w-full">
-              <div>
+              <div className="w-full">
                 <p className="text-[16px] leading-[22px] font-semibold">
                   User password
                 </p>
-                <div className="w-[450px] mt-2">
+                <div className="w-full max-w-[450px] mt-2">
                   {editPassword ? (
                     <div className="flex gap-2">
                       <Input
