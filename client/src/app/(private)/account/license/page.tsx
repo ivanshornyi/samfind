@@ -2,7 +2,7 @@
 
 import { useContext, useEffect, useState } from "react";
 
-import { useGetUserLicense, useGetUserLicenses, useToast } from "@/hooks";
+import { useGetUserLicense, useGetUserLicenses, useGetUserSubscriptionInfo, useToast } from "@/hooks";
 
 import Link from "next/link";
 
@@ -196,6 +196,8 @@ export default function License() {
   
   const { data: license, isPending: isLicensePending } = useGetUserLicense(userLicense?.id ?? "");  
 
+  const { data: userSubscriptionInfo } = useGetUserSubscriptionInfo();
+
   const itemsPerPage = 10;
   const pageCount = Math.ceil(userLicense?.users?.length ?? 0 / itemsPerPage);
 
@@ -266,8 +268,6 @@ export default function License() {
           License management
         </h2>
 
-        {!license && <p>You do not have any license</p>}
-
         {license?.tierType !== LicenseTierType.Freemium && (<>
           {userLicense && !isUserLicensesPending && !isLicensePending && (
             <>
@@ -315,7 +315,7 @@ export default function License() {
           )}
         </>)}
 
-        {license?.tierType === LicenseTierType.Freemium && (
+        {userSubscriptionInfo?.freemiumUser && (
           <>
             <div className="flex flex-col gap-[32px] mt-[60px] w-[742px]">
               <div 
@@ -368,6 +368,8 @@ export default function License() {
             </div>
           </>
         )}
+
+        {}
 
         {!userLicense && !isUserLicensesPending && (
           <div>You do not have a license</div>

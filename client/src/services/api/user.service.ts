@@ -42,8 +42,26 @@ const updateUserReferral = async (referralCode: number, newUserId: string) => {
   }
 };
 
+export interface UserInfo {
+  organizationOwner: boolean; // with organization
+  standardUser: boolean; // private with license, (standard tier) 
+  freemiumUser: boolean; // private with freemium tier (without ActiveLicense bu with License)
+  invitedUser: boolean; // added by invitation (with ActiveLicense)
+}
+
+const getUserSubscriptionInfo = async (id: string) => {
+  try {
+    const response = await apiClient.get(`/user/subscription-info/${id}`);
+
+    return response.data as UserInfo;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 export const UserApiService = {
   getUser,
   updateUser,
   updateUserReferral,
+  getUserSubscriptionInfo,
 };

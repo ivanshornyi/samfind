@@ -1,3 +1,7 @@
+import { useContext } from "react";
+
+import { AuthContext } from "@/context";
+
 import { UserApiService, UpdateUserData } from "@/services";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -23,5 +27,16 @@ export const useUpdateUser = () => {
         description: "Successfully updated",
       });
     },
+  });
+};
+
+export const useGetUserSubscriptionInfo = () => {
+  const { user } = useContext(AuthContext);
+
+  return useQuery({
+    queryFn: () => UserApiService.getUserSubscriptionInfo(user?.id ?? ""),
+    queryKey: ["user-subscription-info"],
+    enabled: !!user?.id,
+    staleTime: 5_000_000,
   });
 };

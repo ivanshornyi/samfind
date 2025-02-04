@@ -31,4 +31,5 @@ export interface User {
   referralCode: string;
   licenseId?: string;
   organizationId?: string;
+  invitedReferralCode?: number;
 }

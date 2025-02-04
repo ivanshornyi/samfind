@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 
 import {
+  LicenseTierType,
   LicenseStatus,
   User,
   UserAuthType,
@@ -196,6 +197,57 @@ export class UserService {
     });
 
     return updatedUser;
+  }
+
+  async findUserSubscriptionInfo(userId: string) {
+    const userInfo = {
+      organizationOwner: false, // with organization
+      standardUser: false, // private with license, (standard tier)
+      freemiumUser: false, // private with freemium tier (without active license)
+      invitedUser: false, // added by invitation (with active license)
+    };
+
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    if (user.organizationId) {
+      userInfo.organizationOwner = true;
+    }
+
+    if (!user.organizationId) {
+      const license = await this.prisma.license.findUnique({
+        where: {
+          ownerId: userId,
+        },
+      });
+
+      if (license) {
+        if (license.tierType === LicenseTierType.freemium) {
+          userInfo.freemiumUser = true;
+        } else if (license.tierType === LicenseTierType.standard) {
+          userInfo.standardUser = true;
+        }
+      } else {
+        const activeLicense = await this.prisma.activeLicense.findFirst({
+          where: {
+            userId,
+          },
+        });
+
+        if (activeLicense) {
+          userInfo.invitedUser = true;
+        }
+      }
+    }
+
+    return userInfo;
   }
 
   private hashPassword(password: string): string {

@@ -29,9 +29,6 @@ export const SubscriptionDetails = ({
 
   return (
     <div className="flex flex-col space-y-4">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-4xl font-semibold">Plans and Billing</h1>
-      </div>
       <div className="flex items-center gap-4 mb-6">
         <h2 className="text-xl">Plan</h2>
         <Button
