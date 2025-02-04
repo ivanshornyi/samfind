@@ -7,6 +7,7 @@ import {
   Body,
   Headers,
   UnauthorizedException,
+  Delete,
 } from "@nestjs/common";
 
 import { UserLicenseService } from "./user-license.service";
@@ -79,5 +80,20 @@ export class UserLicenseController {
     return await this.licenseService.checkLicenseStatusByEmail(
       checkUserLicenseDto.email,
     );
+  }
+
+  @ApiOperation({ summary: "Deactivate user license" })
+  @Post("/deactivate/:id")
+  async deactivateLicense(@Param("id") id: string) {
+    return this.licenseService.deactivateLicense(id);
+  }
+
+  @ApiOperation({ summary: "Delete member from license" })
+  @Delete("/:id/member/:memberId")
+  async deleteMemberFromLicense(
+    @Param("id") id: string,
+    @Param("memberId") memberId: string,
+  ) {
+    return this.licenseService.deleteMemberFromLicense(id, memberId);
   }
 }

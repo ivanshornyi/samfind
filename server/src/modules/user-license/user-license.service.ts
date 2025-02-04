@@ -194,4 +194,43 @@ export class UserLicenseService {
       status: "active",
     };
   }
+
+  async deactivateLicense(id: string) {
+    const license = await this.prisma.license.findUnique({
+      where: { id },
+      include: { subscription: true },
+    });
+
+    if (!license) {
+      throw new NotFoundException("User not found");
+    }
+
+    if (license.subscription) {
+      await this.prisma.subscription.update({
+        where: { id: license.subscription.id },
+        data: { isActive: false },
+      });
+    }
+
+    await this.prisma.license.update({
+      where: { id },
+      data: { status: LicenseStatus.inactive },
+    });
+
+    return { status: LicenseStatus.inactive };
+  }
+
+  async deleteMemberFromLicense(licenseId: string, memberId: string) {
+    const activeLicense = await this.prisma.activeLicense.findFirst({
+      where: { licenseId, userId: memberId },
+    });
+
+    if (!activeLicense) {
+      throw new NotFoundException("Member License not found");
+    }
+
+    await this.prisma.activeLicense.delete({ where: { id: activeLicense.id } });
+
+    return { status: "deleted" };
+  }
 }

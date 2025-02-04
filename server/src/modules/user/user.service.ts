@@ -1,6 +1,12 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 
-import { User, UserAuthType, UserRole, UserStatus } from "@prisma/client";
+import {
+  LicenseStatus,
+  User,
+  UserAuthType,
+  UserRole,
+  UserStatus,
+} from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 
 import { UpdateUserDto } from "./dto/update-user-dto";
@@ -194,5 +200,40 @@ export class UserService {
 
   private hashPassword(password: string): string {
     return createHash("sha256").update(password).digest("hex");
+  }
+
+  async deleteUser(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: { License: true, subscription: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    if (user.License.length) {
+      const licenseIds = user.License.map((l) => l.id);
+      await this.prisma.license.updateMany({
+        where: {
+          id: { in: licenseIds },
+        },
+        data: {
+          status: LicenseStatus.inactive,
+        },
+      });
+    }
+
+    if (user.subscription) {
+      await this.prisma.subscription.update({
+        where: { id: user.subscription.id },
+        data: { isActive: false },
+      });
+    }
+
+    await this.prisma.user.update({
+      where: { id },
+      data: { isDeleted: true },
+    });
   }
 }
