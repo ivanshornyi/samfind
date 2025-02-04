@@ -354,10 +354,14 @@ export class AuthService {
       }
 
       // Create and pay Invoice for License of invited user
-      await this.subscriptionService.payMemberInvoice({
+      const invoice = await this.subscriptionService.payMemberInvoice({
         memberId: user.id,
         ownerId: license.ownerId,
       });
+
+      if (invoice.status !== "paid") {
+        throw new ConflictException("An error occurred during payment Invoice");
+      }
     }
 
     if (authVerificationDto.organizationId) {
@@ -406,10 +410,14 @@ export class AuthService {
       }
 
       // Create and pay Invoice for License of invited user
-      await this.subscriptionService.payMemberInvoice({
+      const invoice = await this.subscriptionService.payMemberInvoice({
         memberId: user.id,
         ownerId: license.ownerId,
       });
+
+      if (invoice.status !== "paid") {
+        throw new ConflictException("An error occurred during payment Invoice");
+      }
 
       // add userId to organization
       const organizationUserIds = organization.userIds;
