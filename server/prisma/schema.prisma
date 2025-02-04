@@ -157,7 +157,7 @@ model Subscription {
   license          License?  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
   licenseId        String?   @unique
   plan             Plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
-  planId           String   @unique
+  planId           String   
   isActive         Boolean
   isInTrial        Boolean
   stripeInvoiceIds String[] @default([])
