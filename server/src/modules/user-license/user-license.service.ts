@@ -1,8 +1,12 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
 import { PrismaService } from "../prisma/prisma.service";
-import { License, LicenseStatus } from "@prisma/client";
+import { License, LicenseStatus, LicenseTierType } from "@prisma/client";
 import { MailService } from "../mail/mail.service";
 
 import { AddUserLicenseDto } from "./dto/add-user-license-dto";
@@ -68,7 +72,9 @@ export class UserLicenseService {
     return {
       id: license.id,
       limit: license.limit,
+      tierType: license.tierType,
       users: license.activeLicenses.map((i) => ({
+        id: i.user.id,
         name: i.user.firstName + "  " + i.user.lastName,
         email: i.user.email,
         date: i.createdAt,
@@ -223,13 +229,42 @@ export class UserLicenseService {
   async deleteMemberFromLicense(licenseId: string, memberId: string) {
     const activeLicense = await this.prisma.activeLicense.findFirst({
       where: { licenseId, userId: memberId },
+      include: { license: true },
     });
 
     if (!activeLicense) {
       throw new NotFoundException("Member License not found");
     }
 
+    if (activeLicense.license.ownerId === memberId) {
+      throw new BadRequestException(
+        "You can delete License Owner from License",
+      );
+    }
+
     await this.prisma.activeLicense.delete({ where: { id: activeLicense.id } });
+
+    let memberLicense = await this.prisma.license.findFirst({
+      where: { ownerId: memberId },
+    });
+
+    if (!memberLicense) {
+      memberLicense = await this.prisma.license.create({
+        data: {
+          ownerId: memberId,
+          status: LicenseStatus.active,
+          limit: 0,
+          tierType: LicenseTierType.freemium,
+        },
+      });
+
+      await this.prisma.activeLicense.create({
+        data: {
+          userId: memberId,
+          licenseId: memberLicense.id,
+        },
+      });
+    }
 
     return { status: "deleted" };
   }
