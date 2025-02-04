@@ -74,4 +74,5 @@ export const UserApiService = {
   updateUser,
   updateUserReferral,
   getUserSubscriptionInfo,
+  deleteUser,
 };
