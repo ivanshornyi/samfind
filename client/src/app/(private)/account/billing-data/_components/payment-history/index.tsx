@@ -1,58 +1,72 @@
-interface PaymentRecord {
-  invoiceNumber: string;
-  date: string;
-  amount: number;
-  status: "Failed" | "Paid";
-  planType: string;
-}
+import { ReusableTable } from "@/components/table";
+import { AuthContext } from "@/context";
+import { useGetBillingHistory } from "@/hooks/api/billing-history";
+import { BillingHistoryItem } from "@/types/billings";
+import {
+  createColumnHelper,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { useContext } from "react";
 
 export const PaymentHistory = () => {
-  const payments: PaymentRecord[] = [
-    {
-      invoiceNumber: "INV473824872",
-      date: "02.02.2025",
-      amount: 19.99,
-      status: "Failed",
-      planType: "Personal Standart Monthly",
-    },
-    {
-      invoiceNumber: "INV473824872",
-      date: "02.02.2025",
-      amount: 19.99,
-      status: "Paid",
-      planType: "Personal Standart Monthly",
-    },
-  ];
+  const { user } = useContext(AuthContext);
+  const { data: billingHistory, isLoading } = useGetBillingHistory(
+    user?.id ?? ""
+  );
 
-  return (
-    <div className="rounded-lg overflow-hidden">
-      <div className="grid grid-cols-4 gap-4 p-4 text-sm text-[#C4C4C4] uppercase">
-        <div>Invoice Number</div>
-        <div>Invoice Date</div>
-        <div>Amount</div>
-        <div>Status</div>
-      </div>
+  const columnHelper = createColumnHelper<BillingHistoryItem>();
 
-      {payments.map((payment, index) => (
-        <div
-          key={`${payment.invoiceNumber}-${payment.date}-${index}`}
-          className="grid grid-cols-4 gap-4 p-4 text-sm border-t border-[#383838]"
-        >
-          <div>
-            <div>{payment.invoiceNumber}</div>
-            <div className="text-[#C4C4C4] text-xs">{payment.planType}</div>
-          </div>
-          <div>{payment.date}</div>
-          <div>${payment.amount}</div>
-          <div
-            className={
-              payment.status === "Failed" ? "text-[#FF6C6C]" : "text-[#4BB543]"
-            }
-          >
-            {payment.status}
+  const columns = [
+    columnHelper.accessor("number", {
+      header: "Invoice Number",
+      cell: (info) => (
+        <div>
+          <div>{info.getValue()}</div>
+          <div className="text-[#C4C4C4] text-xs">
+            {info.row.original.description}
           </div>
         </div>
-      ))}
-    </div>
+      ),
+    }),
+    columnHelper.accessor("date", {
+      header: "Invoice Date",
+      cell: (info) => {
+        const date = new Date(info.getValue() * 1000);
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+      },
+    }),
+    columnHelper.accessor("price", {
+      header: "Amount",
+      cell: (info) => `$${(info.getValue() / 100).toFixed(2)}`,
+    }),
+    columnHelper.accessor("status", {
+      header: "Status",
+      cell: (info) => (
+        <div
+          className={
+            info.getValue() === "paid" ? "text-[#4BB543]" : "text-[#FF6C6C]"
+          }
+        >
+          {info.getValue().charAt(0).toUpperCase() + info.getValue().slice(1)}
+        </div>
+      ),
+    }),
+  ];
+
+  const table = useReactTable({
+    data: billingHistory ?? [],
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
+  return (
+    <ReusableTable
+      table={table}
+      isLoading={isLoading}
+      noDataMessage="No payment history available."
+      onPageChange={() => {}}
+      pageCount={1}
+    />
   );
 };

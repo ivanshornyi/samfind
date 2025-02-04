@@ -3,7 +3,6 @@
 import { useContext, useEffect, useState } from "react";
 
 import {
-  useGetInvitedUserInfo,
   useGetUserLicenses,
   useGetUserSubscriptionInfo,
   useToast,
@@ -40,19 +39,18 @@ import {
 
 import { ReusableTable } from "@/components/table";
 import { AuthContext } from "@/context";
-import { DeleteMember, InviteMember, ProgressChart } from "./_components";
+import { InviteMember, ProgressChart } from "./_components";
 
 import {
   ArrowUpDown,
   Check,
   Copy,
+  Download,
   Info,
   MoreHorizontal,
   Search,
   User,
-  Download,
 } from "lucide-react";
-import { LicenseTierType } from "@/types";
 
 import { format } from "date-fns";
 
