@@ -123,7 +123,7 @@ export class AuthService {
       throw new UnauthorizedException("User is not verified");
     }
 
-    if (!user.isDeleted) {
+    if (user.isDeleted) {
       throw new UnauthorizedException("User is deleted");
     }
 
