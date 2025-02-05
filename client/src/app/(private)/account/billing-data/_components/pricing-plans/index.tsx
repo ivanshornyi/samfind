@@ -1,4 +1,5 @@
 "use client";
+import { Plan } from "@/types";
 import { useState } from "react";
 import { AccountPlanSelector } from "../account-buttons";
 import { pricingPlans } from "../mock-data";
@@ -12,7 +13,7 @@ const getFreemiumTitle = (accountType: AccountType) =>
 export const PricingPlans = () => {
   const [accountType, setAccountType] = useState<AccountType>("personal");
 
-  const currentPricingPlans = pricingPlans.map((plan) =>
+  const currentPricingPlans: Plan[] = pricingPlans.map((plan) =>
     plan.price === 0 ? { ...plan, title: getFreemiumTitle(accountType) } : plan
   );
 
@@ -31,7 +32,7 @@ export const PricingPlans = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {currentPricingPlans.map((plan) => (
-            <PricingCard key={plan.title} plan={plan} />  
+            <PricingCard key={plan.id} plan={plan} />
           ))}
         </div>
       </div>

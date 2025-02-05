@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useContext, useEffect, useState } from "react";
-import { AuthContext } from "@/context";
-import { useUpdateUser } from "@/hooks/api/user";
 import { Button, FullScreenLoader, Input } from "@/components";
+import { AuthContext } from "@/context";
 import { useToast } from "@/hooks";
+import { useUpdateUser } from "@/hooks/api/user";
 import { User } from "lucide-react";
+import React, { useContext, useEffect, useState } from "react";
 import { DeleteAccount } from "./_components";
 
 export default function Settings() {
@@ -28,6 +28,13 @@ export default function Settings() {
     isSuccess: isUpdateUserSuccess,
   } = useUpdateUser();
 
+  const [organizationFormData, setOrganizationFormData] = useState({
+    name: "",
+    businessOrganizationNumber: "",
+    VAT: "",
+    domains: [""],
+  });
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
     const value = event.target.value;
@@ -42,6 +49,13 @@ export default function Settings() {
     const value = event.target.value;
 
     setUserPasswordFormData({ ...userPasswordFormData, [name]: value });
+  };
+
+  const addDomainField = () => {
+    setOrganizationFormData((prev) => ({
+      ...prev,
+      domains: [...prev.domains, ""],
+    }));
   };
 
   const handleSaveSettingsSubmit = (event: React.FormEvent) => {
@@ -129,6 +143,18 @@ export default function Settings() {
       });
     }
   }, [isUpdateUserSuccess]);
+
+  useEffect(() => {
+    if (user?.organization) {
+      setOrganizationFormData({
+        name: user.organization.name,
+        businessOrganizationNumber:
+          user.organization.businessOrganizationNumber,
+        VAT: user.organization.VAT,
+        domains: user.organization.domains || [""],
+      });
+    }
+  }, [user]);
 
   return (
     <div className="pb-[50px] flex justify-center">
@@ -257,6 +283,66 @@ export default function Settings() {
             )}
           </div>
         </div>
+        {user?.accountType === "business" && (
+          <div className="mt-[77px]">
+            <h3 className="text-[20px] leading-[27px] font-semibold">
+              Company details
+            </h3>
+            <div className="w-full mt-6 pb-2 border-b border-[#444444]">
+              <div className="flex justify-between items-start w-full">
+                <div className="w-full">
+                  <div className="flex flex-col gap-4">
+                    <div className="relative">
+                      <p className="text-[16px] leading-[22px] font-semibold mb-2">
+                        Company name
+                      </p>
+                      <p className="text-[14px] leading-[29px] text-disabled font-medium">
+                        {organizationFormData.name}
+                      </p>
+                    </div>
+
+                    <div className="flex gap-4">
+                      <div className="flex-1">
+                        <p className="text-[16px] leading-[22px] font-semibold mb-2">
+                          Business registration number
+                        </p>
+                        <p className="text-[14px] leading-[29px] text-disabled font-medium">
+                          {organizationFormData.businessOrganizationNumber}
+                        </p>
+                      </div>
+
+                      <div className="flex-1">
+                        <p className="text-[16px] leading-[22px] font-semibold mb-2">
+                          VAT number
+                        </p>
+                        <p className="text-[14px] leading-[29px] text-disabled font-medium">
+                          {organizationFormData.VAT}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-[16px] leading-[22px] font-semibold mb-2">
+                        Domains
+                      </p>
+                      <div className="flex flex-col gap-1">
+                        {organizationFormData.domains.map((domain, index) => (
+                          <p
+                            key={index}
+                            className="text-[14px] leading-[29px] text-disabled font-medium"
+                          >
+                            {domain}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="mt-[77px]">
           <h3 className="text-[20px] leading-[27px] font-semibold">
             Manage account

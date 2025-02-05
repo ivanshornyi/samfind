@@ -18,6 +18,13 @@ export enum UserAccountType {
   Business = "business",
 }
 
+export interface Organization {
+  name: string;
+  businessOrganizationNumber: string;
+  VAT: string;
+  domains?: string[];
+}
+
 export interface User {
   id: string;
   firstName: string;
@@ -32,4 +39,5 @@ export interface User {
   licenseId?: string;
   organizationId?: string;
   invitedReferralCode?: number;
+  organization?: Organization;
 }

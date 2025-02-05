@@ -46,13 +46,12 @@ import {
   ArrowUpDown,
   Check,
   Copy,
+  Download,
   Info,
   MoreHorizontal,
   Search,
   User,
-  Download,
 } from "lucide-react";
-import { LicenseTierType } from "@/types";
 
 import { format } from "date-fns";
 
@@ -310,7 +309,7 @@ export default function License() {
           License management
         </h2>
 
-        {userLicense?.tierType !== LicenseTierType.Freemium && (
+        {!userSubscriptionInfo?.freemiumUser && (
           <>
             {userLicense &&
               !isUserLicensesPending &&
