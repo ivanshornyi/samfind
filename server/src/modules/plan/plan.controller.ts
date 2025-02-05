@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from "@nestjs/common";
+import { Controller, Post, Get, Body } from "@nestjs/common";
 
 import { PlanService } from "./plan.service";
 
@@ -14,5 +14,11 @@ export class PlanController {
   @Post("/")
   async addLicense(@Body() addPlanDto: CreatePlanDto) {
     return this.planService.addPlan(addPlanDto);
+  }
+
+  @ApiOperation({ summary: "Get plans" })
+  @Get("/")
+  async getAllPlans() {
+    return this.planService.getAllPlans();
   }
 }

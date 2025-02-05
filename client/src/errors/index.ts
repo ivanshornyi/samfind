@@ -1,2 +1,2 @@
-export * from "./apiError";
-export * from "./toastError";
+export * from "./api-error";
+export * from "./toast-error";

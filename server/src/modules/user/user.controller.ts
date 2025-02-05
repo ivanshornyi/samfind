@@ -1,14 +1,16 @@
-import { 
-  Controller, 
-  Get, 
-  Param, 
-  Patch, 
+import {
+  Controller,
+  Get,
+  Param,
+  Patch,
   Body,
-  Query, 
-  ParseArrayPipe, 
+  Query,
+  ParseArrayPipe,
+  Delete,
 } from "@nestjs/common";
 
 import { User } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 import { UserService } from "./user.service";
 
@@ -63,7 +65,7 @@ export class UserController {
   @ApiOperation({ summary: "Update user" })
   @Patch("/:id")
   async updateUser(
-    @Param("id") id: string, 
+    @Param("id") id: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
     return this.userService.updateUser(id, updateUserDto);
@@ -71,7 +73,7 @@ export class UserController {
 
   @ApiOperation({ summary: "Find users by ids" })
   @Get("/find/find-by-ids")
-  async findUsersByIds(@Query("userId", new ParseArrayPipe) ids: string[]) {
+  async findUsersByIds(@Query("userId", new ParseArrayPipe()) ids: string[]) {
     return this.userService.findUsersByIds(ids);
   }
 
@@ -79,19 +81,45 @@ export class UserController {
   @Patch("/referral/:referralCode")
   async updateUserByReferralCode(
     @Param("referralCode") referralCode: number,
-    @Body() dto: { newUserId: string; discount: number; },
+    @Body() dto: { newUserId: string; discount: number },
   ) {
-    return this.userService.findAndUpdateUserByReferralCode(referralCode, dto.newUserId, dto.discount);
+    const user = await this.userService.findOne(dto.newUserId);
+
+    return this.userService.findAndUpdateUserByReferralCode(
+      referralCode,
+      user,
+      dto.discount,
+    );
   }
 
   @ApiOperation({ summary: "Get domain info" })
   @Get("/check-user-email/:email")
-  async getDomainInfo(
-    @Param("email") email: string,
-  ) {
+  async getDomainInfo(@Param("email") email: string) {
     // find license and users by this domain and email
   }
 
-  // @ApiOperation({ summary: "" })
-  // async 
+  @ApiOperation({ summary: "Delete user" })
+  @Delete("/:id")
+  async deleteUser(@Param("id") id: string) {
+    return this.userService.deleteUser(id);
+  }
+
+  @ApiOperation({ summary: "Find user role subscription info" })
+  @Get("/subscription-role-info/:userId")
+  async findUserSubscriptionRoleInfo(@Param("userId") userId: string) {
+    // find user information, where he has subscription, type of subscription, in other license and organization or not
+    return this.userService.findUserRoleSubscriptionInfo(userId);
+  }
+
+  @ApiOperation({ summary: "Find user invited user info" })
+  @Get("/find-invited-user/info/:userId")
+  async getInvitedUserInfo(@Param("userId") userId: string) {
+    return this.userService.findInvitedUserInfo(userId);
+  }
+
+  @ApiOperation({ summary: "Find user subscription info" })
+  @Get("/subscription-info/:userId")
+  async findUserSubscriptionInfo(@Param("userId") userId: string) {
+    return await this.userService.findUserSubscriptionInfo(userId);
+  }
 }

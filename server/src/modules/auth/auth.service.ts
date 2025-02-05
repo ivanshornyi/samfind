@@ -4,11 +4,13 @@ import {
   NotFoundException,
   UnauthorizedException,
   ConflictException,
+  BadRequestException,
 } from "@nestjs/common";
 
 import {
   LicenseStatus,
   LicenseTierType,
+  PlanPeriod,
   UserAccountType,
   UserAuthType,
 } from "@prisma/client";
@@ -23,6 +25,7 @@ import { SendCodeForEmailDto } from "./dto/send-code-for-email.dto";
 
 import { createHash } from "crypto";
 import { AuthVerificationDto } from "./dto/auth-verification-dto";
+import { SubscriptionService } from "../subscription/subscription.service";
 
 @Injectable()
 export class AuthService {
@@ -31,6 +34,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly tokenService: TokenService,
     private readonly mailService: MailService,
+    private readonly subscriptionService: SubscriptionService,
   ) {}
 
   public async signUp(signUpDto: SignUpDto) {
@@ -96,25 +100,6 @@ export class AuthService {
         });
       }
 
-      // add license
-      if (accountType === UserAccountType.private) {
-        const userLicense = await this.prisma.license.create({
-          data: {
-            ownerId: newUser.id,
-            status: LicenseStatus.active,
-            limit: 0,
-            tierType: LicenseTierType.freemium,
-          },
-        });
-
-        await this.prisma.activeLicense.create({
-          data: {
-            userId: newUser.id,
-            licenseId: userLicense.id,
-          },
-        });
-      }
-
       return newUser;
     } else {
       await this.userService.updateUser(existingUser.id, {
@@ -138,6 +123,10 @@ export class AuthService {
 
     if (!user.isVerified) {
       throw new UnauthorizedException("User is not verified");
+    }
+
+    if (user.isDeleted) {
+      throw new UnauthorizedException("User is deleted");
     }
 
     const isPasswordValid = this.isPasswordValid(password, user.password);
@@ -314,11 +303,35 @@ export class AuthService {
       throw new UnauthorizedException("Verification code has expired");
     }
 
+    // if user private and without license id => add freemium
+    if (
+      !authVerificationDto.licenseId &&
+      !authVerificationDto.organizationId &&
+      user.accountType === UserAccountType.private
+    ) {
+      const userLicense = await this.prisma.license.create({
+        data: {
+          ownerId: user.id,
+          status: LicenseStatus.active,
+          limit: 0,
+          tierType: LicenseTierType.freemium,
+        },
+      });
+
+      await this.prisma.activeLicense.create({
+        data: {
+          userId: user.id,
+          licenseId: userLicense.id,
+        },
+      });
+    }
+
     if (authVerificationDto.licenseId) {
       const license = await this.prisma.license.findUnique({
         where: {
           id: authVerificationDto.licenseId,
         },
+        include: { user: true, subscription: { include: { plan: true } } },
       });
 
       if (!license) {
@@ -337,16 +350,42 @@ export class AuthService {
         throw new ConflictException("License limit is reached");
       }
 
-      if (license.availableEmails.includes(authVerificationDto.email)) {
+      if (!license.availableEmails.includes(authVerificationDto.email)) {
         throw new ConflictException("This email does not have access");
       }
 
-      await this.prisma.activeLicense.create({
-        data: {
-          licenseId: authVerificationDto.licenseId,
-          userId: user.id,
-        },
-      });
+      if (license.purchased > 0) {
+        // Use payed License
+        await this.prisma.license.update({
+          where: { id: license.id },
+          data: { purchased: license.purchased - 1 },
+        });
+        await this.prisma.activeLicense.create({
+          data: { userId: user.id, licenseId: license.id },
+        });
+
+        await this.subscriptionService.addDiscountOnNotUsedPeriod({
+          owner: license.user,
+          memberEmail: user.email,
+          totalAmount: license.subscription.plan.price,
+          nextDate:
+            license.subscription.plan.period === PlanPeriod.yearly
+              ? new Date(license.subscription.nextDate)
+              : undefined,
+        });
+      } else {
+        // Create and pay Invoice for License of invited user
+        const invoice = await this.subscriptionService.payMemberInvoice({
+          memberId: user.id,
+          ownerId: license.ownerId,
+        });
+
+        if (invoice.status !== "paid") {
+          throw new BadRequestException(
+            "An error occurred when paying for the License",
+          );
+        }
+      }
     }
 
     if (authVerificationDto.organizationId) {
@@ -364,6 +403,7 @@ export class AuthService {
         where: {
           ownerId: organization.ownerId,
         },
+        include: { user: true, subscription: { include: { plan: true } } },
       });
 
       if (!license) {
@@ -394,14 +434,6 @@ export class AuthService {
         throw new ConflictException("This email does not have access");
       }
 
-      // create active license
-      await this.prisma.activeLicense.create({
-        data: {
-          licenseId: authVerificationDto.licenseId,
-          userId: user.id,
-        },
-      });
-
       // add userId to organization
       const organizationUserIds = organization.userIds;
       organizationUserIds.push(user.id);
@@ -412,6 +444,39 @@ export class AuthService {
           userIds: organizationUserIds,
         },
       });
+
+      if (license.purchased > 0) {
+        // Use payed License
+        await this.prisma.license.update({
+          where: { id: license.id },
+          data: { purchased: license.purchased - 1 },
+        });
+        await this.prisma.activeLicense.create({
+          data: { userId: user.id, licenseId: license.id },
+        });
+
+        await this.subscriptionService.addDiscountOnNotUsedPeriod({
+          owner: license.user,
+          memberEmail: user.email,
+          totalAmount: license.subscription.plan.price,
+          nextDate:
+            license.subscription.plan.period === PlanPeriod.yearly
+              ? new Date(license.subscription.nextDate)
+              : undefined,
+        });
+      } else {
+        // Create and pay Invoice for License of invited user
+        const invoice = await this.subscriptionService.payMemberInvoice({
+          memberId: user.id,
+          ownerId: license.ownerId,
+        });
+
+        if (invoice.status !== "paid") {
+          throw new BadRequestException(
+            "An error occurred when paying for the License",
+          );
+        }
+      }
     }
 
     await this.userService.updateUser(user.id, {

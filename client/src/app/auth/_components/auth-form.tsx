@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
-import { useSearchParams, useRouter } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { UserAccountType } from "@/types";
 
@@ -16,15 +15,43 @@ import { Button, Input } from "@/components";
 import { SendResetPasswordCodeModal, VerifyUserModal } from "../_components";
 import { ACCOUNT_TYPE_CARD_ITEMS } from "../account-type/data";
 
-import { GoogleLogin } from "@react-oauth/google";
-import { jwtDecode } from "jwt-decode";
-
-import { EyeIcon, EyeOff } from "lucide-react";
-import { GoogleIcon } from "@public/icons";
+import {
+  Building2,
+  Check,
+  EyeIcon,
+  EyeOff,
+  Globe,
+  Hash,
+  Info,
+  X,
+} from "lucide-react";
 
 interface AuthFormProps {
   authPageType: "signIn" | "signUp" | "resetPassword";
 }
+
+const validatePassword = (password: string) => {
+  const minLength = password.length >= 8;
+  const hasNumber = /\d/.test(password);
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+  return {
+    minLength,
+    hasNumber,
+    hasUpperCase,
+    hasLowerCase,
+    hasSpecialChar,
+    isValid:
+      minLength && hasNumber && hasUpperCase && hasLowerCase && hasSpecialChar,
+  };
+};
+
+const validateEmail = (email: string) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
 
 export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
   const { toast } = useToast();
@@ -53,37 +80,71 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
     name: "",
     businessOrganizationNumber: "",
     VAT: "",
-    domain: "",
+    domains: [""],
+  });
+
+  const [showPasswordError, setShowPasswordError] = useState<boolean>(false);
+  const [passwordValidation, setPasswordValidation] = useState({
+    minLength: false,
+    hasNumber: false,
+    hasUpperCase: false,
+    hasLowerCase: false,
+    hasSpecialChar: false,
+    isValid: false,
   });
 
   const { mutate: signInMutation, isPending: isSignInPending } = useSignIn();
-  const { mutate: signUpMutation, isPending: isSignUpPending, isSuccess: isSignUpSuccess } = useSignUp();
+  const {
+    mutate: signUpMutation,
+    isPending: isSignUpPending,
+    isSuccess: isSignUpSuccess,
+  } = useSignUp();
   const { mutate: resetPasswordMutation, isPending: isResetPasswordPending } =
     useResetPassword();
 
   const handleFormInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const name = event.target.name;
-    const value = event.target.value;
-
+    const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
+
+    if (name === "password") {
+      setPasswordValidation(validatePassword(value));
+    }
   };
 
   const handleResetPasswordFormInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
-  ) => {``
+  ) => {
     const name = event.target.name;
     const value = event.target.value;
 
     setResetPasswordFormData({ ...resetPasswordFormData, [name]: value });
   };
 
-  const handleOrganizationFormInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleOrganizationFormInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    index?: number
+  ) => {
     const name = event.target.name;
     const value = event.target.value;
 
-    setOrganizationFormData({ ...organizationFormData, [name]: value });
+    if (name === "domain") {
+      setOrganizationFormData((prev) => {
+        const newDomains = [...prev.domains];
+        newDomains[index!] = value;
+        return { ...prev, domains: newDomains };
+      });
+    } else {
+      setOrganizationFormData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const addDomainField = () => {
+    setOrganizationFormData((prev) => ({
+      ...prev,
+      domains: [...prev.domains, ""],
+    }));
   };
 
   const handlePasswordInputTypeChange = () => {
@@ -126,6 +187,18 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
         return;
       }
 
+      if (!validateEmail(formData.email)) {
+        toast({
+          description: "Invalid email address",
+        });
+        return;
+      }
+
+      if (!passwordValidation.isValid) {
+        setShowPasswordError(true);
+        return;
+      }
+
       let signUpData: SignUpData = {
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
@@ -133,13 +206,13 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
         password: formData.password.trim(),
         authType: UserAuthType.Email,
         accountType,
-      }
+      };
 
       if (referralCode) {
         signUpData = {
           ...signUpData,
           invitedReferralCode: Number(referralCode),
-        }
+        };
       }
 
       if (accountType === UserAccountType.Business) {
@@ -151,26 +224,27 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
           toast({
             description: "Some fields are empty",
           });
-  
+
           return;
         }
 
-        let organization: { 
+        const organization: {
           name: string;
           VAT: string;
           businessOrganizationNumber: string;
-          domain?: string; 
+          domain?: string;
         } = {
           name: organizationFormData.name,
           VAT: organizationFormData.VAT,
-          businessOrganizationNumber: organizationFormData.businessOrganizationNumber,
-        }
+          businessOrganizationNumber:
+            organizationFormData.businessOrganizationNumber,
+        };
 
         // add organization
         signUpData = {
           ...signUpData,
           organization,
-        }
+        };
       }
 
       signUpMutation(signUpData);
@@ -206,10 +280,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
 
   const formDescription = {
     signIn: "Welcome back! Access your personalized experience",
-    signUp: "Join the innovation! You’re almost there!",
-    resetPassword: "Set a secure password to protect your account and ensure safe access.",
-  }
-
+    signUp: "Join the innovation! You're almost there!",
+    resetPassword:
+      "Set a secure password to protect your account and ensure safe access.",
+  };
 
   const disabledFormItems =
     isSignInPending || isSignUpPending || isResetPasswordPending;
@@ -223,71 +297,22 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
     }
 
     if (
-      (authPageType === "signUp" && (!accountType ||
-        (
-          ![UserAccountType.Private, UserAccountType.Business].includes(accountType)
+      authPageType === "signUp" &&
+      (!accountType ||
+        ![UserAccountType.Private, UserAccountType.Business].includes(
+          accountType
         ))
-      )
     ) {
       router.push("/");
     }
   }, [searchParams, accountType]);
-
-  const googleSignUpSuccessHandler = async (credentialResponse: any) => {
-    const user: { email: string } = jwtDecode(credentialResponse?.credential as string);
-
-    console.log(user);
-    // await mutate({
-    //   email: user.email,
-    //   password: "",
-    //   school: currentSchoolName,
-    //   auth: UserAuthType.Google,
-    // });
-
-    // let signUpData: SignUpData = {
-    //   firstName: user.fir,
-    //   lastName: formData.lastName.trim(),
-    //   email: formData.email.trim(),
-    //   password: formData.password.trim(),
-    //   authType: UserAuthType.Email,
-    //   accountType,
-    // }
-
-    // if (referralCode) {
-    //   signUpData = {
-    //     ...signUpData,
-    //     invitedReferralCode: Number(referralCode),
-    //   }
-    // }
-
-    // signUpMutation(signUpData);
-  };
-
-  const googleSignUpErrorHandler = () => {
-    // toast.error("Something went wrong");
-  };
-
-  const googleSignInSuccessHandler = async (credentialResponse: any) => {
-    // const user: { email: string } = jwtDecode(credentialResponse?.credential as string);
-
-    // await mutate({
-    //   email: user.email,
-    //   password: "",
-    //   school: currentSchoolName,
-    //   auth: UserAuthType.Google,
-    // });
-  };
-
-  const googleSignInErrorHandler = () => {
-    // toast.error("Something went wrong");
-  };
 
   return (
     <>
       <div className="w-[591px] border-[1px] border-violet-100 rounded-[30px] p-8">
         {authPageType === "signUp" && (
           <ul>
-            {ACCOUNT_TYPE_CARD_ITEMS.map(item => {
+            {ACCOUNT_TYPE_CARD_ITEMS.map((item) => {
               return item.type === accountType ? (
                 <li
                   key={item.type}
@@ -300,15 +325,22 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                   {item.icon}
                   <span>{accountType} Account</span>
                 </li>
-                ) : null
-              })
-            }
+              ) : null;
+            })}
           </ul>
         )}
 
         <form onSubmit={handleAuthFormSubmit} className="mt-4">
           <h2 className="font-semibold text-3xl">{formTitle[authPageType]}</h2>
           <p className="mt-4 text-lg">{formDescription[authPageType]}</p>
+          {authPageType === "signUp" && referralCode && (
+            <div className="my-4 flex items-center gap-2 bg-[#363637] rounded-2xl px-4 py-2">
+              <Info color="#BEB8FF" />
+              <p className="text-[#BEB8FF]">
+                You&apos;ve got a 10% discount via referral link!
+              </p>
+            </div>
+          )}
 
           <div className="mt-8 flex flex-col gap-2">
             {authPageType === "signUp" && (
@@ -394,87 +426,183 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                       )}
                     </button>
                   </div>
+                  {showPasswordError ? (
+                    <div className="text-xs mt-2">
+                      <p className="font-normal">
+                        Your password must include:.
+                      </p>
+                      <ul className="text-xs">
+                        <li
+                          className={`flex items-center gap-2 ${passwordValidation.minLength ? "text-green-500" : "text-red-500"}`}
+                        >
+                          {passwordValidation.minLength ? (
+                            <Check style={{ width: "10px", height: "10px" }} />
+                          ) : (
+                            <X style={{ width: "10px", height: "10px" }} />
+                          )}{" "}
+                          Password strenghts:{" "}
+                          {passwordValidation.isValid ? "strong" : "weak"}
+                        </li>
+                        <li
+                          className={`flex items-center gap-2 ${passwordValidation.minLength ? "text-green-500" : "text-red-500"}`}
+                        >
+                          {passwordValidation.minLength ? (
+                            <Check style={{ width: "10px", height: "10px" }} />
+                          ) : (
+                            <X style={{ width: "10px", height: "10px" }} />
+                          )}{" "}
+                          At least 8 characters
+                        </li>
+                        <li
+                          className={`flex items-center gap-2 ${passwordValidation.hasNumber ? "text-green-500" : "text-red-500"}`}
+                        >
+                          {passwordValidation.hasNumber ? (
+                            <Check style={{ width: "10px", height: "10px" }} />
+                          ) : (
+                            <X style={{ width: "10px", height: "10px" }} />
+                          )}{" "}
+                          At least one number (0-9).
+                        </li>
+                        <li
+                          className={`flex items-center gap-2 ${passwordValidation.hasUpperCase ? "text-green-500" : "text-red-500"}`}
+                        >
+                          {passwordValidation.hasUpperCase ? (
+                            <Check style={{ width: "10px", height: "10px" }} />
+                          ) : (
+                            <X style={{ width: "10px", height: "10px" }} />
+                          )}{" "}
+                          At least one uppercase letter (A-Z).
+                        </li>
+                        <li
+                          className={`flex items-center gap-2 ${passwordValidation.hasLowerCase ? "text-green-500" : "text-red-500"}`}
+                        >
+                          {passwordValidation.hasLowerCase ? (
+                            <Check style={{ width: "10px", height: "10px" }} />
+                          ) : (
+                            <X style={{ width: "10px", height: "10px" }} />
+                          )}{" "}
+                          At least one lowercase letter (a-z).
+                        </li>
+                        <li
+                          className={`flex items-center gap-2 ${passwordValidation.hasSpecialChar ? "text-green-500" : "text-red-500"}`}
+                        >
+                          {passwordValidation.hasSpecialChar ? (
+                            <Check style={{ width: "10px", height: "10px" }} />
+                          ) : (
+                            <X style={{ width: "10px", height: "10px" }} />
+                          )}{" "}
+                          At least one special character (e.g., @, #, $, %,
+                          etc.)
+                        </li>
+                      </ul>
+                    </div>
+                  ) : null}
                 </div>
               </>
             )}
           </div>
 
-          {authPageType === "signUp" && accountType === UserAccountType.Business && (
-            <div className="flex flex-col gap-2 mt-4"> 
-              <p>Provide detailed information about your business to help us customize your experience</p>
+          {authPageType === "signUp" &&
+            accountType === UserAccountType.Business && (
+              <div className="flex flex-col gap-6 mt-8">
+                <div className="flex flex-col gap-2">
+                  <h3 className="text-xl font-semibold">Company details</h3>
 
-              <Input 
-                name="name"
-                placeholder="Company name" 
-                value={organizationFormData.name}
-                onChange={handleOrganizationFormInputChange}
-              />
-              <Input 
-                name="businessOrganizationNumber"
-                placeholder="Business registration number" 
-                value={organizationFormData.businessOrganizationNumber}
-                onChange={handleOrganizationFormInputChange}
-              />
-              <Input 
-                name="VAT"
-                placeholder="VAT number" 
-                value={organizationFormData.VAT}
-                onChange={handleOrganizationFormInputChange}
-              />
-            </div>
-          )}
+                  <div className="flex flex-col gap-4">
+                    <div className="relative">
+                      <Input
+                        name="name"
+                        placeholder="Company name"
+                        value={organizationFormData.name}
+                        onChange={handleOrganizationFormInputChange}
+                        className="pl-11"
+                      />
+                      <Building2
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                        size={18}
+                      />
+                    </div>
 
-            <Button
-              variant="secondary"
-              className="mt-5 w-full"
-              withLoader={true}
-              loading={disabledFormItems}
-              disabled={disabledFormItems}
-            >
-              {authPageType !== "resetPassword" ? (
-                <span>Continue</span>
-              ) : (
-                <span>Save</span>
-              )}
-            </Button>
+                    <div className="flex gap-4">
+                      <div className="relative flex-1">
+                        <Input
+                          name="businessOrganizationNumber"
+                          placeholder="Business registration number"
+                          value={
+                            organizationFormData.businessOrganizationNumber
+                          }
+                          onChange={handleOrganizationFormInputChange}
+                          className="pl-11"
+                        />
+                        <Hash
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                          size={18}
+                        />
+                      </div>
+
+                      <div className="relative flex-1">
+                        <Input
+                          name="VAT"
+                          placeholder="VAT number"
+                          value={organizationFormData.VAT}
+                          onChange={handleOrganizationFormInputChange}
+                          className="pl-11"
+                        />
+                        <Hash
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                          size={18}
+                        />
+                      </div>
+                    </div>
+
+                    {organizationFormData.domains.map((domain, index) => (
+                      <div key={index} className="relative">
+                        <Input
+                          name="domain"
+                          placeholder="Domain"
+                          value={domain}
+                          onChange={(e) =>
+                            handleOrganizationFormInputChange(e, index)
+                          }
+                          className="pl-11"
+                        />
+                        <Globe
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                          size={18}
+                        />
+                      </div>
+                    ))}
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={addDomainField}
+                      className="w-fit px-4"
+                    >
+                      Add another domain
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          <Button
+            variant="secondary"
+            className="mt-5 w-full"
+            withLoader={true}
+            loading={disabledFormItems}
+            disabled={disabledFormItems}
+          >
+            {authPageType !== "resetPassword" ? (
+              <span>Continue</span>
+            ) : (
+              <span>Save</span>
+            )}
+          </Button>
         </form>
 
         <div className="pt-4">
           {authPageType === "signIn" && <SendResetPasswordCodeModal />}
-
-          {((authPageType === "signUp" && accountType === UserAccountType.Private) || authPageType === "signIn") && (
-            <>
-              <p className="text-center mt-1 mb-5">Or</p>
-            
-              <div className="flex flex-col gap-2 relative">
-                <div className="opacity-0 absolute z-10 w-full mt-0.5 rounded-full overflow-hidden">
-                  <GoogleLogin onSuccess={googleSignInSuccessHandler} onError={googleSignInErrorHandler} />
-                </div>
-                <button 
-                  className="
-                    py-2.5 bg-white flex items-center gap-2 justify-center text-black 
-                    rounded-full relative z-0
-                  "
-                >
-                  <Image 
-                    src={GoogleIcon} 
-                    width={20}
-                    height={20} 
-                    alt="google" 
-                    className="w-5 h-5" 
-                  />
-                    <span>
-                      {authPageType === "signIn" && "Sign in "}
-                      {authPageType === "signUp" && "Sign up "}
-                      with Google
-                    </span>
-                </button>
-                {/* <button className="py-2.5 bg-white text-black rounded-full">
-                  Sign in with Github
-                </button> */}
-              </div>
-            </>
-          )}
 
           {authPageType === "signIn" && (
             <p className="text-sm text-center mt-3">
@@ -502,7 +630,9 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
         </div>
       </div>
 
-      {authPageType === "signUp" && <VerifyUserModal isOpen={isSignUpSuccess} email={formData.email} />}
+      {authPageType === "signUp" && (
+        <VerifyUserModal isOpen={isSignUpSuccess} email={formData.email} />
+      )}
     </>
   );
 };

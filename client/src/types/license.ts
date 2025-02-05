@@ -15,12 +15,15 @@ export interface License {
   tierType: LicenseTierType;
   count: number;
   userIds: [];
+  availableEmails: string[];
 }
 
 export interface LicenseList {
   id: string;
   limit: number;
+  tierType: LicenseTierType;
   users: {
+    id: string;
     name: string;
     email: string;
     date: Date;

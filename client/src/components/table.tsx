@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Table,
   TableBody,
@@ -9,11 +8,11 @@ import {
 } from "@/components";
 import {
   flexRender,
-  RowData,
   Table as ReactTable,
+  RowData,
 } from "@tanstack/react-table";
-import ReactPaginate from "react-paginate";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import ReactPaginate from "react-paginate";
 
 interface ReusableTableProps<T extends RowData> {
   table: ReactTable<T>;
@@ -32,7 +31,7 @@ export const ReusableTable = <T extends RowData>({
 }: ReusableTableProps<T>) => {
   return (
     <div>
-      <Table className="max-w-full w-[1064px]">
+      <Table className="w-full max-w-[1064px]">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow
@@ -67,10 +66,10 @@ export const ReusableTable = <T extends RowData>({
               </TableRow>
             ))}
           {table.getRowModel().rows.length === 0 && !isLoading && (
-            <TableRow>
+            <TableRow className="hover:bg-transparent">
               <TableCell
                 colSpan={table.getAllColumns().length}
-                className="text-center"
+                className="text-center py-20"
               >
                 {noDataMessage}
               </TableCell>
@@ -88,7 +87,7 @@ export const ReusableTable = <T extends RowData>({
           )}
         </TableBody>
       </Table>
-      {pageCount > 1 && (
+      {/* {pageCount > 1 && (
         <ReactPaginate
           breakLabel="..."
           nextLabel={<ChevronRight />}
@@ -105,7 +104,7 @@ export const ReusableTable = <T extends RowData>({
           breakClassName="px-3 py-1 bg-transparent text-[#A8A8A8] rounded-md"
           disabledClassName="bg-transparent text-slate-600 cursor-not-allowed"
         />
-      )}
+      )} */}
     </div>
   );
 };

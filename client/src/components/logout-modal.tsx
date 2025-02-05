@@ -29,7 +29,7 @@ export const LogoutModal = () => {
       >
         Logout
       </Button>
-      <AlertDialogContent className="w-[590px] border gradient-border-modal p-8">
+      <AlertDialogContent className="w-full max-w-[590px] border gradient-border-modal p-8">
         <div className="absolute right-1 top-1">
           <AlertDialogCancel className="shadow-none border-none p-3">
             <X size={18} />
@@ -46,7 +46,11 @@ export const LogoutModal = () => {
         </AlertDialogHeader>
 
         <AlertDialogFooter className="flex gap-6 w-full">
-          <Button className="w-full" variant="tetrary" onClick={() => setOpen(false)}>
+          <Button
+            className="w-full"
+            variant="tetrary"
+            onClick={() => setOpen(false)}
+          >
             Cancel
           </Button>
           <Button

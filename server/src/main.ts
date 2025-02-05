@@ -12,7 +12,8 @@ async function bootstrap() {
   const configService = new ConfigService();
 
   const PORT = configService.get("SERVER_PORT") || 4000;
-
+  const FRONTEND_DOMAIN =
+    configService.get("FRONTEND_DOMAIN") || "http://localhost:3000";
   const app = await NestFactory.create(AppModule, { rawBody: true });
 
   app.enableCors({
@@ -21,6 +22,7 @@ async function bootstrap() {
       "http://localhost:5173",
       "https://www.onsio.io",
       "https://onsio.io",
+      FRONTEND_DOMAIN
     ],
     credentials: true,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",

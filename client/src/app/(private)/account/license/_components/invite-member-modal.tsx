@@ -1,4 +1,10 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+
+import { AuthContext } from "@/context";
+
+import { useQuery } from "@tanstack/react-query";
+import { useUpdateOrganization, useUpdateUserLicense, useGetUserLicenses  } from "@/hooks";
+import { OrganizationApiService, UserLicenseApiService } from "@/services";
 
 import {
   AlertDialog,
@@ -12,7 +18,9 @@ import {
   AlertDialogFooter,
   Input,
 } from "@/components";
+
 import { useToast } from "@/hooks";
+
 import { Info, Send, X } from "lucide-react";
 
 interface InviteMemberProps {
@@ -20,10 +28,43 @@ interface InviteMemberProps {
 }
 
 export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
-  const [emails, setEmails] = useState<string[]>([]);
+  const { user } = useContext(AuthContext);
+
   const [email, setEmail] = useState("");
+  const [emails, setEmails] = useState<string[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { toast } = useToast();
+
+  const {
+    mutate: updateUserLicenseMutation,
+    isPending: isUserLicenseUpdatePending,
+    isSuccess: isUserLicenseUpdateSuccess,
+  } = useUpdateUserLicense();
+  const {
+    mutate: updateOrganizationMutation,
+    isPending: isUpdateOrganizationPending,
+  } = useUpdateOrganization();
+
+  const { data: userLicense } = useGetUserLicenses();
+
+  const { data: userLicenseData } = useQuery({
+    queryFn: () =>
+      userLicense?.id
+        ? UserLicenseApiService.getUserLicense(userLicense?.id)
+        : null,
+    queryKey: ["user-license"],
+    enabled: !!userLicense?.id,
+  });
+
+  const { data: userOrganization } = useQuery({
+    queryFn: () =>
+      user?.organizationId
+        ? OrganizationApiService.getOrganization(user.organizationId)
+        : null,
+    queryKey: ["organization"],
+    enabled: !!user?.organizationId,
+  });
 
   const removeEmail = (emailToRemove: string) => {
     setEmails((prevEmails) =>
@@ -33,10 +74,12 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
 
   const addEmail = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     if (!emailRegex.test(email)) {
       toast({
         description: "Please enter a valid email address.",
       });
+
       return;
     }
 
@@ -44,6 +87,7 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
       toast({
         description: "Email already in list.",
       });
+
       return;
     }
 
@@ -51,20 +95,54 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
     setEmail("");
   };
 
-  const sentInvites = () => {
-    setEmails([]);
+  const handleAddEmails = () => {
+    if (user) {
+      // business
+      if (user.organizationId) {
+        updateOrganizationMutation({
+          id: user.organizationId,
+          organizationData: { availableEmails: emails },
+        });
+      }
+
+      // private
+      if (userLicense) {
+        updateUserLicenseMutation({
+          id: userLicense.id,
+          licenseData: { availableEmails: emails },
+        });
+      }
+    }
   };
 
+  useEffect(() => {
+    if (userLicenseData) {
+      setEmails([...userLicenseData.availableEmails]);
+    }
+  }, [userLicenseData]);
+
+  useEffect(() => {
+    if (userOrganization) {
+      setEmails([...userOrganization.availableEmails]);
+    }
+  }, [userOrganization]);
+
+  useEffect(() => {
+    if (isUserLicenseUpdateSuccess) {
+      setIsModalOpen(false);
+    }
+  }, [isUserLicenseUpdateSuccess]);
+
   return (
-    <AlertDialog>
+    <AlertDialog open={isModalOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="purple" className="" leftIcon={<Send />}>
+        <Button variant="purple" className="" leftIcon={<Send />} onClick={() => setIsModalOpen(true)}>
           Invite members
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent className="w-[590px]">
+      <AlertDialogContent className="w-full max-w-[590px]">
         <div className="absolute right-1 top-1">
-          <AlertDialogCancel className="shadow-none border-none p-3">
+          <AlertDialogCancel onClick={() => setIsModalOpen(false)} className="shadow-none border-none p-3">
             <X size={18} />
           </AlertDialogCancel>
         </div>
@@ -74,8 +152,11 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
             Invite members
           </AlertDialogTitle>
           <AlertDialogDescription className="text-[16px] leading-[22px] p-[10px] px-6 text-link-hover flex gap-2 items-center">
-            <Info style={{ width: "14px", height: "14px" }} />
-            <span>{`You can add ${allowedMembers - emails.length} more members on your plan.`}</span>
+            <Info size={14} />
+            <span>
+              You can add {allowedMembers - emails.length} more members on your
+              plan.
+            </span>
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -94,11 +175,11 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
             <p className="text-[16px] leading-[22px] text-link-hover">
               Added emails
             </p>
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2 flex-wrap mt-2">
               {emails.map((email) => (
                 <div
                   key={email}
-                  className="text-[14px] leading-[19px] font-medium p-2 px-4 flex gap-2 bg-input rounded-[30px]"
+                  className="text-[14px] leading-[19px] font-medium p-2 px-4 flex items-center gap-2 bg-input rounded-[30px]"
                 >
                   <span>{email}</span>
                   <X
@@ -111,11 +192,11 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
           </div>
         ) : null}
 
-        {allowedMembers <= emails.length ? (
+        {/* {allowedMembers <= emails.length ? (
           <p className="mt-4 text-[#FF7676] text-[12px] leading-[16px]">
             You have reached the limit for adding new members
           </p>
-        ) : null}
+        ) : null} */}
 
         <div className="flex gap-2 mt-4">
           <Input
@@ -125,10 +206,10 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
             className="max-w-sm bg-card w-[340px]"
           />
           <Button
-            onClick={addEmail}
             className="w-full"
             variant="saveProfile"
-            disabled={!email.length || emails.length >= allowedMembers}
+            onClick={addEmail}
+            disabled={!email.length}
           >
             Add email
           </Button>
@@ -136,14 +217,14 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
 
         <AlertDialogFooter className="flex gap-6 w-full">
           <Button
-            onClick={sentInvites}
+            onClick={handleAddEmails}
             variant="purple"
             className="w-full"
-            disabled={emails.length <= 0}
+            withLoader
+            loading={isUpdateOrganizationPending || isUserLicenseUpdatePending}
+            disabled={emails.length <= 0 || isUpdateOrganizationPending || isUserLicenseUpdatePending}
           >
-            {emails.length
-              ? `Sent ${emails.length} Invite${emails.length > 1 ? "s" : ""}`
-              : "Sent Invite"}
+            Send invitations
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

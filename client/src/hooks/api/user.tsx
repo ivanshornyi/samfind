@@ -1,3 +1,7 @@
+import { useContext } from "react";
+
+import { AuthContext } from "@/context";
+
 import { UserApiService, UpdateUserData } from "@/services";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -23,5 +27,50 @@ export const useUpdateUser = () => {
         description: "Successfully updated",
       });
     },
+  });
+};
+
+export const useGetUserRoleSubscriptionInfo = () => {
+  const { user } = useContext(AuthContext);
+
+  return useQuery({
+    queryFn: () => UserApiService.getUserRoleSubscriptionInfo(user?.id ?? ""),
+    queryKey: ["user-subscription-info"],
+    enabled: !!user?.id,
+    // staleTime: 5_000_000,
+  });
+};
+
+export const useDeleteUser = () => {
+  const { user, logout } = useContext(AuthContext);
+
+  return useMutation({
+    mutationFn: () => UserApiService.deleteUser(user?.id ?? ""),
+    mutationKey: ["delete-user"],
+    onSuccess: () => {
+      logout();
+    },
+  });
+};
+
+export const useGetInvitedUserInfo = () => {
+  const { user } = useContext(AuthContext);
+
+  return useQuery({
+    queryFn: () => UserApiService.getInvitedUserInfo(user?.id ?? ""),
+    queryKey: ["invited-user-info"],
+    enabled: !!user?.id,
+    staleTime: 5_000_000,
+  });
+};
+
+export const useGetUserSubscriptionInfo = () => {
+  const { user } = useContext(AuthContext);
+
+  return useQuery({
+    queryFn: () => UserApiService.getUserSubscriptionInfo(user?.id ?? ""),
+    queryKey: ["invited-user-info"],
+    enabled: !!user?.id,
+    // staleTime: 5_000_000,
   });
 };

@@ -7,6 +7,7 @@ import {
   Body,
   Headers,
   UnauthorizedException,
+  Delete,
 } from "@nestjs/common";
 
 import { UserLicenseService } from "./user-license.service";
@@ -18,6 +19,7 @@ import { UpdateUserLicenseDto } from "./dto/update-user-license-dto";
 import { CheckDeviceDto } from "./dto/check-device-dto";
 import { ConfigService } from "@nestjs/config";
 import { EXCEPTION } from "src/common/constants/exception.constant";
+import { CheckUserLicenseDto } from "./dto/check-user-license-dto";
 
 @ApiTags("User License")
 @Controller("user-license")
@@ -64,5 +66,34 @@ export class UserLicenseController {
     if ("Bearer " + secret !== authHeader)
       throw new UnauthorizedException(EXCEPTION.INVALID_TOKEN);
     return await this.licenseService.checkDevice(checkDeviceDto);
+  }
+
+  @ApiOperation({ summary: "Check License status by email" })
+  @Post("/check-license")
+  async checkLicenseStatusByEmail(
+    @Headers("authorization") authHeader: string,
+    @Body() checkUserLicenseDto: CheckUserLicenseDto,
+  ) {
+    const secret = this.configService.get("DEVICE_SECRET");
+    if ("Bearer " + secret !== authHeader)
+      throw new UnauthorizedException(EXCEPTION.INVALID_TOKEN);
+    return await this.licenseService.checkLicenseStatusByEmail(
+      checkUserLicenseDto.email,
+    );
+  }
+
+  @ApiOperation({ summary: "Deactivate user license" })
+  @Post("/deactivate/:id")
+  async deactivateLicense(@Param("id") id: string) {
+    return this.licenseService.deactivateLicense(id);
+  }
+
+  @ApiOperation({ summary: "Delete member from license" })
+  @Delete("/:id/member/:memberId")
+  async deleteMemberFromLicense(
+    @Param("id") id: string,
+    @Param("memberId") memberId: string,
+  ) {
+    return this.licenseService.deleteMemberFromLicense(id, memberId);
   }
 }

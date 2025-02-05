@@ -12,11 +12,12 @@ import {
   AlertDialogCancel,
   AlertDialogFooter,
 } from "@/components";
-
+import { useDeleteUser } from "@/hooks/api/user";
 import { X } from "lucide-react";
 
 export const DeleteAccount = () => {
   const [open, setOpen] = useState<boolean>(false);
+  const { mutate: deleteUser } = useDeleteUser();
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -27,7 +28,7 @@ export const DeleteAccount = () => {
       >
         Delete
       </Button>
-      <AlertDialogContent className="w-[590px] border gradient-border-modal">
+      <AlertDialogContent className="w-full sm:w-[590px] border gradient-border-modal">
         <div className="absolute right-1 top-1">
           <AlertDialogCancel className="shadow-none border-none p-3">
             <X size={18} />
@@ -59,6 +60,7 @@ export const DeleteAccount = () => {
             Cancel
           </Button>
           <Button
+            onClick={() => deleteUser()}
             className="w-full bg-[#FF6C6C] hover:bg-[#D23535] active:bg-[#302935]"
             variant="saveProfile"
             withLoader={true}

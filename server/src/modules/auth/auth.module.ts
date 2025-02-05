@@ -11,6 +11,9 @@ import { AuthController } from "./auth.controller";
 import { UserService } from "../user/user.service";
 import { TokenService } from "./token.service";
 import { MailService } from "../mail/mail.service";
+import { SubscriptionService } from "../subscription/subscription.service";
+import { SubscriptionModule } from "../subscription/subscription.module";
+import { StripeService } from "../stripe/stripe.service";
 
 @Module({
   imports: [
@@ -23,6 +26,7 @@ import { MailService } from "../mail/mail.service";
       },
     }),
     PrismaModule,
+    SubscriptionModule,
   ],
   controllers: [AuthController],
   providers: [
@@ -31,6 +35,8 @@ import { MailService } from "../mail/mail.service";
     TokenService,
     MailService,
     PrismaService,
+    SubscriptionService,
+    StripeService,
   ],
   exports: [TokenService],
 })

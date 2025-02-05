@@ -1,4 +1,4 @@
-import { User, UserStatus } from "@/types";
+import { LicenseTierType, PlanPeriod, User, UserStatus } from "@/types";
 
 import { handleApiError } from "@/errors";
 
@@ -42,8 +42,92 @@ const updateUserReferral = async (referralCode: number, newUserId: string) => {
   }
 };
 
+export interface UserInfo {
+  organizationOwner: boolean; // with organization
+  standardUser: boolean; // private with license, (standard tier)
+  freemiumUser: boolean; // private with freemium tier (without ActiveLicense bu with License)
+  invitedUser: boolean; // added by invitation (with ActiveLicense)
+}
+
+const getUserRoleSubscriptionInfo = async (id: string) => {
+  try {
+    const response = await apiClient.get(`/user/subscription-role-info/${id}`);
+
+    return response.data as UserInfo;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
+const deleteUser = async (id: string) => {
+  try {
+    const response = await apiClient.delete(`/user/${id}`);
+
+    return response.data as UserInfo;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
+export interface InvitedUserInfo {
+  license: {
+    id: string;
+    ownerId: string;
+    tierType: LicenseTierType;
+    updatedAt: string;
+  },
+  licenseOwner: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    organizationId: string | null;
+  }
+}
+
+const getInvitedUserInfo = async (userId: string) => {
+  try {
+    const response = await apiClient.get(`/user/find-invited-user/info/${userId}`);
+
+    return response.data as InvitedUserInfo;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
+interface UserSubscriptionInfo {
+  subscription: {
+    isActive: boolean;
+    nextDate: string;
+    planId: string;
+  },
+  plan: {
+    type: LicenseTierType;
+    period: PlanPeriod;
+    price: number;
+  },
+  license: {
+    limit: number;
+    tierType: LicenseTierType;
+  }
+}
+
+const getUserSubscriptionInfo = async (userId: string) => {
+  try {
+    const response = await apiClient.get(`/user/subscription-info/${userId}`);
+
+    return response.data as UserSubscriptionInfo;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 export const UserApiService = {
   getUser,
   updateUser,
   updateUserReferral,
+  getUserRoleSubscriptionInfo,
+  getUserSubscriptionInfo,
+  deleteUser,
+  getInvitedUserInfo,
 };

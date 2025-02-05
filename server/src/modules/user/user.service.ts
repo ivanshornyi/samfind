@@ -1,6 +1,13 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 
-import { User, UserAuthType, UserRole, UserStatus } from "@prisma/client";
+import {
+  LicenseTierType,
+  LicenseStatus,
+  User,
+  UserAuthType,
+  UserRole,
+  UserStatus,
+} from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 
 import { UpdateUserDto } from "./dto/update-user-dto";
@@ -44,36 +51,65 @@ export class UserService {
   }
 
   async findAndUpdateUserByReferralCode(
-    referralCode: number, 
-    newUserId: string,
+    referralCode: number,
+    newUser: User,
     discountNumber: number,
   ) {
     const user = await this.prisma.user.findUnique({
       where: { referralCode },
     });
 
-    if (!user) {
+    const userReferral = await this.prisma.userReferral.findUnique({
+      where: { referralCode },
+    });
+
+    if (!user || !userReferral) {
       throw new NotFoundException("User not found");
     }
 
-    if (user.discount < 50) {
-      await this.prisma.user.update({
-        where: { id: user.id },
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        discount: user.discount + discountNumber,
+      },
+    });
+
+    let discount = await this.prisma.discount.findFirst({
+      where: { userId: user.id, used: false, stripeCouponId: null },
+    });
+
+    if (discount) {
+      await this.prisma.discount.update({
+        where: { id: discount.id },
         data: {
-          discount: user.discount + discountNumber,
+          endAmount: discountNumber + discountNumber,
+        },
+      });
+    } else {
+      discount = await this.prisma.discount.create({
+        data: {
+          userId: user.id,
+          endAmount: discountNumber,
         },
       });
     }
 
-    const userReferral = await this.prisma.userReferral.findUnique({
-      where: { userId: user.id },
+    await this.prisma.discountIncome.create({
+      data: {
+        userId: user.id,
+        referralId: userReferral.id,
+        invitedUserId: newUser.id,
+        amount: discountNumber,
+        discountId: discount.id,
+        description: `Income from referral Registration on email ${newUser.email}`,
+      },
     });
 
     const referralUserIds = userReferral.invitedUserIds;
-    referralUserIds.push(newUserId);
+    referralUserIds.push(newUser.id);
 
     await this.prisma.userReferral.update({
-      where: { 
+      where: {
         userId: user.id,
       },
       data: {
@@ -87,7 +123,7 @@ export class UserService {
       where: {
         id: {
           in: ids,
-        }
+        },
       },
       select: {
         id: true,
@@ -120,13 +156,16 @@ export class UserService {
       data: {
         userId: user.id,
         referralCode,
-      }
+      },
     });
 
     return user;
   }
 
-  async findUserByEmail(email: string, authType: UserAuthType): Promise<User | null> {
+  async findUserByEmail(
+    email: string,
+    authType: UserAuthType,
+  ): Promise<User | null> {
     const user = await this.prisma.user.findFirst({
       where: {
         email,
@@ -137,7 +176,11 @@ export class UserService {
     return user;
   }
 
-  async updateUser(id: string, updateUserDto: UpdateUserDto, resetPassword?: boolean): Promise<User> {
+  async updateUser(
+    id: string,
+    updateUserDto: UpdateUserDto,
+    resetPassword?: boolean,
+  ): Promise<User> {
     const user = await this.prisma.user.findUnique({
       where: { id },
     });
@@ -150,7 +193,7 @@ export class UserService {
       updateUserDto.password = this.hashPassword(updateUserDto.password);
     }
 
-    const updatedUser = await this.prisma.user.update({ 
+    const updatedUser = await this.prisma.user.update({
       where: { id },
       data: updateUserDto,
     });
@@ -158,7 +201,193 @@ export class UserService {
     return updatedUser;
   }
 
+  async findUserRoleSubscriptionInfo(userId: string) {
+    const userInfo = {
+      organizationOwner: false, // with organization
+      standardUser: false, // private with license, (standard tier)
+      freemiumUser: false, // private with freemium tier (without active license)
+      invitedUser: false, // added by invitation (with active license)
+    };
+
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    if (user.organizationId) {
+      userInfo.organizationOwner = true;
+    }
+
+    if (!user.organizationId) {
+      const license = await this.prisma.license.findUnique({
+        where: {
+          ownerId: userId,
+        },
+      });
+
+      if (license) {
+        if (license.tierType === LicenseTierType.freemium) {
+          userInfo.freemiumUser = true;
+        } else if (license.tierType === LicenseTierType.standard) {
+          userInfo.standardUser = true;
+        }
+      } else {
+        const activeLicense = await this.prisma.activeLicense.findFirst({
+          where: {
+            userId,
+          },
+        });
+
+        if (activeLicense) {
+          userInfo.invitedUser = true;
+        }
+      }
+    }
+
+    return userInfo;
+  }
+
+  async findInvitedUserInfo(userId: string) {
+    const activeLicense = await this.prisma.activeLicense.findFirst({
+      where: {
+        userId,
+      },
+    });
+
+    if (!activeLicense) {
+      throw new NotFoundException("Active License not found");
+    }
+
+    const license = await this.prisma.license.findUnique({
+      where: {
+        id: activeLicense.licenseId,
+      },
+      select: {
+        id: true,
+        ownerId: true,
+        tierType: true,
+        updatedAt: true,
+      },
+    });
+
+    const licenseOwner = await this.prisma.user.findUnique({
+      where: {
+        id: license.ownerId,
+      },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        organizationId: true,
+      },
+    });
+
+    return {
+      license: {
+        ...license,
+      },
+      licenseOwner: {
+        ...licenseOwner,
+      },
+    };
+  }
+
+  async findUserSubscriptionInfo(userId: string) {
+    // get subscription
+    // plan (type, period), price, members count (license limit) (get from user subscription)
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      }
+    });
+
+    const subscription = await this.prisma.subscription.findUnique({
+      where: {
+        userId,
+      }, 
+      select: {
+        isActive: true,
+        nextDate: true,
+        planId: true,
+      }
+    });
+
+    const plan = await this.prisma.plan.findUnique({
+      where: {
+        id: subscription.planId,
+      },
+      select: {
+        type: true,
+        period: true,
+        price: true,
+      }
+    });
+
+    const license = await this.prisma.license.findUnique({
+      where: {
+        ownerId: userId,
+      },
+      select: {
+        limit: true,
+        tierType: true,
+      }
+    });
+
+    return {
+      subscription: {
+        ...subscription,
+      },
+      plan: {
+        ...plan,
+      },
+      license: {
+        ...license,
+      }
+    };
+  }
+
   private hashPassword(password: string): string {
     return createHash("sha256").update(password).digest("hex");
+  }
+
+  async deleteUser(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: { License: true, subscription: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    if (user.License.length) {
+      const licenseIds = user.License.map((l) => l.id);
+      await this.prisma.license.updateMany({
+        where: {
+          id: { in: licenseIds },
+        },
+        data: {
+          status: LicenseStatus.inactive,
+        },
+      });
+    }
+
+    if (user.subscription) {
+      await this.prisma.subscription.update({
+        where: { id: user.subscription.id },
+        data: { isActive: false },
+      });
+    }
+
+    await this.prisma.user.update({
+      where: { id },
+      data: { isDeleted: true },
+    });
   }
 }
