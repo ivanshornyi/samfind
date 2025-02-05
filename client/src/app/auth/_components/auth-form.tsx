@@ -20,7 +20,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 
 import { GoogleIcon } from "@public/icons";
-import { EyeIcon, EyeOff, Info } from "lucide-react";
+import { Building2, EyeIcon, EyeOff, Globe, Hash, Info } from "lucide-react";
 
 interface AuthFormProps {
   authPageType: "signIn" | "signUp" | "resetPassword";
@@ -53,7 +53,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
     name: "",
     businessOrganizationNumber: "",
     VAT: "",
-    domain: "",
+    domains: [""],
   });
 
   const { mutate: signInMutation, isPending: isSignInPending } = useSignIn();
@@ -84,12 +84,28 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
   };
 
   const handleOrganizationFormInputChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
+    index?: number
   ) => {
     const name = event.target.name;
     const value = event.target.value;
 
-    setOrganizationFormData({ ...organizationFormData, [name]: value });
+    if (name === "domain") {
+      setOrganizationFormData((prev) => {
+        const newDomains = [...prev.domains];
+        newDomains[index!] = value;
+        return { ...prev, domains: newDomains };
+      });
+    } else {
+      setOrganizationFormData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const addDomainField = () => {
+    setOrganizationFormData((prev) => ({
+      ...prev,
+      domains: [...prev.domains, ""],
+    }));
   };
 
   const handlePasswordInputTypeChange = () => {
@@ -264,7 +280,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
 
     // if (referralCode) {
     //   signUpData = {
-    //     ...signUpData, 
+    //     ...signUpData,
     //     invitedReferralCode: Number(referralCode),
     //   }
     // }
@@ -416,30 +432,85 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
 
           {authPageType === "signUp" &&
             accountType === UserAccountType.Business && (
-              <div className="flex flex-col gap-2 mt-4">
-                <p>
-                  Provide detailed information about your business to help us
-                  customize your experience
-                </p>
+              <div className="flex flex-col gap-6 mt-8">
+                <div className="flex flex-col gap-2">
+                  <h3 className="text-xl font-semibold">Company details</h3>
 
-                <Input
-                  name="name"
-                  placeholder="Company name"
-                  value={organizationFormData.name}
-                  onChange={handleOrganizationFormInputChange}
-                />
-                <Input
-                  name="businessOrganizationNumber"
-                  placeholder="Business registration number"
-                  value={organizationFormData.businessOrganizationNumber}
-                  onChange={handleOrganizationFormInputChange}
-                />
-                <Input
-                  name="VAT"
-                  placeholder="VAT number"
-                  value={organizationFormData.VAT}
-                  onChange={handleOrganizationFormInputChange}
-                />
+                  <div className="flex flex-col gap-4">
+                    <div className="relative">
+                      <Input
+                        name="name"
+                        placeholder="Company name"
+                        value={organizationFormData.name}
+                        onChange={handleOrganizationFormInputChange}
+                        className="pl-11"
+                      />
+                      <Building2
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                        size={18}
+                      />
+                    </div>
+
+                    <div className="flex gap-4">
+                      <div className="relative flex-1">
+                        <Input
+                          name="businessOrganizationNumber"
+                          placeholder="Business registration number"
+                          value={
+                            organizationFormData.businessOrganizationNumber
+                          }
+                          onChange={handleOrganizationFormInputChange}
+                          className="pl-11"
+                        />
+                        <Hash
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                          size={18}
+                        />
+                      </div>
+
+                      <div className="relative flex-1">
+                        <Input
+                          name="VAT"
+                          placeholder="VAT number"
+                          value={organizationFormData.VAT}
+                          onChange={handleOrganizationFormInputChange}
+                          className="pl-11"
+                        />
+                        <Hash
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                          size={18}
+                        />
+                      </div>
+                    </div>
+
+                    {organizationFormData.domains.map((domain, index) => (
+                      <div key={index} className="relative">
+                        <Input
+                          name="domain"
+                          placeholder="Domain"
+                          value={domain}
+                          onChange={(e) =>
+                            handleOrganizationFormInputChange(e, index)
+                          }
+                          className="pl-11"
+                        />
+                        <Globe
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                          size={18}
+                        />
+                      </div>
+                    ))}
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={addDomainField}
+                      className="w-fit px-4"
+                    >
+                      Add another domain
+                    </Button>
+                  </div>
+                </div>
               </div>
             )}
 

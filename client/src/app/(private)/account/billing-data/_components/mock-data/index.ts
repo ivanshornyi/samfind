@@ -1,0 +1,32 @@
+export const pricingPlans = [
+  {
+    id: "free-plan",
+    type: "standard",
+    period: "monthly",
+    price: 0,
+    stripeProductId: "",
+    stripePriceId: "",
+    title: "Freemium",
+    description: "For individuals getting started",
+  },
+  {
+    id: "monthly-plan",
+    type: "standard",
+    period: "monthly",
+    price: 225,
+    stripeProductId: "prod_Ri8VyZzufYtntw",
+    stripePriceId: "price_1QoiE0IQ0ONDLa6i6EiFMqU0",
+    title: "Standard Monthly",
+    description: "For growing teams",
+  },
+  {
+    id: "yearly-plan",
+    type: "standard",
+    period: "yearly",
+    price: 897,
+    stripeProductId: "prod_Ri8g2le2jrWepw",
+    stripePriceId: "price_1QoiPRIQ0ONDLa6iFsjlranI",
+    title: "Standard Yearly",
+    description: "Best value for teams",
+  },
+];
