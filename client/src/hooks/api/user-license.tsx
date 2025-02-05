@@ -33,6 +33,7 @@ export const useGetUserLicense = (id: string) => {
     queryFn: () => UserLicenseApiService.getUserLicense(id),
     queryKey: ["user-license"],
     enabled: !!id,
+    // stale time
   });
 };
 
@@ -43,6 +44,7 @@ export const useGetUserLicenses = () => {
     queryFn: () => UserLicenseApiService.getUserLicenses(user?.id ?? ""),
     queryKey: ["user-license-list", user?.id],
     enabled: !!user?.id,
+    // stale time
   });
 };
 

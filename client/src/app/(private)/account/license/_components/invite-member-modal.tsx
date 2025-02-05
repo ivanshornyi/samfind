@@ -25,27 +25,29 @@ import { Info, Send, X } from "lucide-react";
 
 interface InviteMemberProps {
   allowedMembers: number;
+  isOpen: boolean;
 }
 
-export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
+export const InviteMember = ({ allowedMembers, isOpen }: InviteMemberProps) => {
   const { user } = useContext(AuthContext);
 
   const [email, setEmail] = useState("");
   const [emails, setEmails] = useState<string[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(isOpen);
 
   const { toast } = useToast();
 
   const {
     mutate: updateUserLicenseMutation,
     isPending: isUserLicenseUpdatePending,
+    isSuccess: isUserLicenseUpdateSuccess,
   } = useUpdateUserLicense();
   const {
     mutate: updateOrganizationMutation,
     isPending: isUpdateOrganizationPending,
   } = useUpdateOrganization();
 
-  const { data: userLicense, isPending: isUserLicensesPending } =
-    useGetUserLicenses();
+  const { data: userLicense } = useGetUserLicenses();
 
   const { data: userLicenseData } = useQuery({
     queryFn: () =>
@@ -126,8 +128,14 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
     }
   }, [userOrganization]);
 
+  useEffect(() => {
+    if (isUserLicenseUpdateSuccess) {
+      setIsModalOpen(false);
+    }
+  }, [isUserLicenseUpdateSuccess]);
+
   return (
-    <AlertDialog>
+    <AlertDialog open={isModalOpen}>
       <AlertDialogTrigger asChild>
         <Button variant="purple" className="" leftIcon={<Send />}>
           Invite members
@@ -185,11 +193,11 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
           </div>
         ) : null}
 
-        {allowedMembers <= emails.length ? (
+        {/* {allowedMembers <= emails.length ? (
           <p className="mt-4 text-[#FF7676] text-[12px] leading-[16px]">
             You have reached the limit for adding new members
           </p>
-        ) : null}
+        ) : null} */}
 
         <div className="flex gap-2 mt-4">
           <Input
@@ -202,7 +210,7 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
             className="w-full"
             variant="saveProfile"
             onClick={addEmail}
-            disabled={!email.length || emails.length >= allowedMembers}
+            disabled={!email.length}
           >
             Add email
           </Button>
@@ -215,7 +223,7 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
             className="w-full"
             withLoader
             loading={isUpdateOrganizationPending || isUserLicenseUpdatePending}
-            disabled={emails.length <= 0}
+            disabled={emails.length <= 0 || isUpdateOrganizationPending || isUserLicenseUpdatePending}
           >
             Send invitations
           </Button>

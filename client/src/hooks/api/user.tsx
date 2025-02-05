@@ -37,7 +37,7 @@ export const useGetUserRoleSubscriptionInfo = () => {
     queryFn: () => UserApiService.getUserRoleSubscriptionInfo(user?.id ?? ""),
     queryKey: ["user-subscription-info"],
     enabled: !!user?.id,
-    staleTime: 5_000_000,
+    // staleTime: 5_000_000,
   });
 };
 
@@ -71,5 +71,6 @@ export const useGetUserSubscriptionInfo = () => {
     queryFn: () => UserApiService.getUserSubscriptionInfo(user?.id ?? ""),
     queryKey: ["invited-user-info"],
     enabled: !!user?.id,
+    // staleTime: 5_000_000,
   });
 };

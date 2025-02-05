@@ -9,7 +9,7 @@ import { AuthContext } from "@/context";
 import { usePaySubscription } from "@/hooks";
 import { CreatePaymentData } from "@/services";
 import { Plan } from "@/types";
-import { Check } from "lucide-react";
+import { Check, Minus, Plus } from "lucide-react";
 import { useContext, useState } from "react";
 
 interface PricingCardProps {
@@ -86,7 +86,17 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
 
       <CardContent>
         <div className="mb-8">
-          <div className="flex items-baseline">
+          <div className="flex items-center gap-2 mt-3">
+            <label>Quantity</label>
+            <input 
+              type="number"
+              className="w-[80px] rounded-xl px-4 py-2 bg-background text-center" 
+              value={quantity}
+              onChange={(event) => setQuantity(Number(event.target.value))}
+            />
+          </div>
+
+          <div className="flex items-baseline mt-2">
             <span className="text-4xl font-semibold">
               <span className="text-2xl align-top">$</span>
               {formatPrice(plan.price)}
@@ -97,16 +107,6 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
                 <span>, billed ${(plan.price / 100).toFixed(2)} yearly</span>
               )}
             </span>
-          </div>
-
-          <div className="flex items-center gap-2 mt-3">
-            <label>Quantity</label>
-            <input 
-              type="number"
-              className="w-[80px] rounded-full px-4 py-1 bg-white/70 text-black" 
-              value={quantity}
-              onChange={(event) => setQuantity(Number(event.target.value))}
-            />
           </div>
         </div>
 
