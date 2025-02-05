@@ -16,17 +16,12 @@ import {
 } from "@/components";
 
 import { usePathname } from "next/navigation";
-import { Home, IdCard, Gift, CreditCard, User, Headset } from "lucide-react";
+import { Home, IdCard, Gift, CreditCard, User, Headset, Download } from "lucide-react";
 import { Logo } from "@public/images";
 import Link from "next/link";
 import Image from "next/image";
 
 const NAVIGATION_ITEMS = [
-  {
-    title: "Home",
-    path: "/",
-    icon: Home,
-  },
   {
     title: "License management",
     path: "/account/license",
@@ -42,6 +37,11 @@ const NAVIGATION_ITEMS = [
     path: "/account/billing-data",
     icon: CreditCard,
   },
+  {
+    title: "Profile settings",
+    path: "/account/settings",
+    icon: User,
+  }
 ];
 
 export const AppSidebar = () => {
@@ -111,12 +111,12 @@ export const AppSidebar = () => {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="space-y-4 px-4 bg-background">
-        <Link href="/account/settings">
+        <Link href="/download-app">
           <Button
             variant="menuItem"
-            leftIcon={<User style={{ width: "24px", height: "24px" }} />}
+            leftIcon={<Download style={{ width: "24px", height: "24px" }} />}
           >
-            Profile settings
+            Download app
           </Button>
         </Link>
         {/* <Button
