@@ -352,6 +352,8 @@ export class StripeService {
             id: license.id,
           },
           data: {
+            purchased: firstInvoice ? Number(quantity) - 1 : undefined,
+            status: LicenseStatus.active,
             limit: Number(quantity),
             tierType: subscription.plan.type,
           },
@@ -362,6 +364,7 @@ export class StripeService {
       ) {
         const license = await this.prisma.license.create({
           data: {
+            purchased: firstInvoice ? Number(quantity) - 1 : undefined,
             ownerId: subscription.userId,
             status: LicenseStatus.active,
             limit: Number(quantity),
@@ -394,7 +397,7 @@ export class StripeService {
 
       if (firstInvoice) {
         const discountAmount = this.calculateDiscount(
-          subscription.plan.price * Number(quantity),
+          subscription.plan.price,
           subscription.plan.period === PlanPeriod.yearly
             ? new Date(subscription.nextDate)
             : undefined,

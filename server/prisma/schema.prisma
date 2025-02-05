@@ -83,6 +83,7 @@ model License {
   ownerId          String          @unique
   activeLicenses   ActiveLicense[]
   limit            Float           @default(0)
+  purchased        Float           @default(0)
   tierType         LicenseTierType @default(freemium)
   availableEmails  String[]        @default([])
   licenseExpiresAt DateTime        @default(now())
