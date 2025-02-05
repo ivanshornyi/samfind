@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -8,8 +8,8 @@ import { HeaderMenuIcon } from "@public/icons";
 
 import { AuthContext } from "@/context";
 import { Logo } from "@public/images";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Layout({
   children,
@@ -42,10 +42,7 @@ function MobileHeader() {
             <Image src={HeaderMenuIcon} alt="menu" width={80} height={44} />
           }
         />
-        <Link
-          href="/"
-          className="absolute left-1/2 transform -translate-x-1/2"
-        >
+        <Link href="/" className="absolute left-1/2 transform -translate-x-1/2">
           <Image src={Logo} width={80} height={44} alt="logo" />
         </Link>
       </div>

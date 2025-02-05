@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { OrganizationApiService, UpdateOrganizationData } from "@/services";
 import { useToast } from "../use-toast";
@@ -26,4 +26,12 @@ export const useUpdateOrganization = () => {
   });
 
   return mutationProps;
+};
+
+export const useGetOrganization = (id: string) => {
+  return useQuery({
+    queryFn: () => OrganizationApiService.getOrganization(id),
+    queryKey: ["organization", id],
+    enabled: !!id,
+  });
 };
