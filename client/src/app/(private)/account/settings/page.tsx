@@ -108,7 +108,9 @@ export default function Settings() {
 
   const handleEditCancelDomains = () => {
     if (editDomains && organization) {
-      setDomains(organization.domains || [""]);
+      setDomains(
+        Array.isArray(organization.domains) ? organization.domains : [""]
+      );
     }
     setEditDomains(!editDomains);
   };
@@ -206,14 +208,18 @@ export default function Settings() {
         businessOrganizationNumber:
           organization.businessOrganizationNumber ?? "",
         VAT: organization.VAT ?? "",
-        domains: organization.domains?.length ? organization.domains : [""],
+        domains: Array.isArray(organization.domains)
+          ? organization.domains
+          : [""],
       });
     }
   }, [organization]);
 
   useEffect(() => {
     if (organization) {
-      setDomains(organization.domains?.length ? organization.domains : [""]);
+      setDomains(
+        Array.isArray(organization.domains) ? organization.domains : [""]
+      );
     }
   }, [organization]);
 
