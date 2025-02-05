@@ -74,8 +74,8 @@ export const PaymentHistory = () => {
   return (
     <div className="w-full mt-5 mb-[100px]">
       <Table>
-        <TableHeader>
-          <TableRow className="border-white/30">
+        <TableHeader className="hover:bg-transparent">
+          <TableRow className="border-white/30 hover:bg-transparent">
             <TableHead className="w-[250px] uppercase text-white/60">Invoice</TableHead>
             <TableHead className="uppercase text-white/60">Invoice date</TableHead>
             <TableHead className="uppercase text-white/60">Price</TableHead>
@@ -84,7 +84,7 @@ export const PaymentHistory = () => {
         </TableHeader>
         <TableBody>
           {billingHistory?.map((historyItem) => (
-            <TableRow key={historyItem.number} className="border-none">
+            <TableRow key={historyItem.number} className="border-none hover:bg-transparent">
               <TableCell className="font-medium py-2">
                 <div className="py-3">{historyItem.number}</div>
               </TableCell>
