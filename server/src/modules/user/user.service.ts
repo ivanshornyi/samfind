@@ -98,6 +98,7 @@ export class UserService {
       data: {
         userId: user.id,
         referralId: userReferral.id,
+        invitedUserId: newUser.id,
         amount: discountNumber,
         discountId: discount.id,
         description: `Income from referral Registration on email ${newUser.email}`,
@@ -257,6 +258,10 @@ export class UserService {
         userId,
       },
     });
+
+    if (!activeLicense) {
+      throw new NotFoundException("Active License not found");
+    }
 
     const license = await this.prisma.license.findUnique({
       where: {

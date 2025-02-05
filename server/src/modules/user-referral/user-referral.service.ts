@@ -27,9 +27,7 @@ export class UserReferralService {
         userId,
       },
       include: {
-        discountIncomes: {
-          include: { user: { select: { firstName: true, lastName: true } } },
-        },
+        discountIncomes: true,
       },
     });
 
@@ -37,10 +35,24 @@ export class UserReferralService {
       throw new NotFoundException("Referral not found");
     }
 
-    const referralItems = referral.discountIncomes.map((i) => ({
-      name: i.user,
-    }));
+    const userIds = referral.discountIncomes
+      .filter((i) => typeof i.invitedUserId === "string")
+      .map((i) => i.invitedUserId);
 
-    return referral;
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: userIds } },
+    });
+
+    const referralItems = referral.discountIncomes.map((i) => {
+      const user = users.find((u) => u.id === i.invitedUserId);
+      return {
+        userId: user?.id,
+        name: user?.firstName + " " + user?.lastName,
+        activationDate: i.createdAt,
+        amount: i.amount,
+      };
+    });
+
+    return referralItems;
   }
 }
