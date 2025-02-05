@@ -30,12 +30,12 @@ export default function BillingData() {
         <div>
           {!isUserLicensePending && userLicense && !isUserSubscriptionInfoPending && userSubscriptionInfo && userLicense.tierType !== "freemium" && (
             <SubscriptionDetails
-              plan={`${userSubscriptionInfo.plan.type} ${userSubscriptionInfo.plan.period}`}
+              plan={`${userSubscriptionInfo.plan?.type} ${userSubscriptionInfo.plan?.period}`}
               status="Active subscription"
-              renewalDate={formatDate(userSubscriptionInfo.subscription.nextDate)}
-              price={userSubscriptionInfo.plan.price / 100}
-              billingPeriod={`month billed ${userSubscriptionInfo.plan.period}`}
-              members={{ admin: 1, regular: userSubscriptionInfo.license.limit }}
+              renewalDate={formatDate(userSubscriptionInfo.subscription?.nextDate)}
+              price={userSubscriptionInfo.plan?.price / 100}
+              billingPeriod={`month billed ${userSubscriptionInfo.plan?.period}`}
+              members={{ admin: 1, regular: userSubscriptionInfo.license?.limit }}
             />
           )}
 
