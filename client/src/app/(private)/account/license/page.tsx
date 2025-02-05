@@ -3,6 +3,7 @@
 import { useContext, useEffect, useState } from "react";
 
 import {
+  useGetInvitedUserInfo,
   useGetUserLicenses,
   useGetUserSubscriptionInfo,
   useToast,
@@ -39,7 +40,7 @@ import {
 
 import { ReusableTable } from "@/components/table";
 import { AuthContext } from "@/context";
-import { InviteMember, ProgressChart } from "./_components";
+import { DeleteMember, InviteMember, ProgressChart } from "./_components";
 
 import {
   ArrowUpDown,

@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/context";
 
 import { useQuery } from "@tanstack/react-query";
-import { useUpdateOrganization, useUpdateUserLicense } from "@/hooks";
+import { useUpdateOrganization, useUpdateUserLicense, useGetUserLicenses  } from "@/hooks";
 import { OrganizationApiService, UserLicenseApiService } from "@/services";
 
 import {
@@ -44,13 +44,16 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
     isPending: isUpdateOrganizationPending,
   } = useUpdateOrganization();
 
-  const { data: userLicense } = useQuery({
+  const { data: userLicense, isPending: isUserLicensesPending } =
+    useGetUserLicenses();
+
+  const { data: userLicenseData } = useQuery({
     queryFn: () =>
-      user?.licenseId
-        ? UserLicenseApiService.getUserLicense(user.licenseId)
+      userLicense?.id
+        ? UserLicenseApiService.getUserLicense(userLicense?.id)
         : null,
     queryKey: ["user-license"],
-    enabled: !!user?.licenseId,
+    enabled: !!userLicense?.id,
   });
 
   const { data: userOrganization } = useQuery({
@@ -112,10 +115,10 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
   };
 
   useEffect(() => {
-    if (userLicense) {
-      setEmails([...userLicense.availableEmails]);
+    if (userLicenseData) {
+      setEmails([...userLicenseData.availableEmails]);
     }
-  }, [userLicense]);
+  }, [userLicenseData]);
 
   useEffect(() => {
     if (userOrganization) {

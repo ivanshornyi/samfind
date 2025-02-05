@@ -34,6 +34,8 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
     isPending: isPaySubscriptionPending,
   } = usePaySubscription();
 
+  const [quantity, setQuantity] = useState(1);
+
   const isFreemium = plan.price === 0;
   const [quantity, setQuantity] = useState(1);
 
@@ -61,8 +63,8 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
         ...payment,
         userReferralCode: user.invitedReferralCode,
         discount: {
-          amount: 10,
-          description: "",
+          amount: plan.price * quantity,
+          description: "Referral discount",
         },
       };
     }
@@ -74,6 +76,7 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
     if (plan.period === "yearly") {
       return (price / 100 / 12).toFixed(2);
     }
+    
     return (price / 100).toFixed(2);
   };
 

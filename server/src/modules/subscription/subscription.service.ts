@@ -5,12 +5,18 @@ import {
 } from "@nestjs/common";
 import { addMonths, addYears, startOfMonth } from "date-fns";
 import { PrismaService } from "../prisma/prisma.service";
-import { PlanPeriod } from "@prisma/client";
+import { PlanPeriod, User } from "@prisma/client";
 import { StripeService } from "../stripe/stripe.service";
 import { AddSubscriptionDto } from "./dto/add-subscription-dto";
 import { CreateMemberInvoiceDto } from "./dto/create-member-invoice-dto";
 import Stripe from "stripe";
 
+interface IAddDiscountOnNotUsedPeriod {
+  totalAmount: number;
+  nextDate?: Date;
+  owner: User;
+  memberEmail: string;
+}
 @Injectable()
 export class SubscriptionService {
   constructor(
@@ -29,6 +35,8 @@ export class SubscriptionService {
 
     if (!user) throw new NotFoundException("User not found");
 
+    let stripeCustomerId = user.stripeCustomerId;
+
     let subscription = await this.prisma.subscription.findUnique({
       where: { userId },
     });
@@ -46,17 +54,21 @@ export class SubscriptionService {
 
     let discountId = undefined;
 
-    const stripeCustomer = await this.stripeService.createCustomer(
-      user.email,
-      user.firstName + " " + user.lastName,
-    );
+    if (!stripeCustomerId) {
+      const stripeCustomer = await this.stripeService.createCustomer(
+        user.email,
+        user.firstName + " " + user.lastName,
+      );
 
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: {
-        stripeCustomerId: stripeCustomer.id,
-      },
-    });
+      stripeCustomerId = stripeCustomer.id;
+
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          stripeCustomerId: stripeCustomer.id,
+        },
+      });
+    }
 
     if (discount) {
       await this.prisma.user.update({
@@ -117,7 +129,7 @@ export class SubscriptionService {
     };
 
     const invoice = await this.stripeService.createAndPayInvoice({
-      customerId: stripeCustomer.id,
+      customerId: stripeCustomerId,
       priceId: plan.stripePriceId,
       quantity,
       couponId: discountId,
@@ -251,5 +263,18 @@ export class SubscriptionService {
     }));
 
     return invoices;
+  }
+
+  async addDiscountOnNotUsedPeriod({
+    totalAmount,
+    owner,
+    nextDate,
+    memberEmail,
+  }: IAddDiscountOnNotUsedPeriod) {
+    const discountAmount = this.stripeService.calculateDiscount(
+      totalAmount,
+      nextDate,
+    );
+    await this.stripeService.addDiscount(owner, discountAmount, memberEmail);
   }
 }

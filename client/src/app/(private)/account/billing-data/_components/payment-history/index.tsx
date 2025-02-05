@@ -7,7 +7,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 
 export const PaymentHistory = () => {
   const { user } = useContext(AuthContext);
@@ -59,6 +59,10 @@ export const PaymentHistory = () => {
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
+
+  useEffect(() => {
+    console.log('rerender')
+  }, []);
 
   return (
     <ReusableTable

@@ -5,7 +5,6 @@ import {
   TwitterShareButton,
 } from "react-share";
 import {
-  YoutubeIcon,
   TwitterIcon,
   FacebookIcon,
   InstagramIcon,
@@ -24,12 +23,11 @@ export const SharePopover = ({ url }: { url: string }) => (
       <Popover.Content
         side="top"
         sideOffset={30}
-        className="p-4 bg-[#232323] w-full max-w-[300px] rounded-[30px] space-y-3 z-[1]"
+        className="p-4 bg-[#232323] w-[300px] rounded-[30px] space-y-3 z-[1]"
       >
         <p className="font-medium text-base">Share your link</p>
 
         <div className="flex gap-6">
-          <Image src={YoutubeIcon} width={24} height={24} alt="youtube" />
           <TwitterShareButton url={url}>
             <Image src={TwitterIcon} width={24} height={24} alt="twitter" />
           </TwitterShareButton>
