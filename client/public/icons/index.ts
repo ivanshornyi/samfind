@@ -5,7 +5,6 @@ import FacebookIcon from "./facebook.svg";
 import InstagramIcon from "./instagram.svg";
 import LinkedinIcon from "./linkedin.svg";
 import TwitterIcon from "./twitter.svg";
-import YoutubeIcon from "./youtube.svg";
 
 export {
   HeaderMenuIcon,
@@ -15,5 +14,4 @@ export {
   InstagramIcon,
   LinkedinIcon,
   TwitterIcon,
-  YoutubeIcon,
 };
