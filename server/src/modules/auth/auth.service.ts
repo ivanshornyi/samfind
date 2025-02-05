@@ -350,8 +350,6 @@ export class AuthService {
         throw new ConflictException("License limit is reached");
       }
 
-      console.log(license);
-
       if (!license.availableEmails.includes(authVerificationDto.email)) {
         throw new ConflictException("This email does not have access");
       }
@@ -436,6 +434,17 @@ export class AuthService {
         throw new ConflictException("This email does not have access");
       }
 
+      // add userId to organization
+      const organizationUserIds = organization.userIds;
+      organizationUserIds.push(user.id);
+
+      await this.prisma.organization.update({
+        where: { id: authVerificationDto.organizationId },
+        data: {
+          userIds: organizationUserIds,
+        },
+      });
+
       if (license.purchased > 0) {
         // Use payed License
         await this.prisma.license.update({
@@ -468,17 +477,6 @@ export class AuthService {
           );
         }
       }
-
-      // add userId to organization
-      const organizationUserIds = organization.userIds;
-      organizationUserIds.push(user.id);
-
-      await this.prisma.organization.update({
-        where: { id: authVerificationDto.organizationId },
-        data: {
-          userIds: organizationUserIds,
-        },
-      });
     }
 
     await this.userService.updateUser(user.id, {
