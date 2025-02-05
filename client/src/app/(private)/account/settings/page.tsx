@@ -3,8 +3,13 @@
 import { Button, FullScreenLoader, Input } from "@/components";
 import { AuthContext } from "@/context";
 import { useToast } from "@/hooks";
+import {
+  useGetOrganization,
+  useUpdateOrganization,
+} from "@/hooks/api/organization";
 import { useUpdateUser } from "@/hooks/api/user";
-import { User } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Plus, User, X } from "lucide-react";
 import React, { useContext, useEffect, useState } from "react";
 import { DeleteAccount } from "./_components";
 
@@ -17,6 +22,7 @@ export default function Settings() {
     firstName: "",
     lastName: "",
   });
+  const queryClient = useQueryClient();
   const [userPasswordFormData, setUserPasswordFormData] = useState({
     newPassword: "",
     confirmPassword: "",
@@ -35,6 +41,17 @@ export default function Settings() {
     domains: [""],
   });
 
+  const { data: organization, isLoading: isOrganizationLoading } =
+    useGetOrganization(user?.organizationId ?? "");
+
+  const {
+    mutate: updateOrganizationMutation,
+    isPending: isUpdateOrganizationPending,
+  } = useUpdateOrganization();
+
+  const [editDomains, setEditDomains] = useState(false);
+  const [domains, setDomains] = useState<string[]>([""]);
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
     const value = event.target.value;
@@ -51,11 +68,49 @@ export default function Settings() {
     setUserPasswordFormData({ ...userPasswordFormData, [name]: value });
   };
 
-  const addDomainField = () => {
-    setOrganizationFormData((prev) => ({
-      ...prev,
-      domains: [...prev.domains, ""],
-    }));
+  const handleDomainChange = (index: number, value: string) => {
+    const newDomains = [...domains];
+    newDomains[index] = value;
+    setDomains(newDomains);
+  };
+
+  const addDomain = () => {
+    setDomains([...domains, ""]);
+  };
+
+  const removeDomain = (index: number) => {
+    const newDomains = domains.filter((_, i) => i !== index);
+    setDomains(newDomains);
+  };
+
+  const handleSaveDomains = () => {
+    if (!user?.organizationId) return;
+
+    const filteredDomains = domains.filter((domain) => domain.trim() !== "");
+
+    updateOrganizationMutation(
+      {
+        id: user.organizationId,
+        organizationData: {
+          domains: filteredDomains,
+        },
+      },
+      {
+        onSuccess: () => {
+          setEditDomains(false);
+          queryClient.invalidateQueries({
+            queryKey: ["organization", user.organizationId],
+          });
+        },
+      }
+    );
+  };
+
+  const handleEditCancelDomains = () => {
+    if (editDomains && organization) {
+      setDomains(organization.domains || [""]);
+    }
+    setEditDomains(!editDomains);
   };
 
   const handleSaveSettingsSubmit = (event: React.FormEvent) => {
@@ -145,20 +200,29 @@ export default function Settings() {
   }, [isUpdateUserSuccess]);
 
   useEffect(() => {
-    if (user?.organization) {
+    if (organization) {
       setOrganizationFormData({
-        name: user.organization.name,
+        name: organization.name,
         businessOrganizationNumber:
-          user.organization.businessOrganizationNumber,
-        VAT: user.organization.VAT,
-        domains: user.organization.domains || [""],
+          organization.businessOrganizationNumber ?? "",
+        VAT: organization.VAT ?? "",
+        domains: organization.domains?.length ? organization.domains : [""],
       });
     }
-  }, [user]);
+  }, [organization]);
+
+  useEffect(() => {
+    if (organization) {
+      setDomains(organization.domains?.length ? organization.domains : [""]);
+    }
+  }, [organization]);
 
   return (
     <div className="pb-[50px] flex justify-center">
-      {(isUpdateUserPending || userLoading) && <FullScreenLoader />}
+      {(isUpdateUserPending ||
+        userLoading ||
+        isOrganizationLoading ||
+        isUpdateOrganizationPending) && <FullScreenLoader />}
       <div className="w-full">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full">
           <h2 className="text-2xl sm:text-[32px] leading-[44px] font-semibold mb-4 sm:mb-0">
@@ -297,7 +361,7 @@ export default function Settings() {
                         Company name
                       </p>
                       <p className="text-[14px] leading-[29px] text-disabled font-medium">
-                        {organizationFormData.name}
+                        {organization?.name || "Not provided"}
                       </p>
                     </div>
 
@@ -307,7 +371,8 @@ export default function Settings() {
                           Business registration number
                         </p>
                         <p className="text-[14px] leading-[29px] text-disabled font-medium">
-                          {organizationFormData.businessOrganizationNumber}
+                          {organization?.businessOrganizationNumber ||
+                            "Not provided"}
                         </p>
                       </div>
 
@@ -316,25 +381,78 @@ export default function Settings() {
                           VAT number
                         </p>
                         <p className="text-[14px] leading-[29px] text-disabled font-medium">
-                          {organizationFormData.VAT}
+                          {organization?.VAT || "Not provided"}
                         </p>
                       </div>
                     </div>
 
-                    <div>
-                      <p className="text-[16px] leading-[22px] font-semibold mb-2">
-                        Domains
-                      </p>
-                      <div className="flex flex-col gap-1">
-                        {organizationFormData.domains.map((domain, index) => (
-                          <p
-                            key={index}
-                            className="text-[14px] leading-[29px] text-disabled font-medium"
-                          >
-                            {domain}
-                          </p>
-                        ))}
+                    <div className="flex justify-between items-start w-full">
+                      <div className="w-full">
+                        <div className="flex flex-col gap-4">
+                          <div>
+                            <p className="text-[16px] leading-[22px] font-semibold mb-2">
+                              Domain
+                            </p>
+                            {editDomains ? (
+                              <div className="space-y-2">
+                                {domains.map((domain, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <Input
+                                      value={domain}
+                                      onChange={(e) =>
+                                        handleDomainChange(
+                                          index,
+                                          e.target.value
+                                        )
+                                      }
+                                      placeholder="Enter domain (e.g. @company.com)"
+                                      className="flex-1 bg-[#242424] border-none text-[14px]"
+                                    />
+                                    {domains.length > 1 && (
+                                      <Button
+                                        variant="ghost"
+                                        onClick={() => removeDomain(index)}
+                                        className="p-2 hover:bg-red-500/10"
+                                      >
+                                        <X className="h-4 w-4 text-red-500" />
+                                      </Button>
+                                    )}
+                                  </div>
+                                ))}
+                                <div className="flex gap-2 mt-4">
+                                  <Button
+                                    variant="secondary"
+                                    onClick={addDomain}
+                                    className="flex items-center gap-2 bg-[#242424] hover:bg-[#2f2f2f] border-none"
+                                  >
+                                    <Plus className="h-4 w-4" />
+                                    Add Domain
+                                  </Button>
+                                  <Button
+                                    variant="saveProfile"
+                                    onClick={handleSaveDomains}
+                                    className="w-[148px]"
+                                  >
+                                    Save
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="tjext-[14px] leading-[29px] text-[#C4C4C4] font-medium">
+                                {Array.isArray(organization?.domains)
+                                  ? organization.domains.join(", ")
+                                  : organization?.domains || "No domains added"}
+                              </p>
+                            )}
+                          </div>
+                        </div>
                       </div>
+                      <Button variant="edit" onClick={handleEditCancelDomains}>
+                        {editDomains ? "Cancel" : "Edit"}
+                      </Button>
                     </div>
                   </div>
                 </div>
