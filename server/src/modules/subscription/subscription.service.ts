@@ -29,6 +29,8 @@ export class SubscriptionService {
 
     if (!user) throw new NotFoundException("User not found");
 
+    let stripeCustomerId = user.stripeCustomerId;
+
     let subscription = await this.prisma.subscription.findUnique({
       where: { userId },
     });
@@ -46,17 +48,21 @@ export class SubscriptionService {
 
     let discountId = undefined;
 
-    const stripeCustomer = await this.stripeService.createCustomer(
-      user.email,
-      user.firstName + " " + user.lastName,
-    );
+    if (!stripeCustomerId) {
+      const stripeCustomer = await this.stripeService.createCustomer(
+        user.email,
+        user.firstName + " " + user.lastName,
+      );
 
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: {
-        stripeCustomerId: stripeCustomer.id,
-      },
-    });
+      stripeCustomerId = stripeCustomer.id;
+
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          stripeCustomerId: stripeCustomer.id,
+        },
+      });
+    }
 
     if (discount) {
       await this.prisma.user.update({
@@ -117,7 +123,7 @@ export class SubscriptionService {
     };
 
     const invoice = await this.stripeService.createAndPayInvoice({
-      customerId: stripeCustomer.id,
+      customerId: stripeCustomerId,
       priceId: plan.stripePriceId,
       quantity,
       couponId: discountId,
