@@ -104,8 +104,6 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
         });
       }
 
-      console.log(user, userLicense)
-
       // private
       if (userLicense) {
         updateUserLicenseMutation({

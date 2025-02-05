@@ -82,8 +82,6 @@ export const AuthContextProvider = ({
     logoutTimer = setTimeout(logout, remainingTime);
   };
 
-  // const { data: userSubscriptionInfo } = use
-
   const fetchUser = async () => {
     const token = localStorage.getItem("accessToken");
 

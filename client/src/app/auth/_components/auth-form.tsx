@@ -20,7 +20,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 
 import { GoogleIcon } from "@public/icons";
-import { Check, EyeIcon, EyeOff, Info, X, Building2, EyeIcon, EyeOff, Globe, Hash, Info } from "lucide-react";
+import { Check, X, Building2, EyeIcon, EyeOff, Globe, Hash, Info } from "lucide-react";
 
 interface AuthFormProps {
   authPageType: "signIn" | "signUp" | "resetPassword";

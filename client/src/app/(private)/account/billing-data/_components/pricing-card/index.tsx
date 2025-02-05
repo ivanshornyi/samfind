@@ -10,7 +10,7 @@ import { usePaySubscription } from "@/hooks";
 import { CreatePaymentData } from "@/services";
 import { Plan } from "@/types";
 import { Check } from "lucide-react";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 
 interface PricingCardProps {
   plan: Plan;
@@ -34,6 +34,8 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
     isPending: isPaySubscriptionPending,
   } = usePaySubscription();
 
+  const [quantity, setQuantity] = useState(1);
+
   const isFreemium = plan.price === 0;
 
   const paySubscription = () => {
@@ -42,7 +44,7 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
     let payment: CreatePaymentData = {
       userId: user.id,
       planId: plan.id,
-      quantity: 1,
+      quantity,
     };
 
     if (user.invitedReferralCode) {
@@ -50,8 +52,8 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
         ...payment,
         userReferralCode: user.invitedReferralCode,
         discount: {
-          amount: 10,
-          description: "",
+          amount: plan.price * quantity,
+          description: "Referral discount",
         },
       };
     }
@@ -63,6 +65,7 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
     if (plan.period === "yearly") {
       return (price / 100 / 12).toFixed(2);
     }
+    
     return (price / 100).toFixed(2);
   };
 
@@ -94,6 +97,16 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
                 <span>, billed ${(plan.price / 100).toFixed(2)} yearly</span>
               )}
             </span>
+          </div>
+
+          <div className="flex items-center gap-2 mt-3">
+            <label>Quantity</label>
+            <input 
+              type="number"
+              className="w-[80px] rounded-full px-4 py-1 bg-white/70 text-black" 
+              value={quantity}
+              onChange={(event) => setQuantity(Number(event.target.value))}
+            />
           </div>
         </div>
 
