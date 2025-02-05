@@ -97,7 +97,7 @@ model License {
 model ActiveLicense {
   id        String   @id @default(uuid())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String  
+  userId    String
   license   License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
   licenseId String
   desktopId String?
@@ -109,13 +109,14 @@ model ActiveLicense {
 }
 
 model UserReferral {
-  id             String   @id @default(uuid())
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  invitedUserIds String[] @default([])
-  referralCode   Float    @unique
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  userId         String   @unique
+  id              String           @id @default(uuid())
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invitedUserIds  String[]         @default([])
+  referralCode    Float            @unique
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  userId          String           @unique
+  discountIncomes DiscountIncome[]
 
   @@map("user_referral")
 }
@@ -140,7 +141,7 @@ enum PlanPeriod {
 }
 
 model Plan {
-  id              String         @id @default(uuid())
+  id              String          @id @default(uuid())
   type            LicenseTierType
   period          PlanPeriod
   price           Float
@@ -155,10 +156,10 @@ model Subscription {
   id               String   @id @default(uuid())
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId           String   @unique
-  license          License?  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
-  licenseId        String?   @unique
+  license          License? @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  licenseId        String?  @unique
   plan             Plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
-  planId           String   
+  planId           String
   isActive         Boolean
   isInTrial        Boolean
   stripeInvoiceIds String[] @default([])
@@ -172,11 +173,11 @@ model Subscription {
 model Discount {
   id               String           @id @default(uuid())
   user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId           String           
+  userId           String
   startAmount      Float            @default(0)
   endAmount        Float            @default(0)
   used             Boolean          @default(false)
-  stripeCouponId   String?          
+  stripeCouponId   String?
   discountsIncomes DiscountIncome[]
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
@@ -185,15 +186,18 @@ model Discount {
 }
 
 model DiscountIncome {
-  id          String   @id @default(uuid())
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      String
-  discount    Discount @relation(fields: [discountId], references: [id])
-  discountId  String
-  amount      Float    @default(0)
-  description String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String        @id @default(uuid())
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String
+  discount      Discount      @relation(fields: [discountId], references: [id])
+  discountId    String
+  referral      UserReferral? @relation(fields: [referralId], references: [id])
+  referralId    String?
+  invitedUserId String?
+  amount        Float         @default(0)
+  description   String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 
   @@map("discount_income")
 }

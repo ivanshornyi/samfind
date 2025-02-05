@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 
 import { PrismaService } from "../prisma/prisma.service";
 
@@ -15,7 +15,7 @@ export class UserReferralService {
       data: {
         userId: createUserReferralDto.userId,
         referralCode: code,
-      }
+      },
     });
 
     return referral;
@@ -25,9 +25,34 @@ export class UserReferralService {
     const referral = await this.prisma.userReferral.findUnique({
       where: {
         userId,
-      }
+      },
+      include: {
+        discountIncomes: true,
+      },
     });
 
-    return referral;
+    if (!referral) {
+      throw new NotFoundException("Referral not found");
+    }
+
+    const userIds = referral.discountIncomes
+      .filter((i) => typeof i.invitedUserId === "string")
+      .map((i) => i.invitedUserId);
+
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: userIds } },
+    });
+
+    const referralItems = referral.discountIncomes.map((i) => {
+      const user = users.find((u) => u.id === i.invitedUserId);
+      return {
+        userId: user?.id,
+        name: user?.firstName + " " + user?.lastName,
+        activationDate: i.createdAt,
+        amount: i.amount,
+      };
+    });
+
+    return referralItems;
   }
-} 
+}

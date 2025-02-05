@@ -310,6 +310,8 @@ export class StripeService {
 
       if (!subscription) return;
 
+      let licenseId = subscription.licenseId;
+
       if (userReferralCode) {
         // find user and update user discount
         this.userService.findAndUpdateUserByReferralCode(
@@ -371,6 +373,7 @@ export class StripeService {
             tierType: subscription.plan.type,
           },
         });
+        licenseId = license.id;
         await this.prisma.activeLicense.create({
           data: {
             userId: subscription.userId,
@@ -420,6 +423,7 @@ export class StripeService {
         await this.prisma.subscription.update({
           where: { id: subscription.id },
           data: {
+            licenseId,
             isActive: true,
             isInTrial: false,
             nextDate,

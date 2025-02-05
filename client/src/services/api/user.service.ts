@@ -1,4 +1,4 @@
-import { LicenseTierType, User, UserStatus } from "@/types";
+import { LicenseTierType, PlanPeriod, User, UserStatus } from "@/types";
 
 import { handleApiError } from "@/errors";
 
@@ -49,9 +49,9 @@ export interface UserInfo {
   invitedUser: boolean; // added by invitation (with ActiveLicense)
 }
 
-const getUserSubscriptionInfo = async (id: string) => {
+const getUserRoleSubscriptionInfo = async (id: string) => {
   try {
-    const response = await apiClient.get(`/user/subscription-info/${id}`);
+    const response = await apiClient.get(`/user/subscription-role-info/${id}`);
 
     return response.data as UserInfo;
   } catch (error) {
@@ -95,10 +95,38 @@ const getInvitedUserInfo = async (userId: string) => {
   }
 };
 
+interface UserSubscriptionInfo {
+  subscription: {
+    isActive: boolean;
+    nextDate: string;
+    planId: string;
+  },
+  plan: {
+    type: LicenseTierType;
+    period: PlanPeriod;
+    price: number;
+  },
+  license: {
+    limit: number;
+    tierType: LicenseTierType;
+  }
+}
+
+const getUserSubscriptionInfo = async (userId: string) => {
+  try {
+    const response = await apiClient.get(`/user/subscription-info/${userId}`);
+
+    return response.data as UserSubscriptionInfo;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 export const UserApiService = {
   getUser,
   updateUser,
   updateUserReferral,
+  getUserRoleSubscriptionInfo,
   getUserSubscriptionInfo,
   deleteUser,
   getInvitedUserInfo,

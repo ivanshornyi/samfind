@@ -59,7 +59,11 @@ export class UserService {
       where: { referralCode },
     });
 
-    if (!user) {
+    const userReferral = await this.prisma.userReferral.findUnique({
+      where: { referralCode },
+    });
+
+    if (!user || !userReferral) {
       throw new NotFoundException("User not found");
     }
 
@@ -93,14 +97,12 @@ export class UserService {
     await this.prisma.discountIncome.create({
       data: {
         userId: user.id,
+        referralId: userReferral.id,
+        invitedUserId: newUser.id,
         amount: discountNumber,
         discountId: discount.id,
         description: `Income from referral Registration on email ${newUser.email}`,
       },
-    });
-
-    const userReferral = await this.prisma.userReferral.findUnique({
-      where: { userId: user.id },
     });
 
     const referralUserIds = userReferral.invitedUserIds;
@@ -199,7 +201,7 @@ export class UserService {
     return updatedUser;
   }
 
-  async findUserSubscriptionInfo(userId: string) {
+  async findUserRoleSubscriptionInfo(userId: string) {
     const userInfo = {
       organizationOwner: false, // with organization
       standardUser: false, // private with license, (standard tier)
@@ -254,8 +256,12 @@ export class UserService {
     const activeLicense = await this.prisma.activeLicense.findFirst({
       where: {
         userId,
-      }
+      },
     });
+
+    if (!activeLicense) {
+      throw new NotFoundException("Active License not found");
+    }
 
     const license = await this.prisma.license.findUnique({
       where: {
@@ -266,7 +272,7 @@ export class UserService {
         ownerId: true,
         tierType: true,
         updatedAt: true,
-      }
+      },
     });
 
     const licenseOwner = await this.prisma.user.findUnique({
@@ -279,7 +285,7 @@ export class UserService {
         firstName: true,
         lastName: true,
         organizationId: true,
-      }
+      },
     });
 
     return {
@@ -289,7 +295,61 @@ export class UserService {
       licenseOwner: {
         ...licenseOwner,
       },
-    }
+    };
+  }
+
+  async findUserSubscriptionInfo(userId: string) {
+    // get subscription
+    // plan (type, period), price, members count (license limit) (get from user subscription)
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      }
+    });
+
+    const subscription = await this.prisma.subscription.findUnique({
+      where: {
+        userId,
+      }, 
+      select: {
+        isActive: true,
+        nextDate: true,
+        planId: true,
+      }
+    });
+
+    const plan = await this.prisma.plan.findUnique({
+      where: {
+        id: subscription.planId,
+      },
+      select: {
+        type: true,
+        period: true,
+        price: true,
+      }
+    });
+
+    const license = await this.prisma.license.findUnique({
+      where: {
+        ownerId: userId,
+      },
+      select: {
+        limit: true,
+        tierType: true,
+      }
+    });
+
+    return {
+      subscription: {
+        ...subscription,
+      },
+      plan: {
+        ...plan,
+      },
+      license: {
+        ...license,
+      }
+    };
   }
 
   private hashPassword(password: string): string {
