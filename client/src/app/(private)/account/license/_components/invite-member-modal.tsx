@@ -25,15 +25,14 @@ import { Info, Send, X } from "lucide-react";
 
 interface InviteMemberProps {
   allowedMembers: number;
-  isOpen: boolean;
 }
 
-export const InviteMember = ({ allowedMembers, isOpen }: InviteMemberProps) => {
+export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
   const { user } = useContext(AuthContext);
 
   const [email, setEmail] = useState("");
   const [emails, setEmails] = useState<string[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(isOpen);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { toast } = useToast();
 
@@ -137,13 +136,13 @@ export const InviteMember = ({ allowedMembers, isOpen }: InviteMemberProps) => {
   return (
     <AlertDialog open={isModalOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="purple" className="" leftIcon={<Send />}>
+        <Button variant="purple" className="" leftIcon={<Send />} onClick={() => setIsModalOpen(true)}>
           Invite members
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="w-full max-w-[590px]">
         <div className="absolute right-1 top-1">
-          <AlertDialogCancel className="shadow-none border-none p-3">
+          <AlertDialogCancel onClick={() => setIsModalOpen(false)} className="shadow-none border-none p-3">
             <X size={18} />
           </AlertDialogCancel>
         </div>

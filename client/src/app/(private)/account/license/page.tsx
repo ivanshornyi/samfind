@@ -225,6 +225,7 @@ export default function License() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  // const [isModalOpen, setIs]
 
   const { data: userLicense, isPending: isUserLicensesPending } =
     useGetUserLicenses();
