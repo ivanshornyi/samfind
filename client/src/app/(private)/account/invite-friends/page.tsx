@@ -78,7 +78,7 @@ export default function InvitedFriends() {
           <BalanceInfo balance={user.discount} />
         </div>
       </div>
-      <ReferralsTable />
+      {/* <ReferralsTable /> */}
     </>
   );
 }
