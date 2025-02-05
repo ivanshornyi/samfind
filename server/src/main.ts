@@ -1,8 +1,8 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 
-import { ConfigService } from "@nestjs/config";
 import { ValidationPipe } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 
 import { setupSwagger } from "./swagger";
 
@@ -17,8 +17,16 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
 
   app.enableCors({
-    origin: ["http://localhost:5173", FRONTEND_DOMAIN],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "https://www.onsio.io",
+      "https://onsio.io",
+      FRONTEND_DOMAIN
+    ],
+    credentials: true,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+    allowedHeaders: ["Content-Type", "Authorization"],
   });
   app.setGlobalPrefix("api");
   app.useGlobalPipes(

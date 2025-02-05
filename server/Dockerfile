@@ -1,21 +1,30 @@
-# FROM node:20
-# WORKDIR /app
-# COPY package*.json ./
-# RUN npm install --production
-# COPY . .
-# RUN npm run build
-# EXPOSE 4000
-# ARG NODE_ENV=production
-# ENV NODE_ENV=$NODE_ENV
-# COPY .env .env
-# CMD ["npm", "run", "start:prod"]
-# Use Node.js 20.11.1 base image
-FROM node:20.11.1-alpine
+FROM --platform=$TARGETPLATFORM node:20-alpine AS build
 WORKDIR /app
+
 COPY package*.json ./
-RUN npm cache clean --force
 RUN npm install --legacy-peer-deps
+
 COPY . .
+
+# Generate Prisma Client
 RUN npx prisma generate
-EXPOSE 4000
-CMD [  "npm", "run", "start:migrate:prod" ]
+
+# Build the project
+RUN npm run build
+
+FROM --platform=$TARGETPLATFORM node:20-alpine AS production
+WORKDIR /app
+
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/prisma ./prisma
+COPY --from=build /app/package.json ./package.json
+
+# Add a script to handle database migrations and startup
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+EXPOSE 3000
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["npm", "run", "start:prod"]

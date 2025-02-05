@@ -1,7 +1,7 @@
 import {
+  MiddlewareConsumer,
   Module,
   NestModule,
-  MiddlewareConsumer,
   RequestMethod,
 } from "@nestjs/common";
 import { ScheduleModule } from "@nestjs/schedule";
@@ -12,16 +12,17 @@ import { ConfigModule } from "@nestjs/config";
 import { AuthMiddleware } from "./common/middlewares/auth.middleware";
 
 import { AuthModule } from "./modules/auth/auth.module";
-import { UserModule } from "./modules/user/user.module";
-import { UserLicenseModule } from "./modules/user-license/user-license.module";
-import { UserReferralModule } from "./modules/user-referral/user-referral.module";
-import { StripeModule } from "./modules/stripe/stripe.module";
-import { OrganizationModule } from "./modules/organization/organization.module";
+import { HealthModule } from "./modules/health/health.module";
 import { LicenseVerificationModule } from "./modules/license-verification/license-verification.module";
+import { OrganizationModule } from "./modules/organization/organization.module";
 import { PlanModule } from "./modules/plan/plan.module";
 import { SubscriptionModule } from "./modules/subscription/subscription.module";
 import { CronModule } from "./modules/cron/cron.module";
 import { DiscountModule } from "./modules/user-discount/user-discount.module";
+import { StripeModule } from "./modules/stripe/stripe.module";
+import { UserLicenseModule } from "./modules/user-license/user-license.module";
+import { UserReferralModule } from "./modules/user-referral/user-referral.module";
+import { UserModule } from "./modules/user/user.module";
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { DiscountModule } from "./modules/user-discount/user-discount.module";
     SubscriptionModule,
     CronModule,
     DiscountModule,
+    HealthModule,
   ],
   controllers: [],
   providers: [],
