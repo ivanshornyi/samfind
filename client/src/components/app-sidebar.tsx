@@ -16,7 +16,7 @@ import {
 } from "@/components";
 
 import { usePathname } from "next/navigation";
-import { Home, IdCard, Gift, CreditCard, User, Headset, Download } from "lucide-react";
+import { IdCard, Gift, CreditCard, User, Headset, Download } from "lucide-react";
 import { Logo } from "@public/images";
 import Link from "next/link";
 import Image from "next/image";

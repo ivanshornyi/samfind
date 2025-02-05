@@ -2,7 +2,7 @@
 
 import { useContext } from "react";
 import { AuthContext } from "@/context";
-import { useToast } from "@/hooks";
+import { useToast, useUserReferralls } from "@/hooks";
 
 import { Copy } from "lucide-react";
 
@@ -18,6 +18,8 @@ const frontendDomain = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN;
 export default function InvitedFriends() {
   const { user } = useContext(AuthContext);
   const { toast } = useToast();
+  const { data } = useUserReferralls(user?.id || "");
+  console.log("data: ", data);
 
   const handleCopyReferralCodeLink = () => {
     if (user) {
