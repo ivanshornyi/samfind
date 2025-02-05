@@ -34,7 +34,7 @@ const getUserLicense = async (id: string) => {
 const getUserLicenses = async (userId: string) => {
   try {
     const response = await apiClient.get(`/user-license/find/${userId}`);
-    
+
     return response.data as LicenseList | null;
   } catch (error) {
     handleApiError(error);
@@ -57,9 +57,22 @@ const updateUserLicense = async (id: string, data: UpdateUserLicenseData) => {
   }
 };
 
+const deleteMemberFromLicense = async (licenseId: string, memberId: string) => {
+  try {
+    const response = await apiClient.delete(
+      `/user-license/${licenseId}/member/${memberId}`
+    );
+
+    return response;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 export const UserLicenseApiService = {
   addUserLicense,
   getUserLicense,
   getUserLicenses,
   updateUserLicense,
+  deleteMemberFromLicense,
 };

@@ -1,16 +1,14 @@
 "use client";
 
-import { useGetPlans, useGetUserLicenses, useGetUserSubscriptionInfo } from "@/hooks";
+import { useGetPlans, useGetUserLicenses } from "@/hooks";
 
-import { PaymentHistory, SubscriptionDetails, PlanCard } from "./_components";
-import { useEffect } from "react";
+import { PaymentHistory, SubscriptionDetails } from "./_components";
+import { PricingCard } from "./_components/pricing-card";
 
 export default function BillingData() {
   const { data: plans } = useGetPlans();
-
-  const { data: userLicense, isPending: isUserLicensePending } = useGetUserLicenses();
-
-  const { data: userSubscriptionInfo } = useGetUserSubscriptionInfo();
+  const { data: userLicense, isPending: isUserLicensePending } =
+    useGetUserLicenses();
 
   return (
     <div className="w-full text-white">
@@ -20,24 +18,23 @@ export default function BillingData() {
         </div>
 
         <div>
-          {userLicense && !isUserLicensePending && !userSubscriptionInfo?.freemiumUser && (
-            <SubscriptionDetails
-              plan="Standart Monthly"
-              status="Active subscription"
-              renewalDate="February 02, 2025"
-              price={9.99}
-              billingPeriod="month, billed monthly"
-              members={{ admin: 1, regular: 0 }}
-            />
-          )}
-
-          {(!userLicense || userSubscriptionInfo?.freemiumUser) && (
-            <div className="flex gap-2">
-              {plans?.map(plan => (
-                <PlanCard key={plan.id} plan={plan} />
-              ))}
-            </div>
-          )}
+          {!isUserLicensePending &&
+            (userLicense?.tierType !== "freemium" ? (
+              <SubscriptionDetails
+                plan="Standart Monthly"
+                status="Active subscription"
+                renewalDate="February 02, 2025"
+                price={9.99}
+                billingPeriod="month, billed monthly"
+                members={{ admin: 1, regular: 0 }}
+              />
+            ) : (
+              <div className="flex gap-2">
+                {plans?.map((plan) => (
+                  <PricingCard key={plan.id} plan={plan} />
+                ))}
+              </div>
+            ))}
         </div>
 
         <div>

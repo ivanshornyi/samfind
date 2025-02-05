@@ -83,6 +83,7 @@ model License {
   ownerId          String          @unique
   activeLicenses   ActiveLicense[]
   limit            Float           @default(0)
+  purchased        Float           @default(0)
   tierType         LicenseTierType @default(freemium)
   availableEmails  String[]        @default([])
   licenseExpiresAt DateTime        @default(now())
@@ -157,7 +158,7 @@ model Subscription {
   license          License?  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
   licenseId        String?   @unique
   plan             Plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
-  planId           String   @unique
+  planId           String   
   isActive         Boolean
   isInTrial        Boolean
   stripeInvoiceIds String[] @default([])
@@ -171,7 +172,7 @@ model Subscription {
 model Discount {
   id               String           @id @default(uuid())
   user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId           String           @unique
+  userId           String           
   startAmount      Float            @default(0)
   endAmount        Float            @default(0)
   used             Boolean          @default(false)

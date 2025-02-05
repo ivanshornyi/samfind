@@ -1,4 +1,4 @@
-import { User, UserStatus } from "@/types";
+import { LicenseTierType, User, UserStatus } from "@/types";
 
 import { handleApiError } from "@/errors";
 
@@ -69,10 +69,37 @@ const deleteUser = async (id: string) => {
   }
 };
 
+export interface InvitedUserInfo {
+  license: {
+    id: string;
+    ownerId: string;
+    tierType: LicenseTierType;
+    updatedAt: string;
+  },
+  licenseOwner: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    organizationId: string | null;
+  }
+}
+
+const getInvitedUserInfo = async (userId: string) => {
+  try {
+    const response = await apiClient.get(`/user/find-invited-user/info/${userId}`);
+
+    return response.data as InvitedUserInfo;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 export const UserApiService = {
   getUser,
   updateUser,
   updateUserReferral,
   getUserSubscriptionInfo,
   deleteUser,
+  getInvitedUserInfo,
 };
