@@ -35,7 +35,7 @@ export default function BillingData() {
               renewalDate={formatDate(userSubscriptionInfo.subscription?.nextDate)}
               price={userSubscriptionInfo.plan?.price / 100}
               billingPeriod={`month billed ${userSubscriptionInfo.plan?.period}`}
-              members={{ admin: 1, regular: userSubscriptionInfo.license?.limit }}
+              members={{ admin: 1, regular: userSubscriptionInfo.license?.limit - 1 }}
             />
           )}
 

@@ -13,7 +13,7 @@ const getFreemiumTitle = (accountType: AccountType) =>
 export const PricingPlans = () => {
   const [accountType, setAccountType] = useState<AccountType>("personal");
 
-  const currentPricingPlans: Plan[] = pricingPlans.map((plan) =>
+  const currentPricingPlans: any[] = pricingPlans.map((plan) =>
     plan.price === 0 ? { ...plan, title: getFreemiumTitle(accountType) } : plan
   );
 

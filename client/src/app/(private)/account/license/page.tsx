@@ -244,8 +244,8 @@ export default function License() {
         link = `${link}&orgId=${user.organizationId}`;
       }
 
-      if (user.licenseId) {
-        link = `${link}&lId=${user.licenseId}`;
+      if (userLicense) {
+        link = `${link}&lId=${userLicense.id}`;
       }
 
       navigator.clipboard.writeText(link);
@@ -256,11 +256,11 @@ export default function License() {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+  // const formatDate = (dateString: string) => {
+  //   const date = new Date(dateString);
 
-    return format(date, "MMMM dd, yyyy");
-  }
+  //   return format(date, "MMMM dd, yyyy");
+  // }
 
   useEffect(() => {
     if (userLicense?.users && user) {
