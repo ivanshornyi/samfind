@@ -4,11 +4,13 @@ import {
   NotFoundException,
   UnauthorizedException,
   ConflictException,
+  BadRequestException,
 } from "@nestjs/common";
 
 import {
   LicenseStatus,
   LicenseTierType,
+  PlanPeriod,
   UserAccountType,
   UserAuthType,
 } from "@prisma/client";
@@ -329,6 +331,7 @@ export class AuthService {
         where: {
           id: authVerificationDto.licenseId,
         },
+        include: { user: true, subscription: { include: { plan: true } } },
       });
 
       if (!license) {
@@ -353,11 +356,38 @@ export class AuthService {
         throw new ConflictException("This email does not have access");
       }
 
-      // Create and pay Invoice for License of invited user
-      await this.subscriptionService.payMemberInvoice({
-        memberId: user.id,
-        ownerId: license.ownerId,
-      });
+      if (license.purchased > 0) {
+        // Use payed License
+        await this.prisma.license.update({
+          where: { id: license.id },
+          data: { purchased: license.purchased - 1 },
+        });
+        await this.prisma.activeLicense.create({
+          data: { userId: user.id, licenseId: license.id },
+        });
+
+        await this.subscriptionService.addDiscountOnNotUsedPeriod({
+          owner: license.user,
+          memberEmail: user.email,
+          totalAmount: license.subscription.plan.price,
+          nextDate:
+            license.subscription.plan.period === PlanPeriod.yearly
+              ? new Date(license.subscription.nextDate)
+              : undefined,
+        });
+      } else {
+        // Create and pay Invoice for License of invited user
+        const invoice = await this.subscriptionService.payMemberInvoice({
+          memberId: user.id,
+          ownerId: license.ownerId,
+        });
+
+        if (invoice.status !== "paid") {
+          throw new BadRequestException(
+            "An error occurred when paying for the License",
+          );
+        }
+      }
     }
 
     if (authVerificationDto.organizationId) {
@@ -375,6 +405,7 @@ export class AuthService {
         where: {
           ownerId: organization.ownerId,
         },
+        include: { user: true, subscription: { include: { plan: true } } },
       });
 
       if (!license) {
@@ -405,11 +436,38 @@ export class AuthService {
         throw new ConflictException("This email does not have access");
       }
 
-      // Create and pay Invoice for License of invited user
-      await this.subscriptionService.payMemberInvoice({
-        memberId: user.id,
-        ownerId: license.ownerId,
-      });
+      if (license.purchased > 0) {
+        // Use payed License
+        await this.prisma.license.update({
+          where: { id: license.id },
+          data: { purchased: license.purchased - 1 },
+        });
+        await this.prisma.activeLicense.create({
+          data: { userId: user.id, licenseId: license.id },
+        });
+
+        await this.subscriptionService.addDiscountOnNotUsedPeriod({
+          owner: license.user,
+          memberEmail: user.email,
+          totalAmount: license.subscription.plan.price,
+          nextDate:
+            license.subscription.plan.period === PlanPeriod.yearly
+              ? new Date(license.subscription.nextDate)
+              : undefined,
+        });
+      } else {
+        // Create and pay Invoice for License of invited user
+        const invoice = await this.subscriptionService.payMemberInvoice({
+          memberId: user.id,
+          ownerId: license.ownerId,
+        });
+
+        if (invoice.status !== "paid") {
+          throw new BadRequestException(
+            "An error occurred when paying for the License",
+          );
+        }
+      }
 
       // add userId to organization
       const organizationUserIds = organization.userIds;
