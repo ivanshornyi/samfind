@@ -9,8 +9,8 @@ import { AuthContext } from "@/context";
 import { usePaySubscription } from "@/hooks";
 import { CreatePaymentData } from "@/services";
 import { Plan } from "@/types";
-import { Check } from "lucide-react";
-import { useContext } from "react";
+import { Check, Minus, Plus } from "lucide-react";
+import { useContext, useState } from "react";
 
 interface PricingCardProps {
   plan: Plan;
@@ -35,6 +35,17 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
   } = usePaySubscription();
 
   const isFreemium = plan.price === 0;
+  const [quantity, setQuantity] = useState(1);
+
+  const decreaseQuantity = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+  };
+
+  const increaseQuantity = () => {
+    setQuantity(quantity + 1);
+  };
 
   const paySubscription = () => {
     if (!user || isFreemium) return;
@@ -42,7 +53,7 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
     let payment: CreatePaymentData = {
       userId: user.id,
       planId: plan.id,
-      quantity: 1,
+      quantity: quantity,
     };
 
     if (user.invitedReferralCode) {
@@ -95,6 +106,27 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
               )}
             </span>
           </div>
+          {!isFreemium && (
+            <div className="flex items-center gap-4 mt-4">
+              <span className="text-sm text-[#C4C4C4]">Quantity:</span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={decreaseQuantity}
+                  className="p-1 rounded-full hover:bg-[#383838] disabled:opacity-50"
+                  disabled={quantity <= 1}
+                >
+                  <Minus size={16} />
+                </button>
+                <span className="w-8 text-center">{quantity}</span>
+                <button
+                  onClick={increaseQuantity}
+                  className="p-1 rounded-full hover:bg-[#383838]"
+                >
+                  <Plus size={16} />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         <ul className="space-y-4">
@@ -124,7 +156,7 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
             ? "Active subscription"
             : isPaySubscriptionPending
               ? "Processing..."
-              : "Get started"}
+              : `Get started${quantity > 1 ? ` (${quantity})` : ""}`}
         </Button>
       </CardFooter>
     </Card>
