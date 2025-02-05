@@ -208,10 +208,48 @@ export class SubscriptionService {
 
     if (!member) throw new NotFoundException("User not found");
 
+    const discount = await this.prisma.discount.findFirst({
+      where: {
+        userId: subscription.userId,
+        stripeCouponId: null,
+        used: false,
+      },
+    });
+
+    let discountId = undefined;
+    let discountAmount = undefined;
+    if (discount) {
+      discountAmount = discount.endAmount;
+
+      if (discount.endAmount > subscription.plan.price) {
+        discountAmount = subscription.plan.price;
+        await this.prisma.discount.create({
+          data: {
+            userId: subscription.userId,
+            endAmount: discount.endAmount - subscription.plan.price,
+          },
+        });
+      }
+
+      const stripeDiscount =
+        await this.stripeService.createCoupon(discountAmount);
+
+      discountId = stripeDiscount.id;
+
+      await this.prisma.discount.update({
+        where: { id: discount.id },
+        data: {
+          stripeCouponId: discountId,
+        },
+      });
+    }
+
     const metadata = {
       quantity: 1,
       subscriptionId: subscription.id,
       memberId: member.id,
+      stripeCouponId: discountId,
+      discountAmount,
     };
 
     return await this.stripeService.createAndPayInvoice({
@@ -220,6 +258,7 @@ export class SubscriptionService {
       quantity: 1,
       description: `Member License: ${member.email}`,
       metadata,
+      couponId: discountId,
       pay: true,
     });
   }
