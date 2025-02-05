@@ -66,7 +66,7 @@ export const SubscriptionDetails = ({
       </div>
       <div className="h-[1px] flex-grow bg-[#383838]" />
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-end">
         <span className="text-2xl font-semibold">
           <span className="text-lg">$</span>
           {price}

@@ -8,11 +8,11 @@ import { PricingCard } from "./_components/pricing-card";
 import { format } from "date-fns";
 
 export default function BillingData() {
-  const { data: plans } = useGetPlans();
+  const { data: plans, isPending: isPlansPending } = useGetPlans();
   const { data: userLicense, isPending: isUserLicensePending } =
     useGetUserLicenses();
 
-  const { data: userSubscriptionInfo } = useGetUserSubscriptionInfo();
+  const { data: userSubscriptionInfo, isPending: isUserSubscriptionInfoPending } = useGetUserSubscriptionInfo();
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -28,18 +28,18 @@ export default function BillingData() {
         </div>
 
         <div>
-          {!isUserLicensePending && userLicense && userSubscriptionInfo && userLicense.tierType !== "freemium" && (
+          {!isUserLicensePending && userLicense && !isUserSubscriptionInfoPending && userSubscriptionInfo && userLicense.tierType !== "freemium" && (
             <SubscriptionDetails
               plan={`${userSubscriptionInfo.plan.type} ${userSubscriptionInfo.plan.period}`}
               status="Active subscription"
               renewalDate={formatDate(userSubscriptionInfo.subscription.nextDate)}
-              price={userSubscriptionInfo.plan.price / 100} // change to dollars
+              price={userSubscriptionInfo.plan.price / 100}
               billingPeriod={`month billed ${userSubscriptionInfo.plan.period}`}
               members={{ admin: 1, regular: userSubscriptionInfo.license.limit }}
             />
           )}
 
-          {plans && (!userLicense || userLicense.tierType === "freemium") && (
+          {plans && !isPlansPending && (!userLicense || userLicense.tierType === "freemium") && (
             <div className="flex gap-2">
               {plans?.map((plan) => (
                 <PricingCard key={plan.id} plan={plan} />
@@ -48,12 +48,12 @@ export default function BillingData() {
           )}
         </div>
 
-        {/* <div>
-          <div className="flex items-center gap-4 mb-6">
-            <h2 className="text-xl">Payment history</h2>
+        <div>
+          <div className="flex items-center gap-4 mt-6">
+            <h2 className="text-3xl">Payment history</h2>
           </div>
           <PaymentHistory />
-        </div> */}
+        </div>
       </div>
     </div>
   );

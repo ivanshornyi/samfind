@@ -71,7 +71,7 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
 
   return (
     <Card
-      className={`relative border-none rounded-3xl overflow-hidden ${
+      className={`relative border-none rounded-3xl overflow-hidden w-[360px] ${
         plan.price === 225 ? "bg-[#28282C]" : "bg-[#292832]"
       }`}
     >

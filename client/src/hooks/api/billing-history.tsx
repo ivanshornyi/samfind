@@ -6,5 +6,6 @@ export const useGetBillingHistory = (id: string) => {
   return useQuery({
     queryFn: () => BillingApiServices.getBillingHistory(id),
     queryKey: ["billing-history"],
+    // staleTime: 
   });
 };

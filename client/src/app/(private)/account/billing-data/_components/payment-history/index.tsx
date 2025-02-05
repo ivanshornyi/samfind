@@ -1,4 +1,7 @@
-import { ReusableTable } from "@/components/table";
+"use client";
+
+import { useContext, useEffect } from "react";
+
 import { AuthContext } from "@/context";
 import { useGetBillingHistory } from "@/hooks/api/billing-history";
 import { BillingHistoryItem } from "@/types/billings";
@@ -7,11 +10,19 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useContext, useEffect } from "react";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableCell
+} from "@/components/ui/table"
 
 export const PaymentHistory = () => {
   const { user } = useContext(AuthContext);
-  const { data: billingHistory, isLoading } = useGetBillingHistory(
+  const { data: billingHistory, isPending: isBillingHistoryPending } = useGetBillingHistory(
     user?.id ?? ""
   );
 
@@ -60,17 +71,42 @@ export const PaymentHistory = () => {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  useEffect(() => {
-    console.log('rerender')
-  }, []);
-
   return (
-    <ReusableTable
-      table={table}
-      isLoading={isLoading}
-      noDataMessage="No payment history available."
-      onPageChange={() => {}}
-      pageCount={1}
-    />
+    <div className="w-full mt-5 mb-[100px]">
+      <Table>
+        <TableHeader>
+          <TableRow className="border-white/30">
+            <TableHead className="w-[250px] uppercase text-white/60">Invoice</TableHead>
+            <TableHead className="uppercase text-white/60">Invoice date</TableHead>
+            <TableHead className="uppercase text-white/60">Price</TableHead>
+            <TableHead className="uppercase text-white/60">Status</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {billingHistory?.map((historyItem) => (
+            <TableRow key={historyItem.number} className="border-none">
+              <TableCell className="font-medium py-2">
+                <div className="py-3">{historyItem.number}</div>
+              </TableCell>
+              <TableCell>{historyItem.date}</TableCell>
+              <TableCell>{historyItem.price / 100}</TableCell>
+              <TableCell className={`${historyItem.status === "paid" ? "text-[#4BB543]" : "text-[#FF6C6C]"} capitalize`}>{historyItem.status}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      {!isBillingHistoryPending && (billingHistory?.length === 0 || billingHistory === undefined) && (
+        <div className="py-[50px]">
+          <p className="text-center text-white/60 w-full">This is where your payment history will be displayed</p>
+        </div>
+      )}
+
+      {isBillingHistoryPending && (
+        <div className="py-[50px] text-center">
+          <p>Loading...</p>
+        </div>
+      )}
+    </div>
   );
 };
