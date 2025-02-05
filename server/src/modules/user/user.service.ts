@@ -59,7 +59,11 @@ export class UserService {
       where: { referralCode },
     });
 
-    if (!user) {
+    const userReferral = await this.prisma.userReferral.findUnique({
+      where: { referralCode },
+    });
+
+    if (!user || !userReferral) {
       throw new NotFoundException("User not found");
     }
 
@@ -93,14 +97,11 @@ export class UserService {
     await this.prisma.discountIncome.create({
       data: {
         userId: user.id,
+        referralId: userReferral.id,
         amount: discountNumber,
         discountId: discount.id,
         description: `Income from referral Registration on email ${newUser.email}`,
       },
-    });
-
-    const userReferral = await this.prisma.userReferral.findUnique({
-      where: { userId: user.id },
     });
 
     const referralUserIds = userReferral.invitedUserIds;
@@ -254,7 +255,7 @@ export class UserService {
     const activeLicense = await this.prisma.activeLicense.findFirst({
       where: {
         userId,
-      }
+      },
     });
 
     const license = await this.prisma.license.findUnique({
@@ -266,7 +267,7 @@ export class UserService {
         ownerId: true,
         tierType: true,
         updatedAt: true,
-      }
+      },
     });
 
     const licenseOwner = await this.prisma.user.findUnique({
@@ -279,7 +280,7 @@ export class UserService {
         firstName: true,
         lastName: true,
         organizationId: true,
-      }
+      },
     });
 
     return {
@@ -289,7 +290,7 @@ export class UserService {
       licenseOwner: {
         ...licenseOwner,
       },
-    }
+    };
   }
 
   private hashPassword(password: string): string {
