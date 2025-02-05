@@ -2,8 +2,8 @@
 import { Button } from "@/components/ui";
 import { User } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
-import { ManageSubscriptionModal } from "../manage-subscription-modal";
+// import { useState } from "react";
+// import { ManageSubscriptionModal } from "../manage-subscription-modal";
 
 interface SubscriptionDetailsProps {
   plan: string;
@@ -25,7 +25,7 @@ export const SubscriptionDetails = ({
   billingPeriod,
   members,
 }: SubscriptionDetailsProps) => {
-  const [isManageModalOpen, setIsManageModalOpen] = useState(false);
+  // const [isManageModalOpen, setIsManageModalOpen] = useState(false);
 
   return (
     <div className="flex flex-col space-y-4">
@@ -42,22 +42,22 @@ export const SubscriptionDetails = ({
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-4">
-            <h3 className="text-2xl font-semibold">{plan}</h3>
+            <h3 className="text-2xl capitalize font-semibold">{plan}</h3>
             <span className="text-[#4BB543] bg-[#292832] px-2 py-1 rounded-full">
               {status}
             </span>
           </div>
           <p className="text-[#C4C4C4] mt-1">Renews on {renewalDate}</p>
         </div>
-        <div>
-          <Button
+        {/* <div> */}
+          {/* <Button
             variant="ghost"
             className="text-[#A8A8FF]"
             onClick={() => setIsManageModalOpen(true)}
           >
             Manage subscription
-          </Button>
-        </div>
+          </Button> */}
+        {/* </div> */}
       </div>
       <div className="h-[1px] flex-grow bg-[#383838]" />
 
@@ -78,10 +78,10 @@ export const SubscriptionDetails = ({
         </Link>
       </div>
 
-      <ManageSubscriptionModal
+      {/* <ManageSubscriptionModal
         isOpen={isManageModalOpen}
         onClose={() => setIsManageModalOpen(false)}
-      />
+      /> */}
     </div>
   );
 };

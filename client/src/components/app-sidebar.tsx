@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetUserSubscriptionInfo } from "@/hooks";
+import { useGetUserRoleSubscriptionInfo } from "@/hooks";
 
 import {
   Sidebar,
@@ -47,7 +47,7 @@ const NAVIGATION_ITEMS = [
 export const AppSidebar = () => {
   const pathname = usePathname();
 
-  const { data: userSubscriptionInfo } = useGetUserSubscriptionInfo();
+  const { data: userSubscriptionInfo } = useGetUserRoleSubscriptionInfo();
 
   return (
     <Sidebar className="py-8 border-secondary bg-background">

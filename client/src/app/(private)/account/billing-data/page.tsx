@@ -1,18 +1,24 @@
 "use client";
 
-import { useGetPlans, useGetUserLicenses } from "@/hooks";
+import { useGetPlans, useGetUserLicenses, useGetUserSubscriptionInfo } from "@/hooks";
 
 import { PaymentHistory, SubscriptionDetails } from "./_components";
 import { PricingCard } from "./_components/pricing-card";
+
+import { format } from "date-fns";
 
 export default function BillingData() {
   const { data: plans } = useGetPlans();
   const { data: userLicense, isPending: isUserLicensePending } =
     useGetUserLicenses();
-  
-  console.log(userLicense);
 
-  // const subscriptionDetails// plan (type, period), price, members count  
+  const { data: userSubscriptionInfo } = useGetUserSubscriptionInfo();
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+
+    return format(date, "MMMM dd, yyyy");
+  }
 
   return (
     <div className="w-full text-white">
@@ -22,14 +28,14 @@ export default function BillingData() {
         </div>
 
         <div>
-          {!isUserLicensePending && userLicense && userLicense.tierType !== "freemium" && (
+          {!isUserLicensePending && userLicense && userSubscriptionInfo && userLicense.tierType !== "freemium" && (
             <SubscriptionDetails
-              plan="Standart Monthly"
+              plan={`${userSubscriptionInfo.plan.type} ${userSubscriptionInfo.plan.period}`}
               status="Active subscription"
-              renewalDate="February 02, 2025"
-              price={9.99}
-              billingPeriod="month, billed monthly"
-              members={{ admin: 1, regular: 0 }}
+              renewalDate={formatDate(userSubscriptionInfo.subscription.nextDate)}
+              price={userSubscriptionInfo.plan.price / 100} // change to dollars
+              billingPeriod={`month billed ${userSubscriptionInfo.plan.period}`}
+              members={{ admin: 1, regular: userSubscriptionInfo.license.limit }}
             />
           )}
 

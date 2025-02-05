@@ -199,7 +199,7 @@ export class UserService {
     return updatedUser;
   }
 
-  async findUserSubscriptionInfo(userId: string) {
+  async findUserRoleSubscriptionInfo(userId: string) {
     const userInfo = {
       organizationOwner: false, // with organization
       standardUser: false, // private with license, (standard tier)
@@ -290,6 +290,60 @@ export class UserService {
         ...licenseOwner,
       },
     }
+  }
+
+  async findUserSubscriptionInfo(userId: string) {
+    // get subscription
+    // plan (type, period), price, members count (license limit) (get from user subscription)
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      }
+    });
+
+    const subscription = await this.prisma.subscription.findUnique({
+      where: {
+        userId,
+      }, 
+      select: {
+        isActive: true,
+        nextDate: true,
+        planId: true,
+      }
+    });
+
+    const plan = await this.prisma.plan.findUnique({
+      where: {
+        id: subscription.planId,
+      },
+      select: {
+        type: true,
+        period: true,
+        price: true,
+      }
+    });
+
+    const license = await this.prisma.license.findUnique({
+      where: {
+        ownerId: userId,
+      },
+      select: {
+        limit: true,
+        tierType: true,
+      }
+    });
+
+    return {
+      subscription: {
+        ...subscription,
+      },
+      plan: {
+        ...plan,
+      },
+      license: {
+        ...license,
+      }
+    };
   }
 
   private hashPassword(password: string): string {

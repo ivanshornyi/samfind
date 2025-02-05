@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import {
   useGetInvitedUserInfo,
   useGetUserLicenses,
-  useGetUserSubscriptionInfo,
+  useGetUserRoleSubscriptionInfo,
   useToast,
 } from "@/hooks";
 
@@ -229,7 +229,7 @@ export default function License() {
   const { data: userLicense, isPending: isUserLicensesPending } =
     useGetUserLicenses();
 
-  const { data: userSubscriptionInfo } = useGetUserSubscriptionInfo();
+  const { data: userRoleSubscriptionInfo } = useGetUserRoleSubscriptionInfo();
 
   const { data: invitedUserData } = useGetInvitedUserInfo();
 
@@ -256,7 +256,7 @@ export default function License() {
     }
   };
 
-  function formatDate(dateString: string): string {
+  const formatDate = (dateString: string) => {
     const date = new Date(dateString);
 
     return format(date, "MMMM dd, yyyy");
@@ -309,7 +309,7 @@ export default function License() {
           License management
         </h2>
 
-        {!userSubscriptionInfo?.freemiumUser && (
+        {!userRoleSubscriptionInfo?.freemiumUser && (
           <>
             {userLicense &&
               !isUserLicensesPending &&
@@ -364,7 +364,7 @@ export default function License() {
           </>
         )}
 
-        {userSubscriptionInfo?.organizationOwner && !userLicense && (
+        {userRoleSubscriptionInfo?.organizationOwner && !userLicense && (
           <>
             <div
               className="
@@ -388,7 +388,7 @@ export default function License() {
           </>
         )}
 
-        {userSubscriptionInfo?.freemiumUser && (
+        {userRoleSubscriptionInfo?.freemiumUser && (
           <>
             <div className="flex flex-col gap-[32px] mt-[60px] w-[742px]">
               <div
@@ -444,7 +444,7 @@ export default function License() {
           </>
         )}
 
-        {userSubscriptionInfo?.invitedUser && (
+        {userRoleSubscriptionInfo?.invitedUser && (
           <div className="mt-4">
             <div className="capitalize text-blue-50 flex items-center justify-center gap-2 bg-card rounded-full px-3 py-2 w-[200px]">
               <User size={18} />

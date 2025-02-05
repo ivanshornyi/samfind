@@ -104,16 +104,22 @@ export class UserController {
     return this.userService.deleteUser(id);
   }
 
-  @ApiOperation({ summary: "Find user subscription info" })
-  @Get("/subscription-info/:userId")
-  async findUserSubscriptionInfo(@Param("userId") userId: string) {
+  @ApiOperation({ summary: "Find user role subscription info" })
+  @Get("/subscription-role-info/:userId")
+  async findUserSubscriptionRoleInfo(@Param("userId") userId: string) {
     // find user information, where he has subscription, type of subscription, in other license and organization or not
-    return this.userService.findUserSubscriptionInfo(userId);
+    return this.userService.findUserRoleSubscriptionInfo(userId);
   }
 
   @ApiOperation({ summary: "Find user invited user info" })
   @Get("/find-invited-user/info/:userId")
   async getInvitedUserInfo(@Param("userId") userId: string) {
     return this.userService.findInvitedUserInfo(userId);
+  }
+
+  @ApiOperation({ summary: "Find user subscription info" })
+  @Get("/subscription-info/:userId")
+  async findUserSubscriptionInfo(@Param("userId") userId: string) {
+    return await this.userService.findUserSubscriptionInfo(userId);
   }
 }

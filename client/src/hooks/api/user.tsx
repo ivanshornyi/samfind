@@ -30,11 +30,11 @@ export const useUpdateUser = () => {
   });
 };
 
-export const useGetUserSubscriptionInfo = () => {
+export const useGetUserRoleSubscriptionInfo = () => {
   const { user } = useContext(AuthContext);
 
   return useQuery({
-    queryFn: () => UserApiService.getUserSubscriptionInfo(user?.id ?? ""),
+    queryFn: () => UserApiService.getUserRoleSubscriptionInfo(user?.id ?? ""),
     queryKey: ["user-subscription-info"],
     enabled: !!user?.id,
     staleTime: 5_000_000,
@@ -61,5 +61,15 @@ export const useGetInvitedUserInfo = () => {
     queryKey: ["invited-user-info"],
     enabled: !!user?.id,
     staleTime: 5_000_000,
+  });
+};
+
+export const useGetUserSubscriptionInfo = () => {
+  const { user } = useContext(AuthContext);
+
+  return useQuery({
+    queryFn: () => UserApiService.getUserSubscriptionInfo(user?.id ?? ""),
+    queryKey: ["invited-user-info"],
+    enabled: !!user?.id,
   });
 };
