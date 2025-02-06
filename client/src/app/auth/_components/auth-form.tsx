@@ -228,19 +228,16 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
           return;
         }
 
-        const organization: {
-          name: string;
-          VAT: string;
-          businessOrganizationNumber: string;
-          domain?: string;
-        } = {
+        const organization = {
           name: organizationFormData.name,
           VAT: organizationFormData.VAT,
           businessOrganizationNumber:
             organizationFormData.businessOrganizationNumber,
+          domains: organizationFormData.domains.filter(
+            (domain) => domain.trim() !== ""
+          ),
         };
 
-        // add organization
         signUpData = {
           ...signUpData,
           organization,
