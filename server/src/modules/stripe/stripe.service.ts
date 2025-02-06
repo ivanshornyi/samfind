@@ -319,6 +319,25 @@ export class StripeService {
           subscription.user,
           Math.round(subscription.plan.price / 10),
         );
+
+        await this.prisma.user.update({
+          where: {
+            id: subscription.userId,
+          },
+          data: {
+            discount:
+              subscription.user.discount +
+              Math.round(subscription.plan.price / 10),
+            invitedReferralCode: null,
+          },
+        });
+
+        await this.addDiscount(
+          subscription.user,
+          Math.round(subscription.plan.price / 10),
+          subscription.user.email,
+          true,
+        );
       }
 
       if (subscription.licenseId && memberId) {
@@ -462,7 +481,12 @@ export class StripeService {
     }
   }
 
-  async addDiscount(user: User, discountAmount: number, email: string) {
+  async addDiscount(
+    user: User,
+    discountAmount: number,
+    email: string,
+    referral?: boolean,
+  ) {
     let discount = await this.prisma.discount.findFirst({
       where: {
         userId: user.id,
@@ -494,7 +518,9 @@ export class StripeService {
         userId: user.id,
         discountId: discount.id,
         amount: discountAmount,
-        description: `Discount for unused user period user with email - ${email}`,
+        description: referral
+          ? "Bonus for registration via referral link"
+          : `Discount for unused user period user with email - ${email}`,
       },
     });
 
