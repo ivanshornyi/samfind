@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -16,11 +15,16 @@ import { Button, Input } from "@/components";
 import { SendResetPasswordCodeModal, VerifyUserModal } from "../_components";
 import { ACCOUNT_TYPE_CARD_ITEMS } from "../account-type/data";
 
-import { GoogleLogin } from "@react-oauth/google";
-import { jwtDecode } from "jwt-decode";
-
-import { GoogleIcon } from "@public/icons";
-import { Check, X, Building2, EyeIcon, EyeOff, Globe, Hash, Info } from "lucide-react";
+import {
+  Building2,
+  Check,
+  EyeIcon,
+  EyeOff,
+  Globe,
+  Hash,
+  Info,
+  X,
+} from "lucide-react";
 
 interface AuthFormProps {
   authPageType: "signIn" | "signUp" | "resetPassword";
@@ -302,56 +306,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
       router.push("/");
     }
   }, [searchParams, accountType]);
-
-  const googleSignUpSuccessHandler = async (credentialResponse: any) => {
-    const user: { email: string } = jwtDecode(
-      credentialResponse?.credential as string
-    );
-
-    console.log(user);
-    // await mutate({
-    //   email: user.email,
-    //   password: "",
-    //   school: currentSchoolName,
-    //   auth: UserAuthType.Google,
-    // });
-
-    // let signUpData: SignUpData = {
-    //   firstName: user.first_name,
-    //   lastName: user.last_name,
-    //   email: user.email,
-    //   password: formData.password.trim(),
-    //   authType: UserAuthType.Email,
-    //   accountType,
-    // }
-
-    // if (referralCode) {
-    //   signUpData = {
-    //     ...signUpData,
-    //     invitedReferralCode: Number(referralCode),
-    //   }
-    // }
-
-    // signUpMutation(signUpData);
-  };
-
-  const googleSignUpErrorHandler = () => {
-    // toast.error("Something went wrong");
-  };
-
-  const googleSignInSuccessHandler = async (credentialResponse: any) => {
-    // const user: { email: string } = jwtDecode(credentialResponse?.credential as string);
-    // await mutate({
-    //   email: user.email,
-    //   password: "",
-    //   school: currentSchoolName,
-    //   auth: UserAuthType.Google,
-    // });
-  };
-
-  const googleSignInErrorHandler = () => {
-    // toast.error("Something went wrong");
-  };
 
   return (
     <>
@@ -649,45 +603,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
 
         <div className="pt-4">
           {authPageType === "signIn" && <SendResetPasswordCodeModal />}
-
-          {((authPageType === "signUp" &&
-            accountType === UserAccountType.Private) ||
-            authPageType === "signIn") && (
-            <>
-              <p className="text-center mt-1 mb-5">Or</p>
-
-              <div className="flex flex-col gap-2 relative">
-                <div className="opacity-0 absolute z-10 w-full mt-0.5 rounded-full overflow-hidden">
-                  <GoogleLogin
-                    onSuccess={googleSignInSuccessHandler}
-                    onError={googleSignInErrorHandler}
-                  />
-                </div>
-                <button
-                  className="
-                    py-2.5 bg-white flex items-center gap-2 justify-center text-black 
-                    rounded-full relative z-0
-                  "
-                >
-                  <Image
-                    src={GoogleIcon}
-                    width={20}
-                    height={20}
-                    alt="google"
-                    className="w-5 h-5"
-                  />
-                  <span>
-                    {authPageType === "signIn" && "Sign in "}
-                    {authPageType === "signUp" && "Sign up "}
-                    with Google
-                  </span>
-                </button>
-                {/* <button className="py-2.5 bg-white text-black rounded-full">
-                  Sign in with Github
-                </button> */}
-              </div>
-            </>
-          )}
 
           {authPageType === "signIn" && (
             <p className="text-sm text-center mt-3">
