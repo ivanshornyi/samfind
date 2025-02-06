@@ -456,7 +456,7 @@ export default function License() {
               <div className="p-4 rounded-lg bg-card w-[330px]">
                 <p>
                   You have joined the workspace of the user{" "}
-                  <span className="capitalize text-blue-50">{`${invitedUserData?.licenseOwner.firstName} ${invitedUserData?.licenseOwner.lastName}`}</span>
+                  <span className="capitalize text-blue-50">{`${invitedUserData?.licenseOwner.firstName} ${invitedUserData?.licenseOwner.lastName} `}</span>
                   and use access to the license.
                 </p>
               </div>

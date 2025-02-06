@@ -44,6 +44,19 @@ const NAVIGATION_ITEMS = [
   }
 ];
 
+const INVITED_USER_NAVIGATION_ITEMS = [
+  {
+    title: "License management",
+    path: "/account/license",
+    icon: IdCard,
+  },
+  {
+    title: "Profile settings",
+    path: "/account/settings",
+    icon: User,
+  },
+];
+
 export const AppSidebar = () => {
   const pathname = usePathname();
 
@@ -85,26 +98,30 @@ export const AppSidebar = () => {
               );
             })}
 
-            {userSubscriptionInfo?.invitedUser && (
-              <SidebarMenuItem>
-              <Link href="/account/license">
-                <Button
-                  variant="menuItem"
-                  leftIcon={
-                    <IdCard
-                      style={{ width: "24px", height: "24px" }}
-                    />
-                  }
-                  className={`
-                    ${pathname === "/account/license" && "bg-[#302935] text-white"}
-                    w-full flex justify-start items-center
-                  `}
-                >
-                  <span>License management</span>
-                </Button>
-              </Link>
-            </SidebarMenuItem>
-            )}
+            {userSubscriptionInfo?.invitedUser && INVITED_USER_NAVIGATION_ITEMS.map(item => {
+              const isActive = pathname === item.path;
+            
+              return (
+                <SidebarMenuItem key={item.title}>
+                  <Link href={item.path}>
+                    <Button
+                      variant="menuItem"
+                      leftIcon={
+                        <item.icon
+                          style={{ width: "24px", height: "24px" }}
+                        />
+                      }
+                      className={`
+                        ${isActive && "bg-[#302935] text-white"}
+                        w-full flex justify-start items-center
+                      `}
+                    >
+                      <span>{item.title}</span>
+                    </Button>
+                  </Link>
+                </SidebarMenuItem>
+              );
+            })}
 
             </SidebarMenu>
           </SidebarGroupContent>
