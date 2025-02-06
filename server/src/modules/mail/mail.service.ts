@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, BadRequestException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
 import * as nodemailer from "nodemailer";
@@ -33,7 +33,7 @@ export class MailService {
 
       await this.transporter.sendMail(mailOptions);
     } catch (error) {
-      throw error;
+      throw new BadRequestException(`Failed to send email - ${to}`);
     }
   }
 
@@ -48,7 +48,7 @@ export class MailService {
 
       await this.transporter.sendMail(mailOptions);
     } catch (error) {
-      throw error;
+      throw new BadRequestException(`Failed to send email - ${to}`);
     }
   }
 
@@ -63,7 +63,7 @@ export class MailService {
 
       await this.transporter.sendMail(mailOptions);
     } catch (error) {
-      throw error;
+      throw new BadRequestException(`Failed to send email - ${to}`);
     }
   }
 
@@ -78,7 +78,7 @@ export class MailService {
 
       await this.transporter.sendMail(mailOptions);
     } catch (error) {
-      throw error;
+      throw new BadRequestException(`Failed to send email - ${to}`);
     }
   }
 
@@ -98,7 +98,7 @@ export class MailService {
 
       await this.transporter.sendMail(mailOptions);
     } catch (error) {
-      throw error;
+      throw new BadRequestException(`Failed to send email - ${to}`);
     }
   }
 
@@ -118,7 +118,7 @@ export class MailService {
 
       await this.transporter.sendMail(mailOptions);
     } catch (error) {
-      throw error;
+      throw new BadRequestException(`Failed to send email - ${to}`);
     }
   }
 }
