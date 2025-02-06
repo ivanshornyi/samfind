@@ -363,14 +363,13 @@ export class StripeService {
         if (discountAmount === 0) return;
 
         await this.addDiscount(subscription.user, discountAmount, member.email);
-      } else if (subscription.user.accountType === UserAccountType.private) {
-        const license = await this.prisma.license.findUnique({
-          where: { ownerId: subscription.userId },
-        });
-
+      } else if (
+        subscription.user.accountType === UserAccountType.private &&
+        firstInvoice
+      ) {
         await this.prisma.license.update({
           where: {
-            id: license.id,
+            ownerId: subscription.userId,
           },
           data: {
             purchased: firstInvoice ? Number(quantity) - 1 : undefined,
@@ -449,6 +448,17 @@ export class StripeService {
             stripeInvoiceIds: [...subscription.stripeInvoiceIds, invoice.id],
           },
         });
+
+        if (!firstInvoice && !subscription.isActive) {
+          await this.prisma.license.update({
+            where: {
+              ownerId: subscription.userId,
+            },
+            data: {
+              status: "active",
+            },
+          });
+        }
       }
 
       this.logger.log(`License added for user ${subscription?.userId}`);

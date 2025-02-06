@@ -17,12 +17,13 @@ export class CronService {
   ) {}
 
   @Cron("0 8 1 * *")
-  //   @Cron("19 12 * * *")
+  //   @Cron("55 14 * * *")
   async handleFirstDayOfMonth() {
     this.logger.log(
       "Running on the 1st day of the month at 08:00 AM Create Invoices - start",
     );
     const today = new Date();
+    // const today = new Date("2025-03-01");
 
     const subscriptions = await this.prisma.subscription.findMany({
       where: {
