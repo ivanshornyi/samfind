@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 
 import { AuthContext } from "@/context";
 import { useGetBillingHistory } from "@/hooks/api/billing-history";

@@ -21,6 +21,8 @@ import {
   SharePopover,
 } from "./_components";
 
+import { format } from "date-fns";
+
 const frontendDomain = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN;
 
 export default function InvitedFriends() {
@@ -41,6 +43,11 @@ export default function InvitedFriends() {
 
   const { data: userReferralItems, isPending: isUserReferralItemsLoading } = useGetUserReferralUsers();
   
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+
+    return format(date, "MMMM dd, yyyy");
+  }
 
   if (!user) return null;
 
@@ -109,7 +116,7 @@ export default function InvitedFriends() {
                   </div>
                 </TableCell>
                 <TableCell>{referralUser.name}</TableCell>
-                <TableCell>{referralUser.activationDate}</TableCell>
+                <TableCell>{referralUser.activationDate && formatDate(referralUser.activationDate)}</TableCell>
                 <TableCell>
                   <p className="text-[#4BB543]">{(referralUser.amount / 100).toFixed(2)}</p>
                 </TableCell>
