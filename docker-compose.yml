@@ -51,8 +51,7 @@ services:
       - 'traefik.http.routers.server.tls=true'
       - 'traefik.http.routers.server.tls.certresolver=myresolver'
       - 'traefik.http.services.server.loadbalancer.server.port=4000'
-      - 'traefik.http.middlewares.strip-api.stripprefix.prefixes=/api'
-      - 'traefik.http.routers.server.middlewares=strip-api@docker,cors@docker'
+      - 'traefik.http.routers.server.middlewares=cors@docker'
       - 'traefik.http.middlewares.cors.headers.accesscontrolallowmethods=GET,POST,PUT,DELETE,OPTIONS'
       - 'traefik.http.middlewares.cors.headers.accesscontrolalloworiginlist=*'
       - 'traefik.http.middlewares.cors.headers.accesscontrolmaxage=100'
@@ -67,6 +66,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    command: ['npm', 'run', 'start:prod']
 
   client:
     image: nazarii2314/samfind-client:latest
@@ -78,7 +78,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - NEXT_PUBLIC_API_URL=https://onsio.io/api
+      - NEXT_PUBLIC_BASE_URL=https://onsio.io/api
     command: ['npm', 'run', 'start']
     init: true
     env_file:
