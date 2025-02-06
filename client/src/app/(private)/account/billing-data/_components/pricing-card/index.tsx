@@ -86,6 +86,7 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
             <label>Quantity</label>
             <input 
               type="number"
+              min={1}
               className="w-[80px] rounded-xl px-4 py-2 bg-background text-center" 
               value={quantity}
               onChange={(event) => setQuantity(Number(event.target.value))}
