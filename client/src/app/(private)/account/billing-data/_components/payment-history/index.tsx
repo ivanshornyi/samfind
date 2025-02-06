@@ -13,12 +13,11 @@ import {
 import {
   Table,
   TableBody,
-  TableCaption,
   TableHead,
   TableHeader,
   TableRow,
   TableCell
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 
 export const PaymentHistory = () => {
   const { user } = useContext(AuthContext);
