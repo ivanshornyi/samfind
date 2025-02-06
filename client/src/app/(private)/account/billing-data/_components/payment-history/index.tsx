@@ -84,6 +84,7 @@ export const PaymentHistory = () => {
             <TableHead className="w-[250px] uppercase text-white/60">Invoice</TableHead>
             <TableHead className="uppercase text-white/60">Invoice date</TableHead>
             <TableHead className="uppercase text-white/60">Price</TableHead>
+            <TableHead className="uppercase text-white/60">After discount</TableHead>
             <TableHead className="uppercase text-white/60">Status</TableHead>
           </TableRow>
         </TableHeader>
@@ -94,7 +95,8 @@ export const PaymentHistory = () => {
                 <div className="py-3">{historyItem.number}</div>
               </TableCell>
               <TableCell>{historyItem.date && formatTimestamp(historyItem.date)}</TableCell>
-              <TableCell>{historyItem.price / 100}</TableCell>
+              <TableCell>${historyItem.price / 100}</TableCell>
+              <TableCell>${(historyItem?.afterDiscount ?? historyItem.price / 100) / 100}</TableCell>
               <TableCell className={`${historyItem.status === "paid" ? "text-[#4BB543]" : "text-[#FF6C6C]"} capitalize`}>{historyItem.status}</TableCell>
             </TableRow>
           ))}
