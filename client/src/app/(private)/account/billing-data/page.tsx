@@ -32,7 +32,7 @@ export default function BillingData() {
             <SubscriptionDetails
               plan={`${userSubscriptionInfo.plan?.type} ${userSubscriptionInfo.plan?.period}`}
               status="Active subscription"
-              renewalDate={userSubscriptionInfo.subscription.nextDate ? formatDate(userSubscriptionInfo.subscription.nextDate) : "no date"}
+              renewalDate={userSubscriptionInfo.subscription?.nextDate ? formatDate(userSubscriptionInfo.subscription.nextDate) : "no date"}
               price={userSubscriptionInfo.plan?.price / 100}
               billingPeriod={`month billed ${userSubscriptionInfo.plan?.period}`}
               members={{ admin: 1, regular: userSubscriptionInfo.license?.limit - 1 }}
