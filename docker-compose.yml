@@ -4,112 +4,60 @@ services:
     deploy:
       mode: global
     command:
+      - '--log.level=DEBUG'
       - '--api.dashboard=true'
       - '--api.insecure=true'
       - '--providers.docker=true'
       - '--providers.docker.exposedbydefault=false'
       - '--entryPoints.web.address=:80'
       - '--entryPoints.websecure.address=:443'
+      - '--entrypoints.web.http.redirections.entryPoint.to=websecure'
+      - '--entrypoints.web.http.redirections.entryPoint.scheme=https'
       - '--certificatesresolvers.myresolver.acme.httpchallenge=true'
       - '--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web'
       - '--certificatesresolvers.myresolver.acme.email=nazarii2314@gmail.com'
       - '--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json'
-      - '--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory'
     ports:
       - '80:80'
       - '443:443'
       - '8080:8080'
     volumes:
-      - letsencrypt:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock
+      - letsencrypt:/letsencrypt
     networks:
       - traefik
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.dashboard.rule=Host(`traefik.onsio.io`)'
       - 'traefik.http.routers.dashboard.service=api@internal'
-      - 'traefik.http.routers.dashboard.entrypoints=websecure'
-      - 'traefik.http.routers.dashboard.tls.certresolver=myresolver'
-      - 'traefik.http.services.dashboard.loadbalancer.server.port=8080'
-
-  admin:
-    image: nazarii2314/samfind-admin:latest
-    platform: linux/arm64
-    deploy:
-      # replicas: 3
-      restart_policy:
-        condition: on-failure
-        max_attempts: 3
-    env_file:
-      - ./admin/.env
-    environment:
-      - NODE_ENV=production
-      - PORT=4000
-    command: ['npm', 'run', 'start']
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.services.admin.loadbalancer.server.port=4000'
-      - 'traefik.http.routers.admin.rule=Host(`admin.onsio.io`)'
-      - 'traefik.http.routers.admin.entrypoints=websecure'
-      - 'traefik.http.routers.admin.tls.certresolver=myresolver'
-    networks:
-      - traefik
-    healthcheck:
-      test: ['CMD', 'wget', '--spider', '-q', 'localhost:4000']
-      interval: 10s
-      timeout: 5s
-      retries: 3
-
-  client:
-    image: nazarii2314/samfind-client:latest
-    platform: linux/arm64
-    deploy:
-      # replicas: 3
-      restart_policy:
-        condition: on-failure
-        max_attempts: 3
-    environment:
-      - NODE_ENV=production
-      - PORT=3000
-    command: ['npm', 'run', 'start']
-    init: true
-    env_file:
-      - ./client/.env
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.services.client.loadbalancer.server.port=3000'
-      - 'traefik.http.routers.client.rule=Host(`www.onsio.io`)'
-      - 'traefik.http.routers.client.entrypoints=websecure'
-      - 'traefik.http.routers.client.tls.certresolver=myresolver'
-    networks:
-      - traefik
-    healthcheck:
-      test: ['CMD', 'wget', '--spider', '-q', 'localhost:3000']
-      interval: 10s
-      timeout: 5s
-      retries: 3
+      - 'traefik.http.routers.dashboard.entrypoints=web'
 
   server:
     image: nazarii2314/samfind-server:latest
     platform: linux/arm64
     deploy:
-      # replicas: 3
       restart_policy:
         condition: on-failure
         max_attempts: 3
+    env_file:
+      - ./server/.env
     environment:
       - NODE_ENV=production
       - PORT=4000
-      - DATABASE_URL=${DATABASE_URL}
-    command: ['npm', 'run', 'start:migrate:prod']
-    env_file:
-      - ./server/.env
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.services.server.loadbalancer.server.port=4000'
-      - 'traefik.http.routers.server.rule=Host(`www.onsio.io`) && PathPrefix(`/api`)'
+      - 'traefik.http.routers.server.rule=(Host(`www.onsio.io`) || Host(`onsio.io`)) && PathPrefix(`/api`)'
       - 'traefik.http.routers.server.entrypoints=websecure'
+      - 'traefik.http.routers.server.tls=true'
       - 'traefik.http.routers.server.tls.certresolver=myresolver'
+      - 'traefik.http.services.server.loadbalancer.server.port=4000'
+      - 'traefik.http.middlewares.strip-api.stripprefix.prefixes=/api'
+      - 'traefik.http.routers.server.middlewares=strip-api@docker,cors@docker'
+      - 'traefik.http.middlewares.cors.headers.accesscontrolallowmethods=GET,POST,PUT,DELETE,OPTIONS'
+      - 'traefik.http.middlewares.cors.headers.accesscontrolalloworiginlist=*'
+      - 'traefik.http.middlewares.cors.headers.accesscontrolmaxage=100'
+      - 'traefik.http.middlewares.cors.headers.addvaryheader=true'
+      - 'traefik.http.routers.server.priority=100'
     networks:
       - traefik
     healthcheck:
@@ -120,10 +68,40 @@ services:
       retries: 3
       start_period: 40s
 
-volumes:
-  letsencrypt:
+  client:
+    image: nazarii2314/samfind-client:latest
+    platform: linux/arm64
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - NEXT_PUBLIC_API_URL=https://onsio.io/api
+    command: ['npm', 'run', 'start']
+    init: true
+    env_file:
+      - ./client/.env
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.client.rule=Host(`www.onsio.io`) || Host(`onsio.io`)'
+      - 'traefik.http.routers.client.entrypoints=websecure'
+      - 'traefik.http.routers.client.tls=true'
+      - 'traefik.http.routers.client.tls.certresolver=myresolver'
+      - 'traefik.http.services.client.loadbalancer.server.port=3000'
+      - 'traefik.http.routers.client.priority=1'
+    networks:
+      - traefik
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', '-q', 'localhost:3000']
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 networks:
   traefik:
-    name: traefik
     external: true
+
+volumes:
+  letsencrypt:
