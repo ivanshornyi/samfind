@@ -9,7 +9,7 @@ const differents = [
 
 export const Different = () => {
   return (
-    <div className="flex flex-col sm:flex-row mb-[60px] sm:mb-[680px] justify-evenly align-center">
+    <div className="flex flex-col sm:flex-row mb-[60px] sm:mb-[120px] justify-evenly align-center">
       <h2 className="mt-auto mb-auto font-semibold text-2xl sm:text-[40px] leading-[32px] sm:leading-[54px] w-full max-w-[300px]">
         What Makes Us Different
       </h2>
