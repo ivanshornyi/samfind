@@ -275,20 +275,27 @@ export class StripeService {
   }
 
   private async handleFailedInvoicePayment(invoice: Stripe.Invoice) {
-    const invoiceLink = invoice.hosted_invoice_url;
-    const { subscriptionId } = invoice.metadata;
+    try {
+      const invoiceLink = invoice.hosted_invoice_url;
+      const { subscriptionId } = invoice.metadata;
 
-    const subscription = await this.prisma.subscription.findUnique({
-      where: { id: subscriptionId },
-      include: { user: true },
-    });
+      const subscription = await this.prisma.subscription.findUnique({
+        where: { id: subscriptionId },
+        include: { user: true },
+      });
 
-    if (!subscription) return;
+      if (!subscription) return;
 
-    await this.mailService.sendWarningPaymentFailed(
-      subscription.user.email,
-      invoiceLink,
-    );
+      await this.mailService.sendWarningPaymentFailed(
+        subscription.user.email,
+        invoiceLink,
+      );
+      this.logger.log(
+        `Invoice payment failed for user ${subscription?.userId}`,
+      );
+    } catch (error) {
+      this.logger.error("Error fail pay invoice license to user", error);
+    }
   }
 
   private async handleSuccessfulInvoicePayment(invoice: Stripe.Invoice) {
@@ -360,9 +367,13 @@ export class StripeService {
             : undefined,
         );
 
-        if (discountAmount === 0) return;
-
-        await this.addDiscount(subscription.user, discountAmount, member.email);
+        if (discountAmount > 0) {
+          await this.addDiscount(
+            subscription.user,
+            discountAmount,
+            member.email,
+          );
+        }
       } else if (
         subscription.user.accountType === UserAccountType.private &&
         firstInvoice
@@ -461,9 +472,9 @@ export class StripeService {
         }
       }
 
-      this.logger.log(`License added for user ${subscription?.userId}`);
+      this.logger.log(`Invoice payed for user ${subscription?.userId}`);
     } catch (error) {
-      this.logger.error("Error adding license to user", error);
+      this.logger.error("Error paying license to user", error);
     }
   }
 
