@@ -19,6 +19,8 @@ import {
   TableCell
 } from "@/components/ui/table";
 
+import { format } from "date-fns";
+
 export const PaymentHistory = () => {
   const { user } = useContext(AuthContext);
   const { data: billingHistory, isPending: isBillingHistoryPending } = useGetBillingHistory(
@@ -70,6 +72,10 @@ export const PaymentHistory = () => {
     getCoreRowModel: getCoreRowModel(),
   });
 
+  const formatTimestamp = (timestamp: number) => {
+    return format(new Date(timestamp * 1000), "MMM d, yyyy");
+  }
+
   return (
     <div className="w-full mt-5 mb-[100px]">
       <Table>
@@ -87,7 +93,7 @@ export const PaymentHistory = () => {
               <TableCell className="font-medium py-2">
                 <div className="py-3">{historyItem.number}</div>
               </TableCell>
-              <TableCell>{historyItem.date}</TableCell>
+              <TableCell>{historyItem.date && formatTimestamp(historyItem.date)}</TableCell>
               <TableCell>{historyItem.price / 100}</TableCell>
               <TableCell className={`${historyItem.status === "paid" ? "text-[#4BB543]" : "text-[#FF6C6C]"} capitalize`}>{historyItem.status}</TableCell>
             </TableRow>

@@ -17,7 +17,6 @@ export class CronService {
   ) {}
 
   @Cron("0 8 1 * *")
-  //   @Cron("19 12 * * *")
   async handleFirstDayOfMonth() {
     this.logger.log(
       "Running on the 1st day of the month at 08:00 AM Create Invoices - start",
