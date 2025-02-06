@@ -33,10 +33,6 @@ export const PlanCard = ({ plan }: { plan: Plan }) => {
         payment = {
           ...payment,
           userReferralCode,
-          discount: {
-            amount: 10,
-            description: "",
-          },
         };
       }
 

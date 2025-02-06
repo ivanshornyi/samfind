@@ -24,7 +24,7 @@ export const Info = () => {
   }, []);
 
   return (
-    <div className="relative font-manrope pt-[100px] sm:pt-[150px] mb-[70px] sm:mb-[172px]">
+    <div className="relative font-manrope pt-[100px] pl-4 sm:pt-[150px] mb-[70px] sm:mb-[172px]">
       <Image
         src={EllipseBlueImage}
         width={450}
@@ -37,6 +37,7 @@ export const Info = () => {
         cutting-edge technology.
       </p>
       <Button
+        className="ml-[-16px]"
         variant="link"
         rightIcon={<MoveUpRight style={{ width: "20px", height: "20px" }} />}
         onClick={() => router.push("/contact")}

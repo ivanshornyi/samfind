@@ -19,6 +19,7 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: "Onsio",
   description: "Onsio app",
+  icons: "/favicon.png",
 };
 
 export default function RootLayout({

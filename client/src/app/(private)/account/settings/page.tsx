@@ -318,6 +318,7 @@ export default function Settings() {
                     <div className="flex gap-2">
                       <Input
                         eye
+                        placeholder="New password"
                         name="newPassword"
                         type="password"
                         value={userPasswordFormData.newPassword}
@@ -325,6 +326,7 @@ export default function Settings() {
                       />
                       <Input
                         eye
+                        placeholder="Repeat password"
                         name="confirmPassword"
                         type="password"
                         value={userPasswordFormData.confirmPassword}

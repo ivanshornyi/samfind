@@ -275,20 +275,27 @@ export class StripeService {
   }
 
   private async handleFailedInvoicePayment(invoice: Stripe.Invoice) {
-    const invoiceLink = invoice.hosted_invoice_url;
-    const { subscriptionId } = invoice.metadata;
+    try {
+      const invoiceLink = invoice.hosted_invoice_url;
+      const { subscriptionId } = invoice.metadata;
 
-    const subscription = await this.prisma.subscription.findUnique({
-      where: { id: subscriptionId },
-      include: { user: true },
-    });
+      const subscription = await this.prisma.subscription.findUnique({
+        where: { id: subscriptionId },
+        include: { user: true },
+      });
 
-    if (!subscription) return;
+      if (!subscription) return;
 
-    await this.mailService.sendWarningPaymentFailed(
-      subscription.user.email,
-      invoiceLink,
-    );
+      await this.mailService.sendWarningPaymentFailed(
+        subscription.user.email,
+        invoiceLink,
+      );
+      this.logger.log(
+        `Invoice payment failed for user ${subscription?.userId}`,
+      );
+    } catch (error) {
+      this.logger.error("Error fail pay invoice license to user", error);
+    }
   }
 
   private async handleSuccessfulInvoicePayment(invoice: Stripe.Invoice) {
@@ -319,6 +326,25 @@ export class StripeService {
           subscription.user,
           Math.round(subscription.plan.price / 10),
         );
+
+        await this.prisma.user.update({
+          where: {
+            id: subscription.userId,
+          },
+          data: {
+            discount:
+              subscription.user.discount +
+              Math.round(subscription.plan.price / 10),
+            invitedReferralCode: null,
+          },
+        });
+
+        await this.addDiscount(
+          subscription.user,
+          Math.round(subscription.plan.price / 10),
+          subscription.user.email,
+          true,
+        );
       }
 
       if (subscription.licenseId && memberId) {
@@ -341,17 +367,20 @@ export class StripeService {
             : undefined,
         );
 
-        if (discountAmount === 0) return;
-
-        await this.addDiscount(subscription.user, discountAmount, member.email);
-      } else if (subscription.user.accountType === UserAccountType.private) {
-        const license = await this.prisma.license.findUnique({
-          where: { ownerId: subscription.userId },
-        });
-
+        if (discountAmount > 0) {
+          await this.addDiscount(
+            subscription.user,
+            discountAmount,
+            member.email,
+          );
+        }
+      } else if (
+        subscription.user.accountType === UserAccountType.private &&
+        firstInvoice
+      ) {
         await this.prisma.license.update({
           where: {
-            id: license.id,
+            ownerId: subscription.userId,
           },
           data: {
             purchased: firstInvoice ? Number(quantity) - 1 : undefined,
@@ -430,11 +459,22 @@ export class StripeService {
             stripeInvoiceIds: [...subscription.stripeInvoiceIds, invoice.id],
           },
         });
+
+        if (!firstInvoice && !subscription.isActive) {
+          await this.prisma.license.update({
+            where: {
+              ownerId: subscription.userId,
+            },
+            data: {
+              status: "active",
+            },
+          });
+        }
       }
 
-      this.logger.log(`License added for user ${subscription?.userId}`);
+      this.logger.log(`Invoice payed for user ${subscription?.userId}`);
     } catch (error) {
-      this.logger.error("Error adding license to user", error);
+      this.logger.error("Error paying license to user", error);
     }
   }
 
@@ -462,7 +502,12 @@ export class StripeService {
     }
   }
 
-  async addDiscount(user: User, discountAmount: number, email: string) {
+  async addDiscount(
+    user: User,
+    discountAmount: number,
+    email: string,
+    referral?: boolean,
+  ) {
     let discount = await this.prisma.discount.findFirst({
       where: {
         userId: user.id,
@@ -494,7 +539,9 @@ export class StripeService {
         userId: user.id,
         discountId: discount.id,
         amount: discountAmount,
-        description: `Discount for unused user period user with email - ${email}`,
+        description: referral
+          ? "Bonus for registration via referral link"
+          : `Discount for unused user period user with email - ${email}`,
       },
     });
 

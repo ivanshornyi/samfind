@@ -4,6 +4,7 @@ import {
   IsEmail,
   ValidateNested,
   IsNumber,
+  IsArray,
 } from "class-validator";
 import { Type } from "class-transformer";
 
@@ -33,6 +34,10 @@ export class SignUpOrganizationDto {
 
   @IsString()
   VAT: string;
+
+  @IsArray()
+  @IsOptional()
+  domains?: string[];
 }
 
 export class SignUpDto extends SignInDto {

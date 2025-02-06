@@ -8,9 +8,13 @@ import {
 } from "@nestjs/common";
 
 import {
+  License,
   LicenseStatus,
   LicenseTierType,
+  Plan,
   PlanPeriod,
+  Subscription,
+  User,
   UserAccountType,
   UserAuthType,
 } from "@prisma/client";
@@ -26,6 +30,11 @@ import { SendCodeForEmailDto } from "./dto/send-code-for-email.dto";
 import { createHash } from "crypto";
 import { AuthVerificationDto } from "./dto/auth-verification-dto";
 import { SubscriptionService } from "../subscription/subscription.service";
+
+type LicenseWithRelations = License & {
+  user: User;
+  subscription: Subscription & { plan: Plan };
+};
 
 @Injectable()
 export class AuthService {
@@ -354,38 +363,7 @@ export class AuthService {
         throw new ConflictException("This email does not have access");
       }
 
-      if (license.purchased > 0) {
-        // Use payed License
-        await this.prisma.license.update({
-          where: { id: license.id },
-          data: { purchased: license.purchased - 1 },
-        });
-        await this.prisma.activeLicense.create({
-          data: { userId: user.id, licenseId: license.id },
-        });
-
-        await this.subscriptionService.addDiscountOnNotUsedPeriod({
-          owner: license.user,
-          memberEmail: user.email,
-          totalAmount: license.subscription.plan.price,
-          nextDate:
-            license.subscription.plan.period === PlanPeriod.yearly
-              ? new Date(license.subscription.nextDate)
-              : undefined,
-        });
-      } else {
-        // Create and pay Invoice for License of invited user
-        const invoice = await this.subscriptionService.payMemberInvoice({
-          memberId: user.id,
-          ownerId: license.ownerId,
-        });
-
-        if (invoice.status !== "paid") {
-          throw new BadRequestException(
-            "An error occurred when paying for the License",
-          );
-        }
-      }
+      await this.checkLicenseAndAddMember(license, user);
     }
 
     if (authVerificationDto.organizationId) {
@@ -445,38 +423,7 @@ export class AuthService {
         },
       });
 
-      if (license.purchased > 0) {
-        // Use payed License
-        await this.prisma.license.update({
-          where: { id: license.id },
-          data: { purchased: license.purchased - 1 },
-        });
-        await this.prisma.activeLicense.create({
-          data: { userId: user.id, licenseId: license.id },
-        });
-
-        await this.subscriptionService.addDiscountOnNotUsedPeriod({
-          owner: license.user,
-          memberEmail: user.email,
-          totalAmount: license.subscription.plan.price,
-          nextDate:
-            license.subscription.plan.period === PlanPeriod.yearly
-              ? new Date(license.subscription.nextDate)
-              : undefined,
-        });
-      } else {
-        // Create and pay Invoice for License of invited user
-        const invoice = await this.subscriptionService.payMemberInvoice({
-          memberId: user.id,
-          ownerId: license.ownerId,
-        });
-
-        if (invoice.status !== "paid") {
-          throw new BadRequestException(
-            "An error occurred when paying for the License",
-          );
-        }
-      }
+      await this.checkLicenseAndAddMember(license, user);
     }
 
     await this.userService.updateUser(user.id, {
@@ -495,6 +442,41 @@ export class AuthService {
       ...user,
       ...tokens,
     };
+  }
+
+  async checkLicenseAndAddMember(license: LicenseWithRelations, member: User) {
+    if (license.purchased > 0) {
+      // Use payed License
+      await this.prisma.license.update({
+        where: { id: license.id },
+        data: { purchased: license.purchased - 1 },
+      });
+      await this.prisma.activeLicense.create({
+        data: { userId: member.id, licenseId: license.id },
+      });
+
+      await this.subscriptionService.addDiscountOnNotUsedPeriod({
+        owner: license.user,
+        memberEmail: member.email,
+        totalAmount: license.subscription.plan.price,
+        nextDate:
+          license.subscription.plan.period === PlanPeriod.yearly
+            ? new Date(license.subscription.nextDate)
+            : undefined,
+      });
+    } else {
+      // Create and pay Invoice for License of invited user
+      const invoice = await this.subscriptionService.payMemberInvoice({
+        memberId: member.id,
+        ownerId: license.ownerId,
+      });
+
+      if (invoice.status !== "paid") {
+        throw new BadRequestException(
+          "An error occurred when paying for the License",
+        );
+      }
+    }
   }
 
   private hashField(password: string): string {

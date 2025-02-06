@@ -1,5 +1,6 @@
 import { Button } from "@/components";
 import { ReusableTable } from "@/components/table";
+
 import {
   ColumnDef,
   getCoreRowModel,
@@ -8,13 +9,13 @@ import {
 } from "@tanstack/react-table";
 import { ArrowUpDown, Info } from "lucide-react";
 
-interface ReferrallItem {
+interface ReferralItem {
   username: string;
   activationDate: string;
   payout: number;
 }
 
-interface DisplayReferralItem extends ReferrallItem {
+interface DisplayReferralItem extends ReferralItem {
   icon: React.ReactNode;
 }
 
@@ -29,26 +30,26 @@ const generateUsernameCircle = (username: string) => {
   );
 };
 
-const data: DisplayReferralItem[] = [
-  {
-    icon: generateUsernameCircle("john_doe"),
-    username: "john_doe",
-    activationDate: "2023-01-01",
-    payout: 50,
-  },
-  {
-    icon: generateUsernameCircle("jane_smith"),
-    username: "jane_smith",
-    activationDate: "2023-02-15",
-    payout: 75,
-  },
-  {
-    icon: generateUsernameCircle("alice_jones"),
-    username: "alice_jones",
-    activationDate: "2023-03-10",
-    payout: 100,
-  },
-];
+// const data: DisplayReferralItem[] = [
+//   {
+//     icon: generateUsernameCircle("john_doe"),
+//     username: "john_doe",
+//     activationDate: "2023-01-01",
+//     payout: 50,
+//   },
+//   {
+//     icon: generateUsernameCircle("jane_smith"),
+//     username: "jane_smith",
+//     activationDate: "2023-02-15",
+//     payout: 75,
+//   },
+//   {
+//     icon: generateUsernameCircle("alice_jones"),
+//     username: "alice_jones",
+//     activationDate: "2023-03-10",
+//     payout: 100,
+//   },
+// ];
 
 const columns: ColumnDef<DisplayReferralItem>[] = [
   {
@@ -109,11 +110,11 @@ const columns: ColumnDef<DisplayReferralItem>[] = [
 
 export const ReferralsTable = () => {
   const table = useReactTable({
-    data,
+    data: [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
   });
 
-  return <ReusableTable table={table} onPageChange={() => {}} pageCount={3} />;
+  return <ReusableTable table={table} onPageChange={() => {}} pageCount={1000} />;
 };

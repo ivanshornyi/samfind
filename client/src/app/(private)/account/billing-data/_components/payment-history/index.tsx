@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 
 import { AuthContext } from "@/context";
 import { useGetBillingHistory } from "@/hooks/api/billing-history";
@@ -13,12 +13,13 @@ import {
 import {
   Table,
   TableBody,
-  TableCaption,
   TableHead,
   TableHeader,
   TableRow,
   TableCell
-} from "@/components/ui/table"
+} from "@/components/ui/table";
+
+import { format } from "date-fns";
 
 export const PaymentHistory = () => {
   const { user } = useContext(AuthContext);
@@ -71,6 +72,10 @@ export const PaymentHistory = () => {
     getCoreRowModel: getCoreRowModel(),
   });
 
+  const formatTimestamp = (timestamp: number) => {
+    return format(new Date(timestamp * 1000), "MMM d, yyyy");
+  }
+
   return (
     <div className="w-full mt-5 mb-[100px]">
       <Table>
@@ -79,6 +84,7 @@ export const PaymentHistory = () => {
             <TableHead className="w-[250px] uppercase text-white/60">Invoice</TableHead>
             <TableHead className="uppercase text-white/60">Invoice date</TableHead>
             <TableHead className="uppercase text-white/60">Price</TableHead>
+            <TableHead className="uppercase text-white/60">After discount</TableHead>
             <TableHead className="uppercase text-white/60">Status</TableHead>
           </TableRow>
         </TableHeader>
@@ -88,8 +94,9 @@ export const PaymentHistory = () => {
               <TableCell className="font-medium py-2">
                 <div className="py-3">{historyItem.number}</div>
               </TableCell>
-              <TableCell>{historyItem.date}</TableCell>
-              <TableCell>{historyItem.price / 100}</TableCell>
+              <TableCell>{historyItem.date && formatTimestamp(historyItem.date)}</TableCell>
+              <TableCell>${historyItem.price / 100}</TableCell>
+              <TableCell>${(historyItem?.afterDiscount ?? historyItem.price / 100) / 100}</TableCell>
               <TableCell className={`${historyItem.status === "paid" ? "text-[#4BB543]" : "text-[#FF6C6C]"} capitalize`}>{historyItem.status}</TableCell>
             </TableRow>
           ))}

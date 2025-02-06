@@ -57,7 +57,7 @@ const questionsData = [
 
 export const Questions = () => {
   return (
-    <div className="flex flex-col items-center justify-center ml-auto mr-auto font-manrope pt-[100px] sm:pt-[200px] mb-[60px] sm:mb-[100px]">
+    <div className="flex flex-col items-center justify-center ml-auto mr-auto font-manrope pt-[100px] sm:pt-[200px]">
       <div>
         <Button className="text-[#8F40E5]" variant="tetrary">
           Contact us
@@ -85,7 +85,7 @@ export const Questions = () => {
         Can’t find an answer? Chat to{" "}
         <span className="underline">our team</span>
       </p>
-      <div className="mt-[60px] sm:mt-[100px] mb-[60px] sm:mb-[120px] w-full">
+      <div className="mt-[60px] sm:mt-[100px] w-full">
         {questionsData.map((data) => (
           <QuestionDataItem
             key={data.title}

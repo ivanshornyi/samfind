@@ -2,16 +2,26 @@
 
 import { useContext } from "react";
 import { AuthContext } from "@/context";
-import { useToast } from "@/hooks";
+import { useToast, useGetUserReferralUsers } from "@/hooks";
+
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableCell
+} from "@/components/ui/table";
 
 import { Copy } from "lucide-react";
 
 import {
   BalanceInfo,
   ReferralInfo,
-  ReferralsTable,
   SharePopover,
 } from "./_components";
+
+import { format } from "date-fns";
 
 const frontendDomain = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN;
 
@@ -30,6 +40,14 @@ export default function InvitedFriends() {
       });
     }
   };
+
+  const { data: userReferralItems, isPending: isUserReferralItemsLoading } = useGetUserReferralUsers();
+  
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+
+    return format(date, "MMMM dd, yyyy");
+  }
 
   if (!user) return null;
 
@@ -73,10 +91,52 @@ export default function InvitedFriends() {
           </div>
         </div>
         <div className="hidden lg:block">
-          <BalanceInfo balance={user.discount} />
+          <BalanceInfo balance={(user.discount / 100)} />
         </div>
       </div>
-      <ReferralsTable />
+      
+      <div className="w-full mt-5 mb-[100px]">
+        <Table>
+          <TableHeader className="hover:bg-transparent">
+            <TableRow className="border-white/30 hover:bg-transparent">
+              <TableHead className="w-[80px]"></TableHead>
+              <TableHead className="uppercase text-white/60">Name</TableHead>
+              <TableHead className="uppercase text-white/60">Date of activation</TableHead>
+              <TableHead className="uppercase text-white/60">Payout</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {userReferralItems?.map((referralUser) => (
+              <TableRow key={referralUser.userId} className="border-none hover:bg-transparent">
+                <TableCell>
+                  <div className="py-3">
+                    <div className="bg-card w-[50px] h-[50px] rounded-full flex items-center justify-center text-2xl text-blue-50">
+                      <span>{referralUser.name[0]}</span>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>{referralUser.name}</TableCell>
+                <TableCell>{referralUser.activationDate && formatDate(referralUser.activationDate)}</TableCell>
+                <TableCell>
+                  <p className="text-[#4BB543]">{(referralUser.amount / 100).toFixed(2)}</p>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+
+        {!isUserReferralItemsLoading && userReferralItems?.length === 0 && (
+          <div className="py-[50px]">
+            <p className="text-center text-white/60 w-full">This is where your income from registrations will be displayed</p>
+          </div>
+        )}
+
+        {isUserReferralItemsLoading && (
+          <div className="py-[50px] text-center">
+            <p>Loading...</p>
+          </div>
+        )}
+      </div>
     </>
   );
 }

@@ -21,7 +21,7 @@ export const BalanceInfo = ({ balance }: { balance: number }) => (
       </Popover.Portal>
     </Popover.Root>
     <p className="text-2xl sm:text-[32px] sm:leading-[43px] font-semibold text-[#CE9DF3] text-nowrap mb-2 md:mb-4 md:mt-2">
-      $ {balance}
+      $ {balance.toFixed(2)}
     </p>
     <p className="text-base md:text-xl font-normal text-nowrap">
       Your discount
