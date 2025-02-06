@@ -51,10 +51,6 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
       payment = {
         ...payment,
         userReferralCode: user.invitedReferralCode,
-        discount: {
-          amount: plan.price * quantity,
-          description: "Referral discount",
-        },
       };
     }
 
