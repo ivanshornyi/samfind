@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui";
 import { ArrowUpRight, HomeIntro, HomeIntroMobile } from "@public/home";
 import Image from "next/image";
+import Link from "next/link";
 
 export const Intro = () => {
   return (
@@ -18,12 +19,14 @@ export const Intro = () => {
               <h2>every interaction.</h2>
             </div> */}
           <div className="w-full sm:w-fit gap-[10px] sm:gap-0 flex flex-col sm:flex-row items-center">
-            <Button
-              variant="default"
-              className="w-full sm:w-[250px] h-[44px] rounded-[30px] text-xl font-medium text-[#8F40E5] border-[#A64CE8]"
-            >
-              Download Now
-            </Button>
+            <Link href="/download-app">
+              <Button
+                variant="default"
+                className="w-full sm:w-[250px] h-[44px] rounded-[30px] text-xl font-medium text-[#8F40E5] border-[#A64CE8]"
+              >
+                Download Now
+              </Button>
+            </Link>
             <button className="w-[250px] h-[44px] flex justify-center items-center gap-[5px] text-2xl font-medium">
               <span>Try Demo</span>
               <Image
