@@ -57,6 +57,16 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
     paySubscriptionMutation(payment);
   };
 
+  const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = Number(event.target.value);
+
+    if (newValue < 1 || isNaN(newValue)) {
+      setQuantity(1); 
+    } else {
+      setQuantity(newValue);
+    }
+  };
+
   const formatPrice = (price: number) => {
     if (plan.period === "yearly") {
       return (price / 100 / 12).toFixed(2);
@@ -89,7 +99,7 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
               min={1}
               className="w-[80px] rounded-xl px-4 py-2 bg-background text-center" 
               value={quantity}
-              onChange={(event) => setQuantity(Number(event.target.value))}
+              onChange={handleQuantityChange}
             />
           </div>
 
