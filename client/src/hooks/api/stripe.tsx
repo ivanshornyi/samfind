@@ -41,11 +41,13 @@ export const useConfirmPayment = () => {
           toast({
             title: "Error",
             description: response.error.message,
+            variant: "destructive",
           });
         } else {
           toast({
             title: "Success",
             description: "Successfully paid",
+            variant: "default",
           });
         }
       } catch (error) {

@@ -37,6 +37,7 @@ export default function InvitedFriends() {
 
       toast({
         description: "Copied",
+        variant: "default",
       });
     }
   };

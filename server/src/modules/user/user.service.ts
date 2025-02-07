@@ -320,9 +320,56 @@ export class UserService {
     });
 
     if (!subscription) {
+      console.log("no subscription")
       throw new NotFoundException("Subscription was not found");
     }
+<<<<<<< Updated upstream
     return subscription;
+=======
+
+    console.log(subscription.planId);
+
+    const plan = await this.prisma.plan.findUnique({
+      where: {
+        id: subscription.planId,
+      },
+      select: {
+        type: true,
+        period: true,
+        price: true,
+      },
+    });
+
+    if (!plan) {
+      throw new NotFoundException("Plan is not found");
+    }
+
+    const license = await this.prisma.license.findUnique({
+      where: {
+        ownerId: userId,
+      },
+      select: {
+        limit: true,
+        tierType: true,
+      },
+    });
+
+    if (!license) {
+      throw new NotFoundException("License is not found");
+    }
+
+    return {
+      subscription: {
+        ...subscription,
+      },
+      plan: {
+        ...plan,
+      },
+      license: {
+        ...license,
+      },
+    };
+>>>>>>> Stashed changes
   }
 
   private hashPassword(password: string): string {

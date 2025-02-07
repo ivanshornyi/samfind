@@ -47,6 +47,10 @@ export default {
           DEFAULT: "var(--tetrary-background)",
           foreground: "var(--tetrary-background)",
         },
+        toast: {
+          DEFAULT: "var(--toast-success-background)",
+          destructive: "var(--toast-destructive-background)",
+        },
         link: {
           DEFAULT: "var(--primary)",
           hover: "var(--link-hover)",

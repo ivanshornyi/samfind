@@ -27,6 +27,7 @@ export const useSignIn = () => {
       toast({
         title: "Success",
         description: "Successfully logged in",
+        variant: "default",
       });
 
       login(data.accessToken, data.refreshToken);
