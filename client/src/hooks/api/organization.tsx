@@ -18,7 +18,7 @@ export const useUpdateOrganization = () => {
       toast({
         title: "Success",
         description: "Successfully updated",
-        variant: "default",
+        variant: "success",
       });
     },
     onError: (error) => {

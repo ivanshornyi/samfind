@@ -58,7 +58,7 @@ export const useUpdateUserLicense = () => {
       toast({
         title: "Success",
         description: "Successfully updated",
-        variant: "default",
+        variant: "success",
       });
     },
     onError: (error) => {
@@ -83,7 +83,7 @@ export const useDeleteMemberFromLicense = () => {
       toast({
         title: "Success",
         description: "Member deleted",
-        variant: "default",
+        variant: "success",
       });
 
       queryClient.invalidateQueries({
