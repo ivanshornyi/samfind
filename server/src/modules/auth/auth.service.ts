@@ -69,6 +69,12 @@ export class AuthService {
       authType,
     );
 
+    if (existingUser && existingUser.isDeleted) {
+      throw new ConflictException(
+        "User with this email was deleted. Please register with other email",
+      );
+    }
+
     if (existingUser && existingUser.isVerified) {
       throw new ConflictException(
         "User with this email already exists and verified",
