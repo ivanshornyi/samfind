@@ -51,10 +51,7 @@ import {
   Info,
   MoreHorizontal,
   Search,
-  User,
 } from "lucide-react";
-
-import { format } from "date-fns";
 
 const frontendDomain = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN;
 
@@ -235,7 +232,7 @@ export default function License() {
   const { data: invitedUserData } = useGetInvitedUserInfo();
 
   const itemsPerPage = 10;
-  const pageCount = Math.ceil(userLicense?.users?.length ?? 0 / itemsPerPage);
+  const pageCount = Math.ceil((userLicense?.users?.length ?? 0) / itemsPerPage);
 
   const handleCopyInvitation = () => {
     if (user && userRoleSubscriptionInfo) {
@@ -256,12 +253,6 @@ export default function License() {
       });
     }
   };
-
-  // const formatDate = (dateString: string) => {
-  //   const date = new Date(dateString);
-
-  //   return format(date, "MMMM dd, yyyy");
-  // }
 
   useEffect(() => {
     if (userLicense?.users && user) {
@@ -356,7 +347,9 @@ export default function License() {
                   <ReusableTable
                     table={table}
                     isLoading={isUserLicensesPending}
-                    onPageChange={(page: number) => setCurrentPage(page)}
+                    onPageChange={(page: number) => {
+                      setCurrentPage(page);
+                    }}
                     pageCount={pageCount}
                     noDataMessage="No licenses found."
                   />

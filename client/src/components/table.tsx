@@ -31,7 +31,7 @@ export const ReusableTable = <T extends RowData>({
 }: ReusableTableProps<T>) => {
   return (
     <div>
-      <Table className="w-full max-w-[1064px]">
+      <Table className="w-[600px] md:w-full max-w-[1064px]">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow
@@ -87,12 +87,12 @@ export const ReusableTable = <T extends RowData>({
           )}
         </TableBody>
       </Table>
-      {/* {pageCount > 1 && (
+      {pageCount > 1 && (
         <ReactPaginate
           breakLabel="..."
           nextLabel={<ChevronRight />}
           previousLabel={<ChevronLeft />}
-          onPageChange={(e) => onPageChange(e.selected)}
+          onPageChange={(e) => onPageChange(e.selected + 1)}
           pageRangeDisplayed={2}
           marginPagesDisplayed={2}
           pageCount={pageCount}
@@ -104,7 +104,7 @@ export const ReusableTable = <T extends RowData>({
           breakClassName="px-3 py-1 bg-transparent text-[#A8A8A8] rounded-md"
           disabledClassName="bg-transparent text-slate-600 cursor-not-allowed"
         />
-      )} */}
+      )}
     </div>
   );
 };
