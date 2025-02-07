@@ -28,10 +28,12 @@ export default function BillingData() {
   };
 
   return (
-    <div className="w-full text-white">
-      <div className="space-y-8">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-4xl font-semibold">Plans and Billing</h1>
+    <div className="w-full text-white px-4 sm:px-6 lg:px-0">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+        <div className="flex items-center justify-between mb-4 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold">
+            Plans and Billing
+          </h1>
         </div>
 
         <div>
@@ -40,40 +42,50 @@ export default function BillingData() {
             !isUserSubscriptionInfoPending &&
             userSubscriptionInfo &&
             userLicense.tierType !== "freemium" && (
-              <SubscriptionDetails
-                plan={`${userSubscriptionInfo.plan?.type} ${userSubscriptionInfo.plan?.period}`}
-                status="Active subscription"
-                renewalDate={
-                  userSubscriptionInfo?.nextDate
-                    ? formatDate(userSubscriptionInfo.nextDate)
-                    : "no date"
-                }
-                price={userSubscriptionInfo.plan?.price / 100}
-                billingPeriod={`month billed ${userSubscriptionInfo.plan?.period}`}
-                members={{
-                  admin: 1,
-                  regular:
-                    userSubscriptionInfo.license?._count.activeLicenses - 1,
-                }}
-              />
+              <div className="w-full overflow-x-auto">
+                <SubscriptionDetails
+                  plan={`${userSubscriptionInfo.plan?.type} ${userSubscriptionInfo.plan?.period}`}
+                  status="Active subscription"
+                  renewalDate={
+                    userSubscriptionInfo.subscription?.nextDate
+                      ? formatDate(userSubscriptionInfo.subscription.nextDate)
+                      : "no date"
+                  }
+                  price={userSubscriptionInfo.plan?.price / 100}
+                  billingPeriod={`month billed ${userSubscriptionInfo.plan?.period}`}
+                  members={{
+                    admin: 1,
+                    regular:
+                      userSubscriptionInfo.license?._count.activeLicenses - 1,
+                  }}
+                />
+              </div>
             )}
 
           {plans &&
             !isPlansPending &&
             (!userLicense || userLicense.tierType === "freemium") && (
-              <div className="flex gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                 {plans?.map((plan) => (
-                  <PricingCard key={plan.id} plan={plan} />
+                  <div key={plan.id} className="flex">
+                    <PricingCard plan={plan} />
+                  </div>
                 ))}
               </div>
             )}
         </div>
 
-        <div>
-          <div className="flex items-center gap-4 mt-6">
-            <h2 className="text-3xl">Payment history</h2>
+        <div className="mt-8 sm:mt-12">
+          <div className="flex items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold">
+              Payment history
+            </h2>
           </div>
-          <PaymentHistory />
+          <div className="w-full overflow-x-auto">
+            <div className="min-w-[600px]">
+              <PaymentHistory />
+            </div>
+          </div>
         </div>
       </div>
     </div>
