@@ -304,56 +304,25 @@ export class UserService {
         userId,
       },
       select: {
-        isActive: true,
+        id: true,
         nextDate: true,
-        planId: true,
+        plan: true,
+        license: {
+          select: {
+            limit: true,
+            tierType: true,
+            _count: {
+              select: { activeLicenses: true },
+            },
+          },
+        },
       },
     });
 
     if (!subscription) {
       throw new NotFoundException("Subscription was not found");
     }
-
-    const plan = await this.prisma.plan.findUnique({
-      where: {
-        id: subscription.planId,
-      },
-      select: {
-        type: true,
-        period: true,
-        price: true,
-      },
-    });
-
-    if (!plan) {
-      throw new NotFoundException("Plan is not found");
-    }
-
-    const license = await this.prisma.license.findUnique({
-      where: {
-        ownerId: userId,
-      },
-      select: {
-        limit: true,
-        tierType: true,
-      },
-    });
-
-    if (!license) {
-      throw new NotFoundException("License is not found");
-    }
-
-    return {
-      subscription: {
-        ...subscription,
-      },
-      plan: {
-        ...plan,
-      },
-      license: {
-        ...license,
-      },
-    };
+    return subscription;
   }
 
   private hashPassword(password: string): string {

@@ -310,7 +310,11 @@ export default function License() {
                   <div className="mt-6 flex justify-between items-end">
                     <ProgressChart
                       currentMembers={userLicense.users.length}
-                      maxMembers={userLicense.limit}
+                      maxMembers={
+                        userLicense.limit > userLicense.users.length
+                          ? userLicense.limit
+                          : userLicense.users.length
+                      }
                     />
                     <div className="flex items-center gap-6">
                       <button
