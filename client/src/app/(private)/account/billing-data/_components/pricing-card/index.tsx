@@ -4,12 +4,13 @@ import {
   CardContent,
   CardFooter,
   CardHeader,
-} from "@/components/ui";
+  FullScreenLoader,
+} from "@/components";
 import { AuthContext } from "@/context";
 import { usePaySubscription } from "@/hooks";
 import { CreatePaymentData } from "@/services";
 import { Plan } from "@/types";
-import { Check, Minus, Plus } from "lucide-react";
+import { Check } from "lucide-react";
 import { useContext, useState } from "react";
 
 interface PricingCardProps {
@@ -57,20 +58,31 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
     paySubscriptionMutation(payment);
   };
 
+  const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = Number(event.target.value);
+
+    if (newValue < 1 || isNaN(newValue)) {
+      setQuantity(1);
+    } else {
+      setQuantity(newValue);
+    }
+  };
+
   const formatPrice = (price: number) => {
     if (plan.period === "yearly") {
       return (price / 100 / 12).toFixed(2);
     }
-    
+
     return (price / 100).toFixed(2);
   };
 
   return (
     <Card
-      className={`relative border-none rounded-3xl overflow-hidden w-[360px] ${
+      className={`relative border-none rounded-3xl overflow-hidden w-[360px] flex-1 ${
         plan.price === 225 ? "bg-[#28282C]" : "bg-[#292832]"
       }`}
     >
+      {isPaySubscriptionPending && <FullScreenLoader />}
       <CardHeader className="space-y-4">
         <h3 className="text-2xl font-semibold capitalize">
           {plan.type} {plan.period}
@@ -84,12 +96,12 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
         <div className="mb-8">
           <div className="flex items-center gap-2 mt-3">
             <label>Quantity</label>
-            <input 
+            <input
               type="number"
               min={1}
-              className="w-[80px] rounded-xl px-4 py-2 bg-background text-center" 
+              className="w-[80px] rounded-xl px-4 py-2 bg-background text-center"
               value={quantity}
-              onChange={(event) => setQuantity(Number(event.target.value))}
+              onChange={handleQuantityChange}
             />
           </div>
 

@@ -4,11 +4,11 @@ export const FullScreenLoader = () => {
   return (
     <div
       className="
-        fixed left-0 top-0 h-[100dvh] w-full bg-gray-500/50
+        fixed left-0 top-0 h-[100dvh] w-full bg-black/80
         flex items-center justify-center z-40
       "
     >
-      <LoaderCircle size={40} className="text-gray-800 animate-spin" />
+      <LoaderCircle size={40} className="animate-spin" />
     </div>
   );
 };

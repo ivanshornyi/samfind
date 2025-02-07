@@ -36,6 +36,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Input,
+  UserAccountTypeBox,
 } from "@/components";
 
 import { ReusableTable } from "@/components/table";
@@ -50,10 +51,7 @@ import {
   Info,
   MoreHorizontal,
   Search,
-  User,
 } from "lucide-react";
-
-import { format } from "date-fns";
 
 const frontendDomain = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN;
 
@@ -225,7 +223,6 @@ export default function License() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  // const [isModalOpen, setIs]
 
   const { data: userLicense, isPending: isUserLicensesPending } =
     useGetUserLicenses();
@@ -235,17 +232,17 @@ export default function License() {
   const { data: invitedUserData } = useGetInvitedUserInfo();
 
   const itemsPerPage = 10;
-  const pageCount = Math.ceil(userLicense?.users?.length ?? 0 / itemsPerPage);
+  const pageCount = Math.ceil((userLicense?.users?.length ?? 0) / itemsPerPage);
 
   const handleCopyInvitation = () => {
-    if (user) {
+    if (user && userRoleSubscriptionInfo) {
       let link = `${frontendDomain}/auth/sign-up?accountType=private`;
 
       if (user.organizationId) {
         link = `${link}&orgId=${user.organizationId}`;
       }
 
-      if (userLicense) {
+      if (userLicense && !userRoleSubscriptionInfo.organizationOwner) {
         link = `${link}&lId=${userLicense.id}`;
       }
 
@@ -253,15 +250,10 @@ export default function License() {
 
       toast({
         description: "Copied",
+        variant: "default",
       });
     }
   };
-
-  // const formatDate = (dateString: string) => {
-  //   const date = new Date(dateString);
-
-  //   return format(date, "MMMM dd, yyyy");
-  // }
 
   useEffect(() => {
     if (userLicense?.users && user) {
@@ -316,10 +308,14 @@ export default function License() {
               !isUserLicensesPending &&
               !isUserLicensesPending && (
                 <>
-                  <div className="mt-6 flex justify-between items-end">
+                  <div className="mt-6 flex flex-wrap gap-2 justify-between items-end">
                     <ProgressChart
                       currentMembers={userLicense.users.length}
-                      maxMembers={userLicense.limit}
+                      maxMembers={
+                        userLicense.limit > userLicense.users.length
+                          ? userLicense.limit
+                          : userLicense.users.length
+                      }
                     />
                     <div className="flex items-center gap-6">
                       <button
@@ -332,7 +328,7 @@ export default function License() {
                     </div>
                   </div>
                   <div className="flex items-center justify-end py-4">
-                    <div className="w-[308px] relative">
+                    <div className="w-full relative sm:w-[308px]">
                       <Input
                         placeholder="Search"
                         value={
@@ -345,7 +341,7 @@ export default function License() {
                             .getColumn("name")
                             ?.setFilterValue(event.target.value)
                         }
-                        className="max-w-sm bg-card"
+                        className="bg-card"
                       />
                       <div className="absolute right-6 top-0 h-full flex justify-center items-center">
                         <Search size={24} />
@@ -356,7 +352,9 @@ export default function License() {
                   <ReusableTable
                     table={table}
                     isLoading={isUserLicensesPending}
-                    onPageChange={(page: number) => setCurrentPage(page)}
+                    onPageChange={(page: number) => {
+                      setCurrentPage(page);
+                    }}
                     pageCount={pageCount}
                     noDataMessage="No licenses found."
                   />
@@ -370,7 +368,8 @@ export default function License() {
             <div
               className="
                 flex justify-between items-center rounded-[20px] 
-                p-6 bg-violet-200/10
+                p-6 mt-[60px]
+                bg-gradient-to-r from-transparent to-violet-600
               "
             >
               <div>
@@ -395,10 +394,9 @@ export default function License() {
               <div
                 className="
                   flex justify-between items-center rounded-[20px] 
-                  p-6 bg-violet-200/10
+                  p-6 bg-gradient-to-r from-transparent to-violet-600
                 "
               >
-                {/* bg-gradient-to-r from-[#8F40E5] to-[#6E40E5] */}
                 <div>
                   <h2 className="text-xl font-semibold">
                     Upgrade your subscription and unlock more features!
@@ -413,10 +411,7 @@ export default function License() {
                 </Link>
               </div>
 
-              <div className="capitalize text-blue-50 flex items-center justify-center gap-2 bg-card rounded-full px-3 py-2  w-[200px]">
-                <User size={18} />
-                {user?.accountType} Account
-              </div>
+              <UserAccountTypeBox />
 
               <div>
                 <p className="text-xl">Plan</p>
@@ -448,10 +443,7 @@ export default function License() {
 
         {userRoleSubscriptionInfo?.invitedUser && (
           <div className="mt-4">
-            <div className="capitalize text-blue-50 flex items-center justify-center gap-2 bg-card rounded-full px-3 py-2 w-[200px]">
-              <User size={18} />
-              {user?.accountType} Account
-            </div>
+            <UserAccountTypeBox />
 
             <div className="flex justify-between items-start mt-4">
               <div className="p-4 rounded-lg bg-card w-[330px]">

@@ -1,6 +1,8 @@
 "use client";
 
-import { Button, FullScreenLoader, Input } from "@/components";
+import React, { useContext, useEffect, useState } from "react";
+
+import { Button, FullScreenLoader, Input, UserAccountTypeBox } from "@/components";
 import { AuthContext } from "@/context";
 import { useToast } from "@/hooks";
 import {
@@ -9,9 +11,10 @@ import {
 } from "@/hooks/api/organization";
 import { useUpdateUser } from "@/hooks/api/user";
 import { useQueryClient } from "@tanstack/react-query";
-import { Plus, User, X } from "lucide-react";
-import React, { useContext, useEffect, useState } from "react";
+
 import { DeleteAccount } from "./_components";
+
+import { Plus, X } from "lucide-react";
 
 export default function Settings() {
   const { toast } = useToast();
@@ -228,16 +231,14 @@ export default function Settings() {
       {(isUpdateUserPending ||
         userLoading ||
         isOrganizationLoading ||
-        isUpdateOrganizationPending) && <FullScreenLoader />}
+        isUpdateOrganizationPending) && <FullScreenLoader />
+      }
       <div className="w-full">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full">
           <h2 className="text-2xl sm:text-[32px] leading-[44px] font-semibold mb-4 sm:mb-0">
             Profile settings
           </h2>
-          <div className="text-link-hover flex gap-2 items-center border-none border-r-[20px] p-[10px] px-[26px] rounded-3xl bg-[#242424]">
-            <User size={17} />
-            <span className="capitalize">{user?.accountType} Account</span>
-          </div>
+          <UserAccountTypeBox />
         </div>
         <div className="mt-8 sm:mt-[77px]">
           <h3 className="text-[20px] leading-[27px] font-semibold">

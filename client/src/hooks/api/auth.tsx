@@ -27,10 +27,12 @@ export const useSignIn = () => {
       toast({
         title: "Success",
         description: "Successfully logged in",
+        variant: "default",
       });
 
       login(data.accessToken, data.refreshToken);
-      router.push("/account/home");
+
+      setTimeout(() => router.push("/account/license"), 100);
     },
     onError: (error) => {
       handleToastError(error, toast);
@@ -192,7 +194,7 @@ export const useVerifyUser = () => {
       localStorage.removeItem("licenseId");
       localStorage.removeItem("organizationId");
 
-      router.push("/account/home");
+      setTimeout(() => router.push("/account/license"), 100);
     },
     onError: (error) => {
       handleToastError(error, toast);

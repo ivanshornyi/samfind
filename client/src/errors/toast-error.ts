@@ -5,5 +5,6 @@ export const handleToastError = (error: unknown, toast: any) => {
   toast({
     title: "Error",
     description: errorMessage,
+    variant: "destructive",
   });
 };

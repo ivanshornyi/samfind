@@ -75,19 +75,21 @@ export interface InvitedUserInfo {
     ownerId: string;
     tierType: LicenseTierType;
     updatedAt: string;
-  },
+  };
   licenseOwner: {
     id: string;
     email: string;
     firstName: string;
     lastName: string;
     organizationId: string | null;
-  }
+  };
 }
 
 const getInvitedUserInfo = async (userId: string) => {
   try {
-    const response = await apiClient.get(`/user/find-invited-user/info/${userId}`);
+    const response = await apiClient.get(
+      `/user/find-invited-user/info/${userId}`
+    );
 
     return response.data as InvitedUserInfo;
   } catch (error) {
@@ -96,20 +98,18 @@ const getInvitedUserInfo = async (userId: string) => {
 };
 
 interface UserSubscriptionInfo {
-  subscription: {
-    isActive: boolean;
-    nextDate: string;
-    planId: string;
-  },
+  isActive: boolean;
+  nextDate: string;
   plan: {
     type: LicenseTierType;
     period: PlanPeriod;
     price: number;
-  },
+  };
   license: {
     limit: number;
     tierType: LicenseTierType;
-  }
+    _count: { activeLicenses: number };
+  };
 }
 
 const getUserSubscriptionInfo = async (userId: string) => {
