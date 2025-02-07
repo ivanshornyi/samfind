@@ -32,6 +32,7 @@ export const SubscriptionDetails = ({
 }: SubscriptionDetailsProps) => {
   const { user } = useContext(AuthContext);
   // const [isManageModalOpen, setIsManageModalOpen] = useState(false);
+  // add fullscreen loader
 
   return (
     <div className="flex flex-col space-y-4">

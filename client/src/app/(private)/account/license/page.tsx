@@ -370,9 +370,11 @@ export default function License() {
             <div
               className="
                 flex justify-between items-center rounded-[20px] 
-                p-6 bg-violet-200/10
+                p-6 mt-[60px]
+                bg-gradient-to-r from-transparent to-violet-600
               "
             >
+              
               <div>
                 <h2 className="text-xl font-semibold">
                   Upgrade your subscription and unlock more features!
@@ -395,10 +397,9 @@ export default function License() {
               <div
                 className="
                   flex justify-between items-center rounded-[20px] 
-                  p-6 bg-violet-200/10
+                  p-6 bg-gradient-to-r from-transparent to-violet-600
                 "
               >
-                {/* bg-gradient-to-r from-[#8F40E5] to-[#6E40E5] */}
                 <div>
                   <h2 className="text-xl font-semibold">
                     Upgrade your subscription and unlock more features!

@@ -26,7 +26,7 @@ export default function BillingData() {
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-4xl font-semibold">Plans and Billing</h1>
         </div>
-
+        
         <div>
           {!isUserLicensePending && userLicense && !isUserSubscriptionInfoPending && userSubscriptionInfo && userLicense.tierType !== "freemium" && (
             <SubscriptionDetails

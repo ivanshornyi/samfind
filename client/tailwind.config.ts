@@ -66,6 +66,7 @@ export default {
           "300": "#713FA5",
           "400": "#501A88",
           "500": "#26123A",
+          "600": "#351B936E",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
