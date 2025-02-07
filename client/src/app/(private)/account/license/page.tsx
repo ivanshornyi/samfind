@@ -36,6 +36,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Input,
+  UserAccountTypeBox,
 } from "@/components";
 
 import { ReusableTable } from "@/components/table";
@@ -225,7 +226,6 @@ export default function License() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  // const [isModalOpen, setIs]
 
   const { data: userLicense, isPending: isUserLicensesPending } =
     useGetUserLicenses();
@@ -245,7 +245,7 @@ export default function License() {
         link = `${link}&orgId=${user.organizationId}`;
       }
 
-      if (userLicense) {
+      if (userLicense && !userRoleSubscriptionInfo?.organizationOwner) {
         link = `${link}&lId=${userLicense.id}`;
       }
 
@@ -374,7 +374,6 @@ export default function License() {
                 bg-gradient-to-r from-transparent to-violet-600
               "
             >
-              
               <div>
                 <h2 className="text-xl font-semibold">
                   Upgrade your subscription and unlock more features!
@@ -414,10 +413,7 @@ export default function License() {
                 </Link>
               </div>
 
-              <div className="capitalize text-blue-50 flex items-center justify-center gap-2 bg-card rounded-full px-3 py-2  w-[200px]">
-                <User size={18} />
-                {user?.accountType} Account
-              </div>
+              <UserAccountTypeBox />
 
               <div>
                 <p className="text-xl">Plan</p>
@@ -449,10 +445,7 @@ export default function License() {
 
         {userRoleSubscriptionInfo?.invitedUser && (
           <div className="mt-4">
-            <div className="capitalize text-blue-50 flex items-center justify-center gap-2 bg-card rounded-full px-3 py-2 w-[200px]">
-              <User size={18} />
-              {user?.accountType} Account
-            </div>
+            <UserAccountTypeBox />
 
             <div className="flex justify-between items-start mt-4">
               <div className="p-4 rounded-lg bg-card w-[330px]">
