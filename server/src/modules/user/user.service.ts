@@ -299,14 +299,6 @@ export class UserService {
   }
 
   async findUserSubscriptionInfo(userId: string) {
-    // get subscription
-    // plan (type, period), price, members count (license limit) (get from user subscription)
-    const user = await this.prisma.user.findUnique({
-      where: {
-        id: userId,
-      }
-    });
-
     const subscription = await this.prisma.subscription.findUnique({
       where: {
         userId,
@@ -317,6 +309,10 @@ export class UserService {
         planId: true,
       }
     });
+
+    if (!subscription) {
+      throw new NotFoundException("Subscription was not found");
+    }
 
     const plan = await this.prisma.plan.findUnique({
       where: {
@@ -329,6 +325,10 @@ export class UserService {
       }
     });
 
+    if (!plan) {
+      throw new NotFoundException("Plan is not found");
+    }
+
     const license = await this.prisma.license.findUnique({
       where: {
         ownerId: userId,
@@ -338,6 +338,10 @@ export class UserService {
         tierType: true,
       }
     });
+
+    if (!license) {
+      throw new NotFoundException("License is not found");
+    }
 
     return {
       subscription: {
