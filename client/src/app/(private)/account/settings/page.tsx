@@ -231,7 +231,8 @@ export default function Settings() {
       {(isUpdateUserPending ||
         userLoading ||
         isOrganizationLoading ||
-        isUpdateOrganizationPending) && <FullScreenLoader />}
+        isUpdateOrganizationPending) && <FullScreenLoader />
+      }
       <div className="w-full">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full">
           <h2 className="text-2xl sm:text-[32px] leading-[44px] font-semibold mb-4 sm:mb-0">

@@ -4,12 +4,13 @@ import {
   CardContent,
   CardFooter,
   CardHeader,
-} from "@/components/ui";
+  FullScreenLoader,
+} from "@/components";
 import { AuthContext } from "@/context";
 import { usePaySubscription } from "@/hooks";
 import { CreatePaymentData } from "@/services";
 import { Plan } from "@/types";
-import { Check, Minus, Plus } from "lucide-react";
+import { Check } from "lucide-react";
 import { useContext, useState } from "react";
 
 interface PricingCardProps {
@@ -81,6 +82,7 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
         plan.price === 225 ? "bg-[#28282C]" : "bg-[#292832]"
       }`}
     >
+      {isPaySubscriptionPending && <FullScreenLoader />}
       <CardHeader className="space-y-4">
         <h3 className="text-2xl font-semibold capitalize">
           {plan.type} {plan.period}

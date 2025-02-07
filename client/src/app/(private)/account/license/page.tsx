@@ -238,14 +238,14 @@ export default function License() {
   const pageCount = Math.ceil(userLicense?.users?.length ?? 0 / itemsPerPage);
 
   const handleCopyInvitation = () => {
-    if (user) {
+    if (user && userRoleSubscriptionInfo) {
       let link = `${frontendDomain}/auth/sign-up?accountType=private`;
 
       if (user.organizationId) {
         link = `${link}&orgId=${user.organizationId}`;
       }
 
-      if (userLicense && !userRoleSubscriptionInfo?.organizationOwner) {
+      if (userLicense && !userRoleSubscriptionInfo.organizationOwner) {
         link = `${link}&lId=${userLicense.id}`;
       }
 
