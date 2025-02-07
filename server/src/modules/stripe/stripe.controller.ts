@@ -1,11 +1,11 @@
-import { 
-  Controller, 
-  Post, 
+import {
+  Controller,
+  Post,
   Body,
   Req,
   Res,
-  HttpException, 
-  HttpStatus, 
+  HttpException,
+  HttpStatus,
   RawBodyRequest,
 } from "@nestjs/common";
 
@@ -42,14 +42,27 @@ export class StripeController {
   async createWebhook(@Req() req: RawBodyRequest<Request>) {
     const sig = req.headers["stripe-signature"];
 
+    if (!sig) {
+      throw new HttpException(
+        "Missing stripe-signature",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const rawBody = req.rawBody;
 
+    if (!rawBody) {
+      throw new HttpException("Missing rawBody", HttpStatus.BAD_REQUEST);
+    }
+
+    const whSecret = this.configService.get("WEBHOOK_SECRET");
+
+    if (!whSecret) {
+      throw new HttpException("Missing secret", HttpStatus.BAD_REQUEST);
+    }
+
     try {
-      const event = this.stripeService.constructEvent(
-        rawBody,
-        sig,
-        this.configService.get("WEBHOOK_SECRET"),
-      );
+      const event = this.stripeService.constructEvent(rawBody, sig, whSecret);
 
       await this.stripeService.handleEvent(event);
     } catch (err) {
