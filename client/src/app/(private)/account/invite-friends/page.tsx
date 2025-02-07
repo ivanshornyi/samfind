@@ -62,7 +62,7 @@ export default function InvitedFriends() {
               Invite a Friend
             </h2>
             <div className="lg:hidden">
-              <BalanceInfo balance={user.discount} />
+              <BalanceInfo balance={user.discount / 100} />
             </div>
           </div>
           <ReferralInfo />
