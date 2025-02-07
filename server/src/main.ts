@@ -1,6 +1,5 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
-import * as express from "express";
 import { ValidationPipe } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
@@ -39,14 +38,6 @@ async function bootstrap() {
     }),
   );
   app.use(helmet());
-
-  app.use(
-    express.json({
-      verify: (req: any, res, buf) => {
-        req.rawBody = buf.toString();
-      },
-    }),
-  );
 
   setupSwagger(app);
 
