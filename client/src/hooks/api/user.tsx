@@ -68,8 +68,8 @@ export const useGetUserSubscriptionInfo = () => {
   const { user } = useContext(AuthContext);
 
   return useQuery({
-    queryFn: () => UserApiService.getUserSubscriptionInfo(user?.id ?? ""),
-    queryKey: ["invited-user-info"],
+    queryFn: () => user?.id ? UserApiService.getUserSubscriptionInfo(user?.id) : null,
+    queryKey: ["subscription-user-info"],
     enabled: !!user?.id,
     // staleTime: 5_000_000,
   });

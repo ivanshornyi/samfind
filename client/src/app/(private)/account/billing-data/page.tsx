@@ -14,6 +14,8 @@ export default function BillingData() {
 
   const { data: userSubscriptionInfo, isPending: isUserSubscriptionInfoPending } = useGetUserSubscriptionInfo();
 
+  console.log(userSubscriptionInfo);
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
 

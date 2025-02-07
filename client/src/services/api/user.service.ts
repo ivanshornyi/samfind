@@ -116,6 +116,8 @@ const getUserSubscriptionInfo = async (userId: string) => {
   try {
     const response = await apiClient.get(`/user/subscription-info/${userId}`);
 
+    console.log("get subscription info")
+
     return response.data as UserSubscriptionInfo;
   } catch (error) {
     handleApiError(error);
