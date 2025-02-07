@@ -302,12 +302,12 @@ export class UserService {
     const subscription = await this.prisma.subscription.findUnique({
       where: {
         userId,
-      }, 
+      },
       select: {
         isActive: true,
         nextDate: true,
         planId: true,
-      }
+      },
     });
 
     if (!subscription) {
@@ -322,7 +322,7 @@ export class UserService {
         type: true,
         period: true,
         price: true,
-      }
+      },
     });
 
     if (!plan) {
@@ -336,7 +336,7 @@ export class UserService {
       select: {
         limit: true,
         tierType: true,
-      }
+      },
     });
 
     if (!license) {
@@ -352,7 +352,7 @@ export class UserService {
       },
       license: {
         ...license,
-      }
+      },
     };
   }
 

@@ -332,9 +332,6 @@ export class StripeService {
             id: subscription.userId,
           },
           data: {
-            discount:
-              subscription.user.discount +
-              Math.round(subscription.plan.price / 10),
             invitedReferralCode: null,
           },
         });
@@ -422,7 +419,7 @@ export class StripeService {
         await this.prisma.user.update({
           where: { id: subscription.user.id },
           data: {
-            discount: subscription.user.discount - Number(discountAmount),
+            discount: { decrement: Number(discountAmount) },
           },
         });
       }
@@ -548,7 +545,7 @@ export class StripeService {
     await this.prisma.user.update({
       where: { id: user.id },
       data: {
-        discount: user.discount + discountAmount,
+        discount: { increment: discountAmount },
       },
     });
   }
