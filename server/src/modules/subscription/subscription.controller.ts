@@ -35,4 +35,10 @@ export class SubscriptionController {
   async payInvoice() {
     return this.subscriptionService.payInvoice();
   }
+
+  @ApiOperation({ summary: "Cancel Subscription" })
+  @Post("/cancel/:id")
+  async deleteUser(@Param("id") id: string) {
+    return this.subscriptionService.cancelSubscription(id);
+  }
 }

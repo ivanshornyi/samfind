@@ -96,10 +96,4 @@ export class UserLicenseController {
   ) {
     return this.licenseService.deleteMemberFromLicense(id, memberId);
   }
-
-  @ApiOperation({ summary: "Cancel License" })
-  @Post("/cancel/:id")
-  async deleteUser(@Param("id") id: string) {
-    return this.licenseService.cancelLicense(id);
-  }
 }
