@@ -268,35 +268,4 @@ export class UserLicenseService {
 
     return { status: "deleted" };
   }
-
-  async cancelLicense(id: string) {
-    const license = await this.prisma.license.findUnique({
-      where: { id },
-      include: { subscription: true },
-    });
-
-    if (!license) {
-      throw new NotFoundException("License not found");
-    }
-
-    await this.prisma.license.updateMany({
-      where: {
-        id,
-      },
-      data: {
-        status: LicenseStatus.inactive,
-      },
-    });
-
-    if (license.subscription) {
-      await this.prisma.subscription.update({
-        where: { id: license.subscription.id },
-        data: { isActive: false },
-      });
-    }
-
-    return {
-      status: LicenseStatus.inactive,
-    };
-  }
 }

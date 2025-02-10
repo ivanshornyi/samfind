@@ -5,7 +5,7 @@ import {
 } from "@nestjs/common";
 import { addMonths, addYears, startOfMonth } from "date-fns";
 import { PrismaService } from "../prisma/prisma.service";
-import { PlanPeriod, User } from "@prisma/client";
+import { LicenseStatus, PlanPeriod, User } from "@prisma/client";
 import { StripeService } from "../stripe/stripe.service";
 import { AddSubscriptionDto } from "./dto/add-subscription-dto";
 import { CreateMemberInvoiceDto } from "./dto/create-member-invoice-dto";
@@ -315,5 +315,35 @@ export class SubscriptionService {
       nextDate,
     );
     await this.stripeService.addDiscount(owner, discountAmount, memberEmail);
+  }
+
+  async cancelSubscription(id: string) {
+    const subscription = await this.prisma.subscription.findUnique({
+      where: { id },
+    });
+
+    if (!subscription) {
+      throw new NotFoundException("Subscription not found");
+    }
+
+    await this.prisma.subscription.update({
+      where: {
+        id,
+      },
+      data: {
+        isActive: false,
+      },
+    });
+
+    if (subscription.licenseId) {
+      await this.prisma.license.update({
+        where: { id: subscription.licenseId },
+        data: { status: LicenseStatus.inactive },
+      });
+    }
+
+    return {
+      status: LicenseStatus.inactive,
+    };
   }
 }
