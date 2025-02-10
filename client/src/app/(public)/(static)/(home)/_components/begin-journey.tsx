@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui";
-import { ArrowUpRight } from "@public/home";
-import Image from "next/image";
+import Link from "next/link";
+// import { ArrowUpRight } from "@public/home";
+// import Image from "next/image";
 
 export const BeginJourney = () => {
   return (
@@ -10,13 +11,15 @@ export const BeginJourney = () => {
         <h2>Today.</h2>
       </div>
       <div className="flex flex-col sm:flex-row items-center gap-[10px] sm:gap-0">
-        <Button
-          variant="secondary"
-          className="w-[250px] h-[44px] rounded-[30px] text-xl font-medium border-[#A64CE8] py-6"
-        >
-          Download Now
-        </Button>
-        <button className="w-[250px] h-[44px] flex justify-center items-center gap-[5px] text-2xl font-medium py-6">
+        <Link href="/download-app">
+          <Button
+            variant="secondary"
+            className="w-[250px] h-[44px] rounded-[30px] text-xl font-medium border-[#A64CE8] py-6"
+          >
+            Download Now
+          </Button>
+        </Link>
+        {/* <button className="w-[250px] h-[44px] flex justify-center items-center gap-[5px] text-2xl font-medium py-6">
           <span>Try Demo</span>{" "}
           <Image
             src={ArrowUpRight}
@@ -24,7 +27,7 @@ export const BeginJourney = () => {
             height={43}
             alt="Arrow up right"
           />
-        </button>
+        </button> */}
       </div>
     </div>
   );
