@@ -38,7 +38,13 @@ export class SubscriptionController {
 
   @ApiOperation({ summary: "Cancel Subscription" })
   @Post("/cancel/:id")
-  async deleteUser(@Param("id") id: string) {
+  async cancelSubscription(@Param("id") id: string) {
     return this.subscriptionService.cancelSubscription(id);
+  }
+
+  @ApiOperation({ summary: "Active Subscription" })
+  @Post("/active/:id")
+  async activeSubscription(@Param("id") id: string) {
+    return this.subscriptionService.activeSubscription(id);
   }
 }

@@ -68,20 +68,6 @@ export class UserLicenseController {
     return await this.licenseService.checkDevice(checkDeviceDto);
   }
 
-  @ApiOperation({ summary: "Check License status by email" })
-  @Post("/check-license")
-  async checkLicenseStatusByEmail(
-    @Headers("authorization") authHeader: string,
-    @Body() checkUserLicenseDto: CheckUserLicenseDto,
-  ) {
-    const secret = this.configService.get("DEVICE_SECRET");
-    if ("Bearer " + secret !== authHeader)
-      throw new UnauthorizedException(EXCEPTION.INVALID_TOKEN);
-    return await this.licenseService.checkLicenseStatusByEmail(
-      checkUserLicenseDto.email,
-    );
-  }
-
   @ApiOperation({ summary: "Deactivate user license" })
   @Post("/deactivate/:id")
   async deactivateLicense(@Param("id") id: string) {
