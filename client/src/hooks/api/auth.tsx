@@ -27,7 +27,7 @@ export const useSignIn = () => {
       toast({
         title: "Success",
         description: "Successfully logged in",
-        variant: "default",
+        variant: "success",
       });
 
       login(data.accessToken, data.refreshToken);
@@ -127,6 +127,7 @@ export const useSendVerificationCodeToUpdateEmail = () => {
       toast({
         title: "Success",
         description: "Verification code has been sent to your mail",
+        variant: "success",
       });
     },
     onError: (error) => {
@@ -158,6 +159,7 @@ export const useUpdateUserEmail = () => {
       toast({
         title: "Success",
         description: "Successfully updated",
+        variant: "success",
       });
 
       router.push("/account/settings");
@@ -187,6 +189,7 @@ export const useVerifyUser = () => {
       toast({
         title: "Success",
         description: "Successfully logged in",
+        variant: "success",
       });
 
       login(data.accessToken, data.refreshToken);

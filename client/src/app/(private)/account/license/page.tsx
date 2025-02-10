@@ -250,7 +250,7 @@ export default function License() {
 
       toast({
         description: "Copied",
-        variant: "default",
+        variant: "success",
       });
     }
   };
@@ -308,7 +308,7 @@ export default function License() {
               !isUserLicensesPending &&
               !isUserLicensesPending && (
                 <>
-                  <div className="mt-6 flex justify-between items-end">
+                  <div className="mt-6 flex flex-wrap gap-2 justify-between items-end">
                     <ProgressChart
                       currentMembers={userLicense.users.length}
                       maxMembers={
@@ -328,7 +328,7 @@ export default function License() {
                     </div>
                   </div>
                   <div className="flex items-center justify-end py-4">
-                    <div className="w-[308px] relative">
+                    <div className="w-full relative sm:w-[308px]">
                       <Input
                         placeholder="Search"
                         value={
@@ -341,7 +341,7 @@ export default function License() {
                             .getColumn("name")
                             ?.setFilterValue(event.target.value)
                         }
-                        className="max-w-sm bg-card"
+                        className="bg-card"
                       />
                       <div className="absolute right-6 top-0 h-full flex justify-center items-center">
                         <Search size={24} />

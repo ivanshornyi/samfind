@@ -47,7 +47,7 @@ export const useConfirmPayment = () => {
           toast({
             title: "Success",
             description: "Successfully paid",
-            variant: "default",
+            variant: "success",
           });
         }
       } catch (error) {
