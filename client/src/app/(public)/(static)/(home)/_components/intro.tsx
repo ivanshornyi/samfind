@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui";
-import { ArrowUpRight, HomeIntro, HomeIntroMobile } from "@public/home";
+import { HomeIntro, HomeIntroMobile } from "@public/home";
 import Image from "next/image";
 import Link from "next/link";
 

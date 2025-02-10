@@ -352,7 +352,6 @@ export class SubscriptionService {
       status: LicenseStatus.inactive,
     };
   }
-
   async activeSubscription(id: string) {
     const subscription = await this.prisma.subscription.findUnique({
       where: { id },
