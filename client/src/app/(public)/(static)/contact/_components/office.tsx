@@ -1,26 +1,33 @@
 "use client";
 
-import Image from "next/image";
 import { Button } from "@/components/ui";
-import { Map } from "@public/contact/icons";
 import { EllipseBlueImage } from "@public/contact";
+import { Map } from "@public/contact/icons";
+import Image from "next/image";
 
 const contacts = [
   {
     name: "General:",
     value: "support@onsio.com",
+    href: "mailto:support@onsio.com",
   },
   {
     name: "Technical:",
     value: "tech@onsio.com",
+    href: "mailto:tech@onsio.com",
   },
   {
     name: "Enterprise:",
     value: "enterprise@onsio.com",
+    href: "mailto:enterprise@onsio.com",
   },
 ];
 
 export const Office = () => {
+  const handleContactClick = () => {
+    window.location.href = "mailto:support@onsio.com";
+  };
+
   return (
     <div className="flex flex-col relative items-center justify-center ml-auto mr-auto font-manrope pt-[23px] sm:pt-[100px]">
       <div className="w-full flex justify-start sm:justify-end">
@@ -47,7 +54,11 @@ export const Office = () => {
         </div>
       </div>
       <div className="mt-[100px] sm:mt-[-20px]">
-        <Button className="text-[#8F40E5]" variant="tetrary">
+        <Button
+          className="text-[#8F40E5]"
+          variant="tetrary"
+          onClick={handleContactClick}
+        >
           Contact
         </Button>
       </div>
@@ -63,9 +74,12 @@ export const Office = () => {
             <p className="text-[24px] text-link-hover leading-[24px] text-center uppercase">
               {c.name}
             </p>
-            <p className="text-4 leading-4 sn:text-5 sm:leading-5 text-disabled mt-4 sam:mt-5 text-center">
+            <a
+              href={c.href}
+              className="text-4 leading-4 sn:text-5 sm:leading-5 text-disabled mt-4 sam:mt-5 text-center block hover:underline"
+            >
               {c.value}
-            </p>
+            </a>
           </div>
         ))}
       </div>

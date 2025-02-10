@@ -14,10 +14,6 @@ export const Intro = () => {
               Experience with Onsio
             </h1>
           </div>
-          {/* <div className="absolute top-[29%] left-[75%] transform -translate-x-1/2 -translate-y-1/2 font-semibold text-base text-start">
-              <h2>Experience unmatched privacy in</h2>
-              <h2>every interaction.</h2>
-            </div> */}
           <div className="w-full sm:w-fit gap-[10px] sm:gap-0 flex flex-col sm:flex-row items-center">
             <Link href="/download-app">
               <Button
@@ -27,15 +23,17 @@ export const Intro = () => {
                 Download Now
               </Button>
             </Link>
-            {/* <button className="w-[250px] h-[44px] flex justify-center items-center gap-[5px] text-2xl font-medium">
-              <span>Try Demo</span>
-              <Image
-                src={ArrowUpRight}
-                width={43}
-                height={43}
-                alt="Arrow up right"
-              />
-            </button> */}
+            <Link href="/learn-more/mobile-app">
+              <button className="w-[250px] h-[44px] flex justify-center items-center gap-[5px] text-2xl font-medium">
+                <span>Learn More</span>
+                <Image
+                  src={ArrowUpRight}
+                  width={43}
+                  height={43}
+                  alt="Arrow up right"
+                />
+              </button>
+            </Link>
           </div>
         </div>
         <Image

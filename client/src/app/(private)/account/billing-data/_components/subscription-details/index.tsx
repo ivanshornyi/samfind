@@ -4,11 +4,11 @@ import { useContext } from "react";
 
 import { AuthContext } from "@/context";
 
-import { Button } from "@/components/ui";
+// import { Button } from "@/components/ui";
 import { User } from "lucide-react";
 import Link from "next/link";
-// import { useState } from "react";
-// import { ManageSubscriptionModal } from "../manage-subscription-modal";
+
+// import { ManageSubscriptionModal } from "../manage-subscription-modal/manage-subscription-modal";
 
 interface SubscriptionDetailsProps {
   plan: string;
@@ -31,8 +31,6 @@ export const SubscriptionDetails = ({
   members,
 }: SubscriptionDetailsProps) => {
   const { user } = useContext(AuthContext);
-  // const [isManageModalOpen, setIsManageModalOpen] = useState(false);
-  // add fullscreen loader
 
   return (
     <div className="flex flex-col space-y-4">
@@ -55,15 +53,9 @@ export const SubscriptionDetails = ({
           </div>
           <p className="text-[#C4C4C4] mt-1">Renews on {renewalDate}</p>
         </div>
-        {/* <div> */}
-          {/* <Button
-            variant="ghost"
-            className="text-[#A8A8FF]"
-            onClick={() => setIsManageModalOpen(true)}
-          >
-            Manage subscription
-          </Button> */}
-        {/* </div> */}
+        <div>
+          
+        </div>
       </div>
       <div className="h-[1px] flex-grow bg-[#383838]" />
 
@@ -75,19 +67,18 @@ export const SubscriptionDetails = ({
         <span className="text-[#C4C4C4]">/{billingPeriod}</span>
       </div>
 
-      <div className="flex items-center gap-2">
-        <span className="text-[#C4C4C4]">
-          ({members.admin} Admin, {members.regular} members)
-        </span>
-        <Link href="/account/license" className="text-[#A8A8FF]">
-          Manage members
-        </Link>
-      </div>
+      <div className="flex items-center gap-2 justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-[#C4C4C4]">
+            ({members.admin} Admin, {members.regular} members)
+          </span>
+          <Link href="/account/license" className="text-blue-50">
+            Manage members
+          </Link>
+        </div>
 
-      {/* <ManageSubscriptionModal
-        isOpen={isManageModalOpen}
-        onClose={() => setIsManageModalOpen(false)}
-      /> */}
+        {/* <ManageSubscriptionModal /> */}
+      </div>
     </div>
   );
 };

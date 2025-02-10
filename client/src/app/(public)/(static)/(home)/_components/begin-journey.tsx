@@ -1,4 +1,6 @@
 import { Button } from "@/components/ui";
+import { ArrowUpRight } from "@public/home";
+import Image from "next/image";
 import Link from "next/link";
 // import { ArrowUpRight } from "@public/home";
 // import Image from "next/image";
@@ -19,15 +21,17 @@ export const BeginJourney = () => {
             Download Now
           </Button>
         </Link>
-        {/* <button className="w-[250px] h-[44px] flex justify-center items-center gap-[5px] text-2xl font-medium py-6">
-          <span>Try Demo</span>{" "}
-          <Image
-            src={ArrowUpRight}
-            width={43}
-            height={43}
-            alt="Arrow up right"
-          />
-        </button> */}
+        <Link href="/learn-more/software">
+          <button className="w-[250px] h-[44px] flex justify-center items-center gap-[5px] text-2xl font-medium py-6">
+            <span>Try Demo</span>{" "}
+            <Image
+              src={ArrowUpRight}
+              width={43}
+              height={43}
+              alt="Arrow up right"
+            />
+          </button>
+        </Link>
       </div>
     </div>
   );

@@ -1,16 +1,16 @@
 "use client";
 
-import Link from "next/link";
-import Image from "next/image";
 import { Button, Input } from "@/components/ui";
-import { Logo } from "@public/images";
 import {
+  Facebook,
+  Instagram,
   LinkedIn,
   Twitter,
   Youtube,
-  Instagram,
-  Facebook,
 } from "@public/contact/icons";
+import { Logo } from "@public/images";
+import Image from "next/image";
+import Link from "next/link";
 
 type Link = {
   label: string;
@@ -98,7 +98,7 @@ const FooterSection = ({ title, links }: { title: string; links: Link[] }) => (
 export const Footer = () => {
   return (
     <footer className="text-white py-[14px] sm:py-10 sm:pb-[60px] px-5 sm:px-6 text-nowrap">
-      <div className="mx-auto flex flex-col lg:flex-row justify-between gap-10">
+      <div className="mx-auto flex flex-col lg:flex-row gap-10">
         <div className="flex flex-col lg:block space-y-[30px] lg:space-y-[122px]">
           <Link href="/">
             <Image src={Logo} width={110} height={28} alt="" />
@@ -157,7 +157,7 @@ export const Footer = () => {
         </div>
 
         {/* Stay Updated */}
-        <div className="w-full lg:max-w-[400px] xl:max-w-[608px] space-y-4 hidden lg:block">
+        {/* <div className="w-full lg:max-w-[400px] xl:max-w-[608px] space-y-4 hidden lg:block">
           <h3 className="text-2xl font-bold">Stay Updated.</h3>
           <p className="text-sm text-[#E6E6E6]">
             Join our community of innovators
@@ -184,7 +184,7 @@ export const Footer = () => {
             <span>• Success stories</span>
             <span>• Community highlights</span>
           </div>
-        </div>
+        </div> */}
       </div>
     </footer>
   );

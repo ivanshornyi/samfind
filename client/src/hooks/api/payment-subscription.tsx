@@ -21,3 +21,24 @@ export const usePaySubscription = () => {
 
   return mutationProps;
 };
+
+export const useCancelSubscription = () => {
+  const { toast } = useToast();
+  // get subscription
+
+  const { ...mutationProps } = useMutation({
+    mutationFn: (id: string) => PaymentSubscriptionApiService.cancelSubscription(""),
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Successfully canceled",
+        variant: "success",
+      });
+    },
+    onError: (error) => {
+      handleToastError(error, toast);
+    },
+  });
+
+  return mutationProps;
+};
