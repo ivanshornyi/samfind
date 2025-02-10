@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui";
-import { ArrowUpRight, HomeIntro, HomeIntroMobile } from "@public/home";
+import { HomeIntro, HomeIntroMobile } from "@public/home";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -27,7 +27,7 @@ export const Intro = () => {
                 Download Now
               </Button>
             </Link>
-            <button className="w-[250px] h-[44px] flex justify-center items-center gap-[5px] text-2xl font-medium">
+            {/* <button className="w-[250px] h-[44px] flex justify-center items-center gap-[5px] text-2xl font-medium">
               <span>Try Demo</span>
               <Image
                 src={ArrowUpRight}
@@ -35,7 +35,7 @@ export const Intro = () => {
                 height={43}
                 alt="Arrow up right"
               />
-            </button>
+            </button> */}
           </div>
         </div>
         <Image

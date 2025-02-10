@@ -25,6 +25,7 @@ export const useUpdateUser = () => {
       toast({
         title: "Success",
         description: "Successfully updated",
+        variant: "success",
       });
     },
   });

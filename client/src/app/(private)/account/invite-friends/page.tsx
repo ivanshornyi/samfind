@@ -36,8 +36,9 @@ export default function InvitedFriends() {
       navigator.clipboard.writeText(link);
 
       toast({
+        title: "Success",
         description: "Copied",
-        variant: "default",
+        variant: "success",
       });
     }
   };

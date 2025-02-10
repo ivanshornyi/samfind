@@ -20,7 +20,7 @@ export default function Home() {
 
       toast({
         description: "Copied",
-        variant: "default",
+        variant: "success",
       });
     }
   };
@@ -41,7 +41,7 @@ export default function Home() {
 
       toast({
         description: "Copied",
-        variant: "default",
+        variant: "success",
       });
     }
   };

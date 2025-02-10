@@ -250,7 +250,7 @@ export default function License() {
 
       toast({
         description: "Copied",
-        variant: "default",
+        variant: "success",
       });
     }
   };

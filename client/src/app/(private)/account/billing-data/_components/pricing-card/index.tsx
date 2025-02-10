@@ -68,12 +68,13 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
     }
   };
 
-  const formatPrice = (price: number) => {
-    if (plan.period === "yearly") {
-      return (price / 100 / 12).toFixed(2);
-    }
-
-    return (price / 100).toFixed(2);
+  const formatPrice = (price: number, currency: string = "USD", locale: string = "en-US") => {
+    return new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency,
+      minimumFractionDigits: price % 100 === 0 ? 0 : 2,
+      maximumFractionDigits: 2,
+    }).format(price / 100);
   };
 
   return (
@@ -107,13 +108,12 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
 
           <div className="flex items-baseline mt-2">
             <span className="text-4xl font-semibold">
-              <span className="text-2xl align-top">$</span>
               {formatPrice(plan.price)}
             </span>
             <span className="text-[#C4C4C4] text-sm ml-2">
-              /month
+              {plan.period === "monthly" && <span>/month</span>}
               {plan.period === "yearly" && (
-                <span>, billed ${(plan.price / 100).toFixed(2)} yearly</span>
+                <span>/year, billed {formatPrice(plan.price)} yearly</span>
               )}
             </span>
           </div>
