@@ -51,6 +51,7 @@ export const useSignUp = () => {
       toast({
         title: "Success",
         description: "Verification code has been send to your email",
+        variant: "success",
       });
     },
     onError: (error) => {
@@ -100,6 +101,7 @@ export const useResetPassword = () => {
       toast({
         title: "Success",
         description: "Successfully updated",
+        variant: "success"
       });
 
       router.push("/auth/sign-in");

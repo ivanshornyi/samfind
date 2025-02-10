@@ -70,6 +70,7 @@ const Toast = React.forwardRef<
           {variantIcons[variant]}
         </div>
       )}
+      <div className="w-[130px] h-[130px] border-[30px] border-violet-100 p-[15px] absolute -right-[80px] top-[30px] rounded-full" />
       {props.children}
     </ToastPrimitives.Root>
   );
