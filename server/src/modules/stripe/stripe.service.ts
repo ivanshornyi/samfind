@@ -321,10 +321,16 @@ export class StripeService {
 
       if (userReferralCode) {
         // find user and update user discount
+
+        const discountAmount =
+          subscription.plan.period === PlanPeriod.yearly
+            ? Math.round(subscription.plan.price / 100)
+            : Math.round(subscription.plan.price / 10);
+
         this.userService.findAndUpdateUserByReferralCode(
           Number(userReferralCode),
           subscription.user,
-          Math.round(subscription.plan.price / 10),
+          discountAmount,
         );
 
         await this.prisma.user.update({
@@ -338,7 +344,7 @@ export class StripeService {
 
         await this.addDiscount(
           subscription.user,
-          Math.round(subscription.plan.price / 10),
+          discountAmount,
           subscription.user.email,
           true,
         );
