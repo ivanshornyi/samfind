@@ -24,7 +24,7 @@ COPY --from=build /app/package.json ./package.json
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-EXPOSE 3000
+EXPOSE 4000
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["npm", "run", "start:prod"]

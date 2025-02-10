@@ -21,6 +21,7 @@ async function bootstrap() {
       "http://localhost:5173",
       "http://localhost:4000",
       "https://www.onsio.io",
+      "https://www.onsio.io/api",
       "https://onsio.io",
       FRONTEND_DOMAIN,
     ],
