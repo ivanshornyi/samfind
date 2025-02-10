@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 
 import {
-  LicenseTierType,
   LicenseStatus,
+  LicenseTierType,
   User,
   UserAuthType,
   UserRole,
@@ -10,12 +10,11 @@ import {
 } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 
-import { UpdateUserDto } from "./dto/update-user-dto";
 import { CreateUserDto } from "./dto/create-user-dto";
 import { FindUserDto } from "./dto/find-user-dto";
+import { UpdateUserDto } from "./dto/update-user-dto";
 
 import { createHash } from "crypto";
-import { CreateOrganizationDto } from "../organization/dto/create-organization-dto";
 
 @Injectable()
 export class UserService {

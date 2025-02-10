@@ -1,5 +1,5 @@
 import { Button } from "@/components";
-import { AppstoreImage, WindowsImage, PlaymarketImage } from "@public/images";
+import { AppstoreImage, PlaymarketImage, WindowsImage } from "@public/images";
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 
