@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useContext } from "react";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useContext } from "react";
 
-import { AuthContext } from "@/context";
 import { Button } from "@/components";
+import { AuthContext } from "@/context";
 
 import { Logo } from "@public/images";
 import { User } from "lucide-react";
@@ -14,7 +15,8 @@ import { MenuMobile } from "./menu-mobile";
 export const NAVIGATION_ITEMS = [
   {
     title: "Pricing",
-    path: "/",
+    path: "/#pricing",
+    isHash: true,
   },
   {
     title: "About",
@@ -28,14 +30,32 @@ export const NAVIGATION_ITEMS = [
     title: "Contact",
     path: "/contact",
   },
-  {
-    title: "License Management",
-    path: "/license-management",
-  },
+  // {
+  //   title: "License Management",
+  //   path: "/license-management",
+  // },
 ];
 
 export const Header = () => {
   const { isLoggedIn, user } = useContext(AuthContext);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleNavigation = (path: string, isHash?: boolean) => {
+    if (isHash) {
+      if (pathname === "/") {
+        // If we're already on home page, smooth scroll to the section
+        document
+          .getElementById("pricing")
+          ?.scrollIntoView({ behavior: "smooth" });
+      } else {
+        // If we're on a different page, navigate to home page with hash
+        router.push(path);
+      }
+    } else {
+      router.push(path);
+    }
+  };
 
   return (
     <header
@@ -58,11 +78,13 @@ export const Header = () => {
           <nav className="hidden lg:block">
             <ul className="flex items-center gap-8">
               {NAVIGATION_ITEMS.map((item) => (
-                <Link key={item.title} href={item.path}>
-                  <li className="font-medium text-base transition-all hover:text-violet-50 hover:underline active:text-violet-200">
-                    {item.title}
-                  </li>
-                </Link>
+                <li
+                  key={item.title}
+                  onClick={() => handleNavigation(item.path, item.isHash)}
+                  className="font-medium text-base transition-all hover:text-violet-50 hover:underline active:text-violet-200 cursor-pointer"
+                >
+                  {item.title}
+                </li>
               ))}
             </ul>
           </nav>
