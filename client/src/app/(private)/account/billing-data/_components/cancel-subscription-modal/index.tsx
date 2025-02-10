@@ -1,62 +1,62 @@
-import { Button } from "@/components/ui";
+import { 
+  AlertDialogHeader, 
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription, 
+  AlertDialogTitle, 
+  AlertDialogTrigger, 
+  Button
+} from "@/components/ui";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  
+} from "@/components";
 import { X } from "lucide-react";
+import { AlertDialogCancel } from "@radix-ui/react-alert-dialog";
 
-interface CancelSubscriptionModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-}
+export const CancelSubscriptionModal = () => {
+  // cancel subscription handle
+  // get subscription
 
-export const CancelSubscriptionModal = ({
-  isOpen,
-  onClose,
-  onConfirm,
-}: CancelSubscriptionModalProps) => {
+  // const { mutate: cancelSubscriptionMutation } = useCancelSubscription();
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#1E1E1E] border-none text-white max-w-[600px] rounded-3xl">
-        <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-[32px] leading-[44px] font-semibold">
-              Are you sure you want to cancel your subscription?
-            </DialogTitle>
-            <Button
-              variant="ghost"
-              className="w-12 h-12 p-4 mb-auto"
-              onClick={onClose}
-            >
-              <X className="h-12 w-12" />
-            </Button>
-          </div>
-        </DialogHeader>
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button 
+          variant="ghost"
+        >
+          Cancel subscription
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent className="w-full max-w-[590px]">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-2xl font-semibold">
+           Are you sure you want to cancel your subscription? 
+          </AlertDialogTitle>
+          <AlertDialogDescription />
+        </AlertDialogHeader>
 
-        <p className="text-[#C4C4C4] text-[16px] leading-[22px] mt-4">
+        <p className="text-[#C4C4C4] text-[16px] leading-[22px] mt-2">
           If you cancel, you&apos;ll lose access to all the benefits of your
           subscription. Your subscription is active until the next billing date:
           [Month] 1st.
         </p>
 
         <div className="flex gap-4 mt-8">
-          <Button
-            className="flex-1 bg-[#383838] hover:bg-[#424242] text-white rounded-full h-[56px] text-[16px]"
-            onClick={onClose}
-          >
+          <AlertDialogCancel className="w-1/2 bg-[#383838] hover:bg-[#424242] text-white rounded-full h-[56px] text-[16px]">
             Cancel
-          </Button>
+          </AlertDialogCancel>
           <Button
+            variant="destructive"
             className="flex-1 bg-[#FF6C6C] hover:bg-[#FF5252] text-white rounded-full h-[56px] text-[16px]"
-            onClick={onConfirm}
+            // onClick={onConfirm}
+            withLoader
+
           >
             Continue
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };

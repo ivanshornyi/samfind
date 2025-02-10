@@ -25,6 +25,17 @@ const createPayment = async (data: CreatePaymentData) => {
   }
 };
 
+const cancelSubscription = async (id: string) => {
+  try {
+    const response = await apiClient.post(`/subscription/${id}`);
+
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 export const PaymentSubscriptionApiService = {
   createPayment,
+  cancelSubscription,
 };
