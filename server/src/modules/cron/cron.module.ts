@@ -8,15 +8,24 @@ import { UserModule } from "../user/user.module";
 import { PrismaService } from "nestjs-prisma";
 import { MailModule } from "../mail/mail.module";
 import { MailService } from "../mail/mail.service";
+import { SubscriptionModule } from "../subscription/subscription.module";
+import { SubscriptionService } from "../subscription/subscription.service";
 
 @Module({
-  imports: [ScheduleModule.forRoot(), PrismaModule, UserModule, MailModule],
+  imports: [
+    ScheduleModule.forRoot(),
+    PrismaModule,
+    UserModule,
+    MailModule,
+    SubscriptionModule,
+  ],
   providers: [
     CronService,
     StripeService,
     PrismaService,
     UserService,
     MailService,
+    SubscriptionService,
   ],
   exports: [CronService],
 })

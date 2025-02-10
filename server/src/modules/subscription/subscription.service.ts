@@ -3,7 +3,13 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { addMonths, addYears, startOfMonth } from "date-fns";
+import {
+  addMonths,
+  addYears,
+  compareAsc,
+  startOfDay,
+  startOfMonth,
+} from "date-fns";
 import { PrismaService } from "../prisma/prisma.service";
 import { LicenseStatus, PlanPeriod, User } from "@prisma/client";
 import { StripeService } from "../stripe/stripe.service";
@@ -345,5 +351,115 @@ export class SubscriptionService {
     return {
       status: LicenseStatus.inactive,
     };
+  }
+
+  async activeSubscription(id: string) {
+    const subscription = await this.prisma.subscription.findUnique({
+      where: { id },
+      include: {
+        plan: true,
+        user: true,
+        license: {
+          include: {
+            _count: {
+              select: { activeLicenses: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!subscription) {
+      throw new NotFoundException("Subscription not found");
+    }
+
+    const today = new Date();
+    const nextDate = new Date(subscription.nextDate);
+
+    const difference = compareAsc(startOfDay(today), startOfDay(nextDate));
+
+    if (difference < 0) {
+      await this.prisma.subscription.update({
+        where: {
+          id,
+        },
+        data: {
+          isActive: true,
+        },
+      });
+
+      if (subscription.licenseId) {
+        await this.prisma.license.update({
+          where: { id: subscription.licenseId },
+          data: { status: LicenseStatus.active },
+        });
+      }
+    } else {
+      const payAmount =
+        subscription.license._count.activeLicenses * subscription.plan.price;
+
+      const { discountId, discountAmount } = await this.checkDiscount(
+        subscription.userId,
+        payAmount,
+      );
+
+      const metadata = {
+        quantity: subscription.license._count.activeLicenses,
+        subscriptionId: subscription.id,
+        stripeCouponId: discountId,
+        discountAmount,
+      };
+
+      await this.stripeService.createAndPayInvoice({
+        customerId: subscription.user.stripeCustomerId,
+        priceId: subscription.plan.stripePriceId,
+        quantity: subscription.license._count.activeLicenses,
+        couponId: discountId,
+        description: `Plan - ${subscription.plan.type} - ${subscription.plan.period}. Quantity - ${subscription.license._count.activeLicenses}. ${discountAmount ? `Discount: ${discountAmount / 100}$.` : ""}`,
+        metadata,
+        pay: true,
+      });
+    }
+  }
+
+  async checkDiscount(userId: string, payAmount: number) {
+    const discount = await this.prisma.discount.findFirst({
+      where: {
+        userId,
+        stripeCouponId: null,
+        used: false,
+      },
+    });
+
+    let discountId = undefined;
+    let discountAmount = undefined;
+    if (discount) {
+      discountAmount = discount.endAmount;
+
+      if (discount.endAmount > payAmount) {
+        discountAmount = payAmount;
+        await this.prisma.discount.create({
+          data: {
+            userId,
+            endAmount: discount.endAmount - payAmount,
+          },
+        });
+      }
+
+      const stripeDiscount =
+        await this.stripeService.createCoupon(discountAmount);
+
+      discountId = stripeDiscount.id;
+
+      await this.prisma.discount.update({
+        where: { id: discount.id },
+        data: {
+          stripeCouponId: discountId,
+          endAmount: discountAmount,
+        },
+      });
+    }
+
+    return { discountId, discountAmount };
   }
 }

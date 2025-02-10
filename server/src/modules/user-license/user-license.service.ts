@@ -126,78 +126,86 @@ export class UserLicenseService {
   }: CheckDeviceDto) {
     if (!desktopId && !mobileId) {
       return {
-        error: "email has no paid license",
+        error: "Email has no paid license",
       };
     }
 
-    const user = await this.prisma.user.findFirst({
-      where: { email },
-      include: {
-        activeLicenses: true,
-      },
-    });
-    if (!user || !user.activeLicenses.length) {
-      return {
-        error: "email has no paid license",
-      };
-    }
-
-    if (
-      (desktopId &&
-        user.activeLicenses[0].desktopId &&
-        user.activeLicenses[0].desktopId !== desktopId) ||
-      (mobileId &&
-        user.activeLicenses[0].mobileId &&
-        user.activeLicenses[0].mobileId !== mobileId)
-    ) {
-      return {
-        error: "email has been registered",
-      };
-    }
-
-    if (!user.activeLicenses[0].desktopId && desktopId) {
-      await this.prisma.activeLicense.update({
-        where: { id: user.activeLicenses[0].id },
-        data: {
-          desktopId,
-        },
-      });
-    }
-
-    if (!user.activeLicenses[0].mobileId && mobileId) {
-      await this.prisma.activeLicense.update({
-        where: { id: user.activeLicenses[0].id },
-        data: {
-          mobileId,
-        },
-      });
-    }
-
-    return {
-      error: null,
-    };
-  }
-
-  async checkLicenseStatusByEmail(email: string) {
     const user = await this.prisma.user.findFirst({
       where: { email },
       include: {
         activeLicenses: { include: { license: true } },
       },
     });
-
-    if (
-      !user ||
-      !user.activeLicenses.length ||
-      user.activeLicenses[0].license.status === LicenseStatus.inactive
-    ) {
+    if (!user || !user.activeLicenses.length) {
       return {
-        status: "inactive",
+        error: "Email has no paid license",
       };
     }
 
+    const activeLicense = user.activeLicenses[0];
+
+    if (activeLicense.license.status === LicenseStatus.inactive) {
+      return {
+        error: "Email has no paid license",
+      };
+    }
+
+    if (
+      desktopId &&
+      activeLicense.desktopIds.length &&
+      !activeLicense.desktopIds.includes(desktopId)
+    ) {
+      return {
+        error: "License has been registered on other Device",
+      };
+    }
+
+    if (
+      mobileId &&
+      activeLicense.mobileIds.length >= 2 &&
+      !activeLicense.mobileIds.includes(mobileId)
+    ) {
+      return {
+        error: "License has been registered on other Device",
+      };
+    }
+
+    if (desktopId && activeLicense.desktopIds.includes(desktopId)) {
+      return {
+        error: null,
+        license: activeLicense.license.tierType,
+      };
+    }
+
+    if (mobileId && activeLicense.mobileIds.includes(mobileId)) {
+      return {
+        error: null,
+        license: activeLicense.license.tierType,
+      };
+    }
+
+    const desktopIds = activeLicense.desktopIds;
+    const mobileIds = activeLicense.mobileIds;
+
+    if (desktopId) {
+      desktopIds.push(desktopId);
+    }
+
+    if (mobileId) {
+      mobileIds.push(mobileId);
+    }
+
+    await this.prisma.activeLicense.update({
+      where: { id: activeLicense.id },
+      data: {
+        desktopIds,
+        mobileIds,
+      },
+    });
+
     return {
-      status: "active",
+      error: null,
+      license: activeLicense.license.tierType,
     };
   }
 

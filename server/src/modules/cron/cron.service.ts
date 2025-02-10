@@ -5,6 +5,7 @@ import { PrismaService } from "nestjs-prisma";
 import { StripeService } from "../stripe/stripe.service";
 import { LicenseStatus } from "@prisma/client";
 import { MailService } from "../mail/mail.service";
+import { SubscriptionService } from "../subscription/subscription.service";
 
 @Injectable()
 export class CronService {
@@ -14,6 +15,7 @@ export class CronService {
     private readonly prisma: PrismaService,
     private readonly stripeService: StripeService,
     private readonly mailService: MailService,
+    private readonly subscriptionService: SubscriptionService,
   ) {}
 
   @Cron("0 8 1 * *")
@@ -63,50 +65,14 @@ export class CronService {
       for (let i = 0; i < subscriptions.length; i++) {
         const subscription = subscriptions[i];
         if (subscription.license._count.activeLicenses === 0) continue;
+        const payAmount =
+          subscription.license._count.activeLicenses * subscription.plan.price;
 
-        const discount = await this.prisma.discount.findFirst({
-          where: {
-            userId: subscription.userId,
-            stripeCouponId: null,
-            used: false,
-          },
-        });
-
-        let discountId = undefined;
-        let discountAmount = undefined;
-        if (discount) {
-          discountAmount = discount.endAmount;
-
-          if (
-            discount.endAmount >
-            subscription.license._count.activeLicenses * subscription.plan.price
-          ) {
-            discountAmount =
-              subscription.license._count.activeLicenses *
-              subscription.plan.price;
-            await this.prisma.discount.create({
-              data: {
-                userId: subscription.userId,
-                endAmount:
-                  discount.endAmount -
-                  subscription.license._count.activeLicenses *
-                    subscription.plan.price,
-              },
-            });
-          }
-
-          const stripeDiscount =
-            await this.stripeService.createCoupon(discountAmount);
-
-          discountId = stripeDiscount.id;
-
-          await this.prisma.discount.update({
-            where: { id: discount.id },
-            data: {
-              stripeCouponId: discountId,
-            },
-          });
-        }
+        const { discountId, discountAmount } =
+          await this.subscriptionService.checkDiscount(
+            subscription.userId,
+            payAmount,
+          );
 
         const metadata = {
           quantity: subscription.license._count.activeLicenses,
@@ -120,7 +86,7 @@ export class CronService {
           priceId: subscription.plan.stripePriceId,
           quantity: subscription.license._count.activeLicenses,
           couponId: discountId,
-          description: `Plan - ${subscription.plan.type} - ${subscription.plan.period}. Quantity - ${subscription.license._count.activeLicenses}. ${discount ? `Discount: ${discount.endAmount / 100}$.` : ""}`,
+          description: `Plan - ${subscription.plan.type} - ${subscription.plan.period}. Quantity - ${subscription.license._count.activeLicenses}. ${discountAmount ? `Discount: ${discountAmount / 100}$.` : ""}`,
           metadata,
           pay: true,
         });

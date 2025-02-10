@@ -95,15 +95,15 @@ model License {
 }
 
 model ActiveLicense {
-  id        String   @id @default(uuid())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  license   License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
-  licenseId String
-  desktopId String?
-  mobileId  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  license    License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  licenseId  String
+  desktopIds String[] @default([])
+  mobileIds  String[] @default([])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@map("active_license")
 }
