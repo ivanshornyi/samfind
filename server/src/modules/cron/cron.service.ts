@@ -92,9 +92,41 @@ export class CronService {
 
       for (let i = 0; i < feeBasedSubscriptions.length; i++) {
         const subscription = feeBasedSubscriptions[i];
-        if (subscription.license._count.activeLicenses === 0) continue;
+
+        let planPrice = subscription.plan.price;
+
+        if (subscription.newPlanId) {
+          const newPlan = await this.prisma.plan.findUnique({
+            where: { id: subscription.newPlanId },
+          });
+
+          if (newPlan) {
+            await this.prisma.subscription.update({
+              where: { id: subscription.id },
+              data: {
+                planId: newPlan.id,
+                newPlanId: null,
+                isInTrial:
+                  newPlan.type === LicenseTierType.freemium ? false : true,
+                nextDate:
+                  newPlan.type === LicenseTierType.freemium
+                    ? startOfMonth(addMonths(new Date(), 1)).toISOString()
+                    : subscription.nextDate,
+              },
+            });
+            await this.prisma.license.update({
+              where: { id: subscription.licenseId },
+              data: { tierType: newPlan.type },
+            });
+
+            planPrice = newPlan.price;
+          }
+        }
+
+        if (subscription.license._count.activeLicenses === 0 || planPrice === 0)
+          continue;
         const payAmount =
-          subscription.license._count.activeLicenses * subscription.plan.price;
+          subscription.license._count.activeLicenses * planPrice;
 
         const { discountId, discountAmount } =
           await this.subscriptionService.checkDiscount(

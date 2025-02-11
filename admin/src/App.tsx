@@ -3,6 +3,7 @@ import { HomePage, LoginPage, ReferralManagementPage, UserManagementPage } from 
 import { Layout, PrivateRoute, PublicRoute } from "@/components";
 
 const App = () => {
+  console.log('admin')
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
