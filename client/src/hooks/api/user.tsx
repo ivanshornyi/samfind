@@ -2,7 +2,7 @@ import { useContext } from "react";
 
 import { AuthContext } from "@/context";
 
-import { UserApiService, UpdateUserData } from "@/services";
+import { UpdateUserData, UserApiService } from "@/services";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { useToast } from "../use-toast";
@@ -69,7 +69,8 @@ export const useGetUserSubscriptionInfo = () => {
   const { user } = useContext(AuthContext);
 
   return useQuery({
-    queryFn: () => user?.id ? UserApiService.getUserSubscriptionInfo(user?.id) : null,
+    queryFn: () =>
+      user?.id ? UserApiService.getUserSubscriptionInfo(user?.id) : null,
     queryKey: ["subscription-user-info"],
     enabled: !!user?.id,
     // staleTime: 5_000_000,

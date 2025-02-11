@@ -139,8 +139,8 @@ const columns: ColumnDef<LicenseItem>[] = [
                 <Info style={{ width: "14px", height: "14px" }} />
               </TooltipTrigger>
               <TooltipContent className="p-4 bg-[#232323] max-w-[300px] rounded-[30px] text-xs font-medium text-[#A8A8A8] normal-case">
-                As an Owner, you can add other users to your group. You’ll be
-                responsible for covering their license fees.
+                As an Owner, you can add other users to your group. You&apos;ll
+                be responsible for covering their license fees.
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -390,24 +390,21 @@ export default function License() {
 
         {userRoleSubscriptionInfo?.freemiumUser && (
           <>
-            <div className="flex flex-col gap-[32px] mt-[60px] w-[742px]">
-              <div
-                className="
-                  flex justify-between items-center rounded-[20px] 
-                  p-6 bg-gradient-to-r from-transparent to-violet-600
-                "
-              >
+            <div className="flex flex-col gap-[32px] mt-[60px] w-full max-w-[742px]">
+              <div className="flex flex-col sm:flex-row justify-between items-center rounded-[20px] p-6 bg-gradient-to-r from-transparent to-violet-600 gap-4">
                 <div>
-                  <h2 className="text-xl font-semibold">
+                  <h2 className="text-xl font-semibold text-center sm:text-left">
                     Upgrade your subscription and unlock more features!
                   </h2>
-                  <p>
+                  <p className="text-center sm:text-left">
                     Boost your capabilities with premium features and priority
                     support.
                   </p>
                 </div>
                 <Link href="/account/billing-data">
-                  <Button variant="tetrary">Get started</Button>
+                  <Button variant="tetrary" className="w-full sm:w-auto">
+                    Get started
+                  </Button>
                 </Link>
               </div>
 
@@ -416,22 +413,24 @@ export default function License() {
               <div>
                 <p className="text-xl">Plan</p>
 
-                <div className="border-b border-card py-3 flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <p>Freemium</p>
-                    <span className="bg-green-500/5 p-2 px-4 text-xs text-green-600 rounded-full">
-                      Active subscription
-                    </span>
+                <div className="border-b border-card py-3">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                      <p className="text-lg">Freemium</p>
+                      <span className="bg-green-500/5 p-2 px-4 text-xs text-green-600 rounded-full">
+                        Active subscription
+                      </span>
+                    </div>
+                    <Link href="/account/billing-data" className="underline">
+                      Upgrade
+                    </Link>
                   </div>
-                  <Link href="/account/billing-data" className="underline">
-                    Upgrade
-                  </Link>
                 </div>
 
-                <ul className="flex items-center gap-5 mt-8">
+                <ul className="flex flex-col sm:flex-row items-start sm:items-center gap-5 mt-8">
                   {FREEMIUM_FEATURES.map((item, index) => (
                     <li key={index} className="flex items-center gap-3">
-                      <Check size={16} className="text-violet-50" />
+                      <Check size={16} className="text-violet-50 shrink-0" />
                       <span>{item.title}</span>
                     </li>
                   ))}
