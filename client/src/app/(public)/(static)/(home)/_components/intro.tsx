@@ -1,9 +1,12 @@
 import { Button } from "@/components/ui";
+import { AuthContext } from "@/context";
 import { ArrowUpRight, HomeIntro, HomeIntroMobile } from "@public/home";
 import Image from "next/image";
 import Link from "next/link";
+import { useContext } from "react";
 
 export const Intro = () => {
+  const { user } = useContext(AuthContext);
   return (
     <>
       <div className="relative font-manrope h-[743px] sm:h-[824px] flex items-center justify-center">
@@ -15,7 +18,7 @@ export const Intro = () => {
             </h1>
           </div>
           <div className="w-full sm:w-fit gap-[10px] sm:gap-0 flex flex-col sm:flex-row items-center">
-            <Link href="/download-app">
+            <Link href={user ? "/download-app" : "/auth/account-type"}>
               <Button
                 variant="default"
                 className="w-full sm:w-[250px] h-[44px] rounded-[30px] text-xl font-medium text-[#8F40E5] border-[#A64CE8]"

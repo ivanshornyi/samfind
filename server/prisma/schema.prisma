@@ -164,6 +164,7 @@ model Subscription {
   isInTrial        Boolean
   stripeInvoiceIds String[] @default([])
   nextDate         DateTime
+  newPlanId        String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 

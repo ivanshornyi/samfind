@@ -306,6 +306,7 @@ export class UserService {
         id: true,
         nextDate: true,
         plan: true,
+        isActive: true,
         license: {
           select: {
             limit: true,
@@ -318,10 +319,12 @@ export class UserService {
       },
     });
 
+    console.log(subscription);
+
     if (!subscription) {
-      console.log("no subscription");
       throw new NotFoundException("Subscription was not found");
     }
+
     return subscription;
   }
 

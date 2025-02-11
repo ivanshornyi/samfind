@@ -11,6 +11,7 @@ import {
 import { Logo } from "@public/images";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
 type Link = {
   label: string;
@@ -19,7 +20,7 @@ type Link = {
 
 const links: { menu: Link[]; legals: Link[] } = {
   menu: [
-    { label: "Pricing", href: "/pricing" },
+    { label: "Pricing", href: "/#pricing" },
     { label: "About", href: "/about" },
     { label: "FAQ", href: "/faq" },
     { label: "Contact", href: "/contact" },
@@ -78,22 +79,41 @@ const FooterNetworks = () => {
   );
 };
 
-const FooterSection = ({ title, links }: { title: string; links: Link[] }) => (
-  <div className="space-y-[28px]">
-    <h3 className="text-xl font-semibold">{title}</h3>
-    <div className="flex flex-col gap-[21px] text-sm lg:text-base font-semibold">
-      {links.map((item, index) => (
-        <Link
-          href="/"
-          key={index}
-          className="transition-all hover:text-[#CE9DF3] hover:underline active:text-[#8F40E5]"
-        >
-          {item.label}
-        </Link>
-      ))}
+const FooterSection = ({ title, links }: { title: string; links: Link[] }) => {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleNavigation = (href: string) => {
+    if (href === "/#pricing") {
+      if (pathname === "/") {
+        document
+          .getElementById("pricing")
+          ?.scrollIntoView({ behavior: "smooth" });
+      } else {
+        router.push(href);
+      }
+      return;
+    }
+    router.push(href);
+  };
+
+  return (
+    <div className="space-y-[28px]">
+      <h3 className="text-xl font-semibold">{title}</h3>
+      <div className="flex flex-col gap-[21px] text-sm lg:text-base font-semibold">
+        {links.map((item, index) => (
+          <span
+            key={index}
+            onClick={() => handleNavigation(item.href)}
+            className="transition-all hover:text-[#CE9DF3] hover:underline active:text-[#8F40E5] cursor-pointer"
+          >
+            {item.label}
+          </span>
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const Footer = () => {
   return (
@@ -146,7 +166,7 @@ export const Footer = () => {
 
         <div className="flex flex-row xl:gap-12">
           <FooterSection title="Menu" links={links.menu} />
-          <FooterSection title="Legals" links={links.legals} />
+          {/* <FooterSection title="Legals" links={links.legals} /> */}
         </div>
 
         <div className="lg:hidden flex flex-col justify-between maw-w-[360px]">

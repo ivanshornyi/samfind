@@ -25,9 +25,19 @@ const createPayment = async (data: CreatePaymentData) => {
   }
 };
 
+const activateSubscription = async (id: string) => {
+  try {
+    const response = await apiClient.post(`/subscription/active/${id}`);
+
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 const cancelSubscription = async (id: string) => {
   try {
-    const response = await apiClient.post(`/subscription/${id}`);
+    const response = await apiClient.post(`/subscription/cancel/${id}`);
 
     return response.data;
   } catch (error) {
@@ -38,4 +48,5 @@ const cancelSubscription = async (id: string) => {
 export const PaymentSubscriptionApiService = {
   createPayment,
   cancelSubscription,
+  activateSubscription,
 };

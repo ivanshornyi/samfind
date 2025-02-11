@@ -7,8 +7,7 @@ import { AuthContext } from "@/context";
 // import { Button } from "@/components/ui";
 import { User } from "lucide-react";
 import Link from "next/link";
-
-// import { ManageSubscriptionModal } from "../manage-subscription-modal/manage-subscription-modal";
+import { ManageSubscriptionModal } from "../manage-subscription-modal/manage-subscription-modal";
 
 interface SubscriptionDetailsProps {
   plan: string;
@@ -77,7 +76,7 @@ export const SubscriptionDetails = ({
           </Link>
         </div>
 
-        {/* <ManageSubscriptionModal /> */}
+        <ManageSubscriptionModal />
       </div>
     </div>
   );

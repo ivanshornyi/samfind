@@ -32,7 +32,7 @@ export const PricingPlans = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {currentPricingPlans.map((plan) => (
-            <PricingCard key={plan.id} plan={plan} />
+            <PricingCard key={plan.id} plan={plan} withButton />
           ))}
         </div>
       </div>
