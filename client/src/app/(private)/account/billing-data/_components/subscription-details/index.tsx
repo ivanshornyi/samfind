@@ -36,9 +36,7 @@ export const SubscriptionDetails = ({
     <div className="flex flex-col space-y-4">
       <div className="flex items-center justify-between gap-4 mb-6">
         <h2 className="text-xl">Plan</h2>
-        <div
-          className="capitalize text-blue-50 flex items-center justify-center gap-2 bg-card rounded-full px-3 py-2  w-[200px]"
-        >
+        <div className="capitalize text-blue-50 flex items-center justify-center gap-2 bg-card rounded-full px-3 py-2  w-[200px]">
           <User size={16} />
           {user?.accountType} Account
         </div>
@@ -53,9 +51,7 @@ export const SubscriptionDetails = ({
           </div>
           <p className="text-[#C4C4C4] mt-1">Renews on {renewalDate}</p>
         </div>
-        <div>
-          
-        </div>
+        <div></div>
       </div>
       <div className="h-[1px] flex-grow bg-[#383838]" />
 
