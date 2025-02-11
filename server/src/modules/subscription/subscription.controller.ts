@@ -4,6 +4,7 @@ import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { SubscriptionService } from "./subscription.service";
 import { AddSubscriptionDto } from "./dto/add-subscription-dto";
 import { CreateMemberInvoiceDto } from "./dto/create-member-invoice-dto";
+import { ChangePlanDto } from "./dto/change-plan-dto";
 
 @ApiTags("Subscription")
 @Controller("subscription")
@@ -46,5 +47,11 @@ export class SubscriptionController {
   @Post("/active/:id")
   async activeSubscription(@Param("id") id: string) {
     return this.subscriptionService.activeSubscription(id);
+  }
+
+  @ApiOperation({ summary: "Change Subscription Plan" })
+  @Post("/change-plan")
+  async changePlan(@Body() changePlanDto: ChangePlanDto) {
+    return this.subscriptionService.changePlan(changePlanDto);
   }
 }

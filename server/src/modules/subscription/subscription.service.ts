@@ -16,6 +16,7 @@ import { StripeService } from "../stripe/stripe.service";
 import { AddSubscriptionDto } from "./dto/add-subscription-dto";
 import { CreateMemberInvoiceDto } from "./dto/create-member-invoice-dto";
 import Stripe from "stripe";
+import { ChangePlanDto } from "./dto/change-plan-dto";
 
 interface IAddDiscountOnNotUsedPeriod {
   totalAmount: number;
@@ -352,6 +353,7 @@ export class SubscriptionService {
       status: LicenseStatus.inactive,
     };
   }
+
   async activeSubscription(id: string) {
     const subscription = await this.prisma.subscription.findUnique({
       where: { id },
@@ -409,7 +411,7 @@ export class SubscriptionService {
         discountAmount,
       };
 
-      await this.stripeService.createAndPayInvoice({
+      const invoice = await this.stripeService.createAndPayInvoice({
         customerId: subscription.user.stripeCustomerId,
         priceId: subscription.plan.stripePriceId,
         quantity: subscription.license._count.activeLicenses,
@@ -418,7 +420,15 @@ export class SubscriptionService {
         metadata,
         pay: true,
       });
+
+      if (invoice.status !== "paid") {
+        throw new BadRequestException(
+          "An error occurred when paying for the License",
+        );
+      }
     }
+
+    return { status: LicenseStatus.active };
   }
 
   async checkDiscount(userId: string, payAmount: number) {
@@ -460,5 +470,52 @@ export class SubscriptionService {
     }
 
     return { discountId, discountAmount };
+  }
+
+  async changePlan({ planId, subscriptionId }: ChangePlanDto) {
+    const subscription = await this.prisma.subscription.findUnique({
+      where: { id: subscriptionId },
+    });
+
+    if (!subscription) {
+      throw new NotFoundException("Subscription not found");
+    }
+
+    const plan = await this.prisma.plan.findUnique({
+      where: { id: planId },
+    });
+
+    if (!subscription) {
+      throw new NotFoundException("Plan not found");
+    }
+
+    if (subscription.planId === planId) {
+      throw new BadRequestException("The plan has already been activated");
+    }
+
+    const today = new Date();
+    const nextDate = new Date(subscription.nextDate);
+
+    const difference = compareAsc(startOfDay(today), startOfDay(nextDate));
+
+    if (difference < 0) {
+      await this.prisma.subscription.update({
+        where: { id: subscriptionId },
+        data: { newPlanId: planId },
+      });
+    } else {
+      await this.prisma.subscription.update({
+        where: { id: subscriptionId },
+        data: { planId },
+      });
+      await this.prisma.license.update({
+        where: { id: subscription.licenseId },
+        data: { tierType: plan.type },
+      });
+
+      await this.activeSubscription(subscriptionId);
+    }
+
+    return plan;
   }
 }

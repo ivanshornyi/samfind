@@ -1,9 +1,9 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
-import { startOfDay, endOfDay } from "date-fns";
+import { startOfDay, endOfDay, startOfMonth, addMonths } from "date-fns";
 import { PrismaService } from "nestjs-prisma";
 import { StripeService } from "../stripe/stripe.service";
-import { LicenseStatus } from "@prisma/client";
+import { LicenseStatus, LicenseTierType } from "@prisma/client";
 import { MailService } from "../mail/mail.service";
 import { SubscriptionService } from "../subscription/subscription.service";
 
@@ -49,12 +49,40 @@ export class CronService {
         },
       });
 
-      const subscriptionIds = subscriptions.map((sub) => sub.id);
+      const freeBasedSubscriptions = subscriptions.filter(
+        (sub) => sub.plan.type === LicenseTierType.freemium,
+      );
 
-      if (subscriptionIds.length > 0) {
+      const freeBasedSubscriptionIds = freeBasedSubscriptions.map(
+        (sub) => sub.id,
+      );
+
+      if (freeBasedSubscriptionIds.length > 0) {
+        const nextDate = startOfMonth(addMonths(today, 1)).toISOString();
         await this.prisma.subscription.updateMany({
           where: {
-            id: { in: subscriptionIds },
+            id: { in: freeBasedSubscriptionIds },
+          },
+          data: {
+            nextDate,
+            isActive: true,
+            isInTrial: false,
+          },
+        });
+      }
+
+      const feeBasedSubscriptions = subscriptions.filter(
+        (sub) => sub.plan.type !== LicenseTierType.freemium,
+      );
+
+      const feeBasedSubscriptionIds = feeBasedSubscriptions.map(
+        (sub) => sub.id,
+      );
+
+      if (feeBasedSubscriptionIds.length > 0) {
+        await this.prisma.subscription.updateMany({
+          where: {
+            id: { in: feeBasedSubscriptionIds },
           },
           data: {
             isInTrial: true,
@@ -62,8 +90,8 @@ export class CronService {
         });
       }
 
-      for (let i = 0; i < subscriptions.length; i++) {
-        const subscription = subscriptions[i];
+      for (let i = 0; i < feeBasedSubscriptions.length; i++) {
+        const subscription = feeBasedSubscriptions[i];
         if (subscription.license._count.activeLicenses === 0) continue;
         const payAmount =
           subscription.license._count.activeLicenses * subscription.plan.price;
@@ -112,16 +140,22 @@ export class CronService {
         where: {
           isInTrial: true,
         },
-        include: { user: true },
+        include: { user: true, plan: true },
       });
 
-      const subscriptionIds = subscriptions.map((sub) => sub.id);
-      const licenseIds = subscriptions.map((sub) => sub.licenseId);
+      const feeBasedSubscriptions = subscriptions.filter(
+        (sub) => sub.plan.type !== LicenseTierType.freemium,
+      );
 
-      if (subscriptionIds.length > 0) {
+      const feeBasedSubscriptionIds = feeBasedSubscriptions.map(
+        (sub) => sub.id,
+      );
+      const licenseIds = feeBasedSubscriptions.map((sub) => sub.licenseId);
+
+      if (feeBasedSubscriptionIds.length > 0) {
         await this.prisma.subscription.updateMany({
           where: {
-            id: { in: subscriptionIds },
+            id: { in: feeBasedSubscriptionIds },
           },
           data: {
             isInTrial: false,
@@ -139,8 +173,8 @@ export class CronService {
         });
       }
 
-      for (let i = 0; i < subscriptions.length; i++) {
-        const subscription = subscriptions[i];
+      for (let i = 0; i < feeBasedSubscriptions.length; i++) {
+        const subscription = feeBasedSubscriptions[i];
         const response = await this.stripeService.getUserInvoices(
           subscription.user.stripeCustomerId,
           1,
