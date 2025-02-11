@@ -49,7 +49,7 @@ export const ManageSubscriptionModal = () => {
       <AlertDialogContent 
         className="
           w-full max-w-[800px] overflow-auto h-[100dvh] rounded-none 
-          md:h-[700px] md:rounded-2xl
+          md:h-[700px] md:rounded-[30px]
         "
       >
         <div className="absolute right-5 top-5">

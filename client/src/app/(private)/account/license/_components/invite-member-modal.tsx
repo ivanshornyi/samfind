@@ -136,7 +136,7 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
   return (
     <AlertDialog open={isModalOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="purple" className="" leftIcon={<Send />} onClick={() => setIsModalOpen(true)}>
+        <Button variant="purple" leftIcon={<Send />} onClick={() => setIsModalOpen(true)}>
           Invite members
         </Button>
       </AlertDialogTrigger>
@@ -160,7 +160,7 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
           </AlertDialogDescription>
         </AlertDialogHeader>
 
-        <p className="mt-8 text-[16px] leading-[22px] text-disabled font-medium">
+        <p className="mt-4 text-[16px] leading-[22px] text-disabled font-medium">
           Users you add to your subscription will get full access to all
           features covered by your license. How It Works:
         </p>
@@ -198,15 +198,14 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
           </p>
         ) : null} */}
 
-        <div className="flex gap-2 mt-4">
+        <div className="flex flex-wrap gap-2 mt-4 md:flex-nowrap">
           <Input
             placeholder="Enter email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            className="max-w-sm bg-card w-[340px]"
+            className="bg-card"
           />
           <Button
-            className="w-full"
             variant="saveProfile"
             onClick={addEmail}
             disabled={!email.length}

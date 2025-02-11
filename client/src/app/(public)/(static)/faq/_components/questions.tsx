@@ -58,11 +58,11 @@ const questionsData = [
 export const Questions = () => {
   return (
     <div className="flex flex-col items-center justify-center ml-auto mr-auto font-manrope pt-[100px] sm:pt-[200px]">
-      <div>
+      {/* <div>
         <Button className="text-[#8F40E5]" variant="tetrary">
           Contact us
         </Button>
-      </div>
+      </div> */}
 
       <h1 className="mt-[25px] text-[32px] sm:text-[48px] leading-[44px] sm:leading-[65px] font-semibold">
         Frequently Asked questions
@@ -70,7 +70,7 @@ export const Questions = () => {
       <p className="mt-[25px] text-[20px] leading-[27px] text-center">
         Need help with something? Here are our most frequently asked questions
       </p>
-      <form className="flex space-x-2 mt-[25px] w-full sm:w-[350px] relative">
+      {/* <form className="flex space-x-2 mt-[25px] w-full sm:w-[350px] relative">
         <Input type="text" placeholder="Search" />
         <div className="absolute right-0 top-[2px]">
           <Button
@@ -80,11 +80,11 @@ export const Questions = () => {
             className="w-10"
           ></Button>
         </div>
-      </form>
-      <p className="mt-[25px] sm:mt-[36px] text-[14px] sm:text-[16px] leading-[19px] sm:leading-[22px] text-center">
+      </form> */}
+      {/* <p className="mt-[25px] sm:mt-[36px] text-[14px] sm:text-[16px] leading-[19px] sm:leading-[22px] text-center">
         Can’t find an answer? Chat to{" "}
         <span className="underline">our team</span>
-      </p>
+      </p> */}
       <div className="mt-[60px] sm:mt-[100px] w-full">
         {questionsData.map((data) => (
           <QuestionDataItem
