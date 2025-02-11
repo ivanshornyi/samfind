@@ -11,7 +11,12 @@ import {
   startOfMonth,
 } from "date-fns";
 import { PrismaService } from "../prisma/prisma.service";
-import { LicenseStatus, PlanPeriod, User } from "@prisma/client";
+import {
+  LicenseStatus,
+  LicenseTierType,
+  PlanPeriod,
+  User,
+} from "@prisma/client";
 import { StripeService } from "../stripe/stripe.service";
 import { AddSubscriptionDto } from "./dto/add-subscription-dto";
 import { CreateMemberInvoiceDto } from "./dto/create-member-invoice-dto";
@@ -506,14 +511,30 @@ export class SubscriptionService {
     } else {
       await this.prisma.subscription.update({
         where: { id: subscriptionId },
-        data: { planId },
+        data: {
+          planId,
+          isActive:
+            plan.type === LicenseTierType.freemium
+              ? true
+              : subscription.isActive,
+          isInTrial:
+            plan.type === LicenseTierType.freemium
+              ? false
+              : subscription.isInTrial,
+          nextDate:
+            plan.type === LicenseTierType.freemium
+              ? startOfMonth(addMonths(new Date(), 1)).toISOString()
+              : subscription.nextDate,
+        },
       });
       await this.prisma.license.update({
         where: { id: subscription.licenseId },
         data: { tierType: plan.type },
       });
 
-      await this.activeSubscription(subscriptionId);
+      if (plan.type !== LicenseTierType.freemium) {
+        await this.activeSubscription(subscriptionId);
+      }
     }
 
     return plan;
