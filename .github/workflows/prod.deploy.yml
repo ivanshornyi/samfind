@@ -85,7 +85,7 @@ jobs:
           context: ./admin
           platforms: linux/arm64
           push: true
-          tags: nazarii2314/samfind-admin:latest
+          tags: onsiodocker/samfind-admin:latest
 
       - name: Build and Push Client (Multi-Platform)
         if: needs.detect-changes.outputs.client_changed == 'true'
@@ -94,7 +94,7 @@ jobs:
           context: ./client
           platforms: linux/arm64
           push: true
-          tags: nazarii2314/samfind-client:latest
+          tags: onsiodocker/samfind-client:latest
 
       - name: Build and Push Server (Multi-Platform)
         if: needs.detect-changes.outputs.server_changed == 'true'
@@ -103,7 +103,7 @@ jobs:
           context: ./server
           platforms: linux/arm64
           push: true
-          tags: nazarii2314/samfind-server:latest
+          tags: onsiodocker/samfind-server:latest
           build-args: |
             DATABASE_URL=${{ secrets.DATABASE_URL }}
 
