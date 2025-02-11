@@ -15,6 +15,8 @@ import { useContext, useState } from "react";
 
 interface PricingCardProps {
   plan: Plan;
+  withButton: boolean;
+  currentUserPlanId?: string;
 }
 
 const PLAN_FEATURES = {
@@ -28,7 +30,7 @@ const PLAN_FEATURES = {
   // Add other plan types if needed
 };
 
-export const PricingCard = ({ plan }: PricingCardProps) => {
+export const PricingCard = ({ plan, withButton, currentUserPlanId }: PricingCardProps) => {
   const { user } = useContext(AuthContext);
   const {
     mutate: paySubscriptionMutation,
@@ -86,7 +88,7 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
       {isPaySubscriptionPending && <FullScreenLoader />}
       <CardHeader className="space-y-4">
         <h3 className="text-2xl font-semibold capitalize">
-          {plan.type} {plan.period}
+          {plan.type} {plan.period} 
         </h3>
         <p className="text-[#C4C4C4] text-sm">
           Boost your capabilities with premium features and priority support.
@@ -95,16 +97,18 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
 
       <CardContent>
         <div className="mb-8">
-          <div className="flex items-center gap-2 mt-3">
-            <label>Quantity</label>
-            <input
-              type="number"
-              min={1}
-              className="w-[80px] rounded-xl px-4 py-2 bg-background text-center"
-              value={quantity}
-              onChange={handleQuantityChange}
-            />
-          </div>
+          {withButton && (
+            <div className="flex items-center gap-2 mt-3">
+              <label>Quantity</label>
+              <input
+                type="number"
+                min={1}
+                className="w-[80px] rounded-xl px-4 py-2 bg-background text-center"
+                value={quantity}
+                onChange={handleQuantityChange}
+              />
+            </div>
+          )}
 
           <div className="flex items-baseline mt-2">
             <span className="text-4xl font-semibold">
@@ -132,22 +136,30 @@ export const PricingCard = ({ plan }: PricingCardProps) => {
         </ul>
       </CardContent>
 
-      <CardFooter>
-        <Button
-          className={`w-full rounded-full ${
-            isFreemium
-              ? "bg-transparent border border-[#383838] text-white"
-              : "bg-gradient-to-r from-[#8F40E5] to-[#6E40E5] hover:opacity-90 text-white"
-          }`}
-          onClick={paySubscription}
-          disabled={isPaySubscriptionPending || isFreemium}
-        >
-          {isFreemium
-            ? "Active subscription"
-            : isPaySubscriptionPending
-              ? "Processing..."
-              : "Get started"}
-        </Button>
+      <CardFooter className="mt-2">
+        {withButton && (
+          <Button
+            className={`w-full rounded-full ${
+              isFreemium
+                ? "bg-transparent border border-[#383838] text-white"
+                : "bg-gradient-to-r from-[#8F40E5] to-[#6E40E5] hover:opacity-90 text-white"
+            }`}
+            onClick={paySubscription}
+            disabled={isPaySubscriptionPending || isFreemium}
+          >
+            {isFreemium
+              ? "Active subscription"
+              : isPaySubscriptionPending
+                ? "Processing..."
+                : "Get started"}
+          </Button>
+        )}
+
+        {currentUserPlanId && currentUserPlanId === plan.id && (
+          <div className="w-full text-center py-3 bg-background rounded-full">
+            Active plan
+          </div>
+        )}
       </CardFooter>
     </Card>
   );
