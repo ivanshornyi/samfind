@@ -444,8 +444,8 @@ export default function License() {
           <div className="mt-4">
             <UserAccountTypeBox />
 
-            <div className="flex justify-between items-start mt-4">
-              <div className="p-4 rounded-lg bg-card w-[330px]">
+            <div className="flex flex-wrap gap-3 justify-between items-start mt-4">
+              <div className="p-4 rounded-lg bg-card w-full sm:w-[330px]">
                 <p>
                   You have joined the workspace of the user{" "}
                   <span className="capitalize text-blue-50">{`${invitedUserData?.licenseOwner.firstName} ${invitedUserData?.licenseOwner.lastName} `}</span>
