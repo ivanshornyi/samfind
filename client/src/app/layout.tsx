@@ -27,6 +27,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  console.log("client");
   return (
     <TanstackProvider>
       <html lang="en">
