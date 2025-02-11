@@ -98,9 +98,11 @@ const getInvitedUserInfo = async (userId: string) => {
 };
 
 interface UserSubscriptionInfo {
+  id: string;
   isActive: boolean;
   nextDate: string;
   plan: {
+    id: string;
     type: LicenseTierType;
     period: PlanPeriod;
     price: number;
