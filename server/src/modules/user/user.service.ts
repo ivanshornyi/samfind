@@ -319,8 +319,6 @@ export class UserService {
       },
     });
 
-    console.log(subscription);
-
     if (!subscription) {
       throw new NotFoundException("Subscription was not found");
     }

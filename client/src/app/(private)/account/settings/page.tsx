@@ -124,6 +124,7 @@ export default function Settings() {
     if (userFormData.firstName === "" || userFormData.lastName === "") {
       toast({
         description: "Some fields are empty",
+        variant: "default",
       });
     }
 
@@ -152,6 +153,7 @@ export default function Settings() {
     ) {
       toast({
         description: "Password is not the same",
+        variant: "default",
       });
 
       return;
@@ -163,6 +165,7 @@ export default function Settings() {
     ) {
       toast({
         description: "Some fields are empty",
+        variant: "default",
       });
 
       return;
