@@ -56,7 +56,7 @@ export default function InvitedFriends() {
 
   return (
     <>
-      <div className="flex items-end gap-[55px] mx-auto mb-16">
+      <div className="flex items-end gap-[55px] justify-between mx-auto mb-16">
         <div className="flex flex-col">
           <div className="flex justify-between mb-6">
             <h2 className="text-2xl sm:text-[32px] leading-[44px] font-semibold">
