@@ -6,7 +6,7 @@ export const pricingPlans: PricingPlan[] = [
     description:
       "Boost your capabilities with premium features and priority support.",
     price: 0,
-    currency: "USD",
+    currency: "EUR",
     billingPeriod: "forever",
     features: ["Essential features", "Community access", "Basic support"],
     license: {
@@ -19,7 +19,7 @@ export const pricingPlans: PricingPlan[] = [
     description:
       "Boost your capabilities with premium features and priority support.",
     price: 8.3,
-    currency: "USD",
+    currency: "EUR",
     billingPeriod: "month, billed yearly",
     features: ["Enhanced capabilities", "Priority updates", "Premium support"],
     license: {
@@ -33,7 +33,7 @@ export const pricingPlans: PricingPlan[] = [
     description:
       "Boost your capabilities with premium features and priority support.",
     price: 9.99,
-    currency: "USD",
+    currency: "EUR",
     billingPeriod: "month, billed monthly",
     features: ["Enhanced capabilities", "Priority updates", "Premium support"],
     license: {

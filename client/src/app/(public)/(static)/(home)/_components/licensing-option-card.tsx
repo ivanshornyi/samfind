@@ -1,11 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 
 import { LicensingOptionType } from "../_types";
 
 import { Button } from "@/components";
-import { CheckOutline, DollarIcon } from "@public/home";
+import { CheckOutline } from "@public/home";
 
 import Image from "next/image";
 
@@ -30,11 +30,11 @@ export const LicensingOptionCard = ({
       {option.price !== 0 ? (
         <div className="mb-10 flex gap-2 items-center justify-between">
           <div className="flex items-center">
-            <div className="flex items-start justify-end">
+            {/* <div className="flex items-start justify-end">
               <Image src={DollarIcon} alt="dollar" width={23} height={49} />
-            </div>
+            </div> */}
             <p className="font-semibold text-5xl text-[#DCDCDC] leading-[52px]">
-              {option.price}
+              €{option.price}
               <span className="text-[32px]">/month</span>
             </p>
           </div>
@@ -43,7 +43,7 @@ export const LicensingOptionCard = ({
 
       <Button
         variant={option.buttonVariant}
-        className={`w-full mb-10 border-none ${isLarge ? 'py-[13px]' : ''}`}
+        className={`w-full mb-10 border-none ${isLarge ? "py-[13px]" : ""}`}
         onClick={() => router.push("/auth/account-type")}
       >
         {option.buttonText}

@@ -57,7 +57,7 @@ export const SubscriptionDetails = ({
 
       <div className="flex items-end">
         <span className="text-2xl font-semibold">
-          <span className="text-lg">$</span>
+          <span className="text-lg">€</span>
           {price}
         </span>
         <span className="text-[#C4C4C4]">/{billingPeriod}</span>
