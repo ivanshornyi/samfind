@@ -30,10 +30,12 @@ export class SignUpOrganizationDto {
   name: string;
 
   @IsString()
-  businessOrganizationNumber: string;
+  @IsOptional()
+  businessOrganizationNumber?: string;
 
   @IsString()
-  VAT: string;
+  @IsOptional()
+  VAT?: string;
 
   @IsArray()
   @IsOptional()
@@ -44,7 +46,7 @@ export class SignUpDto extends SignInDto {
   @IsString()
   @IsOptional()
   firstName: string;
-  
+
   @IsString()
   @IsOptional()
   lastName: string;
@@ -66,4 +68,4 @@ export class SignUpDto extends SignInDto {
   @IsNumber()
   @IsOptional()
   invitedReferralCode?: number;
-} 
+}

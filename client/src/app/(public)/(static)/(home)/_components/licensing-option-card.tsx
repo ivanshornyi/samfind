@@ -8,6 +8,9 @@ import { Button } from "@/components";
 import { CheckOutline } from "@public/home";
 
 import Image from "next/image";
+import { AuthContext } from "@/context";
+import { useContext } from "react";
+import { PlanPeriod } from "@/types";
 
 export const LicensingOptionCard = ({
   option,
@@ -17,12 +20,12 @@ export const LicensingOptionCard = ({
   isLarge: boolean;
 }) => {
   const router = useRouter();
-
+  const { user } = useContext(AuthContext);
   return (
     <div
       className={`h-fit flex-1 ${isLarge ? "bg-[#302935]" : "bg-card"} px-6 py-8 rounded-[20px] transition-all hover:shadow-[0_2px_20px_0_#B668F080]`}
     >
-      <h3 className="font-semibold text-[32px] leading-[43px] mb-4">
+      <h3 className="font-semibold text-[32px] leading-[43px] mb-4 first-letter:uppercase">
         {option.title}
       </h3>
       <p className="font-normal text-base mb-10">{option.description}</p>
@@ -35,7 +38,9 @@ export const LicensingOptionCard = ({
             </div> */}
             <p className="font-semibold text-5xl text-[#DCDCDC] leading-[52px]">
               €{option.price}
-              <span className="text-[32px]">/month</span>
+              <span className="text-[32px]">
+                {option.period === PlanPeriod.Monthly ? "/month" : "/year"}
+              </span>
             </p>
           </div>
         </div>
@@ -44,7 +49,9 @@ export const LicensingOptionCard = ({
       <Button
         variant={option.buttonVariant}
         className={`w-full mb-10 border-none ${isLarge ? "py-[13px]" : ""}`}
-        onClick={() => router.push("/auth/account-type")}
+        onClick={() =>
+          router.push(user ? "/account/billing-data" : "/auth/account-type")
+        }
       >
         {option.buttonText}
       </Button>

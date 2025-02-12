@@ -216,11 +216,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
       }
 
       if (accountType === UserAccountType.Business) {
-        if (
-          organizationFormData.name === "" ||
-          organizationFormData.businessOrganizationNumber === "" ||
-          organizationFormData.VAT === ""
-        ) {
+        if (organizationFormData.name === "") {
           toast({
             description: "Some fields are empty",
           });
