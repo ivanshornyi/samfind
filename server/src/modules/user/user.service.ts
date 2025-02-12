@@ -319,8 +319,6 @@ export class UserService {
       },
     });
 
-    console.log(subscription);
-
     if (!subscription) {
       throw new NotFoundException("Subscription was not found");
     }
@@ -365,5 +363,30 @@ export class UserService {
       where: { id },
       data: { isDeleted: true },
     });
+  }
+
+  async getUserOrganizationName(organizationId: string) {
+    const organization = await this.prisma.organization.findUnique({
+      where: { id: organizationId },
+    });
+
+    if (!organization) {
+      throw new NotFoundException("Organization not found");
+    }
+
+    return { name: organization.name };
+  }
+
+  async getUserName(licenseId: string) {
+    const license = await this.prisma.license.findUnique({
+      where: { id: licenseId },
+      include: { user: { select: { firstName: true, lastName: true } } },
+    });
+
+    if (!license) {
+      throw new NotFoundException("License not found");
+    }
+
+    return { name: license.user.firstName + "  " + license.user.lastName };
   }
 }

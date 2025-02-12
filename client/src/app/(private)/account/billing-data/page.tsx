@@ -10,6 +10,7 @@ import { PaymentHistory, SubscriptionDetails } from "./_components";
 import { PricingCard } from "./_components/pricing-card";
 
 import { format } from "date-fns";
+import { PlanPeriod } from "@/types";
 
 export default function BillingData() {
   const { data: plans, isPending: isPlansPending } = useGetPlans();
@@ -52,7 +53,11 @@ export default function BillingData() {
                       : "no date"
                   }
                   price={userSubscriptionInfo.plan?.price / 100}
-                  billingPeriod={`month billed ${userSubscriptionInfo.plan?.period}`}
+                  billingPeriod={
+                    userSubscriptionInfo.plan?.period === PlanPeriod.Monthly
+                      ? "month"
+                      : "year"
+                  }
                   members={{
                     admin: 1,
                     regular:

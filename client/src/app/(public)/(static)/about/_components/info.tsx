@@ -46,7 +46,7 @@ export const Info = () => {
       </Button>
       <h1 className="text-[32px] sm:text-[48px] mt-[56px] leading-[44px] sm:leading-[65px] font-extrabold max-w-[1180px]">
         <span>
-          {`In Osio we're dedicated to creating solutions that respect privacy`}
+          {`In Onsio we're dedicated to creating solutions that respect privacy`}
         </span>
         {"  "}
         <span

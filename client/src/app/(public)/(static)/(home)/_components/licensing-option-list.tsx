@@ -1,9 +1,47 @@
 "use client";
 
+import { useGetPlans } from "@/hooks";
 import { licensingOptions } from "../_lib";
 import { LicensingOptionCard } from "./licensing-option-card";
+import { LicensingOptionType } from "../_types";
+import { useEffect, useState } from "react";
+import { PlanPeriod } from "@/types";
 
 export const LicensingOptionList = () => {
+  const { data: plans } = useGetPlans();
+  const [planOptions, setPlanOptions] = useState<LicensingOptionType[]>([
+    licensingOptions[0],
+  ]);
+
+  useEffect(() => {
+    if (plans?.length) {
+      const newPlanOptions: LicensingOptionType[] = plans.map((plan) => {
+        return {
+          id: plan.id,
+          title:
+            plan.type +
+            "  " +
+            `${plan.period === PlanPeriod.Monthly ? "Monthly" : "Yearly"}`,
+          tierType: plan.type,
+          period: plan.period,
+          description:
+            "Boost your capabilities with premium features and priority support.",
+          price: plan.price / 100,
+          buttonText: "Buy Standard",
+          buttonVariant: "default",
+          features: [
+            "Enhanced capabilities",
+            "Priority updates",
+            "Premium support",
+          ],
+          footerText: undefined,
+          isPremium: true,
+        };
+      });
+
+      setPlanOptions(() => [licensingOptions[0], ...newPlanOptions]);
+    }
+  }, [plans]);
   return (
     <div
       id="pricing"
@@ -20,7 +58,7 @@ export const LicensingOptionList = () => {
       </div>
 
       <div className="flex flex-col items-center ml:flex-row gap-5">
-        {licensingOptions.map((option, index) => (
+        {planOptions.map((option, index) => (
           <LicensingOptionCard
             key={option.id}
             option={option}

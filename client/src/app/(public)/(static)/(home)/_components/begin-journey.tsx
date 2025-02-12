@@ -18,7 +18,7 @@ export const BeginJourney = () => {
             variant="secondary"
             className="w-[250px] h-[44px] rounded-[30px] text-xl font-medium border-[#A64CE8] py-6"
           >
-            Download Now
+            Coming soon
           </Button>
         </Link>
         <Link href="/learn-more/software">

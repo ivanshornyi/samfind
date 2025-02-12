@@ -101,7 +101,7 @@ export const useResetPassword = () => {
       toast({
         title: "Success",
         description: "Successfully updated",
-        variant: "success"
+        variant: "success",
       });
 
       router.push("/auth/sign-in");
@@ -199,7 +199,7 @@ export const useVerifyUser = () => {
       localStorage.removeItem("licenseId");
       localStorage.removeItem("organizationId");
 
-      setTimeout(() => router.push("/account/license"), 100);
+      setTimeout(() => router.push("/account/billing-data"), 100);
     },
     onError: (error) => {
       handleToastError(error, toast);

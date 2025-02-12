@@ -3,7 +3,11 @@ import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/context";
 
 import { useQuery } from "@tanstack/react-query";
-import { useUpdateOrganization, useUpdateUserLicense, useGetUserLicenses  } from "@/hooks";
+import {
+  useUpdateOrganization,
+  useUpdateUserLicense,
+  useGetUserLicenses,
+} from "@/hooks";
 import { OrganizationApiService, UserLicenseApiService } from "@/services";
 
 import {
@@ -22,6 +26,7 @@ import {
 import { useToast } from "@/hooks";
 
 import { Info, Send, X } from "lucide-react";
+import { UserAccountType } from "@/types";
 
 interface InviteMemberProps {
   allowedMembers: number;
@@ -32,6 +37,8 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
 
   const [email, setEmail] = useState("");
   const [emails, setEmails] = useState<string[]>([]);
+  const [domain, setDomain] = useState("");
+  const [domains, setDomains] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { toast } = useToast();
@@ -72,6 +79,12 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
     );
   };
 
+  const removeDomain = (domainToRemove: string) => {
+    setDomains((prevDomains) =>
+      prevDomains.filter((domain) => domain !== domainToRemove)
+    );
+  };
+
   const addEmail = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -95,13 +108,26 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
     setEmail("");
   };
 
+  const addDomain = () => {
+    if (domains.some((e) => e === domain)) {
+      toast({
+        description: "Domain already in list.",
+      });
+
+      return;
+    }
+
+    setDomains((prevDomains) => [...prevDomains, domain]);
+    setDomain("");
+  };
+
   const handleAddEmails = () => {
     if (user) {
       // business
       if (user.organizationId) {
         updateOrganizationMutation({
           id: user.organizationId,
-          organizationData: { availableEmails: emails },
+          organizationData: { availableEmails: emails, domains },
         });
       }
 
@@ -124,6 +150,7 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
   useEffect(() => {
     if (userOrganization) {
       setEmails([...userOrganization.availableEmails]);
+      setDomains(userOrganization.domains);
     }
   }, [userOrganization]);
 
@@ -136,13 +163,20 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
   return (
     <AlertDialog open={isModalOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="purple" leftIcon={<Send />} onClick={() => setIsModalOpen(true)}>
+        <Button
+          variant="purple"
+          leftIcon={<Send />}
+          onClick={() => setIsModalOpen(true)}
+        >
           Invite members
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="w-full max-w-[590px]">
         <div className="absolute right-1 top-1">
-          <AlertDialogCancel onClick={() => setIsModalOpen(false)} className="shadow-none border-none p-3">
+          <AlertDialogCancel
+            onClick={() => setIsModalOpen(false)}
+            className="shadow-none border-none p-3"
+          >
             <X size={18} />
           </AlertDialogCancel>
         </div>
@@ -151,18 +185,18 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
           <AlertDialogTitle className="text-[24px] leading-[33px] font-semibold">
             Invite members
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-[16px] leading-[22px] p-[10px] px-6 text-link-hover flex gap-2 items-center">
+          {/* <AlertDialogDescription className="text-[16px] leading-[22px] p-[10px] px-6 text-link-hover flex gap-2 items-center">
             <Info size={14} />
             <span>
               You can add {allowedMembers - emails.length} more members on your
               plan.
             </span>
-          </AlertDialogDescription>
+          </AlertDialogDescription> */}
         </AlertDialogHeader>
 
         <p className="mt-4 text-[16px] leading-[22px] text-disabled font-medium">
-          Users you add to your subscription will get full access to all
-          features covered by your license. How It Works:
+          If you invite new users to your workspace, and no unused licenses are
+          left, you’ll be charged for each new user who joins. How It Works:
         </p>
         <ol className="list-lower-alpha space-y-2 pl-6 mt-6 text-[16px] leading-[22px] text-disabled font-medium">
           <li>a. Share the invitation link with the user.</li>
@@ -214,6 +248,47 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
           </Button>
         </div>
 
+        {user?.accountType === UserAccountType.Business ? (
+          <>
+            {domains.length ? (
+              <div className="mt-8">
+                <p className="text-[16px] leading-[22px] text-link-hover">
+                  Added domains
+                </p>
+                <div className="flex gap-2 flex-wrap mt-2">
+                  {domains.map((domain) => (
+                    <div
+                      key={domain}
+                      className="text-[14px] leading-[19px] font-medium p-2 px-4 flex items-center gap-2 bg-input rounded-[30px]"
+                    >
+                      <span>{domain}</span>
+                      <X
+                        onClick={() => removeDomain(domain)}
+                        className="cursor-pointer text-disabled hover:text-light"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            <div className="flex flex-wrap gap-2 mt-4 md:flex-nowrap">
+              <Input
+                placeholder="Enter domain"
+                value={domain}
+                onChange={(event) => setDomain(event.target.value)}
+                className="bg-card"
+              />
+              <Button
+                variant="saveProfile"
+                onClick={addDomain}
+                disabled={!domain.length}
+              >
+                Add domain
+              </Button>
+            </div>
+          </>
+        ) : null}
+
         <AlertDialogFooter className="flex gap-6 w-full">
           <Button
             onClick={handleAddEmails}
@@ -221,9 +296,12 @@ export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
             className="w-full"
             withLoader
             loading={isUpdateOrganizationPending || isUserLicenseUpdatePending}
-            disabled={emails.length <= 0 || isUpdateOrganizationPending || isUserLicenseUpdatePending}
+            disabled={
+              // (emails.length <= 0 && domains.length <= 0) ||
+              isUpdateOrganizationPending || isUserLicenseUpdatePending
+            }
           >
-            Send invitations
+            Update/Send invitations
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

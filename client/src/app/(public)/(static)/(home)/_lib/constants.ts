@@ -1,10 +1,11 @@
-import { LicenseTierType } from "@/types";
+import { LicenseTierType, PlanPeriod } from "@/types";
 import { LicensingOptionType } from "../_types";
 
 export const licensingOptions: LicensingOptionType[] = [
   {
     id: 1,
     title: "Freemium",
+    period: PlanPeriod.Monthly,
     tierType: LicenseTierType.Freemium,
     description: "Essential features for personal and community use",
     price: 0,
@@ -17,6 +18,7 @@ export const licensingOptions: LicensingOptionType[] = [
   {
     id: 2,
     title: "Standard",
+    period: PlanPeriod.Monthly,
     tierType: LicenseTierType.Standard,
     description:
       "Boost your capabilities with premium features and priority support.",

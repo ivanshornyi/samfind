@@ -36,8 +36,8 @@ export type SignUpData = {
   invitedReferralCode?: number;
   organization?: {
     name: string;
-    VAT: string;
-    businessOrganizationNumber: string;
+    VAT?: string;
+    businessOrganizationNumber?: string;
   };
 };
 

@@ -99,7 +99,7 @@ const FooterSection = ({ title, links }: { title: string; links: Link[] }) => {
 
   return (
     <div className="space-y-[28px]">
-      <h3 className="text-xl font-semibold">{title}</h3>
+      {/* <h3 className="text-xl font-semibold">{title}</h3> */}
       <div className="flex flex-col gap-[21px] text-sm lg:text-base font-semibold">
         {links.map((item, index) => (
           <span

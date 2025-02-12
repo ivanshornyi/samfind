@@ -114,7 +114,7 @@ export const MenuMobile = () => {
 
             <div className="absolute flex justify-center right-0 left-0 bottom-10">
               <p className="text-sm font-normal">
-                @ Osio2025. All rights reserved.{" "}
+                @ Onsio2025. All rights reserved.{" "}
               </p>
             </div>
           </SheetHeader>

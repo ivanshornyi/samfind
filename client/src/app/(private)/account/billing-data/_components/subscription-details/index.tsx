@@ -1,14 +1,9 @@
 "use client";
 
-import { useContext } from "react";
-
-import { AuthContext } from "@/context";
-
-// import { Button } from "@/components/ui";
-import { User } from "lucide-react";
 import Link from "next/link";
 
 import { ManageSubscriptionModal } from "../manage-subscription-modal/manage-subscription-modal";
+import { UserAccountTypeBox } from "@/components";
 
 interface SubscriptionDetailsProps {
   plan: string;
@@ -30,16 +25,11 @@ export const SubscriptionDetails = ({
   billingPeriod,
   members,
 }: SubscriptionDetailsProps) => {
-  const { user } = useContext(AuthContext);
-
   return (
     <div className="flex flex-col space-y-4">
       <div className="flex items-center justify-between gap-4 mb-6">
         <h2 className="text-xl">Plan</h2>
-        <div className="capitalize text-blue-50 flex items-center justify-center gap-2 bg-card rounded-full px-3 py-2  w-[200px]">
-          <User size={16} />
-          {user?.accountType} Account
-        </div>
+        <UserAccountTypeBox />
       </div>
       <div className="flex items-center justify-between">
         <div>

@@ -7,7 +7,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { UserAccountType } from "@/types";
 
-import { useResetPassword, useSignIn, useSignUp, useToast } from "@/hooks";
+import {
+  useGetUserOrganizationName,
+  useGetUserName,
+  useResetPassword,
+  useSignIn,
+  useSignUp,
+  useToast,
+} from "@/hooks";
 
 import { SignUpData, UserAuthType } from "@/services";
 
@@ -15,16 +22,7 @@ import { Button, Input } from "@/components";
 import { SendResetPasswordCodeModal, VerifyUserModal } from "../_components";
 import { ACCOUNT_TYPE_CARD_ITEMS } from "../account-type/data";
 
-import {
-  Building2,
-  Check,
-  EyeIcon,
-  EyeOff,
-  Globe,
-  Hash,
-  Info,
-  X,
-} from "lucide-react";
+import { Building2, Check, EyeIcon, EyeOff, Hash, Info, X } from "lucide-react";
 
 interface AuthFormProps {
   authPageType: "signIn" | "signUp" | "resetPassword";
@@ -60,6 +58,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
   const searchParams = useSearchParams();
   const accountType = searchParams.get("accountType") as UserAccountType;
   const referralCode = searchParams.get("userReferralCode");
+  const licenseId = searchParams.get("lId");
+  const organizationId = searchParams.get("orgId");
+
+  const { data: organizationName } = useGetUserOrganizationName(organizationId);
+  const { data: userName } = useGetUserName(licenseId);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -140,12 +143,12 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
     }
   };
 
-  const addDomainField = () => {
-    setOrganizationFormData((prev) => ({
-      ...prev,
-      domains: [...prev.domains, ""],
-    }));
-  };
+  // const addDomainField = () => {
+  //   setOrganizationFormData((prev) => ({
+  //     ...prev,
+  //     domains: [...prev.domains, ""],
+  //   }));
+  // };
 
   const handlePasswordInputTypeChange = () => {
     if (passwordInputType === "text") {
@@ -216,11 +219,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
       }
 
       if (accountType === UserAccountType.Business) {
-        if (
-          organizationFormData.name === "" ||
-          organizationFormData.businessOrganizationNumber === "" ||
-          organizationFormData.VAT === ""
-        ) {
+        if (organizationFormData.name === "") {
           toast({
             description: "Some fields are empty",
           });
@@ -320,7 +319,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                   "
                 >
                   {item.icon}
-                  <span>{accountType} Account</span>
+                  <span>
+                    {accountType === "private" ? "personal" : "business"}{" "}
+                    Account
+                  </span>
                 </li>
               ) : null;
             })}
@@ -335,6 +337,17 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
               <Info color="#BEB8FF" />
               <p className="text-[#BEB8FF]">
                 You&apos;ve got a 10% discount via referral link!
+              </p>
+            </div>
+          )}
+
+          {authPageType === "signUp" && (userName || organizationName) && (
+            <div className="my-4 flex items-center gap-2 bg-[#363637] rounded-2xl px-4 py-2">
+              <Info color="#BEB8FF" />
+              <p className="text-[#BEB8FF]">
+                You have been invited to join the workspace of the company
+                {` ${userName?.name || organizationName?.name}`} and use access
+                to the license. Create the account to continue.
               </p>
             </div>
           )}
@@ -509,7 +522,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                     <div className="relative">
                       <Input
                         name="name"
-                        placeholder="Company name"
+                        placeholder="Company name(required)"
                         value={organizationFormData.name}
                         onChange={handleOrganizationFormInputChange}
                         className="pl-11"
@@ -524,7 +537,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                       <div className="relative flex-1">
                         <Input
                           name="businessOrganizationNumber"
-                          placeholder="Business registration number"
+                          placeholder="Business registration №"
                           value={
                             organizationFormData.businessOrganizationNumber
                           }
@@ -552,7 +565,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                       </div>
                     </div>
 
-                    {organizationFormData.domains.map((domain, index) => (
+                    {/* {organizationFormData.domains.map((domain, index) => (
                       <div key={index} className="relative">
                         <Input
                           name="domain"
@@ -568,16 +581,16 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                           size={18}
                         />
                       </div>
-                    ))}
+                    ))} */}
 
-                    <Button
+                    {/* <Button
                       type="button"
                       variant="outline"
                       onClick={addDomainField}
                       className="w-fit px-4"
                     >
                       Add another domain
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
               </div>

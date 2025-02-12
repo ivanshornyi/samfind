@@ -37,6 +37,7 @@ export interface User {
   discount: number;
   referralCode: string;
   licenseId?: string;
+  stripeCustomerId?: string;
   organizationId?: string;
   invitedReferralCode?: number;
   organization?: Organization;

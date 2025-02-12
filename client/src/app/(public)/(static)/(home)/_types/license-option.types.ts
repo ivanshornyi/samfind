@@ -1,9 +1,10 @@
-import { LicenseTierType } from "@/types";
+import { LicenseTierType, PlanPeriod, PlanType } from "@/types";
 
 export type LicensingOptionType = {
-  id: number;
+  id: number | string;
   title: string;
-  tierType: LicenseTierType;
+  period: PlanPeriod;
+  tierType: LicenseTierType | PlanType;
   description: string;
   price: number;
   buttonText: string;

@@ -8,11 +8,13 @@ const items = [
     imageSrc: AppstoreImage,
     name: "MacOS",
     description: "Get the Onsio App from the AppStore",
+    text: "Coming soon",
   },
   {
     imageSrc: WindowsImage,
     name: "Windows",
     description: "Get the Onsio mobile App from the GooglePlay",
+    text: "Coming soon",
   },
   {
     imageSrc: AppstoreImage,
@@ -23,6 +25,7 @@ const items = [
     imageSrc: PlaymarketImage,
     name: "Mobile Android",
     description: "Get the Onsio mobile App from the GooglePlay",
+    text: "Coming soon",
   },
 ];
 
@@ -45,18 +48,22 @@ export default function DownloadSoftware() {
             </h2>
             <h3 className="font-normal text-base">{item.description}</h3>
 
-            <Button
-              variant="link"
-              className="w-full h-[60px] justify-start p-0 m-0 mt-4 relative"
-              rightIcon={
-                <ArrowUpRight
-                  className="absolute top-0 right-0"
-                  style={{ width: "24px", height: "24px" }}
-                />
-              }
-            >
-              Download now
-            </Button>
+            {item.text ? (
+              <p className="text-disabled">{item.text}</p>
+            ) : (
+              <Button
+                variant="link"
+                className="w-full h-[60px] justify-start p-0 m-0 mt-4 relative"
+                rightIcon={
+                  <ArrowUpRight
+                    className="absolute top-0 right-0"
+                    style={{ width: "24px", height: "24px" }}
+                  />
+                }
+              >
+                Download now
+              </Button>
+            )}
           </div>
         ))}
       </div>
