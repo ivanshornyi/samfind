@@ -80,7 +80,7 @@ export class StripeService {
   async createPrice(productId: string, amount: number): Promise<Stripe.Price> {
     return await this.stripe.prices.create({
       unit_amount: amount,
-      currency: "usd",
+      currency: "eur",
       product: productId,
     });
   }
@@ -88,7 +88,7 @@ export class StripeService {
   async createCoupon(amount: number): Promise<Stripe.Coupon> {
     return await this.stripe.coupons.create({
       amount_off: amount,
-      currency: "usd",
+      currency: "eur",
       duration: "once",
     });
   }
@@ -177,7 +177,7 @@ export class StripeService {
       customer: customerId,
       description,
       metadata,
-      currency: "usd",
+      currency: "eur",
       collection_method: "charge_automatically",
     });
 

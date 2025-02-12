@@ -20,8 +20,8 @@ export const licensingOptions: LicensingOptionType[] = [
     tierType: LicenseTierType.Standard,
     description:
       "Boost your capabilities with premium features and priority support.",
-    price: 19.99,
-    buttonText: "Buy Professional",
+    price: 9.99,
+    buttonText: "Buy Standard",
     buttonVariant: "default",
     features: ["Enhanced capabilities", "Priority updates", "Premium support"],
     footerText: undefined,

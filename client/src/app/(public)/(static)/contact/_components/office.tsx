@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui";
 import { EllipseBlueImage } from "@public/contact";
-import { Map } from "@public/contact/icons";
+// import { Map } from "@public/contact/icons";
 import Image from "next/image";
 
 const contacts = [
@@ -30,7 +30,7 @@ export const Office = () => {
 
   return (
     <div className="flex flex-col relative items-center justify-center ml-auto mr-auto font-manrope pt-[23px] sm:pt-[100px]">
-      <div className="w-full flex justify-start sm:justify-end">
+      {/* <div className="w-full flex justify-start sm:justify-end">
         <div className="w-full sm:w-[250px]">
           <div className="flex">
             <Image
@@ -52,7 +52,7 @@ export const Office = () => {
             California, USA
           </p>
         </div>
-      </div>
+      </div> */}
       <div className="mt-[100px] sm:mt-[-20px]">
         <Button
           className="text-[#8F40E5]"
@@ -74,12 +74,12 @@ export const Office = () => {
             <p className="text-[24px] text-link-hover leading-[24px] text-center uppercase">
               {c.name}
             </p>
-            <a
+            {/* <a
               href={c.href}
               className="text-4 leading-4 sn:text-5 sm:leading-5 text-disabled mt-4 sam:mt-5 text-center block hover:underline"
             >
               {c.value}
-            </a>
+            </a> */}
           </div>
         ))}
       </div>

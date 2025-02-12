@@ -16,13 +16,13 @@ export const BalanceInfo = ({ balance }: { balance: number }) => {
             className="p-4 bg-[#232323] max-w-[300px] rounded-[30px] text-xs font-medium text-[#A8A8A8] z-[10]"
             style={{ boxShadow: "0 4px 6px rgba(0, 0, 0, 0.25)" }}
           >
-            Your balance is the amount of funds you’ve earned through referrals or
-            other activities in the system.
+            Your balance is the amount of funds you’ve earned through referrals
+            or other activities in the system.
           </Popover.Content>
         </Popover.Portal>
       </Popover.Root>
       <p className="text-2xl sm:text-[32px] sm:leading-[43px] font-semibold text-[#CE9DF3] text-nowrap mb-2 md:mb-4 md:mt-2">
-        $ {balance}
+        € {balance}
       </p>
       <p className="text-base md:text-xl font-normal text-nowrap">
         Your discount

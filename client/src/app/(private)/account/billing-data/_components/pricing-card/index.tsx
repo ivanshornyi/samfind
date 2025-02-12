@@ -30,7 +30,11 @@ const PLAN_FEATURES = {
   // Add other plan types if needed
 };
 
-export const PricingCard = ({ plan, withButton, currentUserPlanId }: PricingCardProps) => {
+export const PricingCard = ({
+  plan,
+  withButton,
+  currentUserPlanId,
+}: PricingCardProps) => {
   const { user } = useContext(AuthContext);
   const {
     mutate: paySubscriptionMutation,
@@ -70,7 +74,11 @@ export const PricingCard = ({ plan, withButton, currentUserPlanId }: PricingCard
     }
   };
 
-  const formatPrice = (price: number, currency: string = "USD", locale: string = "en-US") => {
+  const formatPrice = (
+    price: number,
+    currency: string = "EUR",
+    locale: string = "en-US"
+  ) => {
     return new Intl.NumberFormat(locale, {
       style: "currency",
       currency,
@@ -88,7 +96,7 @@ export const PricingCard = ({ plan, withButton, currentUserPlanId }: PricingCard
       {isPaySubscriptionPending && <FullScreenLoader />}
       <CardHeader className="space-y-4">
         <h3 className="text-2xl font-semibold capitalize">
-          {plan.type} {plan.period} 
+          {plan.type} {plan.period}
         </h3>
         <p className="text-[#C4C4C4] text-sm">
           Boost your capabilities with premium features and priority support.
@@ -164,3 +172,4 @@ export const PricingCard = ({ plan, withButton, currentUserPlanId }: PricingCard
     </Card>
   );
 };
+
