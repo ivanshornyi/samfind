@@ -122,4 +122,18 @@ export class UserController {
   async findUserSubscriptionInfo(@Param("userId") userId: string) {
     return await this.userService.findUserSubscriptionInfo(userId);
   }
+
+  @ApiOperation({ summary: "Get User Organization Name" })
+  @Get("/organization-name/:organizationId")
+  async getUserOrganizationName(
+    @Param("organizationId") organizationId: string,
+  ) {
+    return await this.userService.getUserOrganizationName(organizationId);
+  }
+
+  @ApiOperation({ summary: "Get User Name" })
+  @Get("/user-name/:licenseId")
+  async getUserName(@Param("licenseId") licenseId: string) {
+    return await this.userService.getUserName(licenseId);
+  }
 }

@@ -76,3 +76,19 @@ export const useGetUserSubscriptionInfo = () => {
     // staleTime: 5_000_000,
   });
 };
+
+export const useGetUserOrganizationName = (organizationId?: string | null) => {
+  return useQuery({
+    queryFn: () => UserApiService.getUserOrganizationName(organizationId!),
+    queryKey: ["user-organization-name", organizationId],
+    enabled: !!organizationId,
+  });
+};
+
+export const useGetUserName = (licenseId?: string | null) => {
+  return useQuery({
+    queryFn: () => UserApiService.getUserName(licenseId!),
+    queryKey: ["user-name-name", licenseId],
+    enabled: !!licenseId,
+  });
+};

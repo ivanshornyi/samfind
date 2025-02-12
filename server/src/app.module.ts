@@ -70,6 +70,14 @@ export class AppModule implements NestModule {
           path: "/plan",
           method: RequestMethod.GET,
         },
+        {
+          path: "/user/organization-name*(.*)",
+          method: RequestMethod.GET,
+        },
+        {
+          path: "/user/user-name(.*)",
+          method: RequestMethod.GET,
+        },
       )
       .forRoutes("user", "user-license", "user-referral", "stripe", "plan");
   }

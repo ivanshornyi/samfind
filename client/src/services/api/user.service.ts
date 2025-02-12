@@ -124,6 +124,28 @@ const getUserSubscriptionInfo = async (userId: string) => {
   }
 };
 
+const getUserOrganizationName = async (organizationId: string) => {
+  try {
+    const response = await apiClient.get(
+      `/user/organization-name/${organizationId}`
+    );
+
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
+const getUserName = async (licenseId: string) => {
+  try {
+    const response = await apiClient.get(`/user/user-name/${licenseId}`);
+
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 export const UserApiService = {
   getUser,
   updateUser,
@@ -132,4 +154,6 @@ export const UserApiService = {
   getUserSubscriptionInfo,
   deleteUser,
   getInvitedUserInfo,
+  getUserOrganizationName,
+  getUserName,
 };
