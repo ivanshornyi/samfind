@@ -39,7 +39,7 @@ export const LicensingOptionList = () => {
         };
       });
 
-      setPlanOptions((prevState) => [...prevState, ...newPlanOptions]);
+      setPlanOptions(() => [licensingOptions[0], ...newPlanOptions]);
     }
   }, [plans]);
   return (

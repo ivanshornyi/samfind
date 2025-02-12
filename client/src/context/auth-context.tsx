@@ -50,7 +50,7 @@ export const AuthContextProvider = ({
     localStorage.removeItem("refreshToken");
 
     queryClient.clear();
-
+    setUser(null);
     if (logoutTimer) {
       clearTimeout(logoutTimer);
     }

@@ -505,7 +505,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                     <div className="relative">
                       <Input
                         name="name"
-                        placeholder="Company name"
+                        placeholder="Company name(required)"
                         value={organizationFormData.name}
                         onChange={handleOrganizationFormInputChange}
                         className="pl-11"
@@ -520,7 +520,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                       <div className="relative flex-1">
                         <Input
                           name="businessOrganizationNumber"
-                          placeholder="Business registration number"
+                          placeholder="Business registration №"
                           value={
                             organizationFormData.businessOrganizationNumber
                           }
@@ -548,7 +548,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                       </div>
                     </div>
 
-                    {organizationFormData.domains.map((domain, index) => (
+                    {/* {organizationFormData.domains.map((domain, index) => (
                       <div key={index} className="relative">
                         <Input
                           name="domain"
@@ -564,16 +564,16 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                           size={18}
                         />
                       </div>
-                    ))}
+                    ))} */}
 
-                    <Button
+                    {/* <Button
                       type="button"
                       variant="outline"
                       onClick={addDomainField}
                       className="w-fit px-4"
                     >
                       Add another domain
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
               </div>

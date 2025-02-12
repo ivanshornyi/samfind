@@ -2,7 +2,12 @@
 
 import React, { useContext, useEffect, useState } from "react";
 
-import { Button, FullScreenLoader, Input, UserAccountTypeBox } from "@/components";
+import {
+  Button,
+  FullScreenLoader,
+  Input,
+  UserAccountTypeBox,
+} from "@/components";
 import { AuthContext } from "@/context";
 import { useToast } from "@/hooks";
 import {
@@ -15,6 +20,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { DeleteAccount } from "./_components";
 
 import { Plus, X } from "lucide-react";
+import { UserAccountType } from "@/types";
 
 export default function Settings() {
   const { toast } = useToast();
@@ -234,8 +240,7 @@ export default function Settings() {
       {(isUpdateUserPending ||
         userLoading ||
         isOrganizationLoading ||
-        isUpdateOrganizationPending) && <FullScreenLoader />
-      }
+        isUpdateOrganizationPending) && <FullScreenLoader />}
       <div className="w-full">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full">
           <h2 className="text-2xl sm:text-[32px] leading-[44px] font-semibold mb-4 sm:mb-0">
@@ -359,7 +364,7 @@ export default function Settings() {
             )}
           </div>
         </div>
-        {user?.accountType === "business" && (
+        {user?.accountType === UserAccountType.Business && (
           <div className="mt-[77px]">
             <h3 className="text-[20px] leading-[27px] font-semibold">
               Company details
@@ -398,7 +403,7 @@ export default function Settings() {
                       </div>
                     </div>
 
-                    <div className="flex justify-between items-start w-full">
+                    {/* <div className="flex justify-between items-start w-full">
                       <div className="w-full">
                         <div className="flex flex-col gap-4">
                           <div>
@@ -465,7 +470,7 @@ export default function Settings() {
                       <Button variant="edit" onClick={handleEditCancelDomains}>
                         {editDomains ? "Cancel" : "Edit"}
                       </Button>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>

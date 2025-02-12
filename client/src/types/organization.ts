@@ -5,6 +5,6 @@ export interface Organization {
   VAT: string;
   businessOrganizationNumber: string;
   userIds: string[];
-  domains?: string;
+  domains: string[];
   availableEmails: string[];
 }
