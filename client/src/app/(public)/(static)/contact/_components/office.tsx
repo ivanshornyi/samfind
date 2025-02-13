@@ -7,17 +7,17 @@ import Image from "next/image";
 
 const contacts = [
   {
-    name: "General:",
+    name: "General",
     value: "support@onsio.com",
     href: "mailto:support@onsio.com",
   },
   {
-    name: "Technical:",
+    name: "Technical",
     value: "tech@onsio.com",
     href: "mailto:tech@onsio.com",
   },
   {
-    name: "Enterprise:",
+    name: "Enterprise",
     value: "enterprise@onsio.com",
     href: "mailto:enterprise@onsio.com",
   },
@@ -64,9 +64,6 @@ export const Office = () => {
       </div>
       <h1 className="mt-[25px] text-[32px] sm:text-[48px] leading-[44px] sm:leading-[65px] text-center font-semibold">
         {`Let's solve challenges`} together:
-      </h1>
-      <h1 className="text-[32px] sm:text-[48px] leading-[44px] sm:leading-[65px] text-center font-semibold">
-        together:
       </h1>
       <div className="mt-[25px] sm:mt-[42px] flex justify-evenly flex-col sm:flex-row w-full">
         {contacts.map((c) => (

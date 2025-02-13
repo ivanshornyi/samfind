@@ -35,7 +35,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Input,
+  // Input,
   UserAccountTypeBox,
 } from "@/components";
 
@@ -50,7 +50,7 @@ import {
   Download,
   Info,
   MoreHorizontal,
-  Search,
+  // Search,
 } from "lucide-react";
 
 const frontendDomain = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN;
@@ -317,17 +317,30 @@ export default function License() {
                           : userLicense.users.length
                       }
                     />
-                    <div className="flex items-center gap-6">
-                      <button
-                        onClick={handleCopyInvitation}
-                        className="text-blue-50 bg-card p-2 rounded-full"
-                      >
-                        <Copy size={24} />
-                      </button>
-                      <InviteMember allowedMembers={userLicense.limit} />
-                    </div>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center gap-6">
+                            <button
+                              onClick={handleCopyInvitation}
+                              className="text-blue-50 bg-card p-2 rounded-full"
+                            >
+                              <Copy size={24} />
+                            </button>
+                            <InviteMember allowedMembers={userLicense.limit} />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent
+                          side="left"
+                          align="center"
+                          className="p-4 bg-[#232323] rounded-[30px] text-xs font-medium text-[#A8A8A8] normal-case"
+                        >
+                          Copy the invitation link
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
-                  <div className="flex items-center justify-end py-4">
+                  {/* <div className="flex items-center justify-end py-4">
                     <div className="w-full relative sm:w-[308px]">
                       <Input
                         placeholder="Search"
@@ -347,7 +360,19 @@ export default function License() {
                         <Search size={24} />
                       </div>
                     </div>
-                  </div>
+                  </div> */}
+
+                  <Link
+                    href="/download-app"
+                    className="
+                    bg-violet-100 flex gap-2 items-center w-[200px] 
+                    justify-center mt-4 text-white rounded-full px-3 
+                    py-2 capitalize hover:opacity-70
+                  "
+                  >
+                    <Download size={24} />
+                    <span>Download</span>
+                  </Link>
 
                   <ReusableTable
                     table={table}
@@ -437,6 +462,17 @@ export default function License() {
                 </ul>
               </div>
             </div>
+            <Link
+              href="/download-app"
+              className="
+                    bg-violet-100 flex gap-2 items-center w-[200px] 
+                    justify-center mt-4 text-white rounded-full px-3 
+                    py-2 capitalize hover:opacity-70
+                  "
+            >
+              <Download size={24} />
+              <span>Download</span>
+            </Link>
           </>
         )}
 
@@ -447,7 +483,7 @@ export default function License() {
             <div className="flex flex-wrap gap-3 justify-between items-start mt-4">
               <div className="p-4 rounded-lg bg-card w-full sm:w-[330px]">
                 <p>
-                  You have joined the workspace of the user{" "}
+                  You have joined the workspace of the company{" "}
                   <span className="capitalize text-blue-50">{`${invitedUserData?.licenseOwner.firstName} ${invitedUserData?.licenseOwner.lastName} `}</span>
                   and use access to the license.
                 </p>
@@ -469,23 +505,33 @@ export default function License() {
                   <p className="capitalize text-lg">
                     {invitedUserData?.license.tierType}
                   </p>
-                  <span className="bg-green-500/5 p-2 px-4 text-xs text-green-600 rounded-full">
-                    Active subscription
+                  <span
+                    className={`bg-green-500/5 p-2 px-4 text-xs  ${
+                      userRoleSubscriptionInfo.deletedMember
+                        ? "text-[#FF5252]"
+                        : "text-green-600"
+                    }  rounded-full`}
+                  >
+                    {userRoleSubscriptionInfo.deletedMember
+                      ? "Inactive subscription"
+                      : "Active subscription"}
                   </span>
                 </div>
 
                 {/* <p className="opacity-50 mt-2">Renews {invitedUserData?.license?.updatedAt && formatDate(invitedUserData.license.updatedAt)}</p> */}
-                <Link
-                  href="/download-app"
-                  className="
+                {!userRoleSubscriptionInfo.deletedMember && (
+                  <Link
+                    href="/download-app"
+                    className="
                     bg-violet-100 flex gap-2 items-center w-[200px] 
                     justify-center mt-4 text-white rounded-full px-3 
                     py-2 capitalize hover:opacity-70
                   "
-                >
-                  <Download size={24} />
-                  <span>Download app</span>
-                </Link>
+                  >
+                    <Download size={24} />
+                    <span>Download</span>
+                  </Link>
+                )}
               </div>
             </div>
           </div>

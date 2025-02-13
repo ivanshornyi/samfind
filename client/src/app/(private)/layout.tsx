@@ -5,7 +5,7 @@ import React, { useContext, useEffect } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { HeaderMenuIcon } from "@public/icons";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { AuthContext } from "@/context";
 import { Logo } from "@public/images";
 import Image from "next/image";
@@ -17,11 +17,16 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   const { user } = useContext(AuthContext);
-  const router = useRouter();
 
-  useEffect(() => {
-    if (!user) router.push("/");
-  }, [router, user]);
+  // const router = useRouter();
+
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     if (!user) {
+  //       router.push("/");
+  //     }
+  //   }, 1000);
+  // }, [router, user]);
 
   return (
     <>

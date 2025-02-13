@@ -344,6 +344,7 @@ export class SubscriptionService {
       },
       data: {
         isActive: false,
+        cancelDate: new Date(),
       },
     });
 
@@ -368,7 +369,13 @@ export class SubscriptionService {
         license: {
           include: {
             _count: {
-              select: { activeLicenses: true },
+              select: {
+                activeLicenses: {
+                  where: {
+                    deleteDate: null,
+                  },
+                },
+              },
             },
           },
         },
@@ -391,6 +398,7 @@ export class SubscriptionService {
         },
         data: {
           isActive: true,
+          cancelDate: null,
         },
       });
 

@@ -1,45 +1,55 @@
-import { 
-  AlertDialogHeader, 
+import {
+  AlertDialogHeader,
   AlertDialog,
   AlertDialogContent,
-  AlertDialogDescription, 
-  AlertDialogTitle, 
-  AlertDialogTrigger, 
-  Button
+  AlertDialogDescription,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+  Button,
 } from "@/components/ui";
-import {
-  
-} from "@/components";
 import { X } from "lucide-react";
 import { AlertDialogCancel } from "@radix-ui/react-alert-dialog";
+import { format } from "date-fns";
+import { useCancelSubscription } from "@/hooks";
 
-export const CancelSubscriptionModal = () => {
-  // cancel subscription handle
-  // get subscription
+interface CancelSubscriptionModalProps {
+  nexDate: string;
+  subscriptionId: string;
+}
 
-  // const { mutate: cancelSubscriptionMutation } = useCancelSubscription();
+export const CancelSubscriptionModal = ({
+  nexDate,
+  subscriptionId,
+}: CancelSubscriptionModalProps) => {
+  const {
+    mutate: cancelSubscriptionMutation,
+    isPending: isCancelSubscriptionPending,
+  } = useCancelSubscription();
 
+  const monthName = format(new Date(nexDate), "MMMM", { locale: undefined });
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button 
-          variant="ghost"
-        >
-          Cancel subscription
-        </Button>
+        <Button variant="ghost">Cancel subscription</Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="w-full max-w-[590px]">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-2xl font-semibold">
-           Are you sure you want to cancel your subscription? 
+            Are you sure you want to cancel your subscription?
           </AlertDialogTitle>
           <AlertDialogDescription />
         </AlertDialogHeader>
 
+        <div className="absolute right-5 top-5">
+          <AlertDialogCancel className="shadow-none border-none p-1 rounded-full bg-card">
+            <X size={18} />
+          </AlertDialogCancel>
+        </div>
+
         <p className="text-[#C4C4C4] text-[16px] leading-[22px] mt-2">
-          If you cancel, you&apos;ll lose access to all the benefits of your
+          If you cancel, you’ll lose access to all the benefits of your
           subscription. Your subscription is active until the next billing date:
-          [Month] 1st.
+          {monthName} 1st.
         </p>
 
         <div className="flex gap-4 mt-8">
@@ -49,9 +59,9 @@ export const CancelSubscriptionModal = () => {
           <Button
             variant="destructive"
             className="flex-1 bg-[#FF6C6C] hover:bg-[#FF5252] text-white rounded-full h-[56px] text-[16px]"
-            // onClick={onConfirm}
+            onClick={() => cancelSubscriptionMutation(subscriptionId)}
             withLoader
-
+            loading={isCancelSubscriptionPending}
           >
             Continue
           </Button>

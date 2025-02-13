@@ -7,7 +7,7 @@ import { UserAccountTypeBox } from "@/components";
 
 interface SubscriptionDetailsProps {
   plan: string;
-  status: string;
+  isActive: boolean;
   renewalDate: string;
   price: number;
   billingPeriod: string;
@@ -19,7 +19,7 @@ interface SubscriptionDetailsProps {
 
 export const SubscriptionDetails = ({
   plan,
-  status,
+  isActive,
   renewalDate,
   price,
   billingPeriod,
@@ -35,8 +35,10 @@ export const SubscriptionDetails = ({
         <div>
           <div className="flex items-center gap-4">
             <h3 className="text-2xl capitalize font-semibold">{plan}</h3>
-            <span className="text-[#4BB543] bg-[#292832] px-2 py-1 rounded-full">
-              {status}
+            <span
+              className={`${isActive ? "text-[#4BB543] " : "text-[#FF5252]"} bg-[#292832] px-2 py-1 rounded-full`}
+            >
+              {isActive ? "Active subscription" : "Inactive subscription"}
             </span>
           </div>
           <p className="text-[#C4C4C4] mt-1">Renews on {renewalDate}</p>
