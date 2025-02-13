@@ -95,15 +95,16 @@ model License {
 }
 
 model ActiveLicense {
-  id         String   @id @default(uuid())
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String    @id @default(uuid())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
-  license    License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  license    License   @relation(fields: [licenseId], references: [id], onDelete: Cascade)
   licenseId  String
-  desktopIds String[] @default([])
-  mobileIds  String[] @default([])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  deleteDate DateTime?
+  desktopIds String[]  @default([])
+  mobileIds  String[]  @default([])
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   @@map("active_license")
 }
@@ -153,21 +154,21 @@ model Plan {
 }
 
 model Subscription {
-  id               String   @id @default(uuid())
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId           String   @unique
-  license          License? @relation(fields: [licenseId], references: [id], onDelete: Cascade)
-  licenseId        String?  @unique
-  plan             Plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
+  id               String    @id @default(uuid())
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId           String    @unique
+  license          License?  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  licenseId        String?   @unique
+  plan             Plan      @relation(fields: [planId], references: [id], onDelete: Cascade)
   planId           String
   isActive         Boolean
   isInTrial        Boolean
-  stripeInvoiceIds String[] @default([])
+  stripeInvoiceIds String[]  @default([])
   nextDate         DateTime
   cancelDate       DateTime?
   newPlanId        String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   @@map("subscription")
 }

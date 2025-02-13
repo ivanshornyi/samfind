@@ -73,13 +73,15 @@ export class UserLicenseService {
       id: license.id,
       limit: license.limit,
       tierType: license.tierType,
-      users: license.activeLicenses.map((i) => ({
-        id: i.user.id,
-        name: i.user.firstName + "  " + i.user.lastName,
-        email: i.user.email,
-        date: i.createdAt,
-        license: i.id,
-      })),
+      users: license.activeLicenses
+        .filter((i) => !i.deleteDate)
+        .map((i) => ({
+          id: i.user.id,
+          name: i.user.firstName + "  " + i.user.lastName,
+          email: i.user.email,
+          date: i.createdAt,
+          license: i.id,
+        })),
     };
   }
 
@@ -144,7 +146,10 @@ export class UserLicenseService {
 
     const activeLicense = user.activeLicenses[0];
 
-    if (activeLicense.license.status === LicenseStatus.inactive) {
+    if (
+      activeLicense.license.status === LicenseStatus.inactive ||
+      activeLicense.deleteDate
+    ) {
       return {
         error: "Email has no paid license",
       };
@@ -240,7 +245,7 @@ export class UserLicenseService {
       include: { license: true },
     });
 
-    if (!activeLicense) {
+    if (!activeLicense || activeLicense.deleteDate) {
       throw new NotFoundException("Member License not found");
     }
 
@@ -250,29 +255,34 @@ export class UserLicenseService {
       );
     }
 
-    await this.prisma.activeLicense.delete({ where: { id: activeLicense.id } });
-
-    let memberLicense = await this.prisma.license.findFirst({
-      where: { ownerId: memberId },
+    await this.prisma.activeLicense.update({
+      where: { id: activeLicense.id },
+      data: { deleteDate: new Date() },
     });
 
-    if (!memberLicense) {
-      memberLicense = await this.prisma.license.create({
-        data: {
-          ownerId: memberId,
-          status: LicenseStatus.active,
-          limit: 0,
-          tierType: LicenseTierType.freemium,
-        },
-      });
+    // await this.prisma.activeLicense.delete({ where: { id: activeLicense.id } });
 
-      await this.prisma.activeLicense.create({
-        data: {
-          userId: memberId,
-          licenseId: memberLicense.id,
-        },
-      });
-    }
+    // let memberLicense = await this.prisma.license.findFirst({
+    //   where: { ownerId: memberId },
+    // });
+
+    // if (!memberLicense) {
+    //   memberLicense = await this.prisma.license.create({
+    //     data: {
+    //       ownerId: memberId,
+    //       status: LicenseStatus.active,
+    //       limit: 0,
+    //       tierType: LicenseTierType.freemium,
+    //     },
+    //   });
+
+    //   await this.prisma.activeLicense.create({
+    //     data: {
+    //       userId: memberId,
+    //       licenseId: memberLicense.id,
+    //     },
+    //   });
+    // }
 
     return { status: "deleted" };
   }

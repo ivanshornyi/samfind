@@ -19,7 +19,7 @@ export class CronService {
   ) {}
 
   @Cron("0 8 1 * *")
-  //   @Cron("55 14 * * *")
+  // @Cron("22 12 * * *")
   async handleFirstDayOfMonth() {
     try {
       this.logger.log(
@@ -42,7 +42,13 @@ export class CronService {
           license: {
             include: {
               _count: {
-                select: { activeLicenses: true },
+                select: {
+                  activeLicenses: {
+                    where: {
+                      deleteDate: null,
+                    },
+                  },
+                },
               },
             },
           },

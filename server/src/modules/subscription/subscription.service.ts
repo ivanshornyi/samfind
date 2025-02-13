@@ -369,7 +369,13 @@ export class SubscriptionService {
         license: {
           include: {
             _count: {
-              select: { activeLicenses: true },
+              select: {
+                activeLicenses: {
+                  where: {
+                    deleteDate: null,
+                  },
+                },
+              },
             },
           },
         },

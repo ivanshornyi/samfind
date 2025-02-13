@@ -187,7 +187,10 @@ export const useVerifyUser = () => {
       licenseId?: string;
       organizationId?: string;
     }) => AuthApiService.verifyUser(data),
-    onSuccess: (data: { accessToken: string; refreshToken: string }) => {
+    onSuccess: (
+      data: { accessToken: string; refreshToken: string },
+      variables
+    ) => {
       toast({
         title: "Success",
         description: "Successfully logged in",
@@ -196,10 +199,19 @@ export const useVerifyUser = () => {
 
       login(data.accessToken, data.refreshToken);
 
+      const { licenseId, organizationId } = variables;
       localStorage.removeItem("licenseId");
       localStorage.removeItem("organizationId");
 
-      setTimeout(() => router.push("/account/billing-data"), 100);
+      setTimeout(
+        () =>
+          router.push(
+            licenseId || organizationId
+              ? "/account/license"
+              : "/account/billing-data"
+          ),
+        100
+      );
     },
     onError: (error) => {
       handleToastError(error, toast);

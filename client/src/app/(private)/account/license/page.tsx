@@ -483,7 +483,7 @@ export default function License() {
             <div className="flex flex-wrap gap-3 justify-between items-start mt-4">
               <div className="p-4 rounded-lg bg-card w-full sm:w-[330px]">
                 <p>
-                  You have joined the workspace of the user{" "}
+                  You have joined the workspace of the company{" "}
                   <span className="capitalize text-blue-50">{`${invitedUserData?.licenseOwner.firstName} ${invitedUserData?.licenseOwner.lastName} `}</span>
                   and use access to the license.
                 </p>
@@ -505,23 +505,33 @@ export default function License() {
                   <p className="capitalize text-lg">
                     {invitedUserData?.license.tierType}
                   </p>
-                  <span className="bg-green-500/5 p-2 px-4 text-xs text-green-600 rounded-full">
-                    Active subscription
+                  <span
+                    className={`bg-green-500/5 p-2 px-4 text-xs  ${
+                      userRoleSubscriptionInfo.deletedMember
+                        ? "text-[#FF5252]"
+                        : "text-green-600"
+                    }  rounded-full`}
+                  >
+                    {userRoleSubscriptionInfo.deletedMember
+                      ? "Inactive subscription"
+                      : "Active subscription"}
                   </span>
                 </div>
 
                 {/* <p className="opacity-50 mt-2">Renews {invitedUserData?.license?.updatedAt && formatDate(invitedUserData.license.updatedAt)}</p> */}
-                <Link
-                  href="/download-app"
-                  className="
+                {!userRoleSubscriptionInfo.deletedMember && (
+                  <Link
+                    href="/download-app"
+                    className="
                     bg-violet-100 flex gap-2 items-center w-[200px] 
                     justify-center mt-4 text-white rounded-full px-3 
                     py-2 capitalize hover:opacity-70
                   "
-                >
-                  <Download size={24} />
-                  <span>Download</span>
-                </Link>
+                  >
+                    <Download size={24} />
+                    <span>Download</span>
+                  </Link>
+                )}
               </div>
             </div>
           </div>

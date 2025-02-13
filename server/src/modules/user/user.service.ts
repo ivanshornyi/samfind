@@ -206,6 +206,7 @@ export class UserService {
       standardUser: false, // private with license, (standard tier)
       freemiumUser: false, // private with freemium tier (without active license)
       invitedUser: false, // added by invitation (with active license)
+      deletedMember: false,
     };
 
     const user = await this.prisma.user.findUnique({
@@ -244,6 +245,10 @@ export class UserService {
 
         if (activeLicense) {
           userInfo.invitedUser = true;
+        }
+
+        if (activeLicense.deleteDate) {
+          userInfo.deletedMember = true;
         }
       }
     }
@@ -312,7 +317,13 @@ export class UserService {
             limit: true,
             tierType: true,
             _count: {
-              select: { activeLicenses: true },
+              select: {
+                activeLicenses: {
+                  where: {
+                    deleteDate: null,
+                  },
+                },
+              },
             },
           },
         },
