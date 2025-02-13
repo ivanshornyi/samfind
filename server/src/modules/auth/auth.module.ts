@@ -14,6 +14,7 @@ import { MailService } from "../mail/mail.service";
 import { SubscriptionService } from "../subscription/subscription.service";
 import { SubscriptionModule } from "../subscription/subscription.module";
 import { StripeService } from "../stripe/stripe.service";
+import { UserLicenseService } from "../user-license/user-license.service";
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { StripeService } from "../stripe/stripe.service";
     PrismaService,
     SubscriptionService,
     StripeService,
+    UserLicenseService,
   ],
   exports: [TokenService],
 })

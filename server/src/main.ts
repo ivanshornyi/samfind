@@ -23,6 +23,8 @@ async function bootstrap() {
       "https://www.onsio.io",
       "https://www.onsio.io/api",
       "https://onsio.io",
+      "http://39.60.238.58",
+      "https://39.60.238.58",
       FRONTEND_DOMAIN,
     ],
     credentials: true,

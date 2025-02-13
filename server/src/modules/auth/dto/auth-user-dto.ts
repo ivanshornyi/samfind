@@ -23,6 +23,10 @@ export class SignInDto extends AuthUserDto {
 
   @IsString()
   password: string;
+
+  @IsString()
+  @IsOptional()
+  mobileId: string;
 }
 
 export class SignUpOrganizationDto {

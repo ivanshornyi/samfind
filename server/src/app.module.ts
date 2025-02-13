@@ -79,6 +79,14 @@ export class AppModule implements NestModule {
           method: RequestMethod.GET,
         },
       )
-      .forRoutes("user", "user-license", "user-referral", "stripe", "plan");
+      .forRoutes(
+        "user",
+        "user-license",
+        "user-referral",
+        "stripe",
+        "plan",
+        "subscription",
+        "auth/sign-out",
+      );
   }
 }
