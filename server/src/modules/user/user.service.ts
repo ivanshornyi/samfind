@@ -292,12 +292,17 @@ export class UserService {
       },
     });
 
+    const organization = await this.prisma.organization.findUnique({
+      where: { ownerId: license.ownerId },
+    });
+
     return {
       license: {
         ...license,
       },
       licenseOwner: {
         ...licenseOwner,
+        organizationName: organization?.name,
       },
     };
   }

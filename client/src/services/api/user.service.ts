@@ -83,6 +83,7 @@ export interface InvitedUserInfo {
     firstName: string;
     lastName: string;
     organizationId: string | null;
+    organizationName?: string;
   };
 }
 

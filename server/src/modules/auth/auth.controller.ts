@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, } from "@nestjs/common";
+import { Body, Controller, Get, Post, Req } from "@nestjs/common";
 
 import { SignInDto, SignUpDto } from "./dto/auth-user-dto";
 import { ResetPasswordDto } from "./dto/reset-password-dto";
@@ -7,7 +7,7 @@ import { AuthService } from "./auth.service";
 
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { SendCodeForEmailDto } from "./dto/send-code-for-email.dto";
-import { AuthVerificationDto } from "./dto/auth-verification-dto"; 
+import { AuthVerificationDto } from "./dto/auth-verification-dto";
 
 @ApiTags("Authentication")
 @Controller("auth")
@@ -26,10 +26,20 @@ export class AuthController {
     return this.authService.signUp(signUpUserDto);
   }
 
+  @ApiOperation({ summary: "Sign out" })
+  @Post("/sign-out")
+  public async signOut(@Req() request) {
+    return this.authService.signOut(request.user.sub);
+  }
+
   @ApiOperation({ summary: "Send verification code for reset password" })
   @Post("/send-verification-code")
-  public async sendResetPasswordCode(@Body() sendVerificationCodeDto: { email: string }) {
-    return this.authService.sendResetPasswordVerificationCode(sendVerificationCodeDto.email);
+  public async sendResetPasswordCode(
+    @Body() sendVerificationCodeDto: { email: string },
+  ) {
+    return this.authService.sendResetPasswordVerificationCode(
+      sendVerificationCodeDto.email,
+    );
   }
 
   @ApiOperation({ summary: "Reset password" })
@@ -40,13 +50,22 @@ export class AuthController {
 
   @ApiOperation({ summary: "Send verification code for email update" })
   @Post("/email/send-verification-code")
-  public async sendVerificationCodeForEmail(@Body() sendCodeForEmailDto: SendCodeForEmailDto) {
+  public async sendVerificationCodeForEmail(
+    @Body() sendCodeForEmailDto: SendCodeForEmailDto,
+  ) {
     return this.authService.sendResetEmailVerificationCode(sendCodeForEmailDto);
   }
 
   @ApiOperation({ summary: "Update user email" })
   @Post("/email/update")
-  public async updateEmail(@Body() emailUpdateDto: { userId: string, verificationCode: string, newEmail: string }) {
+  public async updateEmail(
+    @Body()
+    emailUpdateDto: {
+      userId: string;
+      verificationCode: string;
+      newEmail: string;
+    },
+  ) {
     return this.authService.resetEmail(emailUpdateDto);
   }
 

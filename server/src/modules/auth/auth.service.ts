@@ -30,6 +30,7 @@ import { SendCodeForEmailDto } from "./dto/send-code-for-email.dto";
 import { createHash } from "crypto";
 import { AuthVerificationDto } from "./dto/auth-verification-dto";
 import { SubscriptionService } from "../subscription/subscription.service";
+import { UserLicenseService } from "../user-license/user-license.service";
 
 type LicenseWithRelations = License & {
   user: User;
@@ -44,6 +45,7 @@ export class AuthService {
     private readonly tokenService: TokenService,
     private readonly mailService: MailService,
     private readonly subscriptionService: SubscriptionService,
+    private readonly userLicenseService: UserLicenseService,
   ) {}
 
   public async signUp(signUpDto: SignUpDto) {
@@ -159,9 +161,36 @@ export class AuthService {
     delete user.password;
     delete user.refreshToken;
 
+    let licenseInformation = undefined;
+
+    if (signInDto.mobileId) {
+      licenseInformation = await this.userLicenseService.checkDevice({
+        mobile_id: signInDto.mobileId,
+        email: user.email,
+      });
+    }
+
     return {
       ...user,
       ...tokens,
+      licenseInformation,
+    };
+  }
+
+  public async signOut(id: string) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    await this.prisma.user.update({
+      where: { id },
+      data: { refreshToken: null },
+    });
+
+    return {
+      message: "Logged out successfully",
     };
   }
 
