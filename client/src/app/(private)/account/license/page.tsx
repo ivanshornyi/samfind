@@ -35,7 +35,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Input,
+  // Input,
   UserAccountTypeBox,
 } from "@/components";
 
@@ -50,7 +50,7 @@ import {
   Download,
   Info,
   MoreHorizontal,
-  Search,
+  // Search,
 } from "lucide-react";
 
 const frontendDomain = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN;
@@ -317,17 +317,30 @@ export default function License() {
                           : userLicense.users.length
                       }
                     />
-                    <div className="flex items-center gap-6">
-                      <button
-                        onClick={handleCopyInvitation}
-                        className="text-blue-50 bg-card p-2 rounded-full"
-                      >
-                        <Copy size={24} />
-                      </button>
-                      <InviteMember allowedMembers={userLicense.limit} />
-                    </div>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center gap-6">
+                            <button
+                              onClick={handleCopyInvitation}
+                              className="text-blue-50 bg-card p-2 rounded-full"
+                            >
+                              <Copy size={24} />
+                            </button>
+                            <InviteMember allowedMembers={userLicense.limit} />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent
+                          side="left"
+                          align="center"
+                          className="p-4 bg-[#232323] rounded-[30px] text-xs font-medium text-[#A8A8A8] normal-case"
+                        >
+                          Copy the invitation link
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
-                  <div className="flex items-center justify-end py-4">
+                  {/* <div className="flex items-center justify-end py-4">
                     <div className="w-full relative sm:w-[308px]">
                       <Input
                         placeholder="Search"
@@ -347,7 +360,19 @@ export default function License() {
                         <Search size={24} />
                       </div>
                     </div>
-                  </div>
+                  </div> */}
+
+                  <Link
+                    href="/download-app"
+                    className="
+                    bg-violet-100 flex gap-2 items-center w-[200px] 
+                    justify-center mt-4 text-white rounded-full px-3 
+                    py-2 capitalize hover:opacity-70
+                  "
+                  >
+                    <Download size={24} />
+                    <span>Download</span>
+                  </Link>
 
                   <ReusableTable
                     table={table}
@@ -437,6 +462,17 @@ export default function License() {
                 </ul>
               </div>
             </div>
+            <Link
+              href="/download-app"
+              className="
+                    bg-violet-100 flex gap-2 items-center w-[200px] 
+                    justify-center mt-4 text-white rounded-full px-3 
+                    py-2 capitalize hover:opacity-70
+                  "
+            >
+              <Download size={24} />
+              <span>Download</span>
+            </Link>
           </>
         )}
 
@@ -484,7 +520,7 @@ export default function License() {
                   "
                 >
                   <Download size={24} />
-                  <span>Download app</span>
+                  <span>Download</span>
                 </Link>
               </div>
             </div>

@@ -344,6 +344,7 @@ export class SubscriptionService {
       },
       data: {
         isActive: false,
+        cancelDate: new Date(),
       },
     });
 
@@ -391,6 +392,7 @@ export class SubscriptionService {
         },
         data: {
           isActive: true,
+          cancelDate: null,
         },
       });
 

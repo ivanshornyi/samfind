@@ -1,11 +1,6 @@
 "udr client";
 
-import { 
-  useActivateSubscription, 
-  useCancelSubscription, 
-  useGetPlans,
-  useGetUserSubscriptionInfo, 
-} from "@/hooks";
+import { useGetPlans, useGetUserSubscriptionInfo } from "@/hooks";
 
 import {
   AlertDialog,
@@ -21,32 +16,20 @@ import {
 import { X } from "lucide-react";
 
 import { PricingCard } from "../pricing-card";
-
-import { parseISO, isBefore } from "date-fns";
+import { CancelSubscriptionModal } from "../cancel-subscription-modal";
 
 export const ManageSubscriptionModal = () => {
   const { data: plans } = useGetPlans();
   const { data: userSubscription } = useGetUserSubscriptionInfo();
-  const { 
-    mutate: cancelSubscriptionMutation, 
-    isPending: isCancelSubscriptionPending,
-  } = useCancelSubscription();
-  const { 
-    mutate: activateSubscriptionMutation, 
-    isPending: isActivateSubscriptionPending,
-  } = useActivateSubscription();
 
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button 
-          variant="ghost"
-          className="text-blue-50"
-        >
+        <Button variant="ghost" className="text-blue-50">
           Manage subscription
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent 
+      <AlertDialogContent
         className="
           w-full max-w-[800px] overflow-auto h-[100dvh] rounded-none 
           md:h-[700px] md:rounded-[30px]
@@ -68,41 +51,26 @@ export const ManageSubscriptionModal = () => {
         </AlertDialogHeader>
 
         <div className="flex gap-2 flex-wrap justify-center md:flex-nowrap">
-          {plans?.map(plan => (
+          {plans?.map((plan) => (
             <div key={plan.id}>
               <PricingCard
                 plan={plan}
-                withButton={false} 
+                withButton={false}
                 currentUserPlanId={userSubscription?.plan.id}
+                isActive={userSubscription?.isActive}
+                subscriptionId={userSubscription?.id}
               />
             </div>
           ))}
         </div>
 
-        {userSubscription && (
+        {userSubscription && userSubscription.isActive && (
           <AlertDialogFooter>
             <div className="flex items-center w-full gap-2">
-              {userSubscription.isActive && !isBefore(parseISO(userSubscription.nextDate), new Date()) && (
-                <Button 
-                  variant="tetrary"
-                  onClick={() => cancelSubscriptionMutation(userSubscription.id)}
-                  withLoader
-                  loading={isCancelSubscriptionPending}
-                >
-                  Cancel subscription
-                </Button>
-              )}
-
-              {(!userSubscription.isActive || isBefore(parseISO(userSubscription.nextDate), new Date())) && (
-                <Button 
-                  variant="tetrary"
-                  onClick={() => activateSubscriptionMutation(userSubscription.id)}
-                  withLoader
-                  loading={isActivateSubscriptionPending}
-                >
-                  Activate subscription
-                </Button>
-              )}
+              <CancelSubscriptionModal
+                nexDate={userSubscription.nextDate}
+                subscriptionId={userSubscription.id}
+              />
             </div>
           </AlertDialogFooter>
         )}

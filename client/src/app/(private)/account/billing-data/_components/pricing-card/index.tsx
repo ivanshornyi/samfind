@@ -7,7 +7,7 @@ import {
   FullScreenLoader,
 } from "@/components";
 import { AuthContext } from "@/context";
-import { usePaySubscription } from "@/hooks";
+import { useActivateSubscription, usePaySubscription } from "@/hooks";
 import { CreatePaymentData } from "@/services";
 import { Plan } from "@/types";
 import { Check } from "lucide-react";
@@ -17,6 +17,8 @@ interface PricingCardProps {
   plan: Plan;
   withButton: boolean;
   currentUserPlanId?: string;
+  isActive?: boolean;
+  subscriptionId?: string;
 }
 
 const PLAN_FEATURES = {
@@ -34,12 +36,18 @@ export const PricingCard = ({
   plan,
   withButton,
   currentUserPlanId,
+  isActive,
+  subscriptionId,
 }: PricingCardProps) => {
   const { user } = useContext(AuthContext);
   const {
     mutate: paySubscriptionMutation,
     isPending: isPaySubscriptionPending,
   } = usePaySubscription();
+  const {
+    mutate: activateSubscriptionMutation,
+    isPending: isActivateSubscriptionPending,
+  } = useActivateSubscription();
 
   const [quantity, setQuantity] = useState(1);
 
@@ -124,9 +132,7 @@ export const PricingCard = ({
             </span>
             <span className="text-[#C4C4C4] text-sm ml-2">
               {plan.period === "monthly" && <span>/month</span>}
-              {plan.period === "yearly" && (
-                <span>/year, billed {formatPrice(plan.price)} yearly</span>
-              )}
+              {plan.period === "yearly" && <span>/year</span>}
             </span>
           </div>
         </div>
@@ -145,6 +151,20 @@ export const PricingCard = ({
       </CardContent>
 
       <CardFooter className="mt-2">
+        {currentUserPlanId &&
+          currentUserPlanId === plan.id &&
+          subscriptionId && (
+            <Button
+              variant={"secondary"}
+              className="w-full"
+              onClick={() => activateSubscriptionMutation(subscriptionId)}
+              withLoader
+              loading={isActivateSubscriptionPending}
+              disabled={isActive}
+            >
+              Active subscription
+            </Button>
+          )}
         {withButton && (
           <Button
             className={`w-full rounded-full ${
@@ -162,14 +182,7 @@ export const PricingCard = ({
                 : "Get started"}
           </Button>
         )}
-
-        {currentUserPlanId && currentUserPlanId === plan.id && (
-          <div className="w-full text-center py-3 bg-background rounded-full">
-            Active plan
-          </div>
-        )}
       </CardFooter>
     </Card>
   );
 };
-

@@ -46,7 +46,7 @@ export default function BillingData() {
               <div className="w-full overflow-x-auto">
                 <SubscriptionDetails
                   plan={`${userSubscriptionInfo.plan?.type} ${userSubscriptionInfo.plan?.period}`}
-                  status="Active subscription"
+                  isActive={userSubscriptionInfo.isActive}
                   renewalDate={
                     userSubscriptionInfo.nextDate
                       ? formatDate(userSubscriptionInfo.nextDate)

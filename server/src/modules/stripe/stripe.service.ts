@@ -459,6 +459,7 @@ export class StripeService {
             isActive: true,
             isInTrial: false,
             nextDate,
+            cancelDate: null,
             stripeInvoiceIds: [...subscription.stripeInvoiceIds, invoice.id],
           },
         });

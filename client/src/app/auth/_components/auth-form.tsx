@@ -331,7 +331,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
 
         <form onSubmit={handleAuthFormSubmit} className="mt-4">
           <h2 className="font-semibold text-3xl">{formTitle[authPageType]}</h2>
-          <p className="mt-4 text-lg">{formDescription[authPageType]}</p>
+          <p className="mt-4 text-lg">
+            {userName || organizationName
+              ? "Join the innovation! You’re almost there! Use the email to which you were sent the invitation."
+              : formDescription[authPageType]}
+          </p>
           {authPageType === "signUp" && referralCode && (
             <div className="my-4 flex items-center gap-2 bg-[#363637] rounded-2xl px-4 py-2">
               <Info color="#BEB8FF" />

@@ -9,7 +9,7 @@ import helmet from "helmet";
 
 async function bootstrap() {
   const configService = new ConfigService();
-  console.log("server");
+
   const PORT = configService.get("SERVER_PORT") || 4000;
   const FRONTEND_DOMAIN =
     configService.get("FRONTEND_DOMAIN") || "http://localhost:3000";
