@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext } from "react";
-
+import Link from "next/link";
 import { AuthContext } from "@/context";
 import { useGetBillingHistory } from "@/hooks/api/billing-history";
 // import { BillingHistoryItem } from "@/types/billings";
@@ -91,6 +91,7 @@ export const PaymentHistory = () => {
               After discount
             </TableHead>
             <TableHead className="uppercase text-white/60">Status</TableHead>
+            <TableHead className="uppercase text-white/60"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -100,7 +101,12 @@ export const PaymentHistory = () => {
               className="border-none hover:bg-transparent"
             >
               <TableCell className="font-medium py-2">
-                <div className="py-3">{historyItem.number}</div>
+                <div className="">
+                  <p>{historyItem.number}</p>
+                  <p className="text-disabled text-[12px] truncate w-[200px]">
+                    {historyItem.description}
+                  </p>
+                </div>
               </TableCell>
               <TableCell>
                 {historyItem.date && formatTimestamp(historyItem.date)}
@@ -113,6 +119,18 @@ export const PaymentHistory = () => {
                 className={`${historyItem.status === "paid" ? "text-[#4BB543]" : "text-[#FF6C6C]"} capitalize`}
               >
                 {historyItem.status}
+              </TableCell>
+              <TableCell>
+                {historyItem.url && (
+                  <Link
+                    className="underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={historyItem.url}
+                  >
+                    Open an invoice
+                  </Link>
+                )}
               </TableCell>
             </TableRow>
           ))}
@@ -136,4 +154,3 @@ export const PaymentHistory = () => {
     </div>
   );
 };
-

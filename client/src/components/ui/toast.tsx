@@ -16,10 +16,10 @@ const ToastViewport = React.forwardRef<
   <ToastPrimitives.Viewport
     ref={ref}
     className={cn(
-      "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
+      "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:top-0 sm:right-0 sm:flex-col md:max-w-[420px]",
       className
     )}
-    {...props} 
+    {...props}
   ></ToastPrimitives.Viewport>
 ));
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName;
@@ -49,7 +49,7 @@ const Toast = React.forwardRef<
   const variantIcons = {
     success: <Check size={16} />,
     destructive: <X size={16} />,
-  }
+  };
 
   return (
     <ToastPrimitives.Root
@@ -58,7 +58,7 @@ const Toast = React.forwardRef<
       {...props}
     >
       {variant && variant !== "default" && (
-        <div 
+        <div
           className={`
             ${variant === "destructive" && "text-destructive border-destructive"}
             ${variant === "success" && "text-violet-300 border-violet-300"}
