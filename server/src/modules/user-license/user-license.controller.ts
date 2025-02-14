@@ -68,6 +68,12 @@ export class UserLicenseController {
     return await this.licenseService.checkDevice(checkDeviceDto);
   }
 
+  @ApiOperation({ summary: "Check mobile device for license connected" })
+  @Post("/mobile-device")
+  async checkMobileDevice(@Body() checkDeviceDto: CheckDeviceDto) {
+    return await this.licenseService.checkDevice(checkDeviceDto);
+  }
+
   @ApiOperation({ summary: "Deactivate user license" })
   @Post("/deactivate/:id")
   async deactivateLicense(@Param("id") id: string) {
