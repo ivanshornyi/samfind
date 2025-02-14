@@ -24,7 +24,7 @@ import {
 
 import { useToast } from "@/hooks";
 
-import { Info, Send, X } from "lucide-react";
+import { Send, X, Info } from "lucide-react";
 import { UserAccountType } from "@/types";
 import { CopyLinkButton } from "./cpy-link-button";
 
