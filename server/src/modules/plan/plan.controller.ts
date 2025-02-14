@@ -12,7 +12,7 @@ export class PlanController {
 
   @ApiOperation({ summary: "Add Plan" })
   @Post("/")
-  async addLicense(@Body() addPlanDto: CreatePlanDto) {
+  async addPlan(@Body() addPlanDto: CreatePlanDto) {
     return this.planService.addPlan(addPlanDto);
   }
 

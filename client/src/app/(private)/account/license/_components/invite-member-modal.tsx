@@ -24,14 +24,16 @@ import {
 
 import { useToast } from "@/hooks";
 
-import { Send, X } from "lucide-react";
+import { Info, Send, X } from "lucide-react";
 import { UserAccountType } from "@/types";
+import { CopyLinkButton } from "./cpy-link-button";
 
 interface InviteMemberProps {
   allowedMembers: number;
+  handleCopyInvitation: () => void;
 }
 
-export const InviteMember = ({}: InviteMemberProps) => {
+export const InviteMember = ({ handleCopyInvitation }: InviteMemberProps) => {
   const { user } = useContext(AuthContext);
 
   const [email, setEmail] = useState("");
@@ -170,7 +172,7 @@ export const InviteMember = ({}: InviteMemberProps) => {
           Invite members
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent className="w-full max-w-[590px]">
+      <AlertDialogContent className="w-full max-w-[590px] max-h-[95vh] overflow-y-auto">
         <div className="absolute right-1 top-1">
           <AlertDialogCancel
             onClick={() => setIsModalOpen(false)}
@@ -193,18 +195,81 @@ export const InviteMember = ({}: InviteMemberProps) => {
           </AlertDialogDescription> */}
         </AlertDialogHeader>
 
-        <p className="mt-4 text-[16px] leading-[22px] text-disabled font-medium">
-          If you invite new users to your workspace, and no unused licenses are
-          left, you’ll be charged for each new user who joins. How It Works:
-        </p>
-        <ol className="list-lower-alpha space-y-2 pl-6 mt-6 text-[16px] leading-[22px] text-disabled font-medium">
-          <li>a. Share the invitation link with the user.</li>
-          <li>b. They must register using this link.</li>
-          <li>c. Once registered, they will gain access.</li>
+        <div className="my-4 flex items-center gap-2 rounded-2xl px-4 py-2">
+          <Info color="#BEB8FF" />
+          <p className="text-[#BEB8FF]">
+            If you invite more users than the number of licenses you’ve paid
+            for, you’ll be charged for the extra ones automatically after they
+            join.
+          </p>
+        </div>
+
+        {user?.accountType === UserAccountType.Business ? (
+          <>
+            <div className="flex justify-between">
+              <p className="font-bold">Invite members in your domain:</p>
+              <CopyLinkButton handleCopyInvitation={handleCopyInvitation} />
+            </div>
+            <ol className="list-lower-alpha space-y-2 pl-6 mt-2 text-[16px] leading-[22px] text-disabled font-medium">
+              <li>
+                a. All email addresses{" "}
+                <span className="text-white">
+                  must match your domain to gain access!
+                </span>
+              </li>
+              <li>b. Copy invitation link and share with members</li>
+              <li>c. Once registered, they will gain access.</li>
+            </ol>
+            {domains.length ? (
+              <div className="mt-3">
+                <p className="text-[16px] leading-[22px] text-link-hover">
+                  Added domains
+                </p>
+                <div className="flex gap-2 flex-wrap mt-2">
+                  {domains.map((domain) => (
+                    <div
+                      key={domain}
+                      className="text-[14px] leading-[19px] font-medium p-2 px-4 flex items-center gap-2 bg-input rounded-[30px]"
+                    >
+                      <span>{domain}</span>
+                      <X
+                        onClick={() => removeDomain(domain)}
+                        className="cursor-pointer text-disabled hover:text-light"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            <div className="flex flex-wrap gap-2 mt-2 md:flex-nowrap">
+              <Input
+                placeholder="Enter domain"
+                value={domain}
+                onChange={(event) => setDomain(event.target.value)}
+                className="bg-card"
+              />
+              <Button
+                variant="saveProfile"
+                onClick={addDomain}
+                disabled={!domain.length}
+              >
+                Add domain
+              </Button>
+            </div>
+          </>
+        ) : null}
+
+        <div className="flex justify-between">
+          <p className="font-bold">Invite members by email:</p>
+        </div>
+        <ol className="list-lower-alpha space-y-2 pl-6 mt-2 text-[16px] leading-[22px] text-disabled font-medium">
+          <li>a. Add emails manually</li>
+          <li>b. They must register using this link</li>
+          <li>c. Once registered, they will gain access</li>
         </ol>
 
         {emails.length ? (
-          <div className="mt-8">
+          <div className="mt-3">
             <p className="text-[16px] leading-[22px] text-link-hover">
               Added emails
             </p>
@@ -231,7 +296,7 @@ export const InviteMember = ({}: InviteMemberProps) => {
           </p>
         ) : null} */}
 
-        <div className="flex flex-wrap gap-2 mt-4 md:flex-nowrap">
+        <div className="flex flex-wrap gap-2 mt-2 md:flex-nowrap">
           <Input
             placeholder="Enter email"
             value={email}
@@ -246,47 +311,6 @@ export const InviteMember = ({}: InviteMemberProps) => {
             Add email
           </Button>
         </div>
-
-        {user?.accountType === UserAccountType.Business ? (
-          <>
-            {domains.length ? (
-              <div className="mt-8">
-                <p className="text-[16px] leading-[22px] text-link-hover">
-                  Added domains
-                </p>
-                <div className="flex gap-2 flex-wrap mt-2">
-                  {domains.map((domain) => (
-                    <div
-                      key={domain}
-                      className="text-[14px] leading-[19px] font-medium p-2 px-4 flex items-center gap-2 bg-input rounded-[30px]"
-                    >
-                      <span>{domain}</span>
-                      <X
-                        onClick={() => removeDomain(domain)}
-                        className="cursor-pointer text-disabled hover:text-light"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-            <div className="flex flex-wrap gap-2 mt-4 md:flex-nowrap">
-              <Input
-                placeholder="Enter domain"
-                value={domain}
-                onChange={(event) => setDomain(event.target.value)}
-                className="bg-card"
-              />
-              <Button
-                variant="saveProfile"
-                onClick={addDomain}
-                disabled={!domain.length}
-              >
-                Add domain
-              </Button>
-            </div>
-          </>
-        ) : null}
 
         <AlertDialogFooter className="flex gap-6 w-full">
           <Button

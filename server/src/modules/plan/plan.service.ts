@@ -18,7 +18,7 @@ export class PlanService {
 
     if (type !== LicenseTierType.freemium) {
       const planName = "plan-" + type + "-" + period;
-      const description = "price" + price / 100 + "$";
+      const description = "price" + price / 100 + "€";
       const product = await this.stripeService.createProduct(
         planName,
         description,

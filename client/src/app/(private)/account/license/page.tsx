@@ -41,12 +41,16 @@ import {
 
 import { ReusableTable } from "@/components/table";
 import { AuthContext } from "@/context";
-import { DeleteMember, InviteMember, ProgressChart } from "./_components";
+import {
+  CopyLinkButton,
+  DeleteMember,
+  InviteMember,
+  ProgressChart,
+} from "./_components";
 
 import {
   ArrowUpDown,
   Check,
-  Copy,
   Download,
   Info,
   MoreHorizontal,
@@ -317,28 +321,15 @@ export default function License() {
                           : userLicense.users.length
                       }
                     />
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div className="flex items-center gap-6">
-                            <button
-                              onClick={handleCopyInvitation}
-                              className="text-blue-50 bg-card p-2 rounded-full"
-                            >
-                              <Copy size={24} />
-                            </button>
-                            <InviteMember allowedMembers={userLicense.limit} />
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent
-                          side="left"
-                          align="center"
-                          className="p-4 bg-[#232323] rounded-[30px] text-xs font-medium text-[#A8A8A8] normal-case"
-                        >
-                          Copy the invitation link
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                    <div className="flex items-center gap-6">
+                      <CopyLinkButton
+                        handleCopyInvitation={handleCopyInvitation}
+                      />
+                      <InviteMember
+                        allowedMembers={userLicense.limit}
+                        handleCopyInvitation={handleCopyInvitation}
+                      />
+                    </div>
                   </div>
                   {/* <div className="flex items-center justify-end py-4">
                     <div className="w-full relative sm:w-[308px]">
