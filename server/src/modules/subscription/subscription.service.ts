@@ -548,6 +548,23 @@ export class SubscriptionService {
     return plan;
   }
 
+  async cancelChangePlan(subscriptionId: string) {
+    const subscription = await this.prisma.subscription.findUnique({
+      where: { id: subscriptionId },
+    });
+
+    if (!subscription) {
+      throw new NotFoundException("Subscription not found");
+    }
+
+    await this.prisma.subscription.update({
+      where: { id: subscriptionId },
+      data: { newPlanId: null },
+    });
+
+    return { status: "canalled" };
+  }
+
   async getDiscountHistory(userId: string) {
     const discountHistory: {
       id: string;
