@@ -23,6 +23,7 @@ import { StripeModule } from "./modules/stripe/stripe.module";
 import { UserLicenseModule } from "./modules/user-license/user-license.module";
 import { UserReferralModule } from "./modules/user-referral/user-referral.module";
 import { UserModule } from "./modules/user/user.module";
+import { AppVersionModule } from "./modules/app-version/app-version.module";
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { UserModule } from "./modules/user/user.module";
     CronModule,
     DiscountModule,
     HealthModule,
+    AppVersionModule,
   ],
   controllers: [],
   providers: [],
@@ -77,6 +79,14 @@ export class AppModule implements NestModule {
         {
           path: "/user/user-name(.*)",
           method: RequestMethod.GET,
+        },
+        {
+          path: "/app-version(.*)",
+          method: RequestMethod.GET,
+        },
+        {
+          path: "/app-version(.*)",
+          method: RequestMethod.POST,
         },
       )
       .forRoutes(
