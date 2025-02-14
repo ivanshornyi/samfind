@@ -54,7 +54,7 @@ export const ManageSubscriptionModal = () => {
           </AlertDialogDescription>
         </AlertDialogHeader>
 
-        <div className="flex gap-2 flex-wrap justify-center md:flex-nowrap">
+        <div className="flex gap-2 flex-wrap justify-around md:flex-nowrap">
           {plans
             ?.filter((plan) => {
               return user?.accountType === UserAccountType.Business
@@ -70,6 +70,7 @@ export const ManageSubscriptionModal = () => {
                   isActive={userSubscription?.isActive}
                   subscriptionId={userSubscription?.id}
                   newPlanId={userSubscription?.newPlanId}
+                  nextDate={userSubscription?.nextDate}
                 />
               </div>
             ))}

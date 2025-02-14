@@ -7,9 +7,15 @@ import {
   FullScreenLoader,
 } from "@/components";
 import { AuthContext } from "@/context";
-import { useActivateSubscription, usePaySubscription } from "@/hooks";
+import {
+  useActivateSubscription,
+  usePaySubscription,
+  useChangeSubscriptionPlan,
+  useCancelChangeSubscriptionPlan,
+} from "@/hooks";
 import { CreatePaymentData } from "@/services";
 import { Plan, PlanType } from "@/types";
+import { format } from "date-fns";
 import { Check } from "lucide-react";
 import { useContext, useState } from "react";
 
@@ -19,6 +25,7 @@ interface PricingCardProps {
   currentUserPlanId?: string;
   isActive?: boolean;
   subscriptionId?: string;
+  nextDate?: string;
   newPlanId?: string;
 }
 
@@ -41,6 +48,7 @@ export const PricingCard = ({
   isActive,
   subscriptionId,
   newPlanId,
+  nextDate,
 }: PricingCardProps) => {
   const { user } = useContext(AuthContext);
   const {
@@ -51,6 +59,14 @@ export const PricingCard = ({
     mutate: activateSubscriptionMutation,
     isPending: isActivateSubscriptionPending,
   } = useActivateSubscription();
+  const {
+    mutate: changeSubscriptionPlan,
+    isPending: isChangeSubscriptionPlan,
+  } = useChangeSubscriptionPlan();
+  const {
+    mutate: cancelChangeSubscriptionPlan,
+    isPending: isCancelChangeSubscriptionPlan,
+  } = useCancelChangeSubscriptionPlan();
 
   const [quantity, setQuantity] = useState(1);
 
@@ -171,20 +187,35 @@ export const PricingCard = ({
             </Button>
           )}
         {currentUserPlanId &&
+          nextDate &&
           currentUserPlanId !== plan.id &&
           subscriptionId && (
-            <>
-              {newPlanId === plan.id && <p>Selected as new Plan</p>}
+            <div className="w-full">
+              {newPlanId === plan.id && (
+                <p className="mb-2">
+                  Selected as new Plan from{" "}
+                  {format(new Date(nextDate), "MMMM dd, yyyy")}
+                </p>
+              )}
               <Button
                 variant={"secondary"}
                 className="w-full"
-                // onClick={() => activateSubscriptionMutation(subscriptionId)}
+                onClick={() =>
+                  newPlanId === plan.id
+                    ? cancelChangeSubscriptionPlan(subscriptionId)
+                    : changeSubscriptionPlan({
+                        planId: plan.id,
+                        subscriptionId,
+                      })
+                }
                 withLoader
-                // loading={isActivateSubscriptionPending}
+                loading={
+                  isChangeSubscriptionPlan || isCancelChangeSubscriptionPlan
+                }
               >
                 {newPlanId === plan.id ? "Cancel Select" : "Change Plan"}
               </Button>
-            </>
+            </div>
           )}
         {withButton && (
           <Button
