@@ -11,6 +11,7 @@ import { PricingCard } from "./_components/pricing-card";
 
 import { format } from "date-fns";
 import { PlanPeriod } from "@/types";
+import { BonusHistoryModal } from "./_components/bonus-history-modal";
 
 export default function BillingData() {
   const { data: plans, isPending: isPlansPending } = useGetPlans();
@@ -85,6 +86,7 @@ export default function BillingData() {
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold">
               Payment history
             </h2>
+            <BonusHistoryModal />
           </div>
           <div className="w-full overflow-x-auto">
             <div className="min-w-[600px]">

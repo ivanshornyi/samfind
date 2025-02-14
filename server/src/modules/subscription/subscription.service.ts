@@ -275,7 +275,7 @@ export class SubscriptionService {
     });
   }
 
-  async getBalingHistory(userId: string) {
+  async getBillingHistory(userId: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
 
     if (!user || !user.stripeCustomerId)
@@ -546,5 +546,48 @@ export class SubscriptionService {
     }
 
     return plan;
+  }
+
+  async getDiscountHistory(userId: string) {
+    const discountHistory: {
+      id: string;
+      date: string | Date;
+      type: string;
+      amount: number;
+      description: string;
+    }[] = [];
+
+    const discounts = await this.prisma.discount.findMany({
+      where: { userId, used: true },
+    });
+    const discountIncomes = await this.prisma.discountIncome.findMany({
+      where: { userId },
+    });
+
+    discounts.forEach((d) => {
+      discountHistory.push({
+        id: d.id,
+        date: d.updatedAt,
+        type: "Bonus Used",
+        amount: d.endAmount,
+        description: "Subscription Payment",
+      });
+    });
+
+    discountIncomes.forEach((d) => {
+      discountHistory.push({
+        id: d.id,
+        date: d.updatedAt,
+        type: "Bonus Received",
+        amount: d.amount,
+        description: d.description,
+      });
+    });
+
+    discountHistory.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    );
+
+    return discountHistory;
   }
 }

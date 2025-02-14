@@ -6,6 +6,12 @@ export const useGetBillingHistory = (id: string) => {
   return useQuery({
     queryFn: () => BillingApiServices.getBillingHistory(id),
     queryKey: ["billing-history"],
-    // staleTime: 
+  });
+};
+
+export const useGetDiscountHistory = (id: string) => {
+  return useQuery({
+    queryFn: () => BillingApiServices.getDiscountHistory(id),
+    queryKey: ["discount-history"],
   });
 };

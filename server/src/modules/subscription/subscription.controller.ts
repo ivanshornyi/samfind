@@ -27,8 +27,14 @@ export class SubscriptionController {
 
   @ApiOperation({ summary: "Get User Billing History" })
   @Get("history/:id")
-  async getBalingHistory(@Param("id") id: string) {
-    return this.subscriptionService.getBalingHistory(id);
+  async getBillingHistory(@Param("id") id: string) {
+    return this.subscriptionService.getBillingHistory(id);
+  }
+
+  @ApiOperation({ summary: "Get User Discount History" })
+  @Get("discount-history/:id")
+  async getDiscountHistory(@Param("id") id: string) {
+    return this.subscriptionService.getDiscountHistory(id);
   }
 
   @ApiOperation({ summary: "Test Pay Invoice" })

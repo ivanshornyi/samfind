@@ -17,7 +17,6 @@ import {
   AlertDialogContent,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogDescription,
   AlertDialogCancel,
   AlertDialogFooter,
   Input,
@@ -25,14 +24,14 @@ import {
 
 import { useToast } from "@/hooks";
 
-import { Info, Send, X } from "lucide-react";
+import { Send, X } from "lucide-react";
 import { UserAccountType } from "@/types";
 
 interface InviteMemberProps {
   allowedMembers: number;
 }
 
-export const InviteMember = ({ allowedMembers }: InviteMemberProps) => {
+export const InviteMember = ({}: InviteMemberProps) => {
   const { user } = useContext(AuthContext);
 
   const [email, setEmail] = useState("");

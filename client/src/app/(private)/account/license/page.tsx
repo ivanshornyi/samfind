@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext, useEffect, useState } from "react";
-
+import { useRouter } from "next/navigation";
 import {
   useGetInvitedUserInfo,
   useGetUserLicenses,
@@ -216,7 +216,7 @@ const INVITED_USER_FEATURES = [
 export default function License() {
   const { user } = useContext(AuthContext);
   const { toast } = useToast();
-
+  const router = useRouter();
   const [users, setUsers] = useState<LicenseItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -361,19 +361,14 @@ export default function License() {
                       </div>
                     </div>
                   </div> */}
-
-                  <Link
-                    href="/download-app"
-                    className="
-                    bg-violet-100 flex gap-2 items-center w-[200px] 
-                    justify-center mt-4 text-white rounded-full px-3 
-                    py-2 capitalize hover:opacity-70
-                  "
+                  <Button
+                    className="mt-4 w-[200px]"
+                    variant="secondary"
+                    leftIcon={<Download />}
+                    onClick={() => router.push("/download-app")}
                   >
-                    <Download size={24} />
-                    <span>Download</span>
-                  </Link>
-
+                    Download
+                  </Button>
                   <ReusableTable
                     table={table}
                     isLoading={isUserLicensesPending}
@@ -462,17 +457,14 @@ export default function License() {
                 </ul>
               </div>
             </div>
-            <Link
-              href="/download-app"
-              className="
-                    bg-violet-100 flex gap-2 items-center w-[200px] 
-                    justify-center mt-4 text-white rounded-full px-3 
-                    py-2 capitalize hover:opacity-70
-                  "
+            <Button
+              className="mt-4 w-[200px]"
+              variant="secondary"
+              leftIcon={<Download />}
+              onClick={() => router.push("/download-app")}
             >
-              <Download size={24} />
-              <span>Download</span>
-            </Link>
+              Download
+            </Button>
           </>
         )}
 
@@ -520,17 +512,14 @@ export default function License() {
 
                 {/* <p className="opacity-50 mt-2">Renews {invitedUserData?.license?.updatedAt && formatDate(invitedUserData.license.updatedAt)}</p> */}
                 {!userRoleSubscriptionInfo.deletedMember && (
-                  <Link
-                    href="/download-app"
-                    className="
-                    bg-violet-100 flex gap-2 items-center w-[200px] 
-                    justify-center mt-4 text-white rounded-full px-3 
-                    py-2 capitalize hover:opacity-70
-                  "
+                  <Button
+                    className="mt-4 w-[200px]"
+                    variant="secondary"
+                    leftIcon={<Download />}
+                    onClick={() => router.push("/download-app")}
                   >
-                    <Download size={24} />
-                    <span>Download</span>
-                  </Link>
+                    Download
+                  </Button>
                 )}
               </div>
             </div>
