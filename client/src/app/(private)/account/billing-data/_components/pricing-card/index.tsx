@@ -9,7 +9,7 @@ import {
 import { AuthContext } from "@/context";
 import { useActivateSubscription, usePaySubscription } from "@/hooks";
 import { CreatePaymentData } from "@/services";
-import { Plan } from "@/types";
+import { Plan, PlanType } from "@/types";
 import { Check } from "lucide-react";
 import { useContext, useState } from "react";
 
@@ -19,6 +19,7 @@ interface PricingCardProps {
   currentUserPlanId?: string;
   isActive?: boolean;
   subscriptionId?: string;
+  newPlanId?: string;
 }
 
 const PLAN_FEATURES = {
@@ -29,6 +30,7 @@ const PLAN_FEATURES = {
     "Custom integrations",
     "Team collaboration",
   ],
+  freemium: ["Essential features", "Community access", "Basic support"],
   // Add other plan types if needed
 };
 
@@ -38,6 +40,7 @@ export const PricingCard = ({
   currentUserPlanId,
   isActive,
   subscriptionId,
+  newPlanId,
 }: PricingCardProps) => {
   const { user } = useContext(AuthContext);
   const {
@@ -97,7 +100,7 @@ export const PricingCard = ({
 
   return (
     <Card
-      className={`relative border-none rounded-3xl overflow-hidden w-[360px] flex-1 ${
+      className={`relative border-none rounded-3xl overflow-hidden w-full max-w-[360px] flex-1 ${
         plan.price === 225 ? "bg-[#28282C]" : "bg-[#292832]"
       }`}
     >
@@ -107,7 +110,9 @@ export const PricingCard = ({
           {plan.type} {plan.period}
         </h3>
         <p className="text-[#C4C4C4] text-sm">
-          Boost your capabilities with premium features and priority support.
+          {plan.type === PlanType.Freemium
+            ? "Essential features for personal and community use"
+            : "Boost your capabilities with premium features and priority support."}
         </p>
       </CardHeader>
 
@@ -162,8 +167,24 @@ export const PricingCard = ({
               loading={isActivateSubscriptionPending}
               disabled={isActive}
             >
-              Active subscription
+              {isActive ? "Active subscription" : "Activate subscription"}
             </Button>
+          )}
+        {currentUserPlanId &&
+          currentUserPlanId !== plan.id &&
+          subscriptionId && (
+            <>
+              {newPlanId === plan.id && <p>Selected as new Plan</p>}
+              <Button
+                variant={"secondary"}
+                className="w-full"
+                // onClick={() => activateSubscriptionMutation(subscriptionId)}
+                withLoader
+                // loading={isActivateSubscriptionPending}
+              >
+                {newPlanId === plan.id ? "Cancel Select" : "Change Plan"}
+              </Button>
+            </>
           )}
         {withButton && (
           <Button
