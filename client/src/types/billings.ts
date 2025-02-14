@@ -10,3 +10,11 @@ export interface BillingHistoryItem {
   date: number;
   payDate?: number;
 }
+
+export interface DiscountHistoryItem {
+  id: string;
+  date: string | Date;
+  type: string;
+  amount: number;
+  description: string;
+}
