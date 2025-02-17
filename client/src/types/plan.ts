@@ -1,5 +1,6 @@
 export const enum PlanType {
   Standard = "standard",
+  Freemium = "freemium",
 }
 
 export const enum PlanPeriod {

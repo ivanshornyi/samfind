@@ -19,7 +19,7 @@ export class CronService {
   ) {}
 
   @Cron("0 8 1 * *")
-  // @Cron("22 12 * * *")
+  // @Cron("03 12 * * *")
   async handleFirstDayOfMonth() {
     try {
       this.logger.log(
@@ -98,7 +98,7 @@ export class CronService {
 
       for (let i = 0; i < feeBasedSubscriptions.length; i++) {
         const subscription = feeBasedSubscriptions[i];
-
+        let plan = subscription.plan;
         let planPrice = subscription.plan.price;
 
         if (subscription.newPlanId) {
@@ -126,6 +126,7 @@ export class CronService {
             });
 
             planPrice = newPlan.price;
+            plan = newPlan;
           }
         }
 
@@ -149,10 +150,10 @@ export class CronService {
 
         await this.stripeService.createAndPayInvoice({
           customerId: subscription.user.stripeCustomerId,
-          priceId: subscription.plan.stripePriceId,
+          priceId: plan.stripePriceId,
           quantity: subscription.license._count.activeLicenses,
           couponId: discountId,
-          description: `Plan - ${subscription.plan.type} - ${subscription.plan.period}. Quantity - ${subscription.license._count.activeLicenses}. ${discountAmount ? `Discount: ${discountAmount / 100}$.` : ""}`,
+          description: `Plan - ${plan.type} - ${plan.period}. Quantity - ${subscription.license._count.activeLicenses}. ${discountAmount ? `Discount: ${discountAmount / 100}€.` : ""}`,
           metadata,
           pay: true,
         });

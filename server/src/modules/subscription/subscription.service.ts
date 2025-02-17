@@ -40,7 +40,6 @@ export class SubscriptionService {
     userId,
     planId,
     quantity,
-    discount,
     userReferralCode,
   }: AddSubscriptionDto) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
@@ -51,8 +50,9 @@ export class SubscriptionService {
 
     let subscription = await this.prisma.subscription.findUnique({
       where: { userId },
+      include: { plan: true },
     });
-    if (subscription && subscription.isActive)
+    if (subscription && subscription.plan.type !== LicenseTierType.freemium)
       throw new BadRequestException("Subscription already exists");
 
     const license = await this.prisma.license.findUnique({
@@ -63,8 +63,6 @@ export class SubscriptionService {
     });
 
     if (!plan) throw new NotFoundException("Plan not found");
-
-    let discountId = undefined;
 
     if (!stripeCustomerId) {
       const stripeCustomer = await this.stripeService.createCustomer(
@@ -82,24 +80,10 @@ export class SubscriptionService {
       });
     }
 
-    if (discount) {
-      await this.prisma.user.update({
-        where: { id: user.id },
-        data: {
-          discount: user.discount + discount.amount,
-        },
-      });
-      const stripeDiscount = await this.stripeService.createCoupon(
-        discount.amount,
-      );
-      discountId = stripeDiscount.id;
-      await this.addDiscount(
-        userId,
-        discount.amount,
-        discount.description,
-        discountId,
-      );
-    }
+    const { discountId, discountAmount } = await this.checkDiscount(
+      userId,
+      plan.price * quantity,
+    );
 
     const nextDate =
       plan.period === PlanPeriod.monthly
@@ -116,6 +100,7 @@ export class SubscriptionService {
           isInTrial: false,
           nextDate,
         },
+        include: { plan: true },
       });
     } else {
       subscription = await this.prisma.subscription.update({
@@ -128,6 +113,7 @@ export class SubscriptionService {
           isInTrial: false,
           nextDate,
         },
+        include: { plan: true },
       });
     }
 
@@ -136,7 +122,7 @@ export class SubscriptionService {
       userReferralCode,
       subscriptionId: subscription.id,
       stripeCouponId: discountId,
-      discountAmount: discount?.amount,
+      discountAmount,
       firstInvoice: "true",
     };
 
@@ -145,35 +131,11 @@ export class SubscriptionService {
       priceId: plan.stripePriceId,
       quantity,
       couponId: discountId,
-      description: `Plan - ${plan.type} - ${plan.period}. Quantity - ${quantity}. ${discount ? `Discount: ${discount.amount / 100}$ - ${discount.description}.` : ""}`,
+      description: `Plan - ${plan.type} - ${plan.period}. Quantity - ${quantity}. ${discountAmount ? `Discount: ${discountAmount / 100}€` : ""}`,
       metadata,
     });
 
     return { url: invoice.hosted_invoice_url };
-  }
-
-  async addDiscount(
-    userId: string,
-    amount: number,
-    description: string,
-    discountId?: string,
-  ) {
-    const discount = await this.prisma.discount.create({
-      data: {
-        userId,
-        endAmount: amount,
-        stripeCouponId: discountId,
-      },
-    });
-
-    await this.prisma.discountIncome.create({
-      data: {
-        userId,
-        amount,
-        discountId: discount.id,
-        description,
-      },
-    });
   }
 
   async payInvoice() {
@@ -423,7 +385,7 @@ export class SubscriptionService {
         priceId: subscription.plan.stripePriceId,
         quantity: subscription.license._count.activeLicenses,
         couponId: discountId,
-        description: `Plan - ${subscription.plan.type} - ${subscription.plan.period}. Quantity - ${subscription.license._count.activeLicenses}. ${discountAmount ? `Discount: ${discountAmount / 100}$.` : ""}`,
+        description: `Plan - ${subscription.plan.type} - ${subscription.plan.period}. Quantity - ${subscription.license._count.activeLicenses}. ${discountAmount ? `Discount: ${discountAmount / 100}€.` : ""}`,
         metadata,
         pay: true,
       });
@@ -540,6 +502,23 @@ export class SubscriptionService {
     }
 
     return plan;
+  }
+
+  async cancelChangePlan(subscriptionId: string) {
+    const subscription = await this.prisma.subscription.findUnique({
+      where: { id: subscriptionId },
+    });
+
+    if (!subscription) {
+      throw new NotFoundException("Subscription not found");
+    }
+
+    await this.prisma.subscription.update({
+      where: { id: subscriptionId },
+      data: { newPlanId: null },
+    });
+
+    return { status: "canalled" };
   }
 
   async getDiscountHistory(userId: string) {

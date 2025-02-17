@@ -103,6 +103,7 @@ interface UserSubscriptionInfo {
   id: string;
   isActive: boolean;
   nextDate: string;
+  newPlanId?: string;
   plan: {
     id: string;
     type: LicenseTierType;

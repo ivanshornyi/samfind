@@ -1,4 +1,8 @@
-import { CreatePaymentData, PaymentSubscriptionApiService } from "@/services";
+import {
+  ChangeSubscriptionPlanData,
+  CreatePaymentData,
+  PaymentSubscriptionApiService,
+} from "@/services";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -10,7 +14,8 @@ export const usePaySubscription = () => {
   const { toast } = useToast();
 
   const { ...mutationProps } = useMutation({
-    mutationFn: (data: CreatePaymentData) => PaymentSubscriptionApiService.createPayment(data),
+    mutationFn: (data: CreatePaymentData) =>
+      PaymentSubscriptionApiService.createPayment(data),
     onSuccess: (data: { url: string }) => {
       window.open(data.url, "_blank");
     },
@@ -27,7 +32,8 @@ export const useCancelSubscription = () => {
   const queryClient = useQueryClient();
 
   const { ...mutationProps } = useMutation({
-    mutationFn: (id: string) => PaymentSubscriptionApiService.cancelSubscription(id),
+    mutationFn: (id: string) =>
+      PaymentSubscriptionApiService.cancelSubscription(id),
     onSuccess: () => {
       toast({
         title: "Success",
@@ -53,11 +59,68 @@ export const useActivateSubscription = () => {
   const queryClient = useQueryClient();
 
   const { ...mutationProps } = useMutation({
-    mutationFn: (id: string) => PaymentSubscriptionApiService.activateSubscription(id),
+    mutationFn: (id: string) =>
+      PaymentSubscriptionApiService.activateSubscription(id),
     onSuccess: () => {
       toast({
         title: "Success",
         description: "Successfully activated",
+        variant: "success",
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["subscription-user-info"],
+        refetchType: "all",
+      });
+    },
+    onError: (error) => {
+      handleToastError(error, toast);
+    },
+  });
+
+  return mutationProps;
+};
+
+export const useChangeSubscriptionPlan = () => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { ...mutationProps } = useMutation({
+    mutationFn: (data: ChangeSubscriptionPlanData) =>
+      PaymentSubscriptionApiService.changeSubscriptionPlan(data),
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Successfully changed",
+        variant: "success",
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["subscription-user-info"],
+        refetchType: "all",
+      });
+    },
+    onError: (error) => {
+      handleToastError(error, toast);
+    },
+  });
+
+  return mutationProps;
+};
+
+export const useCancelChangeSubscriptionPlan = () => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { ...mutationProps } = useMutation({
+    mutationFn: (subscriptionId: string) =>
+      PaymentSubscriptionApiService.cancelChangeSubscriptionPlan(
+        subscriptionId
+      ),
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Successfully changed",
         variant: "success",
       });
 

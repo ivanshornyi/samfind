@@ -10,7 +10,7 @@ import { PaymentHistory, SubscriptionDetails } from "./_components";
 import { PricingCard } from "./_components/pricing-card";
 
 import { format } from "date-fns";
-import { PlanPeriod } from "@/types";
+import { PlanPeriod, PlanType } from "@/types";
 import { BonusHistoryModal } from "./_components/bonus-history-modal";
 
 export default function BillingData() {
@@ -72,11 +72,13 @@ export default function BillingData() {
             !isPlansPending &&
             (!userLicense || userLicense.tierType === "freemium") && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-                {plans?.map((plan) => (
-                  <div key={plan.id} className="flex">
-                    <PricingCard plan={plan} withButton={true} />
-                  </div>
-                ))}
+                {plans
+                  ?.filter((plan) => plan.type !== PlanType.Freemium)
+                  .map((plan) => (
+                    <div key={plan.id} className="flex">
+                      <PricingCard plan={plan} withButton={true} />
+                    </div>
+                  ))}
               </div>
             )}
         </div>

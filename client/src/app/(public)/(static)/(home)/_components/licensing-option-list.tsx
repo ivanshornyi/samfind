@@ -1,45 +1,61 @@
 "use client";
 
 import { useGetPlans } from "@/hooks";
-import { licensingOptions } from "../_lib";
 import { LicensingOptionCard } from "./licensing-option-card";
 import { LicensingOptionType } from "../_types";
 import { useEffect, useState } from "react";
-import { PlanPeriod } from "@/types";
+import { PlanPeriod, PlanType } from "@/types";
 
 export const LicensingOptionList = () => {
   const { data: plans } = useGetPlans();
-  const [planOptions, setPlanOptions] = useState<LicensingOptionType[]>([
-    licensingOptions[0],
-  ]);
+  const [planOptions, setPlanOptions] = useState<LicensingOptionType[]>([]);
 
   useEffect(() => {
     if (plans?.length) {
       const newPlanOptions: LicensingOptionType[] = plans.map((plan) => {
-        return {
-          id: plan.id,
-          title:
-            plan.type +
-            "  " +
-            `${plan.period === PlanPeriod.Monthly ? "Monthly" : "Yearly"}`,
-          tierType: plan.type,
-          period: plan.period,
-          description:
-            "Boost your capabilities with premium features and priority support.",
-          price: plan.price / 100,
-          buttonText: "Buy Standard",
-          buttonVariant: "default",
-          features: [
-            "Enhanced capabilities",
-            "Priority updates",
-            "Premium support",
-          ],
-          footerText: undefined,
-          isPremium: true,
-        };
+        if (plan.type === PlanType.Freemium) {
+          return {
+            id: plan.id,
+            title: "Freemium",
+            period: plan.period,
+            tierType: plan.type,
+            description: "Essential features for personal and community use",
+            price: 0,
+            buttonText: "Get Started Free",
+            buttonVariant: "secondary",
+            features: [
+              "Essential features",
+              "Community access",
+              "Basic support",
+            ],
+            footerText: "Community Edition",
+            isPremium: false,
+          };
+        } else
+          return {
+            id: plan.id,
+            title:
+              plan.type +
+              "  " +
+              `${plan.period === PlanPeriod.Monthly ? "Monthly" : "Yearly"}`,
+            tierType: plan.type,
+            period: plan.period,
+            description:
+              "Boost your capabilities with premium features and priority support.",
+            price: plan.price / 100,
+            buttonText: "Buy Standard",
+            buttonVariant: "default",
+            features: [
+              "Enhanced capabilities",
+              "Priority updates",
+              "Premium support",
+            ],
+            footerText: undefined,
+            isPremium: true,
+          };
       });
 
-      setPlanOptions(() => [licensingOptions[0], ...newPlanOptions]);
+      setPlanOptions(newPlanOptions);
     }
   }, [plans]);
   return (

@@ -13,6 +13,11 @@ export interface CreatePaymentData {
   };
 }
 
+export interface ChangeSubscriptionPlanData {
+  subscriptionId: string;
+  planId: string;
+}
+
 const createPayment = async (data: CreatePaymentData) => {
   try {
     const response = await apiClient.post("/subscription", {
@@ -45,8 +50,32 @@ const cancelSubscription = async (id: string) => {
   }
 };
 
+const changeSubscriptionPlan = async (data: ChangeSubscriptionPlanData) => {
+  try {
+    const response = await apiClient.post(`/subscription/change-plan`, data);
+
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
+const cancelChangeSubscriptionPlan = async (subscriptionId: string) => {
+  try {
+    const response = await apiClient.post(`/subscription/cancel-change-plan`, {
+      subscriptionId,
+    });
+
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 export const PaymentSubscriptionApiService = {
   createPayment,
   cancelSubscription,
   activateSubscription,
+  changeSubscriptionPlan,
+  cancelChangeSubscriptionPlan,
 };
