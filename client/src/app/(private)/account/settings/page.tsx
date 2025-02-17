@@ -26,6 +26,7 @@ export default function Settings() {
   const { toast } = useToast();
   const { user, userLoading } = useContext(AuthContext);
   const [editName, setEditName] = useState(false);
+  const [editOrganization, setEditOrganization] = useState(false);
   const [editPassword, setEditPassword] = useState(false);
   const [userFormData, setUserFormData] = useState({
     firstName: "",
@@ -47,7 +48,7 @@ export default function Settings() {
     name: "",
     businessOrganizationNumber: "",
     VAT: "",
-    domains: [""],
+    // domains: [""],
   });
 
   const { data: organization, isLoading: isOrganizationLoading } =
@@ -68,6 +69,15 @@ export default function Settings() {
     setUserFormData({ ...userFormData, [name]: value });
   };
 
+  const handleInputOrganizationChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const name = event.target.name;
+    const value = event.target.value;
+
+    setOrganizationFormData({ ...organizationFormData, [name]: value });
+  };
+
   const handlePasswordFormInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -75,6 +85,30 @@ export default function Settings() {
     const value = event.target.value;
 
     setUserPasswordFormData({ ...userPasswordFormData, [name]: value });
+  };
+
+  const handleUpdateOrganization = () => {
+    if (!user?.organizationId) return;
+
+    updateOrganizationMutation(
+      {
+        id: user.organizationId,
+        organizationData: {
+          name: organizationFormData.name,
+          businessOrganizationNumber:
+            organizationFormData.businessOrganizationNumber,
+          VAT: organizationFormData.VAT,
+        },
+      },
+      {
+        onSuccess: () => {
+          setEditDomains(false);
+          queryClient.invalidateQueries({
+            queryKey: ["organization", user.organizationId],
+          });
+        },
+      }
+    );
   };
 
   const handleDomainChange = (index: number, value: string) => {
@@ -151,6 +185,16 @@ export default function Settings() {
     setEditName(!editName);
   };
 
+  const handleEditCancelOrganization = () => {
+    if (editOrganization && organization)
+      setOrganizationFormData({
+        name: organization.name,
+        businessOrganizationNumber: organization.businessOrganizationNumber,
+        VAT: organization.VAT,
+      });
+    setEditOrganization(!editOrganization);
+  };
+
   const handleChangePasswordSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -220,9 +264,9 @@ export default function Settings() {
         businessOrganizationNumber:
           organization.businessOrganizationNumber ?? "",
         VAT: organization.VAT ?? "",
-        domains: Array.isArray(organization.domains)
-          ? organization.domains
-          : [""],
+        // domains: Array.isArray(organization.domains)
+        //   ? organization.domains
+        //   : [""],
       });
     }
   }, [organization]);
@@ -373,35 +417,84 @@ export default function Settings() {
               <div className="flex justify-between items-start w-full">
                 <div className="w-full">
                   <div className="flex flex-col gap-4">
-                    <div className="relative">
-                      <p className="text-[16px] leading-[22px] font-semibold mb-2">
-                        Company name
-                      </p>
-                      <p className="text-[14px] leading-[29px] text-disabled font-medium">
-                        {organization?.name || "Not provided"}
-                      </p>
+                    <div className="relative flex justify-between">
+                      <div className="w-full max-w-[220px] mt-2 ">
+                        <p className="text-[16px] leading-[22px] font-semibold mb-2">
+                          Company name
+                        </p>
+
+                        {editOrganization ? (
+                          <Input
+                            name="name"
+                            type="text"
+                            value={organizationFormData.name}
+                            onChange={handleInputOrganizationChange}
+                          />
+                        ) : (
+                          <p className="text-[14px] leading-[29px] text-disabled font-medium">
+                            {organization?.name || "Not provided"}
+                          </p>
+                        )}
+                      </div>
+                      <Button
+                        variant="edit"
+                        onClick={handleEditCancelOrganization}
+                      >
+                        {editOrganization ? "Cancel" : "Edit"}
+                      </Button>
                     </div>
 
                     <div className="flex gap-4">
-                      <div className="flex-1">
+                      <div className="flex-1 ">
                         <p className="text-[16px] leading-[22px] font-semibold mb-2">
                           Business registration number
                         </p>
-                        <p className="text-[14px] leading-[29px] text-disabled font-medium">
-                          {organization?.businessOrganizationNumber ||
-                            "Not provided"}
-                        </p>
+                        {editOrganization ? (
+                          <Input
+                            name="businessOrganizationNumber"
+                            type="text"
+                            className="max-w-[220px]"
+                            value={
+                              organizationFormData.businessOrganizationNumber
+                            }
+                            onChange={handleInputOrganizationChange}
+                          />
+                        ) : (
+                          <p className="text-[14px] leading-[29px] text-disabled font-medium">
+                            {organization?.businessOrganizationNumber ||
+                              "Not provided"}
+                          </p>
+                        )}
                       </div>
 
                       <div className="flex-1">
                         <p className="text-[16px] leading-[22px] font-semibold mb-2">
                           VAT number
                         </p>
-                        <p className="text-[14px] leading-[29px] text-disabled font-medium">
-                          {organization?.VAT || "Not provided"}
-                        </p>
+                        {editOrganization ? (
+                          <Input
+                            name="VAT"
+                            type="text"
+                            className="max-w-[220px]"
+                            value={organizationFormData.VAT}
+                            onChange={handleInputOrganizationChange}
+                          />
+                        ) : (
+                          <p className="text-[14px] leading-[29px] text-disabled font-medium">
+                            {organization?.VAT || "Not provided"}
+                          </p>
+                        )}
                       </div>
                     </div>
+                    {editOrganization && (
+                      <Button
+                        className="mt-2 w-[148px]"
+                        variant="saveProfile"
+                        onClick={handleUpdateOrganization}
+                      >
+                        Save
+                      </Button>
+                    )}
 
                     {/* <div className="flex justify-between items-start w-full">
                       <div className="w-full">

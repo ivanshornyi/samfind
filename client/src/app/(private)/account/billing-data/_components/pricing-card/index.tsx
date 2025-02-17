@@ -201,7 +201,7 @@ export const PricingCard = ({
                   withLoader
                   loading={isCancelChangeSubscriptionPlan}
                 >
-                  Change Plan
+                  Cancel Select
                 </Button>
               ) : (
                 <ChangePlanModal

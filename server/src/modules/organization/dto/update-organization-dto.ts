@@ -5,6 +5,14 @@ export class UpdateOrganizationDto {
   @IsOptional()
   name?: string;
 
+  @IsString()
+  @IsOptional()
+  businessOrganizationNumber?: string;
+
+  @IsString()
+  @IsOptional()
+  VAT?: string;
+
   @IsArray()
   @IsOptional()
   domains?: string[];
