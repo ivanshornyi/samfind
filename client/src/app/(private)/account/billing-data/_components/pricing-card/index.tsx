@@ -10,7 +10,6 @@ import { AuthContext } from "@/context";
 import {
   useActivateSubscription,
   usePaySubscription,
-  useChangeSubscriptionPlan,
   useCancelChangeSubscriptionPlan,
 } from "@/hooks";
 import { CreatePaymentData } from "@/services";
@@ -18,6 +17,7 @@ import { Plan, PlanType } from "@/types";
 import { format } from "date-fns";
 import { Check } from "lucide-react";
 import { useContext, useState } from "react";
+import { ChangePlanModal } from "../change-plan-modal";
 
 interface PricingCardProps {
   plan: Plan;
@@ -59,10 +59,6 @@ export const PricingCard = ({
     mutate: activateSubscriptionMutation,
     isPending: isActivateSubscriptionPending,
   } = useActivateSubscription();
-  const {
-    mutate: changeSubscriptionPlan,
-    isPending: isChangeSubscriptionPlan,
-  } = useChangeSubscriptionPlan();
   const {
     mutate: cancelChangeSubscriptionPlan,
     isPending: isCancelChangeSubscriptionPlan,
@@ -197,24 +193,23 @@ export const PricingCard = ({
                   {format(new Date(nextDate), "MMMM dd, yyyy")}
                 </p>
               )}
-              <Button
-                variant={"secondary"}
-                className="w-full"
-                onClick={() =>
-                  newPlanId === plan.id
-                    ? cancelChangeSubscriptionPlan(subscriptionId)
-                    : changeSubscriptionPlan({
-                        planId: plan.id,
-                        subscriptionId,
-                      })
-                }
-                withLoader
-                loading={
-                  isChangeSubscriptionPlan || isCancelChangeSubscriptionPlan
-                }
-              >
-                {newPlanId === plan.id ? "Cancel Select" : "Change Plan"}
-              </Button>
+              {newPlanId === plan.id ? (
+                <Button
+                  variant={"secondary"}
+                  className="w-full"
+                  onClick={() => cancelChangeSubscriptionPlan(subscriptionId)}
+                  withLoader
+                  loading={isCancelChangeSubscriptionPlan}
+                >
+                  Change Plan
+                </Button>
+              ) : (
+                <ChangePlanModal
+                  nextDate={nextDate}
+                  subscriptionId={subscriptionId}
+                  plan={plan}
+                />
+              )}
             </div>
           )}
         {withButton && (
