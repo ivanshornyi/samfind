@@ -17,10 +17,14 @@ import { X } from "lucide-react";
 
 import { PricingCard } from "../pricing-card";
 import { CancelSubscriptionModal } from "../cancel-subscription-modal";
+import { useContext } from "react";
+import { AuthContext } from "@/context";
+import { PlanType, UserAccountType } from "@/types";
 
 export const ManageSubscriptionModal = () => {
   const { data: plans } = useGetPlans();
   const { data: userSubscription } = useGetUserSubscriptionInfo();
+  const { user } = useContext(AuthContext);
 
   return (
     <AlertDialog>
@@ -31,7 +35,7 @@ export const ManageSubscriptionModal = () => {
       </AlertDialogTrigger>
       <AlertDialogContent
         className="
-          w-full max-w-[800px] overflow-auto h-[100dvh] rounded-none 
+          w-full max-w-[880px] overflow-auto h-[100dvh] rounded-none 
           md:h-[700px] md:rounded-[30px]
         "
       >
@@ -50,18 +54,26 @@ export const ManageSubscriptionModal = () => {
           </AlertDialogDescription>
         </AlertDialogHeader>
 
-        <div className="flex gap-2 flex-wrap justify-center md:flex-nowrap">
-          {plans?.map((plan) => (
-            <div key={plan.id}>
-              <PricingCard
-                plan={plan}
-                withButton={false}
-                currentUserPlanId={userSubscription?.plan.id}
-                isActive={userSubscription?.isActive}
-                subscriptionId={userSubscription?.id}
-              />
-            </div>
-          ))}
+        <div className="flex gap-2 flex-wrap justify-around md:flex-nowrap">
+          {plans
+            ?.filter((plan) => {
+              return user?.accountType === UserAccountType.Business
+                ? plan.type !== PlanType.Freemium
+                : true;
+            })
+            .map((plan) => (
+              <div key={plan.id}>
+                <PricingCard
+                  plan={plan}
+                  withButton={false}
+                  currentUserPlanId={userSubscription?.plan.id}
+                  isActive={userSubscription?.isActive}
+                  subscriptionId={userSubscription?.id}
+                  newPlanId={userSubscription?.newPlanId}
+                  nextDate={userSubscription?.nextDate}
+                />
+              </div>
+            ))}
         </div>
 
         {userSubscription && userSubscription.isActive && (

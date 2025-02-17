@@ -47,6 +47,12 @@ export class PlanService {
   async getAllPlans() {
     const plans = await this.prisma.plan.findMany();
 
+    plans.sort((a, b) => {
+      if (a.type === LicenseTierType.freemium) return -1;
+      if (b.type === LicenseTierType.freemium) return 1;
+      return 0;
+    });
+
     return plans;
   }
 }

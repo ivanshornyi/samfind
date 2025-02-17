@@ -317,6 +317,7 @@ export class UserService {
         nextDate: true,
         plan: true,
         isActive: true,
+        newPlanId: true,
         license: {
           select: {
             limit: true,
