@@ -128,6 +128,7 @@ export class UserLicenseService {
   }: CheckDeviceDto): Promise<{
     error: string | null;
     license?: LicenseTierType;
+    userStatus?: string;
   }> {
     if (!desktopId && !mobileId) {
       return {
@@ -155,6 +156,11 @@ export class UserLicenseService {
     ) {
       return {
         error: "Email has no paid license",
+        userStatus: mobileId
+          ? user.isDeleted
+            ? "deleted"
+            : "active"
+          : undefined,
       };
     }
 
@@ -165,6 +171,11 @@ export class UserLicenseService {
     ) {
       return {
         error: "License has been registered on other Device",
+        userStatus: mobileId
+          ? user.isDeleted
+            ? "deleted"
+            : "active"
+          : undefined,
       };
     }
 
@@ -175,6 +186,11 @@ export class UserLicenseService {
     ) {
       return {
         error: "License has been registered on other Device",
+        userStatus: mobileId
+          ? user.isDeleted
+            ? "deleted"
+            : "active"
+          : undefined,
       };
     }
 
@@ -189,6 +205,11 @@ export class UserLicenseService {
       return {
         error: null,
         license: activeLicense.license.tierType,
+        userStatus: mobileId
+          ? user.isDeleted
+            ? "deleted"
+            : "active"
+          : undefined,
       };
     }
 
@@ -214,6 +235,11 @@ export class UserLicenseService {
     return {
       error: null,
       license: activeLicense.license.tierType,
+      userStatus: mobileId
+        ? user.isDeleted
+          ? "deleted"
+          : "active"
+        : undefined,
     };
   }
 
