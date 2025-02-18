@@ -260,18 +260,23 @@ export class SubscriptionService {
       }
     }
 
-    const invoices = allInvoices.map((invoice) => ({
-      id: invoice.id,
-      number: invoice.number,
-      url: invoice.hosted_invoice_url,
-      pdf: invoice.invoice_pdf,
-      status: invoice.status,
-      price: invoice.subtotal,
-      afterDiscount: invoice.total,
-      description: invoice.description,
-      date: invoice.status_transitions.finalized_at,
-      payDate: invoice.status_transitions.paid_at,
-    }));
+    let invoices = allInvoices
+      .filter((invoice, index, arr) => {
+        if (index === 0) return true;
+        return invoice.status === "paid";
+      })
+      .map((invoice) => ({
+        id: invoice.id,
+        number: invoice.number,
+        url: invoice.hosted_invoice_url,
+        pdf: invoice.invoice_pdf,
+        status: invoice.status,
+        price: invoice.subtotal,
+        afterDiscount: invoice.total,
+        description: invoice.description,
+        date: invoice.status_transitions.finalized_at,
+        payDate: invoice.status_transitions.paid_at,
+      }));
 
     return invoices;
   }

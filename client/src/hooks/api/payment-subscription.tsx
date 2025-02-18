@@ -10,6 +10,16 @@ import { useToast } from "../use-toast";
 
 import { handleToastError } from "@/errors";
 
+const handleRedirect = (url: string) => {
+  const link = document.createElement("a");
+  link.href = url;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 export const usePaySubscription = () => {
   const { toast } = useToast();
 
@@ -17,7 +27,7 @@ export const usePaySubscription = () => {
     mutationFn: (data: CreatePaymentData) =>
       PaymentSubscriptionApiService.createPayment(data),
     onSuccess: (data: { url: string }) => {
-      window.open(data.url, "_blank");
+      handleRedirect(data.url);
     },
     onError: (error) => {
       handleToastError(error, toast);
