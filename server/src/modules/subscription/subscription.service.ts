@@ -52,7 +52,11 @@ export class SubscriptionService {
       where: { userId },
       include: { plan: true },
     });
-    if (subscription && subscription.plan.type !== LicenseTierType.freemium)
+    if (
+      subscription &&
+      (subscription.isActive || subscription.isInTrial) &&
+      subscription.plan.type !== LicenseTierType.freemium
+    )
       throw new BadRequestException("Subscription already exists");
 
     const license = await this.prisma.license.findUnique({
