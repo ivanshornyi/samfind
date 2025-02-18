@@ -125,7 +125,10 @@ export class UserLicenseService {
     email,
     computer_id: desktopId,
     mobile_id: mobileId,
-  }: CheckDeviceDto) {
+  }: CheckDeviceDto): Promise<{
+    error: string | null;
+    license?: LicenseTierType;
+  }> {
     if (!desktopId && !mobileId) {
       return {
         error: "Email has no paid license",
