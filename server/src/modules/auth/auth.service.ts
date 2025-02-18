@@ -130,7 +130,7 @@ export class AuthService {
   }
 
   public async signIn(signInDto: SignInDto) {
-    const { email, password, authType } = signInDto;
+    const { email, password, authType, mobileId } = signInDto;
 
     const user = await this.userService.findUserByEmail(email, authType);
 
@@ -163,11 +163,13 @@ export class AuthService {
 
     let licenseInformation = undefined;
 
-    if (signInDto.mobileId) {
+    if (mobileId) {
       licenseInformation = await this.userLicenseService.checkDevice({
-        mobile_id: signInDto.mobileId,
+        mobile_id: mobileId,
         email: user.email,
       });
+
+      if (licenseInformation.error) return { licenseInformation };
     }
 
     return {
