@@ -96,17 +96,19 @@ export default function ChatBot() {
 
       <Dialog.Root open={open} onOpenChange={setOpen}>
         <Dialog.Trigger>
-          <div
-            onClick={() => setOpen(true)}
-            className="fixed bottom-8 right-8 flex items-center justify-center cursor-pointer w-[60px] h-[60px] bg-[#1F1E20] rounded-3xl shadow-[0px_2px_18.9px_0px_#8F40E5] hover:scale-105 transition"
-          >
-            <MessageSquareDot size={32} className="text-white" />
-          </div>
+          {!open && (
+            <div
+              onClick={() => setOpen(true)}
+              className="fixed bottom-8 right-8 flex items-center justify-center cursor-pointer w-[60px] h-[60px] bg-[#1F1E20] rounded-3xl shadow-[0px_2px_18.9px_0px_#8F40E5] hover:scale-105 transition"
+            >
+              <MessageSquareDot size={32} className="text-white" />
+            </div>
+          )}
         </Dialog.Trigger>
 
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/50" />
-          <Dialog.Content className="fixed bottom-8 right-8 w-full sm:w-[570px] h-auto max-h-[700px] gradient-border-modal pb-0">
+          <Dialog.Content className="fixed bottom-8 right-8 w-full sm:w-[570px] h-auto max-h-[700px] gradient-border-modal p-6 backdrop-blur-2xl bg-black/50">
             <div className="absolute right-1 top-1">
               <Dialog.Close className="shadow-none border-none p-3">
                 <X size={18} />
@@ -118,6 +120,30 @@ export default function ChatBot() {
             <Dialog.Description className="text-[16px] leading-[22px] font-semibold">
               I’m here to help you learn more about our platform.
             </Dialog.Description>
+            <div className="mt-6 bg-[#28282C] rounded-[20px] p-4 overflow-auto">
+              <div className="flex gap-4">
+                <div>
+                  <Image src="/o.png" alt="icon" width={32} height={32} />
+                </div>
+                <div className="mb-4">
+                  <p className="text-[14px] text-disabled leading-[19px] font-semibold">
+                    Onsio AI bot
+                  </p>
+                  <p className="text-[16px] leading-[22px] font-semibold">
+                    Let me know if you have any questions!
+                  </p>
+                </div>
+              </div>
+
+              <Button
+                className="w-full"
+                variant="purple"
+                leftIcon={<Send />}
+                onClick={() => setStage("options")}
+              >
+                Сhat with us
+              </Button>
+            </div>
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
