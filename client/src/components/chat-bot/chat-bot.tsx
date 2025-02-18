@@ -17,16 +17,16 @@ const options = [
 
 export default function ChatBot() {
   const [open, setOpen] = useState<boolean>(false);
-  const [stage, setStage] = useState<
-    | "start"
-    | "options"
-    | "aboutPlatform"
-    | "pricingPlans"
-    | "pricing"
-    | "getStarted"
-    | "contact"
-    | "chat"
-  >("start");
+  const [stage, setStage] = useState<"start" | "options" | "contact" | "chat">(
+    "start"
+  );
+  const [option, setOption] = useState<
+    "" | "aboutPlatform" | "pricingPlans" | "pricing" | "getStarted"
+  >("");
+  // const [messages, setMessages] = useState<
+  //   { who: "bot" | "user"; text: string }[]
+  // >([]);
+  const [inputText, setInputText] = useState("");
 
   return (
     <div className="fixed bottom-8 right-8 z-50">
@@ -49,7 +49,6 @@ export default function ChatBot() {
               <Dialog.Close
                 onClick={() => {
                   setOpen(false);
-                  setStage("start");
                 }}
                 className="shadow-none border-none p-3"
               >
@@ -91,36 +90,72 @@ export default function ChatBot() {
               </div>
             )}
             {stage !== "start" && (
-              <div className="flex flex-col justify-between h-[528px] mt-5 p-4 border-t border-[#363637]">
-                {stage === "options" && (
-                  <div className="flex h-full flex-col justify-between">
+              <div>
+                <div className="flex flex-col justify-between h-[528px] mt-5 p-4 border-t border-[#363637]">
+                  <div
+                    className="flex flex-col justify-between 
+                  "
+                  >
                     <div className="flex gap-4 items-center max-w-[400px]">
-                      <div className="w-[110px] h-[50px] relative">
+                      <div className="w-[35px] h-[35px] relative">
                         <Image src="/o.png" alt="icon" fill />
                       </div>
-                      <p className="text-[16px] leading-[22px] font-semibold">
+                      <p className="text-[16px] leading-[22px] font-semibold max-w-[350px]">
                         {`Hi! I'm Onsio AI agent. I’m here to help you learn more
                         about our platform. How could I help you?`}
                       </p>
                     </div>
-                    <div className="flex gap-4 flex-wrap">
-                      {options.map((o) => (
-                        <Button
-                          key={o.value}
-                          variant="secondary"
-                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                          onClick={() => setStage(o.value as any)}
-                        >
-                          {o.name}
-                        </Button>
-                      ))}
-                    </div>
+                    {!option && (
+                      <div className="flex gap-4 flex-wrap">
+                        {options.map((o) => (
+                          <Button
+                            key={o.value}
+                            variant="secondary"
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            onClick={() => setOption(o.value as any)}
+                          >
+                            {o.name}
+                          </Button>
+                        ))}
+                      </div>
+                    )}
+                    {option && (
+                      <div>
+                        <p className="text-[16px] leading-[22px] font-semibold text-right mb-4">
+                          {options.find((o) => o.value === option)?.name}
+                        </p>
+                        <div className="flex gap-4 items-center max-w-[400px]">
+                          <div className="w-[35px] h-[35px] relative">
+                            <Image src="/o.png" alt="icon" fill />
+                          </div>
+                          <p className="text-[16px] leading-[22px] font-semibold max-w-[350px]">
+                            Benefits of a Business Account for Users: Enhanced
+                            capabilities: Access additional features that help
+                            you manage your business more effectively and make
+                            the most out of the platform. Priority updates: Be
+                            among the first to receive new features and
+                            improvements, keeping your business ahead of the
+                            curve. Premium support: Enjoy access to top-tier
+                            support that quickly addresses any issues and
+                            ensures your business operates smoothly.
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
-                <div className="mt-6 h-[60px] bg-[#28282C] rounded-[20px] p-4 overflow-auto flex items-center space-x-2 w-full relative">
-                  <Input type="text" placeholder="Type your question here..." />
-                  <div className="absolute right-8 top-1/2 -translate-y-1/2 cursor-pointer">
-                    <CircleArrowUp style={{ width: "24px", height: "24px" }} />
+
+                  <div className="mt-6 h-[60px] bg-[#28282C] rounded-[20px] p-4 overflow-auto flex items-center space-x-2 w-full relative">
+                    <Input
+                      value={inputText}
+                      onChange={(e) => setInputText(e.target.value)}
+                      type="text"
+                      placeholder="Type your question here..."
+                    />
+                    <div className="absolute right-8 top-1/2 -translate-y-1/2 cursor-pointer">
+                      <CircleArrowUp
+                        style={{ width: "24px", height: "24px" }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
