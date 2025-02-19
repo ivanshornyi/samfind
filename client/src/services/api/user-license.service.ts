@@ -1,4 +1,4 @@
-import { License, LicenseList } from "@/types";
+import { ActiveLicense, License, LicenseList } from "@/types";
 
 import { apiClient } from "@/vars";
 
@@ -69,10 +69,36 @@ const deleteMemberFromLicense = async (licenseId: string, memberId: string) => {
   }
 };
 
+const getUserActiveLicense = async (id: string) => {
+  try {
+    const response = await apiClient.get(`/user-license/active-license/${id}`);
+
+    return response.data as ActiveLicense;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
+const deleteDeviceIdFromLicense = async (data: {
+  activeLicenseId: string;
+  mobileId?: string;
+  desktopId?: string;
+}) => {
+  try {
+    const response = await apiClient.delete(`/user-license/device`, { data });
+
+    return response;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 export const UserLicenseApiService = {
   addUserLicense,
   getUserLicense,
   getUserLicenses,
   updateUserLicense,
   deleteMemberFromLicense,
+  getUserActiveLicense,
+  deleteDeviceIdFromLicense,
 };

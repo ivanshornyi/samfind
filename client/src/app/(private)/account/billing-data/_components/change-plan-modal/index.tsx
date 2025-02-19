@@ -34,7 +34,9 @@ export const ChangePlanModal = ({
     startOfDay(new Date(nextDate))
   );
 
-  const monthName = format(new Date(nextDate), "MMMM", { locale: undefined });
+  const monthName = format(new Date(nextDate), "dd MMMM, yy", {
+    locale: undefined,
+  });
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -58,8 +60,8 @@ export const ChangePlanModal = ({
 
         <p className="text-[#C4C4C4] text-[16px] leading-[22px] mt-2">
           {plan.type === PlanType.Freemium
-            ? `You want to change to a freemium plan. In this case, you will lose all benefits. ${difference < 0 ? `Your current plan is valid until ${monthName} 1st. After that, you will switch to a new plan.` : ``}`
-            : `${difference < 0 ? `Your current plan is valid until ${monthName} 1st. After that, you will switch to a new plan.` : `Upon confirmation, you will be charged for the new plan`}`}
+            ? `You want to change to a freemium plan. In this case, you will lose all benefits. ${difference < 0 ? `Your current plan is valid until ${monthName}. After that, you will switch to a new plan.` : ``}`
+            : `${difference < 0 ? `Your current plan is valid until ${monthName}. After that, you will switch to a new plan.` : `Upon confirmation, you will be charged for the new plan`}`}
         </p>
 
         <div className="flex gap-4 mt-8">

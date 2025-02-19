@@ -9,7 +9,11 @@ import {
   UserAccountTypeBox,
 } from "@/components";
 import { AuthContext } from "@/context";
-import { useToast } from "@/hooks";
+import {
+  useDeleteDeviceIdFromLicense,
+  useGetUserActiveLicense,
+  useToast,
+} from "@/hooks";
 import {
   useGetOrganization,
   useUpdateOrganization,
@@ -18,9 +22,8 @@ import { useUpdateUser } from "@/hooks/api/user";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { DeleteAccount } from "./_components";
-
-import { Plus, X } from "lucide-react";
 import { UserAccountType } from "@/types";
+import { X } from "lucide-react";
 
 export default function Settings() {
   const { toast } = useToast();
@@ -48,8 +51,10 @@ export default function Settings() {
     name: "",
     businessOrganizationNumber: "",
     VAT: "",
-    // domains: [""],
   });
+
+  const [mobileIs, setMobileIds] = useState<string[]>([]);
+  const [desktopIs, setDesktopIds] = useState<string[]>([]);
 
   const { data: organization, isLoading: isOrganizationLoading } =
     useGetOrganization(user?.organizationId ?? "");
@@ -59,8 +64,9 @@ export default function Settings() {
     isPending: isUpdateOrganizationPending,
   } = useUpdateOrganization();
 
-  const [editDomains, setEditDomains] = useState(false);
-  const [domains, setDomains] = useState<string[]>([""]);
+  const { data: activeLicense } = useGetUserActiveLicense(user?.id);
+
+  const { mutate: deleteDeviceIdFromLicense } = useDeleteDeviceIdFromLicense();
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
@@ -102,60 +108,12 @@ export default function Settings() {
       },
       {
         onSuccess: () => {
-          setEditDomains(false);
           queryClient.invalidateQueries({
             queryKey: ["organization", user.organizationId],
           });
         },
       }
     );
-  };
-
-  const handleDomainChange = (index: number, value: string) => {
-    const newDomains = [...domains];
-    newDomains[index] = value;
-    setDomains(newDomains);
-  };
-
-  const addDomain = () => {
-    setDomains([...domains, ""]);
-  };
-
-  const removeDomain = (index: number) => {
-    const newDomains = domains.filter((_, i) => i !== index);
-    setDomains(newDomains);
-  };
-
-  const handleSaveDomains = () => {
-    if (!user?.organizationId) return;
-
-    const filteredDomains = domains.filter((domain) => domain.trim() !== "");
-
-    updateOrganizationMutation(
-      {
-        id: user.organizationId,
-        organizationData: {
-          domains: filteredDomains,
-        },
-      },
-      {
-        onSuccess: () => {
-          setEditDomains(false);
-          queryClient.invalidateQueries({
-            queryKey: ["organization", user.organizationId],
-          });
-        },
-      }
-    );
-  };
-
-  const handleEditCancelDomains = () => {
-    if (editDomains && organization) {
-      setDomains(
-        Array.isArray(organization.domains) ? organization.domains : [""]
-      );
-    }
-    setEditDomains(!editDomains);
   };
 
   const handleSaveSettingsSubmit = (event: React.FormEvent) => {
@@ -264,20 +222,17 @@ export default function Settings() {
         businessOrganizationNumber:
           organization.businessOrganizationNumber ?? "",
         VAT: organization.VAT ?? "",
-        // domains: Array.isArray(organization.domains)
-        //   ? organization.domains
-        //   : [""],
       });
     }
   }, [organization]);
 
   useEffect(() => {
-    if (organization) {
-      setDomains(
-        Array.isArray(organization.domains) ? organization.domains : [""]
-      );
+    console.log(activeLicense);
+    if (activeLicense) {
+      setDesktopIds(activeLicense.desktopIds);
+      setMobileIds(activeLicense.mobileIds);
     }
-  }, [organization]);
+  }, [activeLicense]);
 
   return (
     <div className="pb-[50px] flex justify-center">
@@ -408,6 +363,61 @@ export default function Settings() {
             )}
           </div>
         </div>
+        {desktopIs.length || mobileIs.length ? (
+          <div className="mt-8 sm:mt-[77px]">
+            <h3 className="text-[20px] leading-[27px] font-semibold">
+              Your Devices
+            </h3>
+            {desktopIs.length ? (
+              <div className="mt-3">
+                <p className="text-[16px] leading-[22px]">Desktop</p>
+                <div className="flex gap-2 flex-wrap mt-2">
+                  {desktopIs.map((id) => (
+                    <div
+                      key={id}
+                      className="text-[14px] leading-[19px] font-medium p-2 px-4 flex items-center gap-2 bg-input rounded-[30px]"
+                    >
+                      <span>{id}</span>
+                      <X
+                        onClick={() =>
+                          deleteDeviceIdFromLicense({
+                            activeLicenseId: activeLicense!.id,
+                            desktopId: id,
+                          })
+                        }
+                        className="cursor-pointer text-disabled hover:text-light"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            {mobileIs.length ? (
+              <div className="mt-3">
+                <p className="text-[16px] leading-[22px]">Mobile</p>
+                <div className="flex gap-2 flex-wrap mt-2">
+                  {mobileIs.map((id) => (
+                    <div
+                      key={id}
+                      className="text-[14px] leading-[19px] font-medium p-2 px-4 flex items-center gap-2 bg-input rounded-[30px]"
+                    >
+                      <span>{id}</span>
+                      <X
+                        onClick={() =>
+                          deleteDeviceIdFromLicense({
+                            activeLicenseId: activeLicense!.id,
+                            mobileId: id,
+                          })
+                        }
+                        className="cursor-pointer text-disabled hover:text-light"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
         {user?.accountType === UserAccountType.Business && (
           <div className="mt-[77px]">
             <h3 className="text-[20px] leading-[27px] font-semibold">
@@ -495,75 +505,6 @@ export default function Settings() {
                         Save
                       </Button>
                     )}
-
-                    {/* <div className="flex justify-between items-start w-full">
-                      <div className="w-full">
-                        <div className="flex flex-col gap-4">
-                          <div>
-                            <p className="text-[16px] leading-[22px] font-semibold mb-2">
-                              Domain
-                            </p>
-                            {editDomains ? (
-                              <div className="space-y-2">
-                                {domains.map((domain, index) => (
-                                  <div
-                                    key={index}
-                                    className="flex items-center gap-2"
-                                  >
-                                    <Input
-                                      value={domain}
-                                      onChange={(e) =>
-                                        handleDomainChange(
-                                          index,
-                                          e.target.value
-                                        )
-                                      }
-                                      placeholder="Enter domain (e.g. @company.com)"
-                                      className="flex-1 bg-[#242424] border-none text-[14px]"
-                                    />
-                                    {domains.length > 1 && (
-                                      <Button
-                                        variant="ghost"
-                                        onClick={() => removeDomain(index)}
-                                        className="p-2 hover:bg-red-500/10"
-                                      >
-                                        <X className="h-4 w-4 text-red-500" />
-                                      </Button>
-                                    )}
-                                  </div>
-                                ))}
-                                <div className="flex gap-2 mt-4">
-                                  <Button
-                                    variant="secondary"
-                                    onClick={addDomain}
-                                    className="flex items-center gap-2 bg-[#242424] hover:bg-[#2f2f2f] border-none"
-                                  >
-                                    <Plus className="h-4 w-4" />
-                                    Add Domain
-                                  </Button>
-                                  <Button
-                                    variant="saveProfile"
-                                    onClick={handleSaveDomains}
-                                    className="w-[148px]"
-                                  >
-                                    Save
-                                  </Button>
-                                </div>
-                              </div>
-                            ) : (
-                              <p className="tjext-[14px] leading-[29px] text-[#C4C4C4] font-medium">
-                                {Array.isArray(organization?.domains)
-                                  ? organization.domains.join(", ")
-                                  : organization?.domains || "No domains added"}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <Button variant="edit" onClick={handleEditCancelDomains}>
-                        {editDomains ? "Cancel" : "Edit"}
-                      </Button>
-                    </div> */}
                   </div>
                 </div>
               </div>

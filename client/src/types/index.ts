@@ -13,3 +13,14 @@ export interface License {
   };
   availableEmails: string[];
 }
+
+export interface ActiveLicense {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  licenseId: string;
+  deleteDate: Date | null;
+  desktopIds: string[];
+  mobileIds: string[];
+}

@@ -20,6 +20,7 @@ import { CheckDeviceDto } from "./dto/check-device-dto";
 import { ConfigService } from "@nestjs/config";
 import { EXCEPTION } from "src/common/constants/exception.constant";
 import { CheckUserLicenseDto } from "./dto/check-user-license-dto";
+import { DeleteDeviceIdDto } from "./dto/delete-device-id-dto";
 
 @ApiTags("User License")
 @Controller("user-license")
@@ -87,5 +88,19 @@ export class UserLicenseController {
     @Param("memberId") memberId: string,
   ) {
     return this.licenseService.deleteMemberFromLicense(id, memberId);
+  }
+
+  @ApiOperation({ summary: "Get user active license" })
+  @Get("/active-license/:id")
+  async getUserActiveLicense(@Param("id") id: string) {
+    return this.licenseService.getUserActiveLicense(id);
+  }
+
+  @ApiOperation({ summary: "Delete device id from license" })
+  @Delete("/device")
+  async deleteDeviceIdFromLicense(
+    @Body() deleteDeviceIdDto: DeleteDeviceIdDto,
+  ) {
+    return this.licenseService.deleteDeviceIdFromLicense(deleteDeviceIdDto);
   }
 }
