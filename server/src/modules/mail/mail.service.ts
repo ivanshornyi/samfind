@@ -2,6 +2,7 @@ import { Injectable, BadRequestException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
 import * as nodemailer from "nodemailer";
+import { SendSupportEmailDto } from "./dto/send-support-email-dto";
 
 const configService = new ConfigService();
 
@@ -119,6 +120,36 @@ export class MailService {
       await this.transporter.sendMail(mailOptions);
     } catch (error) {
       throw new BadRequestException(`Failed to send email - ${to}`);
+    }
+  }
+
+  async sendSupportEmail({
+    fullName,
+    message,
+    category,
+    email,
+  }: SendSupportEmailDto) {
+    try {
+      const mailOptions = {
+        from: configService.get("MAIL_USER"),
+        to: configService.get("SUPPORT_MAIL"),
+        subject: "Support request",
+        html: `
+        <div>
+          <h>User: ${fullName}</h>
+          <p>email: ${email}</p>
+          <p>email: ${category}</p>
+          <h>Message:</h>
+          <p>${message}</p>
+        </div>
+        `,
+      };
+
+      await this.transporter.sendMail(mailOptions);
+    } catch (error) {
+      throw new BadRequestException(
+        `Failed to send email - ${configService.get("SUPPORT_MAIL")}`,
+      );
     }
   }
 }
