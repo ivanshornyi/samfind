@@ -98,3 +98,41 @@ export const useDeleteMemberFromLicense = () => {
 
   return mutationProps;
 };
+
+export const useGetUserActiveLicense = (id?: string) => {
+  return useQuery({
+    queryFn: () => UserLicenseApiService.getUserActiveLicense(id!),
+    queryKey: ["user-active-license"],
+    enabled: !!id,
+  });
+};
+
+export const useDeleteDeviceIdFromLicense = () => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { ...mutationProps } = useMutation({
+    mutationFn: (data: {
+      activeLicenseId: string;
+      mobileId?: string;
+      desktopId?: string;
+    }) => UserLicenseApiService.deleteDeviceIdFromLicense(data),
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Device deleted",
+        variant: "success",
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["user-active-license"],
+        refetchType: "all",
+      });
+    },
+    onError: (error) => {
+      handleToastError(error, toast);
+    },
+  });
+
+  return mutationProps;
+};

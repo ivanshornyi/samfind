@@ -12,6 +12,7 @@ import { MailService } from "../mail/mail.service";
 import { AddUserLicenseDto } from "./dto/add-user-license-dto";
 import { UpdateUserLicenseDto } from "./dto/update-user-license-dto";
 import { CheckDeviceDto } from "./dto/check-device-dto";
+import { DeleteDeviceIdDto } from "./dto/delete-device-id-dto";
 
 @Injectable()
 export class UserLicenseService {
@@ -289,29 +290,46 @@ export class UserLicenseService {
       data: { deleteDate: new Date() },
     });
 
-    // await this.prisma.activeLicense.delete({ where: { id: activeLicense.id } });
+    return { status: "deleted" };
+  }
 
-    // let memberLicense = await this.prisma.license.findFirst({
-    //   where: { ownerId: memberId },
-    // });
+  async getUserActiveLicense(userId: string) {
+    const activeLicense = await this.prisma.activeLicense.findFirst({
+      where: { userId },
+    });
 
-    // if (!memberLicense) {
-    //   memberLicense = await this.prisma.license.create({
-    //     data: {
-    //       ownerId: memberId,
-    //       status: LicenseStatus.active,
-    //       limit: 0,
-    //       tierType: LicenseTierType.freemium,
-    //     },
-    //   });
+    if (!activeLicense || activeLicense.deleteDate) {
+      throw new NotFoundException("License not found");
+    }
 
-    //   await this.prisma.activeLicense.create({
-    //     data: {
-    //       userId: memberId,
-    //       licenseId: memberLicense.id,
-    //     },
-    //   });
-    // }
+    return activeLicense;
+  }
+
+  async deleteDeviceIdFromLicense({
+    activeLicenseId,
+    desktopId,
+    mobileId,
+  }: DeleteDeviceIdDto) {
+    const activeLicense = await this.prisma.activeLicense.findFirst({
+      where: { id: activeLicenseId },
+    });
+
+    if (!activeLicense || activeLicense.deleteDate) {
+      throw new NotFoundException("License not found");
+    }
+
+    let mobileIds = activeLicense.mobileIds;
+    let desktopIds = activeLicense.desktopIds;
+
+    if (desktopId)
+      desktopIds = activeLicense.desktopIds.filter((id) => id !== desktopId);
+    if (mobileId)
+      mobileIds = activeLicense.mobileIds.filter((id) => id !== mobileId);
+
+    await this.prisma.activeLicense.update({
+      where: { id: activeLicenseId },
+      data: { mobileIds, desktopIds },
+    });
 
     return { status: "deleted" };
   }
