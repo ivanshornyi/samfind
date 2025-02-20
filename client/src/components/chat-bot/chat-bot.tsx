@@ -51,7 +51,7 @@ export default function ChatBot() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, option, showQuestions]);
+  }, [messages, option, showQuestions, open]);
 
   const onClickThankYou = () => {
     setStage("start");
@@ -91,7 +91,7 @@ export default function ChatBot() {
 
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0" />
-          <Dialog.Content className="fixed bottom-8 right-8 w-full sm:w-[570px] max-h-[700px] p-6 backdrop-blur-2xl rounded-[30px] bg-black/50">
+          <Dialog.Content className="fixed bottom-8 right-8 w-full sm:w-[570px] max-h-[700px] p-6 backdrop-blur-2xl rounded-[30px] bg-black/30">
             <div className="absolute right-1 top-1">
               <Dialog.Close
                 onClick={() => {
@@ -111,7 +111,7 @@ export default function ChatBot() {
               </div>
             )}
             <Dialog.Title
-              className={`text-[32px] leading-[44px] font-semibold ${stage === "contact" ? "text-center" : ""}`}
+              className={`text-[24px] leading-[32px] font-semibold ${stage === "contact" ? "text-center" : ""}`}
             >
               {stage === "start"
                 ? "Hi there!"
@@ -127,8 +127,8 @@ export default function ChatBot() {
             {stage === "start" && (
               <div className="mt-6 bg-[#28282C] rounded-[20px] p-4 overflow-auto">
                 <div className="flex gap-4">
-                  <div>
-                    <Image src="/o.png" alt="icon" width={32} height={32} />
+                  <div className="w-[40px] h-[37px] relative">
+                    <Image src="/o.png" alt="icon" fill />
                   </div>
                   <div className="mb-4">
                     <p className="text-[14px] text-disabled leading-[19px] font-semibold">
@@ -157,8 +157,8 @@ export default function ChatBot() {
                     className="flex flex-col justify-between overflow-y-auto h-[450px] max-h-[450px] relative
                   "
                   >
-                    <div className="flex gap-4 items-center max-w-[400px]">
-                      <div className="w-[35px] h-[35px] relative">
+                    <div className="flex gap-4 items-start max-w-[400px]">
+                      <div className="w-[40px] h-[37px] relative">
                         <Image src="/o.png" alt="icon" fill />
                       </div>
                       <p className="text-[16px] leading-[22px] font-semibold max-w-[350px]">
@@ -182,11 +182,13 @@ export default function ChatBot() {
                     )}
                     {option && (
                       <div>
-                        <p className="text-[16px] leading-[22px] font-semibold text-right mb-4">
-                          {options.find((o) => o.value === option)?.name}
-                        </p>
-                        <div className="flex gap-4 items-center max-w-[400px]">
-                          <div className="w-[35px] h-[35px] relative">
+                        <div className="flex justify-end">
+                          <p className="text-[16px] leading-[22px] font-semibold text-right mb-4 bg-[#28282C] rounded-[20px] p-3 px-6 inline-block">
+                            {options.find((o) => o.value === option)?.name}
+                          </p>
+                        </div>
+                        <div className="flex gap-4 items-start max-w-[400px]">
+                          <div className="w-[40px] h-[37px] relative">
                             <Image src="/o.png" alt="icon" fill />
                           </div>
                           <p className="text-[16px] leading-[22px] font-semibold max-w-[350px]">
@@ -209,13 +211,13 @@ export default function ChatBot() {
                           <div key={message.text}>
                             {message.who === "user" ? (
                               <div className="flex justify-end">
-                                <p className="text-[16px] leading-[22px] font-semibold text-right mb-4 max-w-[400px]">
+                                <p className="text-[16px] leading-[22px] font-semibold text-right mb-4 max-w-[400px]  bg-[#28282C] rounded-[20px] p-3 px-6 inline-block">
                                   {message.text}
                                 </p>
                               </div>
                             ) : (
-                              <div className="flex gap-4 items-center max-w-[400px]">
-                                <div className="w-[35px] h-[35px] relative">
+                              <div className="flex gap-4 items-start max-w-[400px]">
+                                <div className="w-[40px] h-[37px] relative">
                                   <Image src="/o.png" alt="icon" fill />
                                 </div>
                                 <p className="text-[16px] leading-[22px] font-semibold max-w-[350px]">
@@ -259,7 +261,13 @@ export default function ChatBot() {
                     <Input
                       value={inputText}
                       onChange={(e) => setInputText(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          onClickSent();
+                        }
+                      }}
                       type="text"
+                      className="pr-11"
                       placeholder="Type your question here..."
                     />
                     <div
