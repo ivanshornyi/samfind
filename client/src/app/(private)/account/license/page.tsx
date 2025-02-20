@@ -69,12 +69,13 @@ const headers = {
 
 interface LicenseItem {
   licenseId: string;
-  userId: string;
+  userId?: string;
   icon?: string;
   name: string;
-  email: string;
+  email?: string;
   date?: string;
   access: string;
+  activeLicenseId: string;
 }
 
 const columns: ColumnDef<LicenseItem>[] = [
@@ -178,8 +179,7 @@ const columns: ColumnDef<LicenseItem>[] = [
               <DropdownMenuContent className="bg-input border-none" align="end">
                 <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                   <DeleteMember
-                    licenseId={row.original.licenseId}
-                    memberId={row.original.userId}
+                    activeLicenseId={row.original.activeLicenseId}
                     userName={row.original.name}
                     email={row.original.email}
                   />
@@ -268,12 +268,12 @@ export default function License() {
         .slice(startIndex, endIndex)
         .map((u) => ({
           licenseId: userLicense.id,
-          userId: u.id,
+          userId: u.memberId,
           name: u.name,
           email: u.email,
           date: new Intl.DateTimeFormat("ru-RU").format(new Date(u.date)),
           access: u.email === user?.email ? "Owner" : "Member",
-          license: u.license,
+          activeLicenseId: u.licenseId,
         }));
 
       setUsers([...selectedUsers]);

@@ -136,4 +136,10 @@ export class UserController {
   async getUserName(@Param("licenseId") licenseId: string) {
     return await this.userService.getUserName(licenseId);
   }
+
+  @ApiOperation({ summary: "Get User Wallet" })
+  @Get("/wallet/:id")
+  async getUserWallet(@Param("id") id: string) {
+    return await this.userService.getUserWallet(id);
+  }
 }

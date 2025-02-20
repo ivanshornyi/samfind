@@ -12,9 +12,11 @@ import {
 } from "date-fns";
 import { PrismaService } from "../prisma/prisma.service";
 import {
+  BalanceType,
   LicenseStatus,
   LicenseTierType,
   PlanPeriod,
+  TransactionType,
   User,
 } from "@prisma/client";
 import { StripeService } from "../stripe/stripe.service";
@@ -180,41 +182,10 @@ export class SubscriptionService {
 
     if (!member) throw new NotFoundException("User not found");
 
-    const discount = await this.prisma.discount.findFirst({
-      where: {
-        userId: subscription.userId,
-        stripeCouponId: null,
-        used: false,
-      },
-    });
-
-    let discountId = undefined;
-    let discountAmount = undefined;
-    if (discount) {
-      discountAmount = discount.endAmount;
-
-      if (discount.endAmount > subscription.plan.price) {
-        discountAmount = subscription.plan.price;
-        await this.prisma.discount.create({
-          data: {
-            userId: subscription.userId,
-            endAmount: discount.endAmount - subscription.plan.price,
-          },
-        });
-      }
-
-      const stripeDiscount =
-        await this.stripeService.createCoupon(discountAmount);
-
-      discountId = stripeDiscount.id;
-
-      await this.prisma.discount.update({
-        where: { id: discount.id },
-        data: {
-          stripeCouponId: discountId,
-        },
-      });
-    }
+    const { discountId, discountAmount } = await this.checkDiscount(
+      subscription.userId,
+      subscription.plan.price,
+    );
 
     const metadata = {
       quantity: 1,
@@ -410,39 +381,79 @@ export class SubscriptionService {
   }
 
   async checkDiscount(userId: string, payAmount: number) {
-    const discount = await this.prisma.discount.findFirst({
-      where: {
+    let discountId = undefined;
+    let discountAmount = undefined;
+    let spentBonuses = 0;
+    let spentDiscount = 0;
+
+    const wallet = await this.prisma.wallet.findUnique({ where: { userId } });
+
+    if (
+      !wallet ||
+      (!wallet?.discountAmount && !wallet?.selectedBonusToDiscount)
+    )
+      return { discountId, discountAmount };
+
+    if (payAmount >= wallet.discountAmount + wallet.selectedBonusToDiscount) {
+      discountAmount = wallet.discountAmount + wallet.selectedBonusToDiscount;
+      spentBonuses = wallet.selectedBonusToDiscount;
+      spentDiscount = wallet.discountAmount;
+    } else if (
+      payAmount > wallet.discountAmount &&
+      payAmount < wallet.discountAmount + wallet.selectedBonusToDiscount
+    ) {
+      discountAmount = payAmount;
+      spentBonuses = payAmount - wallet.discountAmount;
+      spentDiscount = wallet.discountAmount;
+    } else {
+      discountAmount = payAmount;
+      spentDiscount = payAmount;
+    }
+
+    const stripeDiscount =
+      await this.stripeService.createCoupon(discountAmount);
+
+    discountId = stripeDiscount.id;
+
+    await this.prisma.discount.create({
+      data: {
         userId,
-        stripeCouponId: null,
-        used: false,
+        amount: discountAmount,
+        spentBonuses,
+        spentDiscount,
+        stripeCouponId: discountId,
       },
     });
 
-    let discountId = undefined;
-    let discountAmount = undefined;
-    if (discount) {
-      discountAmount = discount.endAmount;
+    await this.prisma.wallet.update({
+      where: { id: wallet.id },
+      data: {
+        discountAmount: { decrement: spentDiscount },
+        bonusAmount: { decrement: spentBonuses },
+        selectedBonusToDiscount: { decrement: spentBonuses },
+      },
+    });
 
-      if (discount.endAmount > payAmount) {
-        discountAmount = payAmount;
-        await this.prisma.discount.create({
-          data: {
-            userId,
-            endAmount: discount.endAmount - payAmount,
-          },
-        });
-      }
+    await this.prisma.walletTransaction.create({
+      data: {
+        userId,
+        walletId: wallet.id,
+        amount: spentDiscount,
+        transactionType: TransactionType.expense,
+        balanceType: BalanceType.discount,
+        description: "Subscription payment",
+      },
+    });
 
-      const stripeDiscount =
-        await this.stripeService.createCoupon(discountAmount);
-
-      discountId = stripeDiscount.id;
-
-      await this.prisma.discount.update({
-        where: { id: discount.id },
+    if (spentBonuses > 0) {
+      await this.prisma.walletTransaction.create({
         data: {
-          stripeCouponId: discountId,
-          endAmount: discountAmount,
+          userId,
+          walletId: wallet.id,
+          amount: spentBonuses,
+          transactionType: TransactionType.expense,
+          balanceType: BalanceType.bonus,
+          description: "Subscription payment",
         },
       });
     }
@@ -534,33 +545,20 @@ export class SubscriptionService {
     const discountHistory: {
       id: string;
       date: string | Date;
-      type: string;
+      type: TransactionType;
       amount: number;
       description: string;
     }[] = [];
 
-    const discounts = await this.prisma.discount.findMany({
-      where: { userId, used: true },
-    });
-    const discountIncomes = await this.prisma.discountIncome.findMany({
-      where: { userId },
+    const discountTransactions = await this.prisma.walletTransaction.findMany({
+      where: { userId, balanceType: BalanceType.discount },
     });
 
-    discounts.forEach((d) => {
+    discountTransactions.forEach((d) => {
       discountHistory.push({
         id: d.id,
         date: d.updatedAt,
-        type: "Bonus Used",
-        amount: d.endAmount,
-        description: "Subscription Payment",
-      });
-    });
-
-    discountIncomes.forEach((d) => {
-      discountHistory.push({
-        id: d.id,
-        date: d.updatedAt,
-        type: "Bonus Received",
+        type: d.transactionType,
         amount: d.amount,
         description: d.description,
       });

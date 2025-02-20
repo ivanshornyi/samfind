@@ -27,7 +27,7 @@ export class UserReferralService {
         userId,
       },
       include: {
-        discountIncomes: true,
+        walletTransactions: true,
       },
     });
 
@@ -35,7 +35,7 @@ export class UserReferralService {
       throw new NotFoundException("Referral not found");
     }
 
-    const userIds = referral.discountIncomes
+    const userIds = referral.walletTransactions
       .filter((i) => typeof i.invitedUserId === "string")
       .map((i) => i.invitedUserId);
 
@@ -43,7 +43,7 @@ export class UserReferralService {
       where: { id: { in: userIds } },
     });
 
-    const referralItems = referral.discountIncomes.map((i) => {
+    const referralItems = referral.walletTransactions.map((i) => {
       const user = users.find((u) => u.id === i.invitedUserId);
       return {
         userId: user?.id,

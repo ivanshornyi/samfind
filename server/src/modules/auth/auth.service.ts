@@ -98,6 +98,12 @@ export class AuthService {
         invitedReferralCode,
       });
 
+      await this.prisma.wallet.create({
+        data: {
+          userId: newUser.id,
+        },
+      });
+
       if (organization) {
         const userOrganization = await this.prisma.organization.create({
           data: {
@@ -482,24 +488,14 @@ export class AuthService {
   }
 
   async checkLicenseAndAddMember(license: LicenseWithRelations, member: User) {
-    if (license.purchased > 0) {
+    const freeActiveLicense = await this.prisma.activeLicense.findFirst({
+      where: { licenseId: license.id, userId: null, deleteDate: null },
+    });
+    if (freeActiveLicense) {
       // Use payed License
-      await this.prisma.license.update({
-        where: { id: license.id },
-        data: { purchased: license.purchased - 1 },
-      });
-      await this.prisma.activeLicense.create({
-        data: { userId: member.id, licenseId: license.id },
-      });
-
-      await this.subscriptionService.addDiscountOnNotUsedPeriod({
-        owner: license.user,
-        memberEmail: member.email,
-        totalAmount: license.subscription.plan.price,
-        nextDate:
-          license.subscription.plan.period === PlanPeriod.yearly
-            ? new Date(license.subscription.nextDate)
-            : undefined,
+      await this.prisma.activeLicense.update({
+        where: { id: freeActiveLicense.id },
+        data: { userId: member.id },
       });
     } else {
       // Create and pay Invoice for License of invited user

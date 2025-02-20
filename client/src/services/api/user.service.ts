@@ -1,4 +1,4 @@
-import { LicenseTierType, PlanPeriod, User, UserStatus } from "@/types";
+import { LicenseTierType, PlanPeriod, User, UserStatus, Wallet } from "@/types";
 
 import { handleApiError } from "@/errors";
 
@@ -149,6 +149,16 @@ const getUserName = async (licenseId: string) => {
   }
 };
 
+const getUseWallet = async (userId: string) => {
+  try {
+    const response = await apiClient.get(`/user/wallet/${userId}`);
+
+    return response.data as Wallet;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 export const UserApiService = {
   getUser,
   updateUser,
@@ -159,4 +169,5 @@ export const UserApiService = {
   getInvitedUserInfo,
   getUserOrganizationName,
   getUserName,
+  getUseWallet,
 };
