@@ -138,7 +138,7 @@ export class MailService {
         <div>
           <h>User: ${fullName}</h>
           <p>email: ${email}</p>
-          <p>email: ${category}</p>
+          <p>category: ${category}</p>
           <h>Message:</h>
           <p>${message}</p>
         </div>
