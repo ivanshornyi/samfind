@@ -29,39 +29,39 @@ enum UserAccountType {
 }
 
 model User {
-  id                        String           @id @default(uuid())
-  email                     String           @unique
-  password                  String           @db.VarChar
-  firstName                 String           @db.VarChar
-  lastName                  String           @db.VarChar
+  id                        String              @id @default(uuid())
+  email                     String              @unique
+  password                  String              @db.VarChar
+  firstName                 String              @db.VarChar
+  lastName                  String              @db.VarChar
   authType                  UserAuthType
-  refreshToken              String?          @db.VarChar
+  refreshToken              String?             @db.VarChar
   status                    UserStatus
   role                      UserRole
-  isVerified                Boolean          @default(false)
-  isDeleted                 Boolean          @default(false)
+  isVerified                Boolean             @default(false)
+  isDeleted                 Boolean             @default(false)
   registrationCode          String?
   registrationCodeExpiresAt DateTime?
-  resetCode                 String?          @db.VarChar
+  resetCode                 String?             @db.VarChar
   resetCodeExpiresAt        DateTime?
-  emailResetCode            String?          @db.VarChar
+  emailResetCode            String?             @db.VarChar
   emailResetCodeExpiresAt   DateTime?
-  discount                  Float            @default(0)
-  discountPercent           Float            @default(0)
-  referralCode              Float            @unique
-  invitedReferralCode       Float?           @unique
-  accountType               UserAccountType  @default(private)
+  discountPercent           Float               @default(0)
+  referralCode              Float               @unique
+  invitedReferralCode       Float?              @unique
+  accountType               UserAccountType     @default(private)
   organizationId            String?
   licenseId                 String?
-  stripeCustomerId          String?          @unique
-  createdAt                 DateTime         @default(now())
-  organization              Organization?    @relation(fields: [organizationId], references: [id])
+  stripeCustomerId          String?             @unique
+  createdAt                 DateTime            @default(now())
+  organization              Organization?       @relation(fields: [organizationId], references: [id])
   UserReferral              UserReferral[]
   License                   License[]
   activeLicenses            ActiveLicense[]
   subscription              Subscription?
   discounts                 Discount[]
-  discountsIncomes          DiscountIncome[]
+  walletTransactions        WalletTransaction[]
+  wallet                    Wallet?
 
   @@map("user")
 }
@@ -83,7 +83,6 @@ model License {
   ownerId          String          @unique
   activeLicenses   ActiveLicense[]
   limit            Float           @default(0)
-  purchased        Float           @default(0)
   tierType         LicenseTierType @default(freemium)
   availableEmails  String[]        @default([])
   licenseExpiresAt DateTime        @default(now())
@@ -96,8 +95,8 @@ model License {
 
 model ActiveLicense {
   id         String    @id @default(uuid())
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     String
+  user       User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String?
   license    License   @relation(fields: [licenseId], references: [id], onDelete: Cascade)
   licenseId  String
   deleteDate DateTime?
@@ -110,14 +109,14 @@ model ActiveLicense {
 }
 
 model UserReferral {
-  id              String           @id @default(uuid())
-  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  invitedUserIds  String[]         @default([])
-  referralCode    Float            @unique
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  userId          String           @unique
-  discountIncomes DiscountIncome[]
+  id                 String              @id @default(uuid())
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invitedUserIds     String[]            @default([])
+  referralCode       Float               @unique
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  userId             String              @unique
+  walletTransactions WalletTransaction[]
 
   @@map("user_referral")
 }
@@ -173,36 +172,64 @@ model Subscription {
   @@map("subscription")
 }
 
-model Discount {
-  id               String           @id @default(uuid())
-  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId           String
-  startAmount      Float            @default(0)
-  endAmount        Float            @default(0)
-  used             Boolean          @default(false)
-  stripeCouponId   String?
-  discountsIncomes DiscountIncome[]
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
+model Wallet {
+  id                      String              @id @default(uuid())
+  user                    User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                  String              @unique
+  discountAmount          Float               @default(0)
+  bonusAmount             Float               @default(0)
+  sharesAmount            Float               @default(0)
+  selectedBonusToDiscount Float               @default(0)
+  walletTransactions      WalletTransaction[]
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
 
-  @@map("discount")
+  @@map("wallet")
 }
 
-model DiscountIncome {
-  id            String        @id @default(uuid())
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId        String
-  discount      Discount      @relation(fields: [discountId], references: [id])
-  discountId    String
-  referral      UserReferral? @relation(fields: [referralId], references: [id])
-  referralId    String?
-  invitedUserId String?
-  amount        Float         @default(0)
-  description   String
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+enum BalanceType {
+  discount
+  bonus
+  shares
+}
 
-  @@map("discount_income")
+enum TransactionType {
+  income
+  expense
+}
+
+model WalletTransaction {
+  id              String          @id @default(uuid())
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
+  wallet          Wallet          @relation(fields: [walletId], references: [id])
+  walletId        String
+  referral        UserReferral?   @relation(fields: [referralId], references: [id])
+  balanceType     BalanceType
+  transactionType TransactionType
+  referralId      String?
+  invitedUserId   String?
+  amount          Float           @default(0)
+  description     String
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@map("wallet_transaction")
+}
+
+model Discount {
+  id             String   @id @default(uuid())
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  amount         Float
+  spentBonuses   Float
+  spentDiscount  Float
+  used           Boolean  @default(false)
+  stripeCouponId String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("discount")
 }
 
 enum OsType {
@@ -213,12 +240,12 @@ enum OsType {
 }
 
 model AppVersion {
-  id            String        @id @default(uuid())
-  osType        OsType
-  version       String
-  url           String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id        String   @id @default(uuid())
+  osType    OsType
+  version   String
+  url       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("app_version")
 }

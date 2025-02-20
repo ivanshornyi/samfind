@@ -1,8 +1,8 @@
 "use client";
 
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/context";
-import { useToast, useGetUserReferralUsers } from "@/hooks";
+import { useToast, useGetUserReferralUsers, useGetUserWallet } from "@/hooks";
 
 import {
   Table,
@@ -10,24 +10,27 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  TableCell
+  TableCell,
 } from "@/components/ui/table";
 
 import { Copy } from "lucide-react";
 
-import {
-  BalanceInfo,
-  ReferralInfo,
-  SharePopover,
-} from "./_components";
+import { BalanceInfo, ReferralInfo, SharePopover } from "./_components";
 
 import { format } from "date-fns";
 
 const frontendDomain = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN;
 
 export default function InvitedFriends() {
+  const [bonusAmount, setBonusAmount] = useState(0);
   const { user } = useContext(AuthContext);
   const { toast } = useToast();
+
+  const { data: userWallet } = useGetUserWallet();
+
+  useEffect(() => {
+    if (userWallet) setBonusAmount(userWallet.bonusAmount / 100);
+  }, [userWallet]);
 
   const handleCopyReferralCodeLink = () => {
     if (user) {
@@ -42,13 +45,14 @@ export default function InvitedFriends() {
     }
   };
 
-  const { data: userReferralItems, isPending: isUserReferralItemsLoading } = useGetUserReferralUsers();
-  
+  const { data: userReferralItems, isPending: isUserReferralItemsLoading } =
+    useGetUserReferralUsers();
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
 
     return format(date, "MMMM dd, yyyy");
-  }
+  };
 
   if (!user) return null;
 
@@ -63,7 +67,7 @@ export default function InvitedFriends() {
               Invite a Friend
             </h2>
             <div className="lg:hidden">
-              <BalanceInfo balance={user.discount / 100} />
+              <BalanceInfo balance={bonusAmount} />
             </div>
           </div>
           <ReferralInfo />
@@ -92,23 +96,28 @@ export default function InvitedFriends() {
           </div>
         </div>
         <div className="hidden lg:block">
-          <BalanceInfo balance={(user.discount / 100)} />
+          <BalanceInfo balance={bonusAmount} />
         </div>
       </div>
-      
+
       <div className="w-full mt-5 mb-[100px]">
         <Table>
           <TableHeader className="hover:bg-transparent">
             <TableRow className="border-white/30 hover:bg-transparent">
               <TableHead className="w-[80px]"></TableHead>
               <TableHead className="uppercase text-white/60">Name</TableHead>
-              <TableHead className="uppercase text-white/60">Date of activation</TableHead>
+              <TableHead className="uppercase text-white/60">
+                Date of activation
+              </TableHead>
               <TableHead className="uppercase text-white/60">Payout</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {userReferralItems?.map((referralUser) => (
-              <TableRow key={referralUser.userId} className="border-none hover:bg-transparent">
+              <TableRow
+                key={referralUser.userId}
+                className="border-none hover:bg-transparent"
+              >
                 <TableCell>
                   <div className="py-3">
                     <div className="bg-card w-[50px] h-[50px] rounded-full flex items-center justify-center text-2xl text-blue-50">
@@ -117,9 +126,14 @@ export default function InvitedFriends() {
                   </div>
                 </TableCell>
                 <TableCell>{referralUser.name}</TableCell>
-                <TableCell>{referralUser.activationDate && formatDate(referralUser.activationDate)}</TableCell>
                 <TableCell>
-                  <p className="text-[#4BB543]">{(referralUser.amount / 100).toFixed(2)}</p>
+                  {referralUser.activationDate &&
+                    formatDate(referralUser.activationDate)}
+                </TableCell>
+                <TableCell>
+                  <p className="text-[#4BB543]">
+                    {(referralUser.amount / 100).toFixed(2)}
+                  </p>
                 </TableCell>
               </TableRow>
             ))}
@@ -128,7 +142,9 @@ export default function InvitedFriends() {
 
         {!isUserReferralItemsLoading && userReferralItems?.length === 0 && (
           <div className="py-[50px]">
-            <p className="text-center text-white/60 w-full">This is where your income from registrations will be displayed</p>
+            <p className="text-center text-white/60 w-full">
+              This is where your income from registrations will be displayed
+            </p>
           </div>
         )}
 

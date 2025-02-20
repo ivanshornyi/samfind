@@ -16,15 +16,13 @@ import { X } from "lucide-react";
 import { useDeleteMemberFromLicense } from "@/hooks";
 
 interface DeleteMemberProps {
-  licenseId: string;
-  memberId: string;
+  activeLicenseId: string;
   userName: string;
-  email: string;
+  email?: string;
 }
 
 export const DeleteMember = ({
-  licenseId,
-  memberId,
+  activeLicenseId,
   userName,
   email,
 }: DeleteMemberProps) => {
@@ -84,7 +82,7 @@ export const DeleteMember = ({
             Cancel
           </Button>
           <Button
-            onClick={() => deleteMember({ licenseId, memberId })}
+            onClick={() => deleteMember(activeLicenseId)}
             className="w-full bg-[#FF6C6C] hover:bg-[#D23535] active:bg-[#302935]"
             variant="saveProfile"
             withLoader={true}

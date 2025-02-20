@@ -1,8 +1,10 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 
 import {
+  BalanceType,
   LicenseStatus,
   LicenseTierType,
+  TransactionType,
   User,
   UserAuthType,
   UserRole,
@@ -56,50 +58,31 @@ export class UserService {
   ) {
     const user = await this.prisma.user.findUnique({
       where: { referralCode },
+      include: { wallet: true },
     });
 
     const userReferral = await this.prisma.userReferral.findUnique({
       where: { referralCode },
     });
 
-    if (!user || !userReferral) {
+    if (!user || !userReferral || !user.wallet) {
       throw new NotFoundException("User not found");
     }
 
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: {
-        discount: user.discount + discountNumber,
-      },
+    await this.prisma.wallet.update({
+      where: { id: user.wallet.id },
+      data: { bonusAmount: { increment: discountNumber } },
     });
 
-    let discount = await this.prisma.discount.findFirst({
-      where: { userId: user.id, used: false, stripeCouponId: null },
-    });
-
-    if (discount) {
-      await this.prisma.discount.update({
-        where: { id: discount.id },
-        data: {
-          endAmount: discountNumber + discountNumber,
-        },
-      });
-    } else {
-      discount = await this.prisma.discount.create({
-        data: {
-          userId: user.id,
-          endAmount: discountNumber,
-        },
-      });
-    }
-
-    await this.prisma.discountIncome.create({
+    await this.prisma.walletTransaction.create({
       data: {
         userId: user.id,
+        walletId: user.wallet.id,
+        amount: discountNumber,
+        transactionType: TransactionType.income,
+        balanceType: BalanceType.bonus,
         referralId: userReferral.id,
         invitedUserId: newUser.id,
-        amount: discountNumber,
-        discountId: discount.id,
         description: `Income from referral Registration on email ${newUser.email}`,
       },
     });
@@ -113,6 +96,38 @@ export class UserService {
       },
       data: {
         invitedUserIds: referralUserIds,
+      },
+    });
+
+    //Update invited user
+    await this.prisma.user.update({
+      where: {
+        id: newUser.id,
+      },
+      data: {
+        invitedReferralCode: null,
+      },
+    });
+
+    const newUserWallet = await this.prisma.wallet.findUnique({
+      where: { userId: newUser.id },
+    });
+
+    if (!newUserWallet) return;
+
+    await this.prisma.wallet.update({
+      where: { userId: newUser.id },
+      data: { bonusAmount: { increment: discountNumber } },
+    });
+
+    await this.prisma.walletTransaction.create({
+      data: {
+        userId: newUser.id,
+        walletId: newUserWallet.id,
+        amount: discountNumber,
+        transactionType: TransactionType.income,
+        balanceType: BalanceType.bonus,
+        description: `Bonus for registration via referral link`,
       },
     });
   }
@@ -405,5 +420,9 @@ export class UserService {
     }
 
     return { name: license.user.firstName + "  " + license.user.lastName };
+  }
+
+  async getUserWallet(userId: string) {
+    return await this.prisma.wallet.findUnique({ where: { userId } });
   }
 }

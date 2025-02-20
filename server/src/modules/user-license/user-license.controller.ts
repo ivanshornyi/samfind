@@ -82,12 +82,9 @@ export class UserLicenseController {
   }
 
   @ApiOperation({ summary: "Delete member from license" })
-  @Delete("/:id/member/:memberId")
-  async deleteMemberFromLicense(
-    @Param("id") id: string,
-    @Param("memberId") memberId: string,
-  ) {
-    return this.licenseService.deleteMemberFromLicense(id, memberId);
+  @Delete("/member/:id")
+  async deleteMemberFromLicense(@Param("id") id: string) {
+    return this.licenseService.deleteMemberFromLicense(id);
   }
 
   @ApiOperation({ summary: "Get user active license" })

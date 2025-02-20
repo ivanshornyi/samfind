@@ -74,11 +74,8 @@ export const useDeleteMemberFromLicense = () => {
   const queryClient = useQueryClient();
 
   const { ...mutationProps } = useMutation({
-    mutationFn: (data: { licenseId: string; memberId: string }) =>
-      UserLicenseApiService.deleteMemberFromLicense(
-        data.licenseId,
-        data.memberId
-      ),
+    mutationFn: (activeLicenseId: string) =>
+      UserLicenseApiService.deleteMemberFromLicense(activeLicenseId),
     onSuccess: () => {
       toast({
         title: "Success",

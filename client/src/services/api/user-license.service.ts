@@ -57,10 +57,10 @@ const updateUserLicense = async (id: string, data: UpdateUserLicenseData) => {
   }
 };
 
-const deleteMemberFromLicense = async (licenseId: string, memberId: string) => {
+const deleteMemberFromLicense = async (activeLicenseId: string) => {
   try {
     const response = await apiClient.delete(
-      `/user-license/${licenseId}/member/${memberId}`
+      `/user-license/member/${activeLicenseId}`
     );
 
     return response;

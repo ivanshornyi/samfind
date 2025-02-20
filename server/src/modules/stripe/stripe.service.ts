@@ -3,11 +3,12 @@ import { ConfigService } from "@nestjs/config";
 
 import Stripe from "stripe";
 import {
-  LicenseTierType,
   UserAccountType,
   LicenseStatus,
   PlanPeriod,
   User,
+  TransactionType,
+  BalanceType,
 } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { UserService } from "../user/user.service";
@@ -261,14 +262,6 @@ export class StripeService {
       case "invoice.payment_failed":
         this.handleFailedInvoicePayment(invoice);
         break;
-      // case "payment_intent.succeeded":
-      //   const paymentIntent = event.data.object;
-
-      //   this.handleSuccessfulPayment(paymentIntent);
-      //   break;
-      // case "identity.verification_session.created":
-      //   // const verificationCreated = event.data.object;
-      //   break;
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
@@ -312,7 +305,7 @@ export class StripeService {
 
       const subscription = await this.prisma.subscription.findUnique({
         where: { id: subscriptionId },
-        include: { plan: true, user: true },
+        include: { plan: true, user: true, license: true },
       });
 
       if (!subscription) return;
@@ -331,22 +324,6 @@ export class StripeService {
           Number(userReferralCode),
           subscription.user,
           discountAmount,
-        );
-
-        await this.prisma.user.update({
-          where: {
-            id: subscription.userId,
-          },
-          data: {
-            invitedReferralCode: null,
-          },
-        });
-
-        await this.addDiscount(
-          subscription.user,
-          discountAmount,
-          subscription.user.email,
-          true,
         );
       }
 
@@ -379,26 +356,34 @@ export class StripeService {
         }
       } else if (
         subscription.user.accountType === UserAccountType.private &&
-        firstInvoice
+        firstInvoice &&
+        subscription.license
       ) {
         await this.prisma.license.update({
           where: {
             ownerId: subscription.userId,
           },
           data: {
-            purchased: firstInvoice ? Number(quantity) - 1 : undefined,
             status: LicenseStatus.active,
             limit: Number(quantity),
             tierType: subscription.plan.type,
           },
         });
+        if (Number(quantity) > 1) {
+          const data = Array.from({ length: Number(quantity) - 1 }, () => ({
+            licenseId: subscription.license.id,
+          }));
+
+          await this.prisma.activeLicense.createMany({
+            data,
+          });
+        }
       } else if (
         subscription.user.accountType === UserAccountType.business &&
         !subscription.licenseId
       ) {
         const license = await this.prisma.license.create({
           data: {
-            purchased: firstInvoice ? Number(quantity) - 1 : undefined,
             ownerId: subscription.userId,
             status: LicenseStatus.active,
             limit: Number(quantity),
@@ -412,6 +397,15 @@ export class StripeService {
             licenseId: license.id,
           },
         });
+        if (Number(quantity) > 1) {
+          const data = Array.from({ length: Number(quantity) - 1 }, () => ({
+            licenseId: subscription.license.id,
+          }));
+
+          await this.prisma.activeLicense.createMany({
+            data,
+          });
+        }
       }
 
       if (stripeCouponId && discountAmount) {
@@ -421,18 +415,16 @@ export class StripeService {
             used: true,
           },
         });
-
-        await this.prisma.user.update({
-          where: { id: subscription.user.id },
-          data: {
-            discount: { decrement: Number(discountAmount) },
-          },
-        });
       }
 
       if (firstInvoice) {
+        const totalAmount =
+          quantity && Number(quantity) > 1
+            ? subscription.plan.price * Number(quantity)
+            : subscription.plan.price;
+
         const discountAmount = this.calculateDiscount(
-          subscription.plan.price,
+          totalAmount,
           subscription.plan.period === PlanPeriod.yearly
             ? new Date(subscription.nextDate)
             : undefined,
@@ -512,111 +504,26 @@ export class StripeService {
     email: string,
     referral?: boolean,
   ) {
-    let discount = await this.prisma.discount.findFirst({
-      where: {
-        userId: user.id,
-        stripeCouponId: null,
-        used: false,
-      },
+    const wallet = await this.prisma.wallet.findUnique({
+      where: { userId: user.id },
     });
 
-    if (!discount) {
-      discount = await this.prisma.discount.create({
-        data: {
-          userId: user.id,
-          stripeCouponId: null,
-          used: false,
-          endAmount: discountAmount,
-        },
-      });
-    } else {
-      await this.prisma.discount.update({
-        where: { id: discount.id },
-        data: {
-          endAmount: discount.endAmount + discountAmount,
-        },
-      });
-    }
+    if (!wallet) return;
 
-    await this.prisma.discountIncome.create({
+    await this.prisma.wallet.update({
+      where: { userId: user.id },
+      data: { discountAmount: { increment: discountAmount } },
+    });
+
+    await this.prisma.walletTransaction.create({
       data: {
         userId: user.id,
-        discountId: discount.id,
+        walletId: wallet.id,
         amount: discountAmount,
-        description: referral
-          ? "Bonus for registration via referral link"
-          : `Discount for unused user period user with email - ${email}`,
+        transactionType: TransactionType.income,
+        balanceType: BalanceType.discount,
+        description: `Discount for unused user period user with email - ${email}`,
       },
     });
-
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: {
-        discount: { increment: discountAmount },
-      },
-    });
-  }
-
-  private async handleSuccessfulPayment(paymentIntent: Stripe.PaymentIntent) {
-    try {
-      const { userId, limit, tierType, userReferralCode, referralDiscount } =
-        paymentIntent.metadata;
-
-      const user = await this.prisma.user.findUnique({
-        where: {
-          id: userId,
-        },
-      });
-
-      if (!user) return;
-
-      if (userReferralCode) {
-        // find user and update user discount
-        this.userService.findAndUpdateUserByReferralCode(
-          Number(userReferralCode),
-          user,
-          Number(referralDiscount),
-        );
-
-        await this.prisma.user.update({
-          where: {
-            id: userId,
-          },
-          data: {
-            discount: user.discount + Number(referralDiscount),
-            invitedReferralCode: null,
-          },
-        });
-      }
-
-      if (user.accountType === UserAccountType.private) {
-        const license = await this.prisma.license.findUnique({
-          where: { ownerId: userId },
-        });
-
-        await this.prisma.license.update({
-          where: {
-            id: license.id,
-          },
-          data: {
-            limit: Number(limit),
-            tierType: tierType as LicenseTierType,
-          },
-        });
-      } else if (user.accountType === UserAccountType.business) {
-        await this.prisma.license.create({
-          data: {
-            ownerId: userId,
-            status: LicenseStatus.active,
-            limit: Number(limit),
-            tierType: LicenseTierType.standard,
-          },
-        });
-      }
-
-      this.logger.log(`License added for user ${userId}`);
-    } catch (error) {
-      this.logger.error("Error adding license to user", error);
-    }
   }
 }

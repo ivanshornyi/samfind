@@ -23,10 +23,10 @@ export interface LicenseList {
   limit: number;
   tierType: LicenseTierType;
   users: {
-    id: string;
+    memberId?: string;
     name: string;
-    email: string;
+    email?: string;
     date: Date;
-    license: string;
+    licenseId: string;
   }[];
 }

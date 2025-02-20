@@ -77,11 +77,13 @@ export class UserLicenseService {
       users: license.activeLicenses
         .filter((i) => !i.deleteDate)
         .map((i) => ({
-          id: i.user.id,
-          name: i.user.firstName + "  " + i.user.lastName,
-          email: i.user.email,
+          memberId: i.user?.id,
+          name: i.user
+            ? i.user.firstName + "  " + i.user.lastName
+            : "Free for use",
+          email: i.user?.email,
           date: i.createdAt,
-          license: i.id,
+          licenseId: i.id,
         })),
     };
   }
@@ -269,9 +271,9 @@ export class UserLicenseService {
     return { status: LicenseStatus.inactive };
   }
 
-  async deleteMemberFromLicense(licenseId: string, memberId: string) {
+  async deleteMemberFromLicense(id: string) {
     const activeLicense = await this.prisma.activeLicense.findFirst({
-      where: { licenseId, userId: memberId },
+      where: { id },
       include: { license: true },
     });
 
@@ -279,7 +281,7 @@ export class UserLicenseService {
       throw new NotFoundException("Member License not found");
     }
 
-    if (activeLicense.license.ownerId === memberId) {
+    if (activeLicense.license.ownerId === activeLicense.userId) {
       throw new BadRequestException(
         "You can delete License Owner from License",
       );

@@ -34,11 +34,21 @@ export interface User {
   accountType: UserAccountType;
   role: UserRole;
   status: UserStatus;
-  discount: number;
   referralCode: string;
   licenseId?: string;
   stripeCustomerId?: string;
   organizationId?: string;
   invitedReferralCode?: number;
   organization?: Organization;
+}
+
+export interface Wallet {
+  id: string;
+  userId: string;
+  discountAmount: number;
+  bonusAmount: number;
+  sharesAmount: number;
+  selectedBonusToDiscount: number;
+  createdAt: string;
+  updatedAt: string;
 }

@@ -14,7 +14,7 @@ export interface BillingHistoryItem {
 export interface DiscountHistoryItem {
   id: string;
   date: string | Date;
-  type: string;
+  type: "income" | "expense";
   amount: number;
   description: string;
 }

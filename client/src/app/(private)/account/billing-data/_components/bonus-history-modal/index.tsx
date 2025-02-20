@@ -31,13 +31,13 @@ export const BonusHistoryModal = () => {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button className="underline text-disabled" variant="ghost">
-          Bonus funds movement
+          Discount funds movement
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="w-full max-w-[760px]">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-2xl font-semibold">
-            Bonus funds movement
+            Discount funds movement
           </AlertDialogTitle>
           <AlertDialogDescription />
         </AlertDialogHeader>
@@ -73,7 +73,7 @@ export const BonusHistoryModal = () => {
                 </TableCell>
                 <TableCell>{historyItem.type}</TableCell>
                 <TableCell>
-                  {historyItem.type === "Bonus Received" ? "+" : "-"}€
+                  {historyItem.type === "income" ? "+" : "-"}€
                   {historyItem.amount / 100}
                 </TableCell>
                 <TableCell>

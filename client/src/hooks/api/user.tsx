@@ -92,3 +92,13 @@ export const useGetUserName = (licenseId?: string | null) => {
     enabled: !!licenseId,
   });
 };
+
+export const useGetUserWallet = () => {
+  const { user } = useContext(AuthContext);
+
+  return useQuery({
+    queryFn: () => UserApiService.getUseWallet(user?.id ?? ""),
+    queryKey: ["user-wallet"],
+    enabled: !!user?.id,
+  });
+};

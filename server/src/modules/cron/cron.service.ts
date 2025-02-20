@@ -19,7 +19,7 @@ export class CronService {
   ) {}
 
   @Cron("0 8 1 * *")
-  // @Cron("03 12 * * *")
+  // @Cron("36 16 * * *")
   async handleFirstDayOfMonth() {
     try {
       this.logger.log(
