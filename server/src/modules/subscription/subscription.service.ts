@@ -383,31 +383,16 @@ export class SubscriptionService {
   async checkDiscount(userId: string, payAmount: number) {
     let discountId = undefined;
     let discountAmount = undefined;
-    let spentBonuses = 0;
-    let spentDiscount = 0;
 
     const wallet = await this.prisma.wallet.findUnique({ where: { userId } });
 
-    if (
-      !wallet ||
-      (!wallet?.discountAmount && !wallet?.selectedBonusToDiscount)
-    )
+    if (!wallet || !wallet?.discountAmount)
       return { discountId, discountAmount };
 
-    if (payAmount >= wallet.discountAmount + wallet.selectedBonusToDiscount) {
-      discountAmount = wallet.discountAmount + wallet.selectedBonusToDiscount;
-      spentBonuses = wallet.selectedBonusToDiscount;
-      spentDiscount = wallet.discountAmount;
-    } else if (
-      payAmount > wallet.discountAmount &&
-      payAmount < wallet.discountAmount + wallet.selectedBonusToDiscount
-    ) {
-      discountAmount = payAmount;
-      spentBonuses = payAmount - wallet.discountAmount;
-      spentDiscount = wallet.discountAmount;
+    if (payAmount >= wallet.discountAmount) {
+      discountAmount = wallet.discountAmount;
     } else {
       discountAmount = payAmount;
-      spentDiscount = payAmount;
     }
 
     const stripeDiscount =
@@ -419,8 +404,6 @@ export class SubscriptionService {
       data: {
         userId,
         amount: discountAmount,
-        spentBonuses,
-        spentDiscount,
         stripeCouponId: discountId,
       },
     });
@@ -428,9 +411,7 @@ export class SubscriptionService {
     await this.prisma.wallet.update({
       where: { id: wallet.id },
       data: {
-        discountAmount: { decrement: spentDiscount },
-        bonusAmount: { decrement: spentBonuses },
-        selectedBonusToDiscount: { decrement: spentBonuses },
+        discountAmount: { decrement: discountAmount },
       },
     });
 
@@ -438,25 +419,12 @@ export class SubscriptionService {
       data: {
         userId,
         walletId: wallet.id,
-        amount: spentDiscount,
+        amount: discountAmount,
         transactionType: TransactionType.expense,
         balanceType: BalanceType.discount,
         description: "Subscription payment",
       },
     });
-
-    if (spentBonuses > 0) {
-      await this.prisma.walletTransaction.create({
-        data: {
-          userId,
-          walletId: wallet.id,
-          amount: spentBonuses,
-          transactionType: TransactionType.expense,
-          balanceType: BalanceType.bonus,
-          description: "Subscription payment",
-        },
-      });
-    }
 
     return { discountId, discountAmount };
   }

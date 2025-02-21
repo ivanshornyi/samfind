@@ -421,8 +421,4 @@ export class UserService {
 
     return { name: license.user.firstName + "  " + license.user.lastName };
   }
-
-  async getUserWallet(userId: string) {
-    return await this.prisma.wallet.findUnique({ where: { userId } });
-  }
 }

@@ -2,8 +2,12 @@ import { useContext } from "react";
 
 import { AuthContext } from "@/context";
 
-import { UpdateUserData, UserApiService } from "@/services";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  UpdateUserData,
+  UpdateUserWalletData,
+  UserApiService,
+} from "@/services";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useToast } from "../use-toast";
 
@@ -100,5 +104,28 @@ export const useGetUserWallet = () => {
     queryFn: () => UserApiService.getUseWallet(user?.id ?? ""),
     queryKey: ["user-wallet"],
     enabled: !!user?.id,
+  });
+};
+
+export const useUpdateUserWallet = () => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: UpdateUserWalletData) => {
+      return UserApiService.updateUserWallet(data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Successfully transferred",
+        variant: "success",
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["user-wallet"],
+        refetchType: "all",
+      });
+    },
   });
 };
