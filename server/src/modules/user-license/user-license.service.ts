@@ -80,7 +80,7 @@ export class UserLicenseService {
           memberId: i.user?.id,
           name: i.user
             ? i.user.firstName + "  " + i.user.lastName
-            : "Free for use",
+            : "Available",
           email: i.user?.email,
           date: i.createdAt,
           licenseId: i.id,

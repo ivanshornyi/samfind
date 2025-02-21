@@ -16,7 +16,7 @@ import {
 } from "@/components";
 
 import { usePathname } from "next/navigation";
-import { Home, IdCard, Gift, CreditCard, User, Headset, Download } from "lucide-react";
+import { IdCard, Gift, CreditCard, User, Download, Wallet } from "lucide-react";
 import { Logo } from "@public/images";
 import Link from "next/link";
 import Image from "next/image";
@@ -41,7 +41,12 @@ const NAVIGATION_ITEMS = [
     title: "Profile settings",
     path: "/account/settings",
     icon: User,
-  }
+  },
+  {
+    title: "Wallet",
+    path: "/account/wallet",
+    icon: Wallet,
+  },
 ];
 
 const INVITED_USER_NAVIGATION_ITEMS = [
@@ -73,56 +78,57 @@ export const AppSidebar = () => {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-4">
-            {!userSubscriptionInfo?.invitedUser && NAVIGATION_ITEMS.map(item => {
-              const isActive = pathname === item.path;
-            
-              return (
-                <SidebarMenuItem key={item.title}>
-                  <Link href={item.path}>
-                    <Button
-                      variant="menuItem"
-                      leftIcon={
-                        <item.icon
-                          style={{ width: "24px", height: "24px" }}
-                        />
-                      }
-                      className={`
+              {!userSubscriptionInfo?.invitedUser &&
+                NAVIGATION_ITEMS.map((item) => {
+                  const isActive = pathname === item.path;
+
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <Link href={item.path}>
+                        <Button
+                          variant="menuItem"
+                          leftIcon={
+                            <item.icon
+                              style={{ width: "24px", height: "24px" }}
+                            />
+                          }
+                          className={`
                         ${isActive && "bg-[#302935] text-white"}
                         w-full flex justify-start items-center
                       `}
-                    >
-                      <span>{item.title}</span>
-                    </Button>
-                  </Link>
-                </SidebarMenuItem>
-              );
-            })}
+                        >
+                          <span>{item.title}</span>
+                        </Button>
+                      </Link>
+                    </SidebarMenuItem>
+                  );
+                })}
 
-            {userSubscriptionInfo?.invitedUser && INVITED_USER_NAVIGATION_ITEMS.map(item => {
-              const isActive = pathname === item.path;
-            
-              return (
-                <SidebarMenuItem key={item.title}>
-                  <Link href={item.path}>
-                    <Button
-                      variant="menuItem"
-                      leftIcon={
-                        <item.icon
-                          style={{ width: "24px", height: "24px" }}
-                        />
-                      }
-                      className={`
+              {userSubscriptionInfo?.invitedUser &&
+                INVITED_USER_NAVIGATION_ITEMS.map((item) => {
+                  const isActive = pathname === item.path;
+
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <Link href={item.path}>
+                        <Button
+                          variant="menuItem"
+                          leftIcon={
+                            <item.icon
+                              style={{ width: "24px", height: "24px" }}
+                            />
+                          }
+                          className={`
                         ${isActive && "bg-[#302935] text-white"}
                         w-full flex justify-start items-center
                       `}
-                    >
-                      <span>{item.title}</span>
-                    </Button>
-                  </Link>
-                </SidebarMenuItem>
-              );
-            })}
-
+                        >
+                          <span>{item.title}</span>
+                        </Button>
+                      </Link>
+                    </SidebarMenuItem>
+                  );
+                })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

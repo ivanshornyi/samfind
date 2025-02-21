@@ -24,9 +24,7 @@ export const BalanceInfo = ({ balance }: { balance: number }) => {
       <p className="text-2xl sm:text-[32px] sm:leading-[43px] font-semibold text-[#CE9DF3] text-nowrap mb-2 md:mb-4 md:mt-2">
         € {balance}
       </p>
-      <p className="text-base md:text-xl font-normal text-nowrap">
-        Your discount
-      </p>
+      <p className="text-base md:text-xl font-normal text-nowrap">Your bonus</p>
     </div>
   );
 };

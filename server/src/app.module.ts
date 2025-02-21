@@ -24,6 +24,7 @@ import { UserLicenseModule } from "./modules/user-license/user-license.module";
 import { UserReferralModule } from "./modules/user-referral/user-referral.module";
 import { UserModule } from "./modules/user/user.module";
 import { AppVersionModule } from "./modules/app-version/app-version.module";
+import { WalletModule } from "./modules/wallet/wallet.module";
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { AppVersionModule } from "./modules/app-version/app-version.module";
     DiscountModule,
     HealthModule,
     AppVersionModule,
+    WalletModule,
   ],
   controllers: [],
   providers: [],
@@ -101,6 +103,7 @@ export class AppModule implements NestModule {
         "plan",
         "subscription",
         "auth/sign-out",
+        "wallet",
       );
   }
 }

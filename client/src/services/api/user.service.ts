@@ -22,6 +22,13 @@ export interface UpdateUserData {
   status?: UserStatus;
 }
 
+export interface UpdateUserWalletData {
+  id: string;
+  discountAmount?: number;
+  bonusAmount?: number;
+  sharesAmount?: number;
+}
+
 const updateUser = async (id: string, data: UpdateUserData) => {
   try {
     await apiClient.patch(`/user/${id}`, {
@@ -151,9 +158,19 @@ const getUserName = async (licenseId: string) => {
 
 const getUseWallet = async (userId: string) => {
   try {
-    const response = await apiClient.get(`/user/wallet/${userId}`);
+    const response = await apiClient.get(`/wallet/${userId}`);
 
     return response.data as Wallet;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
+const updateUserWallet = async (data: UpdateUserWalletData) => {
+  try {
+    await apiClient.put(`/wallet`, {
+      ...data,
+    });
   } catch (error) {
     handleApiError(error);
   }
@@ -170,4 +187,5 @@ export const UserApiService = {
   getUserOrganizationName,
   getUserName,
   getUseWallet,
+  updateUserWallet,
 };

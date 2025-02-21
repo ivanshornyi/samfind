@@ -179,7 +179,6 @@ model Wallet {
   discountAmount          Float               @default(0)
   bonusAmount             Float               @default(0)
   sharesAmount            Float               @default(0)
-  selectedBonusToDiscount Float               @default(0)
   walletTransactions      WalletTransaction[]
   createdAt               DateTime            @default(now())
   updatedAt               DateTime            @updatedAt
@@ -222,8 +221,6 @@ model Discount {
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId         String
   amount         Float
-  spentBonuses   Float
-  spentDiscount  Float
   used           Boolean  @default(false)
   stripeCouponId String?
   createdAt      DateTime @default(now())

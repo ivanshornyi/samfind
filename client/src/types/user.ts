@@ -48,7 +48,12 @@ export interface Wallet {
   discountAmount: number;
   bonusAmount: number;
   sharesAmount: number;
-  selectedBonusToDiscount: number;
   createdAt: string;
   updatedAt: string;
+}
+
+export enum BalanceType {
+  Discount = "discount",
+  Bonus = "bonus",
+  Shares = "shares",
 }
