@@ -10,6 +10,8 @@ import { StripeService } from "../stripe/stripe.service";
 import { UserService } from "../user/user.service";
 import { MailService } from "../mail/mail.service";
 import { MailModule } from "../mail/mail.module";
+import { ShareService } from "../share/share.service";
+import { WalletService } from "../wallet/wallet.service";
 
 @Module({
   imports: [PrismaModule, UserModule, MailModule],
@@ -20,6 +22,8 @@ import { MailModule } from "../mail/mail.module";
     PrismaService,
     UserService,
     MailService,
+    ShareService,
+    WalletService,
   ],
   exports: [PlanService],
 })

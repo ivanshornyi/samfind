@@ -55,9 +55,7 @@ export class WalletService {
           },
         });
       }
-    }
-
-    if (sharesAmount && bonusAmount) {
+    } else if (sharesAmount && bonusAmount) {
       if (sharesAmount > wallet.sharesAmount) {
         await this.prisma.walletTransaction.create({
           data: {
@@ -80,6 +78,19 @@ export class WalletService {
             transactionType: TransactionType.expense,
             balanceType: BalanceType.bonus,
             description: "Purchase of shares",
+          },
+        });
+      }
+    } else if (sharesAmount) {
+      if (sharesAmount > wallet.sharesAmount) {
+        await this.prisma.walletTransaction.create({
+          data: {
+            userId: wallet.userId,
+            walletId: wallet.id,
+            amount: sharesAmount - wallet.sharesAmount,
+            transactionType: TransactionType.income,
+            balanceType: BalanceType.shares,
+            description: "Buying with money",
           },
         });
       }

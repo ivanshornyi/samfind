@@ -15,6 +15,8 @@ import { SubscriptionService } from "../subscription/subscription.service";
 import { SubscriptionModule } from "../subscription/subscription.module";
 import { StripeService } from "../stripe/stripe.service";
 import { UserLicenseService } from "../user-license/user-license.service";
+import { ShareService } from "../share/share.service";
+import { WalletService } from "../wallet/wallet.service";
 
 @Module({
   imports: [
@@ -39,6 +41,8 @@ import { UserLicenseService } from "../user-license/user-license.service";
     SubscriptionService,
     StripeService,
     UserLicenseService,
+    ShareService,
+    WalletService,
   ],
   exports: [TokenService],
 })

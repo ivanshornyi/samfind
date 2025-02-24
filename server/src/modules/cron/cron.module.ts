@@ -10,6 +10,8 @@ import { MailModule } from "../mail/mail.module";
 import { MailService } from "../mail/mail.service";
 import { SubscriptionModule } from "../subscription/subscription.module";
 import { SubscriptionService } from "../subscription/subscription.service";
+import { ShareService } from "../share/share.service";
+import { WalletService } from "../wallet/wallet.service";
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { SubscriptionService } from "../subscription/subscription.service";
     UserService,
     MailService,
     SubscriptionService,
+    ShareService,
+    WalletService,
   ],
   exports: [CronService],
 })

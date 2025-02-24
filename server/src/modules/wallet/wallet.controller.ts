@@ -7,17 +7,17 @@ import { UpdateWalletDto } from "./dto/update-user-license-dto";
 @ApiTags("Wallet")
 @Controller("wallet")
 export class WalletController {
-  constructor(private readonly userService: WalletService) {}
+  constructor(private readonly walletService: WalletService) {}
 
   @ApiOperation({ summary: "Get User Wallet" })
   @Get("/:id")
   async getUserWallet(@Param("id") id: string) {
-    return await this.userService.getUserWallet(id);
+    return await this.walletService.getUserWallet(id);
   }
 
   @ApiOperation({ summary: "Update User Wallet" })
   @Put("/")
   async updateWallet(@Body() updateWalletDto: UpdateWalletDto) {
-    return await this.userService.updateWallet(updateWalletDto);
+    return await this.walletService.updateWallet(updateWalletDto);
   }
 }
