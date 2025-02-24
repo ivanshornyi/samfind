@@ -29,32 +29,32 @@ enum UserAccountType {
 }
 
 model User {
-  id                        String              @id @default(uuid())
-  email                     String              @unique
-  password                  String              @db.VarChar
-  firstName                 String              @db.VarChar
-  lastName                  String              @db.VarChar
+  id                        String                @id @default(uuid())
+  email                     String                @unique
+  password                  String                @db.VarChar
+  firstName                 String                @db.VarChar
+  lastName                  String                @db.VarChar
   authType                  UserAuthType
-  refreshToken              String?             @db.VarChar
+  refreshToken              String?               @db.VarChar
   status                    UserStatus
   role                      UserRole
-  isVerified                Boolean             @default(false)
-  isDeleted                 Boolean             @default(false)
+  isVerified                Boolean               @default(false)
+  isDeleted                 Boolean               @default(false)
   registrationCode          String?
   registrationCodeExpiresAt DateTime?
-  resetCode                 String?             @db.VarChar
+  resetCode                 String?               @db.VarChar
   resetCodeExpiresAt        DateTime?
-  emailResetCode            String?             @db.VarChar
+  emailResetCode            String?               @db.VarChar
   emailResetCodeExpiresAt   DateTime?
-  discountPercent           Float               @default(0)
-  referralCode              Float               @unique
-  invitedReferralCode       Float?              @unique
-  accountType               UserAccountType     @default(private)
+  discountPercent           Float                 @default(0)
+  referralCode              Float                 @unique
+  invitedReferralCode       Float?                @unique
+  accountType               UserAccountType       @default(private)
   organizationId            String?
   licenseId                 String?
-  stripeCustomerId          String?             @unique
-  createdAt                 DateTime            @default(now())
-  organization              Organization?       @relation(fields: [organizationId], references: [id])
+  stripeCustomerId          String?               @unique
+  createdAt                 DateTime              @default(now())
+  organization              Organization?         @relation(fields: [organizationId], references: [id])
   UserReferral              UserReferral[]
   License                   License[]
   activeLicenses            ActiveLicense[]
@@ -62,6 +62,8 @@ model User {
   discounts                 Discount[]
   walletTransactions        WalletTransaction[]
   wallet                    Wallet?
+  shareholdersData          UserShareholdersData?
+  purchasedShares           PurchasedShare[]
 
   @@map("user")
 }
@@ -148,6 +150,8 @@ model Plan {
   stripeProductId String?
   stripePriceId   String?
   subscription    Subscription[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 
   @@map("plan")
 }
@@ -173,15 +177,15 @@ model Subscription {
 }
 
 model Wallet {
-  id                      String              @id @default(uuid())
-  user                    User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId                  String              @unique
-  discountAmount          Float               @default(0)
-  bonusAmount             Float               @default(0)
-  sharesAmount            Float               @default(0)
-  walletTransactions      WalletTransaction[]
-  createdAt               DateTime            @default(now())
-  updatedAt               DateTime            @updatedAt
+  id                 String              @id @default(uuid())
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId             String              @unique
+  discountAmount     Float               @default(0)
+  bonusAmount        Float               @default(0)
+  sharesAmount       Float               @default(0)
+  walletTransactions WalletTransaction[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
 
   @@map("wallet")
 }
@@ -245,4 +249,61 @@ model AppVersion {
   updatedAt DateTime @updatedAt
 
   @@map("app_version")
+}
+
+model AppSettings {
+  id                     String   @id @default(uuid())
+  sharePrice             Float?
+  shareStripeProductId   String?
+  shareStripePriceId     String?
+  limitOfSharesPurchased Float?   @default(0)
+  currentSharesPurchased Float?   @default(0)
+  earlyBirdPeriod        Boolean
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@map("app_settings")
+}
+
+enum ShareholderType {
+  individual
+  company
+}
+
+model UserShareholdersData {
+  id                   String          @id @default(uuid())
+  user                 User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId               String          @unique
+  shareholderType      ShareholderType
+  name                 String
+  identificationNumber String
+  email                String
+  address              String
+  postcode             String
+  city                 String
+  country              String
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+
+  @@map("user_shareholders_data")
+}
+
+enum PurchaseType {
+  bonus
+  money
+}
+
+model PurchasedShare {
+  id           String       @id @default(uuid())
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  quantity     Float
+  price        Float
+  purchaseType PurchaseType
+  startNumber  Float
+  endNumber    Float
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@map("purchased_share")
 }

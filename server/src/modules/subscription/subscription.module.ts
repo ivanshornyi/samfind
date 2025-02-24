@@ -10,6 +10,8 @@ import { SubscriptionService } from "./subscription.service";
 import { SubscriptionController } from "./subscription.controller";
 import { MailModule } from "../mail/mail.module";
 import { MailService } from "../mail/mail.service";
+import { ShareService } from "../share/share.service";
+import { WalletService } from "../wallet/wallet.service";
 
 @Module({
   imports: [PrismaModule, UserModule, MailModule],
@@ -20,6 +22,8 @@ import { MailService } from "../mail/mail.service";
     PrismaService,
     UserService,
     MailService,
+    ShareService,
+    WalletService,
   ],
   exports: [SubscriptionService],
 })

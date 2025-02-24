@@ -25,6 +25,8 @@ import { UserReferralModule } from "./modules/user-referral/user-referral.module
 import { UserModule } from "./modules/user/user.module";
 import { AppVersionModule } from "./modules/app-version/app-version.module";
 import { WalletModule } from "./modules/wallet/wallet.module";
+import { ShareModule } from "./modules/share/share.module";
+import { AppSettingsModule } from "./modules/appSettings/appSettings.module";
 
 @Module({
   imports: [
@@ -45,6 +47,8 @@ import { WalletModule } from "./modules/wallet/wallet.module";
     HealthModule,
     AppVersionModule,
     WalletModule,
+    ShareModule,
+    AppSettingsModule,
   ],
   controllers: [],
   providers: [],
@@ -104,6 +108,8 @@ export class AppModule implements NestModule {
         "subscription",
         "auth/sign-out",
         "wallet",
+        "share",
+        "app-settings",
       );
   }
 }

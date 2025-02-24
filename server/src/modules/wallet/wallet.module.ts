@@ -8,6 +8,6 @@ import { WalletService } from "./wallet.service";
   imports: [PrismaModule],
   controllers: [WalletController],
   providers: [WalletService],
-  exports: [],
+  exports: [WalletService],
 })
 export class WalletModule {}

@@ -212,7 +212,7 @@ export class SubscriptionService {
     if (!user || !user.stripeCustomerId)
       throw new NotFoundException("User not found");
 
-    let allInvoices: Stripe.Invoice[] = [];
+    const allInvoices: Stripe.Invoice[] = [];
     let hasMore = true;
     let lastInvoiceId = undefined;
 
@@ -231,8 +231,9 @@ export class SubscriptionService {
       }
     }
 
-    let invoices = allInvoices
-      .filter((invoice, index, arr) => {
+    const invoices = allInvoices
+      .filter((invoice) => !invoice.metadata.share)
+      .filter((invoice, index) => {
         if (index === 0) return true;
         return invoice.status === "paid";
       })
