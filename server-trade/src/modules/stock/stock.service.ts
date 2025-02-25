@@ -1,6 +1,6 @@
-import { CreateStockDto } from './dto/create-stock-dto'
 import { BadRequestException, Injectable } from "@nestjs/common"
 import { PrismaService } from "nestjs-prisma"
+import { CreateStockDto } from './dto/create-stock-dto'
 import { UpdateStockDto } from './dto/update-stock-dto'
 
 @Injectable()
@@ -54,6 +54,25 @@ export class StockService {
       where: { id: id },
       include: { stockOwner: true }
     })
+  }
+
+  async getAllStocksWithPagination(page: number, limit: number, order: "asc" | "desc") {
+    const stocks = await this.prisma.stock.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: { createdAt: order }
+    })
+
+    const total = await this.prisma.stock.count()
+
+    return {
+      paging: {
+        page,
+        limit,
+        total
+      },
+      data: stocks
+    }
   }
 
   async updateStockById(id: string, body: UpdateStockDto) {
