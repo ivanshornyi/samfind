@@ -4,7 +4,7 @@ model TransactionHistory {
   stock     Stock                  @relation(fields: [stockId], references: [id], onDelete: Cascade)
   userId    String
   user      User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  orderId   String?                @unique
+  orderId   String?
   order     OrderStock?            @relation(fields: [orderId], references: [id], onDelete: SetNull)
   type      TransactionHistoryType
   quantity  Int

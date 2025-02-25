@@ -135,9 +135,6 @@ CREATE TABLE "wallet" (
 CREATE UNIQUE INDEX "stock_externalUserId_key" ON "stock"("externalUserId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "transaction_history_orderId_key" ON "transaction_history"("orderId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
 -- CreateIndex
