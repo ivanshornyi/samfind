@@ -1,0 +1,27 @@
+enum BalanceType {
+  discount
+  bonus
+  shares
+}
+
+enum TransactionType {
+  income
+  expense
+}
+
+model WalletTransaction {
+  id              String          @id @default(uuid())
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
+  wallet          Wallet          @relation(fields: [walletId], references: [id])
+  walletId        String
+  balanceType     BalanceType
+  transactionType TransactionType
+  invitedUserId   String?
+  amount          Float           @default(0)
+  description     String
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@map("wallet_transaction")
+}

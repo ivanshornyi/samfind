@@ -1,0 +1,13 @@
+model AppSettings {
+  id                     String   @id @default(uuid())
+  sharePrice             Float?
+  shareStripeProductId   String?
+  shareStripePriceId     String?
+  limitOfSharesPurchased Float?   @default(0)
+  currentSharesPurchased Float?   @default(0)
+  earlyBirdPeriod        Boolean
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@map("app_settings")
+}
