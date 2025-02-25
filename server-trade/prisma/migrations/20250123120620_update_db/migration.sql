@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "license" ALTER COLUMN "licenseExpiresAt" SET DEFAULT CURRENT_TIMESTAMP;

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "license" ADD COLUMN     "purchased" DOUBLE PRECISION NOT NULL DEFAULT 0;

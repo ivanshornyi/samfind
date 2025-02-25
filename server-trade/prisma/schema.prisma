@@ -1,0 +1,309 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  active
+  inactive
+}
+
+enum UserAuthType {
+  email
+  google
+}
+
+enum UserRole {
+  admin
+  customer
+}
+
+enum UserAccountType {
+  private
+  business
+}
+
+model User {
+  id                        String                @id @default(uuid())
+  email                     String                @unique
+  password                  String                @db.VarChar
+  firstName                 String                @db.VarChar
+  lastName                  String                @db.VarChar
+  authType                  UserAuthType
+  refreshToken              String?               @db.VarChar
+  status                    UserStatus
+  role                      UserRole
+  isVerified                Boolean               @default(false)
+  isDeleted                 Boolean               @default(false)
+  registrationCode          String?
+  registrationCodeExpiresAt DateTime?
+  resetCode                 String?               @db.VarChar
+  resetCodeExpiresAt        DateTime?
+  emailResetCode            String?               @db.VarChar
+  emailResetCodeExpiresAt   DateTime?
+  discountPercent           Float                 @default(0)
+  referralCode              Float                 @unique
+  invitedReferralCode       Float?                @unique
+  accountType               UserAccountType       @default(private)
+  organizationId            String?
+  licenseId                 String?
+  stripeCustomerId          String?               @unique
+  createdAt                 DateTime              @default(now())
+  organization              Organization?         @relation(fields: [organizationId], references: [id])
+  UserReferral              UserReferral[]
+  License                   License[]
+  activeLicenses            ActiveLicense[]
+  subscription              Subscription?
+  discounts                 Discount[]
+  walletTransactions        WalletTransaction[]
+  wallet                    Wallet?
+  shareholdersData          UserShareholdersData?
+  purchasedShares           PurchasedShare[]
+
+  @@map("user")
+}
+
+enum LicenseStatus {
+  active
+  inactive
+}
+
+enum LicenseTierType {
+  freemium
+  standard
+}
+
+model License {
+  id               String          @id @default(uuid())
+  user             User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  status           LicenseStatus   @default(active)
+  ownerId          String          @unique
+  activeLicenses   ActiveLicense[]
+  limit            Float           @default(0)
+  tierType         LicenseTierType @default(freemium)
+  availableEmails  String[]        @default([])
+  licenseExpiresAt DateTime        @default(now())
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  subscription     Subscription?
+
+  @@map("license")
+}
+
+model ActiveLicense {
+  id         String    @id @default(uuid())
+  user       User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String?
+  license    License   @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  licenseId  String
+  deleteDate DateTime?
+  desktopIds String[]  @default([])
+  mobileIds  String[]  @default([])
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@map("active_license")
+}
+
+model UserReferral {
+  id                 String              @id @default(uuid())
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invitedUserIds     String[]            @default([])
+  referralCode       Float               @unique
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  userId             String              @unique
+  walletTransactions WalletTransaction[]
+
+  @@map("user_referral")
+}
+
+model Organization {
+  id                         String   @id @default(uuid())
+  name                       String
+  domains                    String[] @default([])
+  VAT                        String?
+  businessOrganizationNumber String?
+  User                       User[]
+  ownerId                    String   @unique
+  userIds                    String[] @default([])
+  availableEmails            String[] @default([])
+
+  @@map("organization")
+}
+
+enum PlanPeriod {
+  monthly
+  yearly
+}
+
+model Plan {
+  id              String          @id @default(uuid())
+  type            LicenseTierType
+  period          PlanPeriod
+  price           Float
+  stripeProductId String?
+  stripePriceId   String?
+  subscription    Subscription[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@map("plan")
+}
+
+model Subscription {
+  id               String    @id @default(uuid())
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId           String    @unique
+  license          License?  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  licenseId        String?   @unique
+  plan             Plan      @relation(fields: [planId], references: [id], onDelete: Cascade)
+  planId           String
+  isActive         Boolean
+  isInTrial        Boolean
+  stripeInvoiceIds String[]  @default([])
+  nextDate         DateTime
+  cancelDate       DateTime?
+  newPlanId        String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@map("subscription")
+}
+
+model Wallet {
+  id                 String              @id @default(uuid())
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId             String              @unique
+  discountAmount     Float               @default(0)
+  bonusAmount        Float               @default(0)
+  sharesAmount       Float               @default(0)
+  walletTransactions WalletTransaction[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  @@map("wallet")
+}
+
+enum BalanceType {
+  discount
+  bonus
+  shares
+}
+
+enum TransactionType {
+  income
+  expense
+}
+
+model WalletTransaction {
+  id              String          @id @default(uuid())
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
+  wallet          Wallet          @relation(fields: [walletId], references: [id])
+  walletId        String
+  referral        UserReferral?   @relation(fields: [referralId], references: [id])
+  balanceType     BalanceType
+  transactionType TransactionType
+  referralId      String?
+  invitedUserId   String?
+  amount          Float           @default(0)
+  description     String
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@map("wallet_transaction")
+}
+
+model Discount {
+  id             String   @id @default(uuid())
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  amount         Float
+  used           Boolean  @default(false)
+  stripeCouponId String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("discount")
+}
+
+enum OsType {
+  windows
+  mac
+  android
+  ios
+}
+
+model AppVersion {
+  id        String   @id @default(uuid())
+  osType    OsType
+  version   String
+  url       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("app_version")
+}
+
+model AppSettings {
+  id                     String   @id @default(uuid())
+  sharePrice             Float?
+  shareStripeProductId   String?
+  shareStripePriceId     String?
+  limitOfSharesPurchased Float?   @default(0)
+  currentSharesPurchased Float?   @default(0)
+  earlyBirdPeriod        Boolean
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@map("app_settings")
+}
+
+enum ShareholderType {
+  individual
+  company
+}
+
+model UserShareholdersData {
+  id                   String          @id @default(uuid())
+  user                 User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId               String          @unique
+  shareholderType      ShareholderType
+  name                 String
+  identificationNumber String
+  email                String
+  address              String
+  postcode             String
+  city                 String
+  country              String
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+
+  @@map("user_shareholders_data")
+}
+
+enum PurchaseType {
+  bonus
+  money
+}
+
+model PurchasedShare {
+  id           String       @id @default(uuid())
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  quantity     Float
+  price        Float
+  purchaseType PurchaseType
+  startNumber  Float
+  endNumber    Float
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@map("purchased_share")
+}
