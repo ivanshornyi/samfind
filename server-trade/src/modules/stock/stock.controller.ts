@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { UserService } from "../user/user.service";
@@ -38,6 +38,12 @@ export class StockController {
     @Query("order") order: "asc" | "desc"
   ) {
     return await this.stockService.getAllStocksWithPagination(page, limit, order)
+  }
+
+  @ApiOperation({ summary: "Delete a stock with an user" })
+  @Delete("/:id")
+  async deleteStockById(@Param("id") id: string) {
+    return await this.stockService.deleteStockById(id)
   }
 
   @ApiOperation({ summary: "Update stock by id" })

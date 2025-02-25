@@ -16,6 +16,12 @@ export class StockService {
 
     try {
       const stock = await this.prisma.$transaction(async (prisma) => {
+        const stock = await prisma.stock.findFirst({
+          where: { externalUserId }
+        })
+
+        if (stock) throw new BadRequestException("Stock with this email already exist.")
+
         let user = await prisma.user.findFirst({
           where: { email },
         })
@@ -87,6 +93,12 @@ export class StockService {
         price,
         quantity
       }
+    })
+  }
+
+  async deleteStockById(id: string) {
+    return await this.prisma.stock.delete({
+      where: { id }
     })
   }
 }
