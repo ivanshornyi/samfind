@@ -32,7 +32,9 @@ import { AppSettingsModule } from "./modules/appSettings/appSettings.module"
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(() => { })
+      .apply((req, res, next) => {
+        next();
+      })
       .exclude(
         {
           path: "/user",
