@@ -340,7 +340,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
             <div className="my-4 flex items-center gap-2 bg-[#363637] rounded-2xl px-4 py-2">
               <Info color="#BEB8FF" />
               <p className="text-[#BEB8FF]">
-                You&apos;ve got a 10% discount via referral link!
+                You&apos;ve got a 10% bonus via referral link!
               </p>
             </div>
           )}

@@ -19,7 +19,6 @@ import { UpdateUserLicenseDto } from "./dto/update-user-license-dto";
 import { CheckDeviceDto } from "./dto/check-device-dto";
 import { ConfigService } from "@nestjs/config";
 import { EXCEPTION } from "src/common/constants/exception.constant";
-import { CheckUserLicenseDto } from "./dto/check-user-license-dto";
 import { DeleteDeviceIdDto } from "./dto/delete-device-id-dto";
 
 @ApiTags("User License")

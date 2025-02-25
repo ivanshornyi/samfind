@@ -8,6 +8,7 @@ interface BalanceInfoProps {
   balanceType: BalanceType;
   balance: number;
   transferBonusToDiscount: (amount: number) => void;
+  sharePrice?: number;
 }
 
 const balancesDescription = {
@@ -25,7 +26,7 @@ const balancesDescription = {
   [BalanceType.Shares]: {
     description: `Balance of the number of company shares`,
     name: "Your shares",
-    currency: "",
+    currency: "€",
   },
 };
 
@@ -33,6 +34,7 @@ export const BalanceInfo = ({
   balance,
   balanceType,
   transferBonusToDiscount,
+  sharePrice,
 }: BalanceInfoProps) => {
   const [showConvert, setShowConvert] = useState(false);
   const [convertAmount, setConvertAmount] = useState("");
@@ -98,9 +100,12 @@ export const BalanceInfo = ({
         <p className="text-base md:text-xl font-normal text-nowrap">
           {description.name}
         </p>
+
         <p className="text-2xl sm:text-[32px] sm:leading-[43px] font-semibold text-[#CE9DF3] text-nowrap mb-2 md:mb-4 md:mt-2">
-          {description.currency} {"  "} {balance}
+          {description.currency} {"  "}
+          {sharePrice ? `${(sharePrice * balance) / 100}` : balance}
         </p>
+        {sharePrice && <p>{`${balance} X ${sharePrice / 100}€`}</p>}
         {balanceType === BalanceType.Bonus && balance > 0 && (
           <div>
             {showConvert ? (

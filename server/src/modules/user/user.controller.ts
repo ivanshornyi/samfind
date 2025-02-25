@@ -7,10 +7,10 @@ import {
   Query,
   ParseArrayPipe,
   Delete,
+  Post,
 } from "@nestjs/common";
 
 import { User } from "@prisma/client";
-import { Prisma } from "@prisma/client";
 
 import { UserService } from "./user.service";
 
@@ -18,6 +18,7 @@ import { ApiOperation, ApiTags, ApiQuery } from "@nestjs/swagger";
 
 import { UpdateUserDto } from "./dto/update-user-dto";
 import { FindUserDto } from "./dto/find-user-dto";
+import { AddUserShareholderDataDto } from "./dto/add-user-shareholder-dto";
 
 // import { RefreshGuard } from "src/common/guards/refresh.guard";
 
@@ -135,5 +136,19 @@ export class UserController {
   @Get("/user-name/:licenseId")
   async getUserName(@Param("licenseId") licenseId: string) {
     return await this.userService.getUserName(licenseId);
+  }
+
+  @ApiOperation({ summary: "Get shareholder data" })
+  @Get("/shareholder/:userId")
+  async getUserShareholderData(@Param("userId") userId: string) {
+    return await this.userService.getUserShareholderData(userId);
+  }
+
+  @ApiOperation({ summary: "Add shareholder data" })
+  @Post("/shareholder")
+  async addUserShareholderData(
+    @Body() addUserShareholderDataDto: AddUserShareholderDataDto,
+  ) {
+    return this.userService.addUserShareholderData(addUserShareholderDataDto);
   }
 }

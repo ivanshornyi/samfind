@@ -352,14 +352,6 @@ export default function License() {
                       </div>
                     </div>
                   </div> */}
-                  <Button
-                    className="mt-4 w-[200px]"
-                    variant="secondary"
-                    leftIcon={<Download />}
-                    onClick={() => router.push("/download-app")}
-                  >
-                    Download
-                  </Button>
                   <ReusableTable
                     table={table}
                     isLoading={isUserLicensesPending}
@@ -448,14 +440,6 @@ export default function License() {
                 </ul>
               </div>
             </div>
-            <Button
-              className="mt-4 w-[200px]"
-              variant="secondary"
-              leftIcon={<Download />}
-              onClick={() => router.push("/download-app")}
-            >
-              Download
-            </Button>
           </>
         )}
 

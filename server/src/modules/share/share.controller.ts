@@ -17,7 +17,7 @@ export class ShareController {
   }
 
   @ApiOperation({ summary: "Create Invoice to buy" })
-  @Post("/buy")
+  @Post("/invoice")
   async createInvoiceToByShares(
     @Body() createSharesInvoiceDto: CreateSharesInvoiceDto,
   ) {

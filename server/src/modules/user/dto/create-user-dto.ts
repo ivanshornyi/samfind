@@ -1,6 +1,6 @@
 import { IsDate, IsNumber, IsOptional, IsString } from "class-validator";
 
-import { UserAccountType, UserAuthType } from "@prisma/client"; 
+import { UserAccountType, UserAuthType } from "@prisma/client";
 
 export class CreateUserDto {
   @IsString()
