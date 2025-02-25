@@ -13,6 +13,7 @@ model OrderStock {
   updatedAt    DateTime            @updatedAt
   transaction  TransactionHistory?
   // do we need maxPrice | minPrice per stock?
+  // do we need notifications for our service, when status of order changes?
 
   @@map("stock_orders")
 }
@@ -23,9 +24,9 @@ enum OrderType {
 }
 
 enum OrderStatus {
-  PENDING
-  ACCEPTED
-  REJECTED
-  COMPLETED
-  CANCELED
+  PENDING // someone accepted order
+  ACCEPTED // someone takes order in payment process
+  REJECTED // someone reject order
+  COMPLETED // payment was successfull
+  CANCELED // host canceled order 
 }

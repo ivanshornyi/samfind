@@ -40,15 +40,15 @@ export class StockController {
     return await this.stockService.getAllStocksWithPagination(page, limit, order)
   }
 
-  @ApiOperation({ summary: "Delete a stock with an user" })
-  @Delete("/:id")
-  async deleteStockById(@Param("id") id: string) {
-    return await this.stockService.deleteStockById(id)
-  }
-
   @ApiOperation({ summary: "Update stock by id" })
   @Patch("/:id")
   async updateStockById(@Param("id") id: string, @Body() updateStockDto: UpdateStockDto) {
     return await this.stockService.updateStockById(id, updateStockDto)
+  }
+
+  @ApiOperation({ summary: "Delete a stock with an user" })
+  @Delete("/:id")
+  async deleteStockById(@Param("id") id: string) {
+    return await this.stockService.deleteStockById(id)
   }
 }

@@ -15,8 +15,8 @@ model TransactionHistory {
 }
 
 enum TransactionHistoryType {
-  PLACEMENT
-  PURCHASE
-  SALE
-  REJECTION
+  PLACEMENT // order is created
+  PURCHASE // order was purshared
+  SALE // order was saled
+  REJECTION // order was failed
 }
