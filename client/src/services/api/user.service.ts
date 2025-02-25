@@ -1,4 +1,11 @@
-import { LicenseTierType, PlanPeriod, User, UserStatus, Wallet } from "@/types";
+import {
+  LicenseTierType,
+  PlanPeriod,
+  User,
+  UserShareholderData,
+  UserStatus,
+  Wallet,
+} from "@/types";
 
 import { handleApiError } from "@/errors";
 
@@ -176,6 +183,28 @@ const updateUserWallet = async (data: UpdateUserWalletData) => {
   }
 };
 
+const getUserShareholderData = async (userId: string) => {
+  try {
+    const response = await apiClient.get(`/user/shareholder/${userId}`);
+
+    return response.data as UserShareholderData | null;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
+const addUserShareholderData = async (
+  data: Omit<UserShareholderData, "id" | "createdAt" | "updatedAt">
+) => {
+  try {
+    await apiClient.post(`/shareholder`, {
+      ...data,
+    });
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 export const UserApiService = {
   getUser,
   updateUser,
@@ -188,4 +217,6 @@ export const UserApiService = {
   getUserName,
   getUseWallet,
   updateUserWallet,
+  getUserShareholderData,
+  addUserShareholderData,
 };

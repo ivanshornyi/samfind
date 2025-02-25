@@ -26,7 +26,7 @@ import { UserModule } from "./modules/user/user.module";
 import { AppVersionModule } from "./modules/app-version/app-version.module";
 import { WalletModule } from "./modules/wallet/wallet.module";
 import { ShareModule } from "./modules/share/share.module";
-import { AppSettingsModule } from "./modules/appSettings/appSettings.module";
+import { AppSettingsModule } from "./modules/app-settings/appSettings.module";
 
 @Module({
   imports: [

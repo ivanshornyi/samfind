@@ -83,7 +83,6 @@ export class StripeService {
   }
 
   async createPrice(productId: string, amount: number): Promise<Stripe.Price> {
-    console.log("amount", amount);
     return await this.stripe.prices.create({
       unit_amount: amount,
       currency: "eur",
@@ -185,6 +184,7 @@ export class StripeService {
       metadata,
       currency: "eur",
       collection_method: "charge_automatically",
+      automatic_tax: metadata.subscriptionId ? { enabled: true } : undefined,
     });
 
     await this.createInvoiceItem({
@@ -338,7 +338,7 @@ export class StripeService {
 
           const discountAmount =
             subscription.plan.period === PlanPeriod.yearly
-              ? Math.round(subscription.plan.price / 100)
+              ? Math.round(subscription.plan.price / 10)
               : Math.round(subscription.plan.price / 10);
 
           this.userService.findAndUpdateUserByReferralCode(

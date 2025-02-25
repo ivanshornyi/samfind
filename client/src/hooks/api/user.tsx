@@ -10,6 +10,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useToast } from "../use-toast";
+import { UserShareholderData } from "@/types";
 
 export const useGetUser = (id: string) => {
   return useQuery({
@@ -127,5 +128,32 @@ export const useUpdateUserWallet = () => {
         refetchType: "all",
       });
     },
+  });
+};
+
+export const useAddUserShareholderData = () => {
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: (
+      data: Omit<UserShareholderData, "id" | "createdAt" | "updatedAt">
+    ) => {
+      return UserApiService.addUserShareholderData(data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Shareholder information added",
+        variant: "success",
+      });
+    },
+  });
+};
+
+export const useGetUserShareholderData = (userId?: string | null) => {
+  return useQuery({
+    queryFn: () => UserApiService.getUserShareholderData(userId!),
+    queryKey: ["user-shareholder-data", userId],
+    enabled: !!userId,
   });
 };

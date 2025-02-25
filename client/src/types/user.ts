@@ -57,3 +57,23 @@ export enum BalanceType {
   Bonus = "bonus",
   Shares = "shares",
 }
+
+export enum ShareholderType {
+  Individual = "individual",
+  Company = "company",
+}
+
+export interface UserShareholderData {
+  id: string;
+  userId: string;
+  shareholderType: ShareholderType;
+  name: string;
+  identificationNumber: string;
+  email: string;
+  address: string;
+  postcode: string;
+  city: string;
+  country: string;
+  createdAt: string;
+  updatedAt: string;
+}

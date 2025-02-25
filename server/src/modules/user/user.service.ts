@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 
 import {
   BalanceType,
@@ -17,6 +21,7 @@ import { FindUserDto } from "./dto/find-user-dto";
 import { UpdateUserDto } from "./dto/update-user-dto";
 
 import { createHash } from "crypto";
+import { AddUserShareholderDataDto } from "./dto/add-user-shareholder-dto";
 
 @Injectable()
 export class UserService {
@@ -420,5 +425,23 @@ export class UserService {
     }
 
     return { name: license.user.firstName + "  " + license.user.lastName };
+  }
+
+  async addUserShareholderData(data: AddUserShareholderDataDto) {
+    const shareholderData = await this.prisma.userShareholdersData.findUnique({
+      where: { userId: data.userId },
+    });
+
+    if (shareholderData) {
+      throw new BadRequestException("Data already added");
+    }
+
+    return await this.prisma.userShareholdersData.create({ data });
+  }
+
+  async getUserShareholderData(userId: string) {
+    return await this.prisma.userShareholdersData.findUnique({
+      where: { userId },
+    });
   }
 }

@@ -45,25 +45,27 @@ export class ShareService {
       : 1;
     const endNumber = startNumber + quantity - 1;
 
-    await this.prisma.purchasedShare.create({
-      data: {
-        userId,
-        startNumber,
-        endNumber,
-        price,
-        quantity,
-        purchaseType,
-      },
-    });
-
-    await this.prisma.appSettings.update({
-      where: { id: appSettings.id },
-      data: {
-        currentSharesPurchased: {
-          increment: price * quantity,
+    await this.prisma.$transaction([
+      this.prisma.purchasedShare.create({
+        data: {
+          userId,
+          startNumber,
+          endNumber,
+          price,
+          quantity,
+          purchaseType,
         },
-      },
-    });
+      }),
+
+      this.prisma.appSettings.update({
+        where: { id: appSettings.id },
+        data: {
+          currentSharesPurchased: {
+            increment: price * quantity,
+          },
+        },
+      }),
+    ]);
 
     await this.walletService.updateWallet({
       id: user.wallet.id,

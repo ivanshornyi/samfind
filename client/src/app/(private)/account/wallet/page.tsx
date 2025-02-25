@@ -1,16 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useGetUserWallet, useUpdateUserWallet } from "@/hooks";
+import {
+  useGetAppSettings,
+  useGetUserWallet,
+  useUpdateUserWallet,
+} from "@/hooks";
 import { BalanceType, Wallet } from "@/types";
 
-import { BalanceInfo } from "./_components";
+import { BalanceInfo, BuyShares } from "./_components";
 
 export default function WalletPage() {
   const [wallet, setWallet] = useState<Wallet | null>(null);
+  const [sharePrice, setSharePrice] = useState(0);
 
   const { data: userWallet } = useGetUserWallet();
   const { mutate: updateUserWallet } = useUpdateUserWallet();
+  const { data: appSettings } = useGetAppSettings();
 
   const transferBonusToDiscount = (amount: number) => {
     if (!wallet) return;
@@ -24,6 +30,11 @@ export default function WalletPage() {
   useEffect(() => {
     if (userWallet) setWallet(userWallet);
   }, [userWallet]);
+
+  useEffect(() => {
+    if (appSettings && appSettings.sharePrice)
+      setSharePrice(appSettings.sharePrice);
+  }, [appSettings]);
 
   return (
     <div className="mx-auto max-w-[1000px]">
@@ -41,11 +52,20 @@ export default function WalletPage() {
             balanceType={BalanceType.Discount}
           />
           <BalanceInfo
+            sharePrice={sharePrice}
             transferBonusToDiscount={transferBonusToDiscount}
             balance={wallet?.sharesAmount || 0}
             balanceType={BalanceType.Shares}
           />
         </div>
+        {sharePrice && (
+          <div className="flex justify-center mt-10">
+            <BuyShares
+              sharePrice={sharePrice}
+              bonusAmount={wallet?.bonusAmount || 0}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
