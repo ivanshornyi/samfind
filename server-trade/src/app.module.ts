@@ -16,6 +16,7 @@ import { ShareModule } from "./modules/share/share.module"
 import { AppSettingsModule } from "./modules/appSettings/appSettings.module"
 import { StockModule } from "./modules/stock/stock.module"
 import { StockOrdersModule } from "./modules/orders-stock/orders-stock.module"
+import { TransactionHistoryModule } from "./modules/transaction-history/transaction-history.module"
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { StockOrdersModule } from "./modules/orders-stock/orders-stock.module"
     StripeModule,
     StockModule,
     StockOrdersModule,
+    TransactionHistoryModule,
     ShareModule,
     AppSettingsModule
   ],
