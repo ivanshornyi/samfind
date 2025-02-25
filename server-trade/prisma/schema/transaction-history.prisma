@@ -1,0 +1,22 @@
+model TransactionHistory {
+  id        String                 @id @default(uuid())
+  stockId   String
+  stock     Stock                  @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderId   String?                @unique
+  order     OrderStock?            @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  type      TransactionHistoryType
+  quantity  Int
+  price     Float
+  createdAt DateTime               @default(now())
+
+  @@map("transaction_history")
+}
+
+enum TransactionHistoryType {
+  PLACEMENT
+  PURCHASE
+  SALE
+  REJECTION
+}

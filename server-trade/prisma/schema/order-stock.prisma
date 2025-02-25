@@ -1,0 +1,31 @@
+model OrderStock {
+  id           String              @id @default(uuid())
+  stockId      String // On what stock is order accepted
+  stock        Stock               @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  userId       String // Who maded an order
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type         OrderType
+  quantity     Int
+  offeredPrice Float // per single stock
+  paymentId    String? // payment stipe
+  status       OrderStatus         @default(PENDING)
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  transaction  TransactionHistory?
+  // do we need maxPrice | minPrice per stock?
+
+  @@map("stock_orders")
+}
+
+enum OrderType {
+  BUY
+  SELL
+}
+
+enum OrderStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+  CANCELED
+}

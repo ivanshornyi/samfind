@@ -1,0 +1,14 @@
+model Stock {
+  id                 String               @id @default(uuid())
+  ownerId            String
+  name               String               @db.VarChar
+  price              Float
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  quantity           Int                  @default(0)
+  stockOwner         User                 @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  transactionHistory TransactionHistory[]
+  orders             OrderStock[]
+
+  @@map("stock")
+}
