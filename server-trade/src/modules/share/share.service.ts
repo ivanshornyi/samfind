@@ -19,7 +19,7 @@ export class ShareService {
     private readonly walletService: WalletService,
     @Inject(forwardRef(() => StripeService))
     private readonly stripeService: StripeService,
-  ) {}
+  ) { }
 
   async byShares({ quantity, price, purchaseType, userId }: BySharesDto) {
     const user = await this.prisma.user.findUnique({

@@ -1,55 +1,16 @@
-enum UserStatus {
-  active
-  inactive
-}
-
-enum UserAuthType {
-  email
-  google
-}
-
-enum UserRole {
-  admin
-  customer
-}
-
-enum UserAccountType {
-  private
-  business
-}
-
 model User {
-  id                        String               @id @default(uuid())
-  email                     String               @unique
-  password                  String               @db.VarChar
-  firstName                 String               @db.VarChar
-  lastName                  String               @db.VarChar
-  authType                  UserAuthType
-  refreshToken              String?              @db.VarChar
-  status                    UserStatus
-  role                      UserRole
-  isVerified                Boolean              @default(false)
-  isDeleted                 Boolean              @default(false)
-  registrationCode          String?
-  registrationCodeExpiresAt DateTime?
-  resetCode                 String?              @db.VarChar
-  resetCodeExpiresAt        DateTime?
-  emailResetCode            String?              @db.VarChar
-  emailResetCodeExpiresAt   DateTime?
-  discountPercent           Float                @default(0)
-  referralCode              Float                @unique
-  invitedReferralCode       Float?               @unique
-  accountType               UserAccountType      @default(private)
-  organizationId            String?
-  licenseId                 String?
-  stripeCustomerId          String?              @unique
-  createdAt                 DateTime             @default(now())
-  stocks                    Stock[]
-  orders                    OrderStock[]
-  transactions              TransactionHistory[]
-  walletTransactions        WalletTransaction[]
-  wallet                    Wallet?
-  purchasedShares           PurchasedShare[]
+  id                 String               @id @default(uuid())
+  email              String               @unique
+  firstName          String
+  lastName           String
+  stripeCustomerId   String?              @unique
+  createdAt          DateTime             @default(now())
+  stocks             Stock[]
+  orders             OrderStock[]
+  transactions       TransactionHistory[]
+  walletTransactions WalletTransaction[]
+  wallet             Wallet?
+  purchasedShares    PurchasedShare[]
 
   @@map("user")
 }

@@ -1,17 +1,14 @@
 -- CreateEnum
+CREATE TYPE "OrderType" AS ENUM ('BUY', 'SELL');
+
+-- CreateEnum
+CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'ACCEPTED', 'REJECTED', 'COMPLETED', 'CANCELED');
+
+-- CreateEnum
 CREATE TYPE "PurchaseType" AS ENUM ('bonus', 'money');
 
 -- CreateEnum
-CREATE TYPE "UserStatus" AS ENUM ('active', 'inactive');
-
--- CreateEnum
-CREATE TYPE "UserAuthType" AS ENUM ('email', 'google');
-
--- CreateEnum
-CREATE TYPE "UserRole" AS ENUM ('admin', 'customer');
-
--- CreateEnum
-CREATE TYPE "UserAccountType" AS ENUM ('private', 'business');
+CREATE TYPE "TransactionHistoryType" AS ENUM ('PLACEMENT', 'PURCHASE', 'SALE', 'REJECTION');
 
 -- CreateEnum
 CREATE TYPE "BalanceType" AS ENUM ('discount', 'bonus', 'shares');
@@ -35,6 +32,22 @@ CREATE TABLE "app_settings" (
 );
 
 -- CreateTable
+CREATE TABLE "stock_orders" (
+    "id" TEXT NOT NULL,
+    "stockId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "type" "OrderType" NOT NULL,
+    "quantity" INTEGER NOT NULL,
+    "offeredPrice" DOUBLE PRECISION NOT NULL,
+    "paymentId" TEXT,
+    "status" "OrderStatus" NOT NULL DEFAULT 'PENDING',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "stock_orders_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "purchased_share" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
@@ -50,30 +63,39 @@ CREATE TABLE "purchased_share" (
 );
 
 -- CreateTable
+CREATE TABLE "stock" (
+    "id" TEXT NOT NULL,
+    "externalUserId" TEXT NOT NULL,
+    "ownerId" TEXT NOT NULL,
+    "name" VARCHAR NOT NULL,
+    "price" DOUBLE PRECISION NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "quantity" INTEGER NOT NULL DEFAULT 0,
+
+    CONSTRAINT "stock_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "transaction_history" (
+    "id" TEXT NOT NULL,
+    "stockId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "orderId" TEXT,
+    "type" "TransactionHistoryType" NOT NULL,
+    "quantity" INTEGER NOT NULL,
+    "price" DOUBLE PRECISION NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "transaction_history_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "user" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "password" VARCHAR NOT NULL,
-    "firstName" VARCHAR NOT NULL,
-    "lastName" VARCHAR NOT NULL,
-    "authType" "UserAuthType" NOT NULL,
-    "refreshToken" VARCHAR,
-    "status" "UserStatus" NOT NULL,
-    "role" "UserRole" NOT NULL,
-    "isVerified" BOOLEAN NOT NULL DEFAULT false,
-    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
-    "registrationCode" TEXT,
-    "registrationCodeExpiresAt" TIMESTAMP(3),
-    "resetCode" VARCHAR,
-    "resetCodeExpiresAt" TIMESTAMP(3),
-    "emailResetCode" VARCHAR,
-    "emailResetCodeExpiresAt" TIMESTAMP(3),
-    "discountPercent" DOUBLE PRECISION NOT NULL DEFAULT 0,
-    "referralCode" DOUBLE PRECISION NOT NULL,
-    "invitedReferralCode" DOUBLE PRECISION,
-    "accountType" "UserAccountType" NOT NULL DEFAULT 'private',
-    "organizationId" TEXT,
-    "licenseId" TEXT,
+    "firstName" TEXT NOT NULL,
+    "lastName" TEXT NOT NULL,
     "stripeCustomerId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -110,13 +132,13 @@ CREATE TABLE "wallet" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "stock_externalUserId_key" ON "stock"("externalUserId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "transaction_history_orderId_key" ON "transaction_history"("orderId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "user_referralCode_key" ON "user"("referralCode");
-
--- CreateIndex
-CREATE UNIQUE INDEX "user_invitedReferralCode_key" ON "user"("invitedReferralCode");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "user_stripeCustomerId_key" ON "user"("stripeCustomerId");
@@ -125,7 +147,25 @@ CREATE UNIQUE INDEX "user_stripeCustomerId_key" ON "user"("stripeCustomerId");
 CREATE UNIQUE INDEX "wallet_userId_key" ON "wallet"("userId");
 
 -- AddForeignKey
+ALTER TABLE "stock_orders" ADD CONSTRAINT "stock_orders_stockId_fkey" FOREIGN KEY ("stockId") REFERENCES "stock"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "stock_orders" ADD CONSTRAINT "stock_orders_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "purchased_share" ADD CONSTRAINT "purchased_share_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "stock" ADD CONSTRAINT "stock_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "transaction_history" ADD CONSTRAINT "transaction_history_stockId_fkey" FOREIGN KEY ("stockId") REFERENCES "stock"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "transaction_history" ADD CONSTRAINT "transaction_history_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "transaction_history" ADD CONSTRAINT "transaction_history_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "stock_orders"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "wallet_transaction" ADD CONSTRAINT "wallet_transaction_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;

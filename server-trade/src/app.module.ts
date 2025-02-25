@@ -14,6 +14,7 @@ import { WalletModule } from "./modules/wallet/wallet.module"
 import { StripeModule } from "./modules/stripe/stripe.module"
 import { ShareModule } from "./modules/share/share.module"
 import { AppSettingsModule } from "./modules/appSettings/appSettings.module"
+import { StockModule } from "./modules/stock/stock.module"
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AppSettingsModule } from "./modules/appSettings/appSettings.module"
     UserModule,
     WalletModule,
     StripeModule,
+    StockModule,
     ShareModule,
     AppSettingsModule
   ],

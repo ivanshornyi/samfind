@@ -1,5 +1,6 @@
 model Stock {
   id                 String               @id @default(uuid())
+  externalUserId     String               @unique
   ownerId            String
   name               String               @db.VarChar
   price              Float
