@@ -9,11 +9,9 @@ import { PrismaModule } from "nestjs-prisma"
 
 import { ConfigModule } from "@nestjs/config"
 
-import { AuthMiddleware } from "./common/middlewares/auth.middleware"
-
-import { StripeModule } from "./modules/stripe/stripe.module"
 import { UserModule } from "./modules/user/user.module"
 import { WalletModule } from "./modules/wallet/wallet.module"
+import { StripeModule } from "./modules/stripe/stripe.module"
 import { ShareModule } from "./modules/share/share.module"
 import { AppSettingsModule } from "./modules/appSettings/appSettings.module"
 
@@ -23,8 +21,8 @@ import { AppSettingsModule } from "./modules/appSettings/appSettings.module"
     ScheduleModule.forRoot(),
     PrismaModule,
     UserModule,
-    StripeModule,
     WalletModule,
+    StripeModule,
     ShareModule,
     AppSettingsModule
   ],
@@ -34,7 +32,7 @@ import { AppSettingsModule } from "./modules/appSettings/appSettings.module"
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(AuthMiddleware)
+      .apply(() => { })
       .exclude(
         {
           path: "/user",

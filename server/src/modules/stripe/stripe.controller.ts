@@ -3,7 +3,6 @@ import {
   Post,
   Body,
   Req,
-  Res,
   HttpException,
   HttpStatus,
   RawBodyRequest,
@@ -23,7 +22,7 @@ export class StripeController {
   constructor(
     private readonly stripeService: StripeService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   @ApiOperation({ summary: "Create customer" })
   @Post("/create-customer")

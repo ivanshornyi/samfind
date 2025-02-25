@@ -1,9 +1,8 @@
 import {
   Controller,
   Post,
-  Body,
+  // Body,
   Req,
-  Res,
   HttpException,
   HttpStatus,
   RawBodyRequest,
@@ -13,7 +12,7 @@ import { ConfigService } from "@nestjs/config";
 
 import { StripeService } from "./stripe.service";
 
-import { CreateIntentDto } from "./dto/create-intent-dto";
+// import { CreateIntentDto } from "./dto/create-intent-dto";
 
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 
@@ -23,19 +22,19 @@ export class StripeController {
   constructor(
     private readonly stripeService: StripeService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
-  @ApiOperation({ summary: "Create customer" })
-  @Post("/create-customer")
-  async createCustomer(@Body() body: { email: string; name: string }) {
-    return this.stripeService.createCustomer(body.email, body.name);
-  }
+  // @ApiOperation({ summary: "Create customer" })
+  // @Post("/create-customer")
+  // async createCustomer(@Body() body: { email: string; name: string }) {
+  //   return this.stripeService.createCustomer(body.email, body.name);
+  // }
 
-  @ApiOperation({ summary: "Create payment" })
-  @Post("/create-payment-intent")
-  async createPaymentIntent(@Body() createIntentDto: CreateIntentDto) {
-    return this.stripeService.createPaymentIntent(createIntentDto);
-  }
+  // @ApiOperation({ summary: "Create payment" })
+  // @Post("/create-payment-intent")
+  // async createPaymentIntent(@Body() createIntentDto: CreateIntentDto) {
+  //   return this.stripeService.createPaymentIntent(createIntentDto);
+  // }
 
   @ApiOperation({ summary: "Stripe webhook" })
   @Post("/webhook")

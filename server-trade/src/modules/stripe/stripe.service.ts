@@ -2,27 +2,27 @@ import { forwardRef, Inject, Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
 import Stripe from "stripe";
-import {
-  UserAccountType,
-  LicenseStatus,
-  PlanPeriod,
-  User,
-  TransactionType,
-  BalanceType,
-  PurchaseType,
-} from "@prisma/client";
+// import {
+//   UserAccountType,
+//   LicenseStatus,
+//   PlanPeriod,
+//   User,
+//   TransactionType,
+//   BalanceType,
+//   PurchaseType,
+// } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { UserService } from "../user/user.service";
 
-import { CreateIntentDto } from "./dto/create-intent-dto";
-import {
-  addMonths,
-  addYears,
-  getDate,
-  getDaysInMonth,
-  getMonth,
-  startOfMonth,
-} from "date-fns";
+// import { CreateIntentDto } from "./dto/create-intent-dto";
+// import {
+//   addMonths,
+//   addYears,
+//   getDate,
+//   getDaysInMonth,
+//   getMonth,
+//   startOfMonth,
+// } from "date-fns";
 import { MailService } from "../mail/mail.service";
 import { ShareService } from "../share/share.service";
 
@@ -219,36 +219,36 @@ export class StripeService {
     return this.stripe.paymentIntents.retrieve(paymentIntentId);
   }
 
-  async createPaymentIntent(
-    createPaymentDto: CreateIntentDto,
-  ): Promise<Stripe.PaymentIntent> {
-    const { userId, amount, currency, tierType, limit, userReferralCode } =
-      createPaymentDto;
+  // async createPaymentIntent(
+  //   createPaymentDto: CreateIntentDto,
+  // ): Promise<Stripe.PaymentIntent> {
+  //   const { userId, amount, currency, tierType, limit, userReferralCode } =
+  //     createPaymentDto;
 
-    const referralDiscount = amount / 10;
+  //   const referralDiscount = amount / 10;
 
-    const metadata: any = {
-      userId,
-      tierType,
-      limit,
-    };
+  //   const metadata: any = {
+  //     userId,
+  //     tierType,
+  //     limit,
+  //   };
 
-    const intent = {
-      amount,
-      currency,
-      metadata,
-    };
+  //   const intent = {
+  //     amount,
+  //     currency,
+  //     metadata,
+  //   };
 
-    if (userReferralCode) {
-      intent.metadata = {
-        ...metadata,
-        userReferralCode,
-        referralDiscount,
-      };
-    }
+  //   if (userReferralCode) {
+  //     intent.metadata = {
+  //       ...metadata,
+  //       userReferralCode,
+  //       referralDiscount,
+  //     };
+  //   }
 
-    return this.stripe.paymentIntents.create(intent);
-  }
+  //   return this.stripe.paymentIntents.create(intent);
+  // }
 
   constructEvent(
     payload: any,
@@ -263,322 +263,322 @@ export class StripeService {
 
     switch (event.type) {
       case "invoice.payment_succeeded":
-        this.handleSuccessfulInvoicePayment(invoice);
+        // this.handleSuccessfulInvoicePayment(invoice);
         break;
       case "invoice.payment_failed":
-        this.handleFailedInvoicePayment(invoice);
+        // this.handleFailedInvoicePayment(invoice);
         break;
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
   }
 
-  private async handleFailedInvoicePayment(invoice: Stripe.Invoice) {
-    try {
-      const invoiceLink = invoice.hosted_invoice_url;
-      const { subscriptionId } = invoice.metadata;
+  // private async handleFailedInvoicePayment(invoice: Stripe.Invoice) {
+  //   try {
+  //     const invoiceLink = invoice.hosted_invoice_url;
+  //     const { subscriptionId } = invoice.metadata;
 
-      const subscription = await this.prisma.subscription.findUnique({
-        where: { id: subscriptionId },
-        include: { user: true },
-      });
+  //     const subscription = await this.prisma.subscription.findUnique({
+  //       where: { id: subscriptionId },
+  //       include: { user: true },
+  //     });
 
-      if (!subscription) return;
+  //     if (!subscription) return;
 
-      await this.mailService.sendWarningPaymentFailed(
-        subscription.user.email,
-        invoiceLink,
-      );
-      this.logger.log(
-        `Invoice payment failed for user ${subscription?.userId}`,
-      );
-    } catch (error) {
-      this.logger.error("Error fail pay invoice license to user", error);
-    }
-  }
+  //     await this.mailService.sendWarningPaymentFailed(
+  //       subscription.user.email,
+  //       invoiceLink,
+  //     );
+  //     this.logger.log(
+  //       `Invoice payment failed for user ${subscription?.userId}`,
+  //     );
+  //   } catch (error) {
+  //     this.logger.error("Error fail pay invoice license to user", error);
+  //   }
+  // }
 
-  private async handleSuccessfulInvoicePayment(invoice: Stripe.Invoice) {
-    try {
-      const {
-        quantity,
-        userReferralCode,
-        subscriptionId,
-        stripeCouponId,
-        discountAmount,
-        memberId,
-        firstInvoice,
-        share,
-        userId,
-      } = invoice.metadata;
+  // private async handleSuccessfulInvoicePayment(invoice: Stripe.Invoice) {
+  //   try {
+  //     const {
+  //       quantity,
+  //       userReferralCode,
+  //       subscriptionId,
+  //       stripeCouponId,
+  //       discountAmount,
+  //       memberId,
+  //       firstInvoice,
+  //       share,
+  //       userId,
+  //     } = invoice.metadata;
 
-      if (share && userId && quantity) {
-        await this.shareService.byShares({
-          quantity: Number(quantity),
-          purchaseType: PurchaseType.money,
-          userId,
-          price: invoice.total,
-        });
-      } else {
-        const subscription = await this.prisma.subscription.findUnique({
-          where: { id: subscriptionId },
-          include: { plan: true, user: true, license: true },
-        });
+  //     if (share && userId && quantity) {
+  //       await this.shareService.byShares({
+  //         quantity: Number(quantity),
+  //         purchaseType: PurchaseType.money,
+  //         userId,
+  //         price: invoice.total,
+  //       });
+  //     } else {
+  //       const subscription = await this.prisma.subscription.findUnique({
+  //         where: { id: subscriptionId },
+  //         include: { plan: true, user: true, license: true },
+  //       });
 
-        if (!subscription) return;
+  //       if (!subscription) return;
 
-        // check Early Bird Bonus
-        await this.checkAndAddEarlyBirdBonus(
-          subscription.userId,
-          invoice.total,
-        );
+  //       // check Early Bird Bonus
+  //       await this.checkAndAddEarlyBirdBonus(
+  //         subscription.userId,
+  //         invoice.total,
+  //       );
 
-        let licenseId = subscription.licenseId;
+  //       let licenseId = subscription.licenseId;
 
-        if (userReferralCode) {
-          // find user and update user discount
+  //       if (userReferralCode) {
+  //         // find user and update user discount
 
-          const discountAmount =
-            subscription.plan.period === PlanPeriod.yearly
-              ? Math.round(subscription.plan.price / 100)
-              : Math.round(subscription.plan.price / 10);
+  //         const discountAmount =
+  //           subscription.plan.period === PlanPeriod.yearly
+  //             ? Math.round(subscription.plan.price / 100)
+  //             : Math.round(subscription.plan.price / 10);
 
-          this.userService.findAndUpdateUserByReferralCode(
-            Number(userReferralCode),
-            subscription.user,
-            discountAmount,
-          );
-        }
+  //         this.userService.findAndUpdateUserByReferralCode(
+  //           Number(userReferralCode),
+  //           subscription.user,
+  //           discountAmount,
+  //         );
+  //       }
 
-        if (subscription.licenseId && memberId) {
-          const member = await this.prisma.user.findUnique({
-            where: { id: memberId },
-          });
-          if (!member) return;
+  //       if (subscription.licenseId && memberId) {
+  //         const member = await this.prisma.user.findUnique({
+  //           where: { id: memberId },
+  //         });
+  //         if (!member) return;
 
-          await this.prisma.activeLicense.create({
-            data: {
-              userId: memberId,
-              licenseId: subscription.licenseId,
-            },
-          });
+  //         await this.prisma.activeLicense.create({
+  //           data: {
+  //             userId: memberId,
+  //             licenseId: subscription.licenseId,
+  //           },
+  //         });
 
-          const discountAmount = this.calculateDiscount(
-            subscription.plan.price,
-            subscription.plan.period === PlanPeriod.yearly
-              ? new Date(subscription.nextDate)
-              : undefined,
-          );
+  //         const discountAmount = this.calculateDiscount(
+  //           subscription.plan.price,
+  //           subscription.plan.period === PlanPeriod.yearly
+  //             ? new Date(subscription.nextDate)
+  //             : undefined,
+  //         );
 
-          if (discountAmount > 0) {
-            await this.addDiscount(
-              subscription.user,
-              discountAmount,
-              member.email,
-            );
-          }
-        } else if (
-          subscription.user.accountType === UserAccountType.private &&
-          firstInvoice &&
-          subscription.license
-        ) {
-          await this.prisma.license.update({
-            where: {
-              ownerId: subscription.userId,
-            },
-            data: {
-              status: LicenseStatus.active,
-              limit: Number(quantity),
-              tierType: subscription.plan.type,
-            },
-          });
-          if (Number(quantity) > 1) {
-            const data = Array.from({ length: Number(quantity) - 1 }, () => ({
-              licenseId: subscription.license.id,
-            }));
+  //         if (discountAmount > 0) {
+  //           await this.addDiscount(
+  //             subscription.user,
+  //             discountAmount,
+  //             member.email,
+  //           );
+  //         }
+  //       } else if (
+  //         subscription.user.accountType === UserAccountType.private &&
+  //         firstInvoice &&
+  //         subscription.license
+  //       ) {
+  //         await this.prisma.license.update({
+  //           where: {
+  //             ownerId: subscription.userId,
+  //           },
+  //           data: {
+  //             status: LicenseStatus.active,
+  //             limit: Number(quantity),
+  //             tierType: subscription.plan.type,
+  //           },
+  //         });
+  //         if (Number(quantity) > 1) {
+  //           const data = Array.from({ length: Number(quantity) - 1 }, () => ({
+  //             licenseId: subscription.license.id,
+  //           }));
 
-            await this.prisma.activeLicense.createMany({
-              data,
-            });
-          }
-        } else if (
-          subscription.user.accountType === UserAccountType.business &&
-          !subscription.licenseId
-        ) {
-          const license = await this.prisma.license.create({
-            data: {
-              ownerId: subscription.userId,
-              status: LicenseStatus.active,
-              limit: Number(quantity),
-              tierType: subscription.plan.type,
-            },
-          });
-          licenseId = license.id;
-          await this.prisma.activeLicense.create({
-            data: {
-              userId: subscription.userId,
-              licenseId: license.id,
-            },
-          });
-          if (Number(quantity) > 1) {
-            const data = Array.from({ length: Number(quantity) - 1 }, () => ({
-              licenseId: subscription.license.id,
-            }));
+  //           await this.prisma.activeLicense.createMany({
+  //             data,
+  //           });
+  //         }
+  //       } else if (
+  //         subscription.user.accountType === UserAccountType.business &&
+  //         !subscription.licenseId
+  //       ) {
+  //         const license = await this.prisma.license.create({
+  //           data: {
+  //             ownerId: subscription.userId,
+  //             status: LicenseStatus.active,
+  //             limit: Number(quantity),
+  //             tierType: subscription.plan.type,
+  //           },
+  //         });
+  //         licenseId = license.id;
+  //         await this.prisma.activeLicense.create({
+  //           data: {
+  //             userId: subscription.userId,
+  //             licenseId: license.id,
+  //           },
+  //         });
+  //         if (Number(quantity) > 1) {
+  //           const data = Array.from({ length: Number(quantity) - 1 }, () => ({
+  //             licenseId: subscription.license.id,
+  //           }));
 
-            await this.prisma.activeLicense.createMany({
-              data,
-            });
-          }
-        }
+  //           await this.prisma.activeLicense.createMany({
+  //             data,
+  //           });
+  //         }
+  //       }
 
-        if (stripeCouponId && discountAmount) {
-          await this.prisma.discount.updateMany({
-            where: { stripeCouponId },
-            data: {
-              used: true,
-            },
-          });
-        }
+  //       if (stripeCouponId && discountAmount) {
+  //         await this.prisma.discount.updateMany({
+  //           where: { stripeCouponId },
+  //           data: {
+  //             used: true,
+  //           },
+  //         });
+  //       }
 
-        if (firstInvoice) {
-          const totalAmount =
-            quantity && Number(quantity) > 1
-              ? subscription.plan.price * Number(quantity)
-              : subscription.plan.price;
+  //       if (firstInvoice) {
+  //         const totalAmount =
+  //           quantity && Number(quantity) > 1
+  //             ? subscription.plan.price * Number(quantity)
+  //             : subscription.plan.price;
 
-          const discountAmount = this.calculateDiscount(
-            totalAmount,
-            subscription.plan.period === PlanPeriod.yearly
-              ? new Date(subscription.nextDate)
-              : undefined,
-          );
+  //         const discountAmount = this.calculateDiscount(
+  //           totalAmount,
+  //           subscription.plan.period === PlanPeriod.yearly
+  //             ? new Date(subscription.nextDate)
+  //             : undefined,
+  //         );
 
-          if (discountAmount === 0) return;
+  //         if (discountAmount === 0) return;
 
-          await this.addDiscount(
-            subscription.user,
-            discountAmount,
-            subscription.user.email,
-          );
-        }
+  //         await this.addDiscount(
+  //           subscription.user,
+  //           discountAmount,
+  //           subscription.user.email,
+  //         );
+  //       }
 
-        if (!memberId) {
-          const nextDate =
-            subscription.plan.period === PlanPeriod.monthly
-              ? startOfMonth(addMonths(new Date(), 1)).toISOString()
-              : startOfMonth(addYears(new Date(), 1)).toISOString();
-          await this.prisma.subscription.update({
-            where: { id: subscription.id },
-            data: {
-              licenseId,
-              isActive: true,
-              isInTrial: false,
-              nextDate,
-              cancelDate: null,
-              stripeInvoiceIds: [...subscription.stripeInvoiceIds, invoice.id],
-            },
-          });
+  //       if (!memberId) {
+  //         const nextDate =
+  //           subscription.plan.period === PlanPeriod.monthly
+  //             ? startOfMonth(addMonths(new Date(), 1)).toISOString()
+  //             : startOfMonth(addYears(new Date(), 1)).toISOString();
+  //         await this.prisma.subscription.update({
+  //           where: { id: subscription.id },
+  //           data: {
+  //             licenseId,
+  //             isActive: true,
+  //             isInTrial: false,
+  //             nextDate,
+  //             cancelDate: null,
+  //             stripeInvoiceIds: [...subscription.stripeInvoiceIds, invoice.id],
+  //           },
+  //         });
 
-          if (!firstInvoice && !subscription.isActive) {
-            await this.prisma.license.update({
-              where: {
-                ownerId: subscription.userId,
-              },
-              data: {
-                status: "active",
-              },
-            });
-          }
-        }
+  //         if (!firstInvoice && !subscription.isActive) {
+  //           await this.prisma.license.update({
+  //             where: {
+  //               ownerId: subscription.userId,
+  //             },
+  //             data: {
+  //               status: "active",
+  //             },
+  //           });
+  //         }
+  //       }
 
-        this.logger.log(`Invoice payed for user ${subscription?.userId}`);
-      }
-    } catch (error) {
-      this.logger.error("Error paying invoice to user", error);
-    }
-  }
+  //       this.logger.log(`Invoice payed for user ${subscription?.userId}`);
+  //     }
+  //   } catch (error) {
+  //     this.logger.error("Error paying invoice to user", error);
+  //   }
+  // }
 
-  calculateDiscount(totalAmount: number, nextDate?: Date): number {
-    const today = new Date();
-    const currentDay = getDate(today);
-    const currentMonth = getMonth(today);
-    const totalDaysInMonth = getDaysInMonth(today);
+  // calculateDiscount(totalAmount: number, nextDate?: Date): number {
+  //   const today = new Date();
+  //   const currentDay = getDate(today);
+  //   const currentMonth = getMonth(today);
+  //   const totalDaysInMonth = getDaysInMonth(today);
 
-    if (nextDate) {
-      const renewalMonth = getMonth(nextDate);
-      let monthsPassed = ((currentMonth - renewalMonth + 12) % 12) - 1;
-      if (monthsPassed < 0) monthsPassed = 0;
+  //   if (nextDate) {
+  //     const renewalMonth = getMonth(nextDate);
+  //     let monthsPassed = ((currentMonth - renewalMonth + 12) % 12) - 1;
+  //     if (monthsPassed < 0) monthsPassed = 0;
 
-      const monthlyRate = totalAmount / 12;
-      const pastMonthsAmount = monthlyRate * monthsPassed;
+  //     const monthlyRate = totalAmount / 12;
+  //     const pastMonthsAmount = monthlyRate * monthsPassed;
 
-      const dailyRate = monthlyRate / totalDaysInMonth;
-      const currentMonthDiscount = dailyRate * (currentDay - 1);
+  //     const dailyRate = monthlyRate / totalDaysInMonth;
+  //     const currentMonthDiscount = dailyRate * (currentDay - 1);
 
-      return Math.round(pastMonthsAmount + currentMonthDiscount);
-    } else {
-      const dailyRate = Math.round(totalAmount / totalDaysInMonth);
-      return dailyRate * (currentDay - 1);
-    }
-  }
+  //     return Math.round(pastMonthsAmount + currentMonthDiscount);
+  //   } else {
+  //     const dailyRate = Math.round(totalAmount / totalDaysInMonth);
+  //     return dailyRate * (currentDay - 1);
+  //   }
+  // }
 
-  async addDiscount(user: User, discountAmount: number, email: string) {
-    const wallet = await this.prisma.wallet.findUnique({
-      where: { userId: user.id },
-    });
+  // async addDiscount(user: User, discountAmount: number, email: string) {
+  //   const wallet = await this.prisma.wallet.findUnique({
+  //     where: { userId: user.id },
+  //   });
 
-    if (!wallet) return;
+  //   if (!wallet) return;
 
-    await this.prisma.wallet.update({
-      where: { userId: user.id },
-      data: { discountAmount: { increment: discountAmount } },
-    });
+  //   await this.prisma.wallet.update({
+  //     where: { userId: user.id },
+  //     data: { discountAmount: { increment: discountAmount } },
+  //   });
 
-    await this.prisma.walletTransaction.create({
-      data: {
-        userId: user.id,
-        walletId: wallet.id,
-        amount: discountAmount,
-        transactionType: TransactionType.income,
-        balanceType: BalanceType.discount,
-        description: `Discount for unused user period user with email - ${email}`,
-      },
-    });
-  }
+  //   await this.prisma.walletTransaction.create({
+  //     data: {
+  //       userId: user.id,
+  //       walletId: wallet.id,
+  //       amount: discountAmount,
+  //       transactionType: TransactionType.income,
+  //       balanceType: BalanceType.discount,
+  //       description: `Discount for unused user period user with email - ${email}`,
+  //     },
+  //   });
+  // }
 
-  async checkAndAddEarlyBirdBonus(userId: string, amount: number) {
-    const appSettings = await this.prisma.appSettings.findFirst({
-      where: {},
-    });
+  // async checkAndAddEarlyBirdBonus(userId: string, amount: number) {
+  //   const appSettings = await this.prisma.appSettings.findFirst({
+  //     where: {},
+  //   });
 
-    if (
-      !appSettings ||
-      !appSettings.earlyBirdPeriod ||
-      appSettings.currentSharesPurchased >=
-      appSettings.limitOfSharesPurchased ||
-      amount === 0
-    )
-      return;
+  //   if (
+  //     !appSettings ||
+  //     !appSettings.earlyBirdPeriod ||
+  //     appSettings.currentSharesPurchased >=
+  //     appSettings.limitOfSharesPurchased ||
+  //     amount === 0
+  //   )
+  //     return;
 
-    const wallet = await this.prisma.wallet.findUnique({
-      where: { userId },
-    });
+  //   const wallet = await this.prisma.wallet.findUnique({
+  //     where: { userId },
+  //   });
 
-    if (!wallet) return;
+  //   if (!wallet) return;
 
-    await this.prisma.wallet.update({
-      where: { userId },
-      data: { bonusAmount: { increment: amount } },
-    });
+  //   await this.prisma.wallet.update({
+  //     where: { userId },
+  //     data: { bonusAmount: { increment: amount } },
+  //   });
 
-    await this.prisma.walletTransaction.create({
-      data: {
-        userId: userId,
-        walletId: wallet.id,
-        amount,
-        transactionType: TransactionType.income,
-        balanceType: BalanceType.bonus,
-        description: `Early Bird Bonus`,
-      },
-    });
-  }
+  //   await this.prisma.walletTransaction.create({
+  //     data: {
+  //       userId: userId,
+  //       walletId: wallet.id,
+  //       amount,
+  //       transactionType: TransactionType.income,
+  //       balanceType: BalanceType.bonus,
+  //       description: `Early Bird Bonus`,
+  //     },
+  //   });
+  // }
 }

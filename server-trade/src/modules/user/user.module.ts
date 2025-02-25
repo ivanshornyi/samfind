@@ -5,14 +5,13 @@ import { PrismaService } from "../prisma/prisma.service";
 
 import { UserService } from "./user.service";
 import { UserController } from "./user.controller";
-import { TokenService } from "../auth/token.service";
 
 import { JwtService } from "@nestjs/jwt";
 
 @Module({
   imports: [PrismaModule],
   controllers: [UserController],
-  providers: [UserService, TokenService, JwtService, PrismaService],
-  exports: [TokenService],
+  providers: [UserService, JwtService, PrismaService],
+  exports: [],
 })
-export class UserModule {}
+export class UserModule { }
