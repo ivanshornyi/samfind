@@ -8,6 +8,7 @@ export class StockOrdersService {
 
   async createStockService(body: CreateStockOrderDto) {
     const { stockId, userId, type, quantity, offeredPrice, paymentId } = body
+    // TO-DO: Send email after order is placed
 
     if (!stockId || !userId) throw new BadRequestException("StockID and UserID is required in order creation.")
     try {

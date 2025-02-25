@@ -24,4 +24,27 @@ export class TransactionHistoryService {
       data: history
     }
   }
+
+  async getAllTransactionHistoriesWithPaginationForId(id: string, page: number, limit: number, order: "asc" | "desc") {
+    const history = await this.prisma.transactionHistory.findMany({
+      where: { id },
+      skip: (page - 1) * limit,
+      take: limit,
+      include: { user: true, stock: true, order: true },
+      orderBy: { createdAt: order }
+    })
+
+    const total = await this.prisma.transactionHistory.count({
+      where: { id }
+    })
+
+    return {
+      paging: {
+        page,
+        limit,
+        total
+      },
+      data: history
+    }
+  }
 }

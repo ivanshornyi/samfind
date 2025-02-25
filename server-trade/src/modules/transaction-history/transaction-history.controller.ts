@@ -17,4 +17,15 @@ export class TransactionHistoryController {
   ) {
     return await this.transactionHistoryService.getAllTransactionHistoriesWithPagination(page, limit, order)
   }
+
+  @ApiOperation({ summary: "Get all transactions with pagination for specific id" })
+  @Get("/")
+  async getEntireTransactionHistoryWithPaginationForId(
+    @Query("id") id: string,
+    @Query("page") page: number,
+    @Query("limit") limit: number,
+    @Query("order") order: "asc" | "desc"
+  ) {
+    return await this.transactionHistoryService.getAllTransactionHistoriesWithPaginationForId(id, page, limit, order)
+  }
 }
