@@ -40,6 +40,9 @@ model User {
   role                      UserRole
   isVerified                Boolean               @default(false)
   isDeleted                 Boolean               @default(false)
+  isFromNorway              Boolean               @default(false)
+  isSale                    Boolean               @default(false)
+  isStaff                   Boolean               @default(false)
   registrationCode          String?
   registrationCodeExpiresAt DateTime?
   resetCode                 String?               @db.VarChar
@@ -290,6 +293,7 @@ model UserShareholdersData {
 
 enum PurchaseType {
   bonus
+  earlyBird
   money
 }
 

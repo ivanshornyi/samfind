@@ -1,4 +1,10 @@
-import { IsDate, IsNumber, IsOptional, IsString } from "class-validator";
+import {
+  IsBoolean,
+  IsDate,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from "class-validator";
 
 import { UserAccountType, UserAuthType } from "@prisma/client";
 
@@ -30,4 +36,7 @@ export class CreateUserDto {
   @IsNumber()
   @IsOptional()
   invitedReferralCode?: number;
+
+  @IsBoolean()
+  isFromNorway: boolean;
 }

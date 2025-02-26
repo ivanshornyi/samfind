@@ -69,6 +69,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
     lastName: "",
     email: "",
     password: "",
+    isFromNorway: false,
   });
   const [passwordInputType, setPasswordInputType] = useState<
     "password" | "text"
@@ -209,6 +210,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
         password: formData.password.trim(),
         authType: UserAuthType.Email,
         accountType,
+        isFromNorway: formData.isFromNorway,
       };
 
       if (referralCode) {

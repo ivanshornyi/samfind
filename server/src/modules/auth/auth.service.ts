@@ -58,6 +58,7 @@ export class AuthService {
       accountType,
       organization,
       invitedReferralCode,
+      isFromNorway,
     } = signUpDto;
 
     // send verification code
@@ -96,6 +97,7 @@ export class AuthService {
         registrationCodeExpiresAt,
         accountType,
         invitedReferralCode,
+        isFromNorway,
       });
 
       await this.prisma.wallet.create({
