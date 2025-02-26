@@ -2,6 +2,7 @@ import { BadRequestException, ConflictException, Injectable } from "@nestjs/comm
 import { PrismaService } from "nestjs-prisma"
 import { $Enums } from "@prisma/client"
 import { CreateStockOrderDto } from "./dto/create-order-dto"
+import { CreatePoolPurchaseDto } from "./dto/create-pool-purshare-dto"
 
 interface Order {
   stockId: string
@@ -33,6 +34,7 @@ export class StockOrdersService {
 
         if (!stock || !user) throw new BadRequestException("Stock or User wasn`t created or properly assigned.")
 
+        // check if user have enough quantity to sell
         if (type === "SELL") {
           const sellerShare = await prisma.purchasedShare.findFirst({
             where: { userId, stockId },
@@ -40,6 +42,11 @@ export class StockOrdersService {
           if (!sellerShare || sellerShare.quantity < quantity) {
             throw new BadRequestException("Insufficient shares to sell.")
           }
+        }
+
+        // check if totalQuantity is enough to fullfill user needs
+        if (type === 'BUY' && stock.totalQuantity < quantity) {
+          throw new BadRequestException("You cant order to buy more then amount of stocks available.")
         }
 
         const stockOrder = await prisma.orderStock.create({
@@ -81,71 +88,143 @@ export class StockOrdersService {
     }
   }
 
-  // async cancelStockOrder(id: string) {
-  //   // TO-DO: Send email after order is canceled | rejected
-  //   // TO-DO: Also / OR make and webhook notification, if will be decided to ALTER model with it
+  async createPoolPurchaseOrder(body: CreatePoolPurchaseDto) {
+    const { stockId, userId, quantity, offeredPrice, paymentId } = body
+    // TO-DO: Send email after pool purchase
+    // TO-DO: Also / OR make and webhook notification, if will be decided to ALTER model with it
 
-  //   try {
-  //     const stockOrder = await this.prisma.$transaction(async (prisma) => {
-  //       const originalOrder = await prisma.orderStock.findFirst({
-  //         where: { id },
-  //         include: { stock: true, user: true }
-  //       })
+    if (!stockId || !userId) throw new BadRequestException("StockID and UserID are required in pool purchase.")
 
-  //       if (!originalOrder) {
-  //         throw new Error("Order not found.")
-  //       }
+    return this.prisma.$transaction(async (prisma) => {
+      const stock = await prisma.stock.findUnique({ where: { id: stockId } })
+      const user = await prisma.user.findUnique({ where: { id: userId } })
 
-  //       if (!['PENDING', 'ACCEPTED'].includes(originalOrder.status)) {
-  //         throw new Error("Only pending or accepted orders can be canceled.")
-  //       }
+      if (!stock || !user) throw new BadRequestException("Stock or User wasn`t created or properly assigned.")
 
-  //       const stockOrder = await prisma.orderStock.update({
-  //         where: { id: id },
-  //         data: {
-  //           status: 'CANCELED'
-  //         }
-  //       })
+      // check for available shares in the pool
+      const purchasedShares = await prisma.purchasedShare.aggregate({
+        where: { stockId },
+        _sum: { quantity: true },
+      })
+      const ownedQuantity = purchasedShares._sum.quantity || 0
+      const freeQuantity = stock.totalQuantity - ownedQuantity
 
-  //       await prisma.transactionHistory.create({
-  //         data: {
-  //           stockId: originalOrder.stock.id,
-  //           userId: originalOrder.user.id,
-  //           orderId: id,
-  //           type: "REJECTION",
-  //           quantity: 0,
-  //           price: 0
-  //         }
-  //       })
+      if (freeQuantity < quantity) {
+        throw new BadRequestException(`Not enough free shares available to buy. Available: ${freeQuantity}`)
+      }
 
-  //       return stockOrder
-  //     })
+      // create an order from the pool
+      const poolOrder = await prisma.orderStock.create({
+        data: {
+          stockId,
+          userId,
+          type: "BUY", // Accept as BUY, because order from pool
+          quantity,
+          offeredPrice,
+          paymentId: paymentId || null,
+          status: "COMPLETED", // Auto confirm, because its purshare from pool
+        },
+      })
 
-  //     return stockOrder
-  //   } catch (error) {
-  //     throw new ConflictException(`Failed to erase stock-order: ${error.message}`)
-  //   }
-  // }
+      // history update
+      await prisma.transactionHistory.create({
+        data: {
+          stockId,
+          userId,
+          orderId: poolOrder.id,
+          type: "PURCHASE",
+          quantity,
+          price: offeredPrice,
+        },
+      })
 
-  // async getAllStockOrdersWithPagination(page: number, limit: number, order: "asc" | "desc") {
-  //   const stockOrders = await this.prisma.orderStock.findMany({
-  //     skip: (page - 1) * limit,
-  //     take: limit,
-  //     include: { user: true, stock: true, transaction: true },
-  //     orderBy: { createdAt: order }
-  //   })
+      // update user purshare from pool purshare
+      const buyerShare = await prisma.purchasedShare.findFirst({
+        where: { userId, stockId },
+      })
 
-  //   const total = await this.prisma.orderStock.count()
+      if (buyerShare) {
+        await prisma.purchasedShare.update({
+          where: { id: buyerShare.id },
+          data: { quantity: buyerShare.quantity + quantity },
+        })
+      } else {
+        await prisma.purchasedShare.create({
+          data: { userId, stockId, quantity },
+        })
+      }
 
-  //   return {
-  //     paging: {
-  //       page,
-  //       limit,
-  //       total
-  //     },
-  //     data: stockOrders
-  //   }
-  // }
+      return poolOrder
+    }).catch((error) => {
+      throw new BadRequestException(`Failed to create pool purchase order: ${error.message}`)
+    })
+  }
+
+  async cancelStockOrder(id: string) {
+    // TO-DO: Send email after order is canceled | rejected
+    // TO-DO: Also / OR make and webhook notification, if will be decided to ALTER model with it
+
+    try {
+      const stockOrder = await this.prisma.$transaction(async (prisma) => {
+        const originalOrder = await prisma.orderStock.findFirst({
+          where: { id },
+          include: { stock: true, user: true }
+        })
+
+        if (!originalOrder) {
+          throw new Error("Order not found.")
+        }
+
+        if (!['PENDING', 'ACCEPTED'].includes(originalOrder.status)) {
+          throw new Error("Only pending or accepted orders can be canceled.")
+        }
+
+        const stockOrder = await prisma.orderStock.update({
+          where: { id: id },
+          data: {
+            status: 'CANCELED'
+          }
+        })
+
+        await prisma.transactionHistory.create({
+          data: {
+            stockId: originalOrder.stock.id,
+            userId: originalOrder.user.id,
+            orderId: id,
+            type: "REJECTION",
+            quantity: 0,
+            price: 0
+          }
+        })
+
+        return stockOrder
+      })
+
+      return stockOrder
+    } catch (error) {
+      throw new ConflictException(`Failed to erase stock-order: ${error.message}`)
+    }
+  }
+
+  async getAllStockOrdersWithPagination(page: number, limit: number, order: "asc" | "desc") {
+    const stockOrders = await this.prisma.orderStock.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+      include: { user: true, stock: true, transaction: true },
+      orderBy: { createdAt: order }
+    })
+
+    const total = await this.prisma.orderStock.count()
+
+    return {
+      paging: {
+        page,
+        limit,
+        total
+      },
+      data: stockOrders
+    }
+  }
 
   /**
     |============================
