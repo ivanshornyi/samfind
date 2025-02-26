@@ -2,23 +2,11 @@ import { IsNumber, IsString } from "class-validator";
 
 export class CreateStockDto {
   @IsString()
-  email: string
+  name: string
 
-  @IsString()
-  stockName: string;
-
-  @IsString()
-  firstName: string
-
-  @IsString()
-  lastName: string
-
-  @IsString()
-  externalUserId: string
+  @IsNumber()
+  totalQuantity: number;
 
   @IsNumber()
   price: number;
-
-  @IsNumber()
-  quantity: number;
 }

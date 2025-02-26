@@ -10,8 +10,6 @@ import { UserModule } from "../user/user.module";
 import { UserService } from "../user/user.service";
 import { MailService } from "../mail/mail.service";
 import { MailModule } from "../mail/mail.module";
-import { ShareService } from "../share/share.service";
-import { ShareModule } from "../share/share.module";
 import { WalletService } from "../wallet/wallet.service";
 
 @Module({
@@ -19,8 +17,7 @@ import { WalletService } from "../wallet/wallet.service";
     ConfigModule.forRoot(),
     PrismaModule,
     UserModule,
-    MailModule,
-    forwardRef(() => ShareModule),
+    MailModule
   ],
   controllers: [StripeController],
   providers: [
@@ -28,9 +25,8 @@ import { WalletService } from "../wallet/wallet.service";
     PrismaService,
     UserService,
     MailService,
-    ShareService,
     WalletService,
   ],
   exports: [StripeService],
 })
-export class StripeModule {}
+export class StripeModule { }

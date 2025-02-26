@@ -2,11 +2,11 @@ import { IsNumber, IsString } from "class-validator";
 
 export class UpdateStockDto {
   @IsString()
-  stockName: string;
+  name: string;
 
   @IsNumber()
   price: number
 
   @IsNumber()
-  quantity: number
+  totalQuantity: number
 }

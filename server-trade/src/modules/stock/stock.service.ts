@@ -8,41 +8,25 @@ export class StockService {
   constructor(private readonly prisma: PrismaService) { }
 
   async createStockItem(CreateStockDto: CreateStockDto) {
-    const { stockName, firstName, lastName, email, externalUserId, price, quantity } = CreateStockDto
+    const { name, totalQuantity, price } = CreateStockDto
 
-    if (!email) {
-      throw new BadRequestException("Email is required to create a stock.")
+    if (!totalQuantity || !price || !name) {
+      throw new BadRequestException("Body is required to create a stock.")
     }
 
     try {
       const stock = await this.prisma.$transaction(async (prisma) => {
         const stock = await prisma.stock.findFirst({
-          where: { externalUserId }
+          where: { name }
         })
 
-        if (stock) throw new BadRequestException("Stock with this email already exist.")
-
-        let user = await prisma.user.findFirst({
-          where: { email },
-        })
-
-        if (!user) {
-          user = await prisma.user.create({
-            data: {
-              email,
-              firstName,
-              lastName,
-            },
-          })
-        }
+        if (stock) throw new BadRequestException("This Stock already exist.")
 
         return prisma.stock.create({
           data: {
-            externalUserId,
-            ownerId: user.id,
-            name: stockName,
-            price,
-            quantity,
+            name,
+            totalQuantity,
+            price
           },
         })
       })
@@ -57,8 +41,7 @@ export class StockService {
     if (!id) throw new BadRequestException("Id was not provided or invalid.")
 
     return await this.prisma.stock.findFirst({
-      where: { id: id },
-      include: { stockOwner: true }
+      where: { id: id }
     })
   }
 
@@ -84,14 +67,14 @@ export class StockService {
   async updateStockById(id: string, body: UpdateStockDto) {
     if (!id) throw new BadRequestException("Id was not provided or invalid.")
 
-    const { stockName, price, quantity } = body
+    const { name, price, totalQuantity } = body
 
     return await this.prisma.stock.update({
       where: { id },
       data: {
-        name: stockName,
+        name: name,
         price,
-        quantity
+        totalQuantity
       }
     })
   }

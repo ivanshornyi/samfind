@@ -12,11 +12,11 @@ import { ConfigModule } from "@nestjs/config"
 import { UserModule } from "./modules/user/user.module"
 import { WalletModule } from "./modules/wallet/wallet.module"
 import { StripeModule } from "./modules/stripe/stripe.module"
-import { ShareModule } from "./modules/share/share.module"
 import { AppSettingsModule } from "./modules/appSettings/appSettings.module"
 import { StockModule } from "./modules/stock/stock.module"
 import { StockOrdersModule } from "./modules/orders-stock/orders-stock.module"
 import { TransactionHistoryModule } from "./modules/transaction-history/transaction-history.module"
+import { PursharedSharesModule } from "./modules/purshared-shares/purshared-shares.module"
 
 @Module({
   imports: [
@@ -27,9 +27,9 @@ import { TransactionHistoryModule } from "./modules/transaction-history/transact
     WalletModule,
     StripeModule,
     StockModule,
+    PursharedSharesModule,
     StockOrdersModule,
     TransactionHistoryModule,
-    ShareModule,
     AppSettingsModule
   ],
   controllers: [],

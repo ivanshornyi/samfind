@@ -1,19 +1,11 @@
-enum PurchaseType {
-  bonus
-  money
-}
-
 model PurchasedShare {
-  id           String       @id @default(uuid())
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId       String
-  quantity     Float
-  price        Float
-  purchaseType PurchaseType
-  startNumber  Float
-  endNumber    Float
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  id        String   @id @default(uuid())
+  userId    String
+  stockId   String
+  quantity  Int      @default(0)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stock     Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 
   @@map("purchased_share")
 }

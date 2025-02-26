@@ -1,6 +1,16 @@
-import { IsString } from "class-validator";
+import { IsOptional, IsString } from "class-validator";
 
 export class CreateUserDto {
   @IsString()
-  email: string;
+  firstName: string
+
+  @IsString()
+  lastName: string
+
+  @IsString()
+  email: string
+
+  @IsString()
+  @IsOptional()
+  stripeCustomerId?: string
 }

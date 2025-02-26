@@ -5,9 +5,6 @@ CREATE TYPE "OrderType" AS ENUM ('BUY', 'SELL');
 CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'ACCEPTED', 'REJECTED', 'COMPLETED', 'CANCELED');
 
 -- CreateEnum
-CREATE TYPE "PurchaseType" AS ENUM ('bonus', 'money');
-
--- CreateEnum
 CREATE TYPE "TransactionHistoryType" AS ENUM ('PLACEMENT', 'PURCHASE', 'SALE', 'REJECTION');
 
 -- CreateEnum
@@ -51,13 +48,9 @@ CREATE TABLE "stock_orders" (
 CREATE TABLE "purchased_share" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "quantity" DOUBLE PRECISION NOT NULL,
-    "price" DOUBLE PRECISION NOT NULL,
-    "purchaseType" "PurchaseType" NOT NULL,
-    "startNumber" DOUBLE PRECISION NOT NULL,
-    "endNumber" DOUBLE PRECISION NOT NULL,
+    "stockId" TEXT NOT NULL,
+    "quantity" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "purchased_share_pkey" PRIMARY KEY ("id")
 );
@@ -65,13 +58,11 @@ CREATE TABLE "purchased_share" (
 -- CreateTable
 CREATE TABLE "stock" (
     "id" TEXT NOT NULL,
-    "externalUserId" TEXT NOT NULL,
-    "ownerId" TEXT NOT NULL,
     "name" VARCHAR NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
+    "totalQuantity" INTEGER NOT NULL DEFAULT 1000,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "quantity" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "stock_pkey" PRIMARY KEY ("id")
 );
@@ -132,7 +123,7 @@ CREATE TABLE "wallet" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "stock_externalUserId_key" ON "stock"("externalUserId");
+CREATE UNIQUE INDEX "stock_name_key" ON "stock"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
@@ -153,7 +144,7 @@ ALTER TABLE "stock_orders" ADD CONSTRAINT "stock_orders_userId_fkey" FOREIGN KEY
 ALTER TABLE "purchased_share" ADD CONSTRAINT "purchased_share_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "stock" ADD CONSTRAINT "stock_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "purchased_share" ADD CONSTRAINT "purchased_share_stockId_fkey" FOREIGN KEY ("stockId") REFERENCES "stock"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "transaction_history" ADD CONSTRAINT "transaction_history_stockId_fkey" FOREIGN KEY ("stockId") REFERENCES "stock"("id") ON DELETE CASCADE ON UPDATE CASCADE;

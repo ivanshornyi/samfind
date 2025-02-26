@@ -24,7 +24,6 @@ import { UserService } from "../user/user.service";
 //   startOfMonth,
 // } from "date-fns";
 import { MailService } from "../mail/mail.service";
-import { ShareService } from "../share/share.service";
 
 interface ICreatePaymentSession {
   customerId: string;
@@ -63,8 +62,6 @@ export class StripeService {
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
     private readonly mailService: MailService,
-    @Inject(forwardRef(() => ShareService))
-    private readonly shareService: ShareService,
   ) {
     this.stripe = new Stripe(this.configService.get("STRIPE_SECRET_KEY"), {
       // @ts-expect-error because of using diffirent version

@@ -15,19 +15,19 @@ export class StockOrdersController {
     return await this.stockOrdersService.createStockOrder(createStockOrderDto)
   }
 
-  @ApiOperation({ summary: "Cancel | Delete order from the market" })
-  @Post("/cancel/:id")
-  async eraseStockOrder(@Param("id") id: string) {
-    return await this.stockOrdersService.cancelStockOrder(id)
-  }
+  // @ApiOperation({ summary: "Cancel | Delete order from the market" })
+  // @Post("/cancel/:id")
+  // async eraseStockOrder(@Param("id") id: string) {
+  //   return await this.stockOrdersService.cancelStockOrder(id)
+  // }
 
-  @ApiOperation({ summary: "Get all StockOrders with pagination" })
-  @Get("/")
-  async getAllStockOrdersWithPagination(
-    @Query("page") page: number,
-    @Query("limit") limit: number,
-    @Query("order") order: "asc" | "desc"
-  ) {
-    return await this.stockOrdersService.getAllStockOrdersWithPagination(page, limit, order)
-  }
+  // @ApiOperation({ summary: "Get all StockOrders with pagination" })
+  // @Get("/")
+  // async getAllStockOrdersWithPagination(
+  //   @Query("page") page: number,
+  //   @Query("limit") limit: number,
+  //   @Query("order") order: "asc" | "desc"
+  // ) {
+  //   return await this.stockOrdersService.getAllStockOrdersWithPagination(page, limit, order)
+  // }
 }

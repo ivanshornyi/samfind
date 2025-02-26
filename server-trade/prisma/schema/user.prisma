@@ -5,12 +5,14 @@ model User {
   lastName           String
   stripeCustomerId   String?              @unique
   createdAt          DateTime             @default(now())
-  stocks             Stock[]
   orders             OrderStock[]
   transactions       TransactionHistory[]
   walletTransactions WalletTransaction[]
   wallet             Wallet?
   purchasedShares    PurchasedShare[]
+
+  // maybe we gonna need an externalUserId - we are registering same user from our 2nd backend
+  // i dont think we gonna need password, maybe integrate that from 2 services
 
   @@map("user")
 }
