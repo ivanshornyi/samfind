@@ -6,7 +6,7 @@ model OrderStock {
   user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   type         OrderType
   quantity     Int
-  offeredPrice Float // per single stock
+  offeredPrice Float // per single stock | max per purshare | min per sell
   paymentId    String? // payment stipe
   status       OrderStatus          @default(PENDING)
   createdAt    DateTime             @default(now())
