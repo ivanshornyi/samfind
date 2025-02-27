@@ -29,7 +29,8 @@ export class StockOrdersService {
 
   async createStockOrder(body: CreateStockOrderDto) {
     const { stockId, userId, type, quantity, offeredPrice, paymentId } = body
-    // TO-DO: Send email after order is placed
+    let newOrderUserEmail: string
+    let matchOrderUserEmail: string
     // TO-DO: Also / OR make and webhook notification, if will be decided to ALTER model with it
 
     if (!stockId || !userId) throw new BadRequestException("StockID and UserID is required in order creation.")
@@ -77,16 +78,35 @@ export class StockOrdersService {
           }
         })
 
-        const matchingOrder = await this.checkMatchingOrder(prisma, stockOrder)
+        const matchingOrder: Order = await this.checkMatchingOrder(prisma, stockOrder)
+        const matchedUser = await this.prisma.user.findUnique({ where: { id: matchingOrder.userId } })
+        matchOrderUserEmail = matchedUser.email
+        newOrderUserEmail = user.email
         if (matchingOrder) {
           await this.performTrade(prisma, stockOrder, matchingOrder)
           return { ...stockOrder, status: 'COMPLETED' }
-          // we should return a created order with COMPLETED status
-          // even if this another requiest
         }
 
         return stockOrder
       })
+
+      this.sendEmailNotification(
+        { userId: "" },
+        "Shares Selling Success",
+        `Shares has been successfully sold to the ${matchOrderUserEmail} user. Thank you for choosing us.`,
+        newOrderUserEmail)
+        .catch((err) => {
+          console.error(`Failed to send email-notification: ${err.message}`)
+        })
+
+      this.sendEmailNotification(
+        { userId: "" },
+        "Shares Purchase Success",
+        `Shares has been successfully purchased from the ${newOrderUserEmail}. Thank you for choosing us.`,
+        matchOrderUserEmail)
+        .catch((err) => {
+          console.error(`Failed to send email-notification: ${err.message}`)
+        })
 
       return stockOrder
     } catch (error) {
@@ -96,89 +116,102 @@ export class StockOrdersService {
 
   async createPoolPurchaseOrder(body: CreatePoolPurchaseDto) {
     const { stockId, userId, quantity, offeredPrice, paymentId } = body
-    // TO-DO: Send email after pool purchase
+    let userEmail: string
     // TO-DO: Also / OR make and webhook notification, if will be decided to ALTER model with it
 
     if (!stockId || !userId) throw new BadRequestException("StockID and UserID are required in pool purchase.")
 
-    return this.prisma.$transaction(async (prisma) => {
-      const stock = await prisma.stock.findUnique({ where: { id: stockId } })
-      const user = await prisma.user.findUnique({ where: { id: userId } })
+    try {
+      const transaction = this.prisma.$transaction(async (prisma) => {
+        const stock = await prisma.stock.findUnique({ where: { id: stockId } })
+        const user = await prisma.user.findUnique({ where: { id: userId } })
+        userEmail = user.email
 
-      if (!stock || !user) throw new BadRequestException("Stock or User wasn`t created or properly assigned.")
-      if (offeredPrice < stock.price) {
-        throw new BadRequestException(`Offered price (${offeredPrice}) is below the current stock price (${stock.price}).`)
-      }
+        if (!stock || !user) throw new BadRequestException("Stock or User wasn`t created or properly assigned.")
+        if (offeredPrice < stock.price) {
+          throw new BadRequestException(`Offered price (${offeredPrice}) is below the current stock price (${stock.price}).`)
+        }
 
-      // check for available shares in the pool
-      const purchasedShares = await prisma.purchasedShare.aggregate({
-        where: { stockId },
-        _sum: { quantity: true },
-      })
-      const ownedQuantity = purchasedShares._sum.quantity || 0
-      const freeQuantity = stock.totalQuantity - ownedQuantity
-
-      if (freeQuantity < quantity) {
-        throw new BadRequestException(`Not enough free shares available to buy. Available: ${freeQuantity}`)
-      }
-
-      // create an order from the pool
-      const poolOrder = await prisma.orderStock.create({
-        data: {
-          stockId,
-          userId,
-          type: "BUY", // Accept as BUY, because order from pool
-          quantity,
-          offeredPrice,
-          paymentId: paymentId || null,
-          status: "COMPLETED", // Auto confirm, because its purshare from pool
-        },
-      })
-
-      // history update
-      await prisma.transactionHistory.create({
-        data: {
-          stockId,
-          userId,
-          orderId: poolOrder.id,
-          type: "PURCHASE",
-          quantity,
-          price: offeredPrice,
-        },
-      })
-
-      // update user purshare from pool purshare
-      const buyerShare = await prisma.purchasedShare.findFirst({
-        where: { userId, stockId },
-      })
-
-      if (buyerShare) {
-        await prisma.purchasedShare.update({
-          where: { id: buyerShare.id },
-          data: { quantity: buyerShare.quantity + quantity },
+        // check for available shares in the pool
+        const purchasedShares = await prisma.purchasedShare.aggregate({
+          where: { stockId },
+          _sum: { quantity: true },
         })
-      } else {
-        await prisma.purchasedShare.create({
-          data: { userId, stockId, quantity },
+        const ownedQuantity = purchasedShares._sum.quantity || 0
+        const freeQuantity = stock.totalQuantity - ownedQuantity
+
+        if (freeQuantity < quantity) {
+          throw new BadRequestException(`Not enough free shares available to buy. Available: ${freeQuantity}`)
+        }
+
+        // create an order from the pool
+        const poolOrder = await prisma.orderStock.create({
+          data: {
+            stockId,
+            userId,
+            type: "BUY", // Accept as BUY, because order from pool
+            quantity,
+            offeredPrice,
+            paymentId: paymentId || null,
+            status: "COMPLETED", // Auto confirm, because its purshare from pool
+          },
         })
-      }
 
-      // TO-DO: Implement or not, decrease actual stocks quantity, but we might use market / free on web app
-      // update "free" stocks quantity to a real number, but cant go below 0
-      // const newTotalQuantity = Math.max(stock.totalQuantity - quantity, 0)
-      // await prisma.stock.update({
-      //   where: { id: stockId },
-      //   data: { totalQuantity: newTotalQuantity },
-      // })
+        // history update
+        await prisma.transactionHistory.create({
+          data: {
+            stockId,
+            userId,
+            orderId: poolOrder.id,
+            type: "PURCHASE",
+            quantity,
+            price: offeredPrice,
+          },
+        })
 
-      return poolOrder
-    }).catch((error) => {
-      throw new BadRequestException(`Failed to create pool purchase order: ${error.message}`)
-    })
+        // update user purshare from pool purshare
+        const buyerShare = await prisma.purchasedShare.findFirst({
+          where: { userId, stockId },
+        })
+
+        if (buyerShare) {
+          await prisma.purchasedShare.update({
+            where: { id: buyerShare.id },
+            data: { quantity: buyerShare.quantity + quantity },
+          })
+        } else {
+          await prisma.purchasedShare.create({
+            data: { userId, stockId, quantity },
+          })
+        }
+
+        // TO-DO: Implement or not, decrease actual stocks quantity, but we might use market / free on web app
+        // update "free" stocks quantity to a real number, but cant go below 0
+        // const newTotalQuantity = Math.max(stock.totalQuantity - quantity, 0)
+        // await prisma.stock.update({
+        //   where: { id: stockId },
+        //   data: { totalQuantity: newTotalQuantity },
+        // })
+
+        return poolOrder
+      })
+
+      this.sendEmailNotification(
+        { userId: "" },
+        "Shares Purchase Success",
+        `Shares has been successfully purchased from the market pool. Thank you for choosing us.`,
+        userEmail)
+        .catch((err) => {
+          console.error(`Failed to send email-notification: ${err.message}`)
+        })
+
+      return transaction
+    } catch (error) {
+      throw new BadRequestException(`Failed to purchase stock-order: ${error.message}`)
+    }
   }
 
   async cancelStockOrder(id: string, canceledBy: CanceledBy) {
-    // TO-DO: Send email after order is canceled | rejected
     // TO-DO: Also / OR make and webhook notification, if will be decided to ALTER model with it
 
     try {
@@ -336,7 +369,7 @@ export class StockOrdersService {
     |============================
   */
 
-  async checkMatchingOrder(prismaProp, newOrder: Order) {
+  private async checkMatchingOrder(prismaProp, newOrder: Order) {
     const { stockId, type, quantity, offeredPrice } = newOrder
 
     if (type === "SELL") {
@@ -372,7 +405,7 @@ export class StockOrdersService {
     return null
   }
 
-  async performTrade(prismaProp, newOrder: Order, matchingOrder: Order) {
+  private async performTrade(prismaProp, newOrder: Order, matchingOrder: Order) {
     const { type: newOrderType, userId: newUserId, stockId, quantity, offeredPrice: newPrice } = newOrder
     const { id: matchingOrderId, userId: matchingUserId, offeredPrice: matchingPrice } = matchingOrder
 
@@ -463,11 +496,15 @@ export class StockOrdersService {
     }
   }
 
-  private async sendEmailNotification(stockOrder: Partial<Order>, subject: string, message: string) {
-    const { userId } = stockOrder
-    const user = await this.prisma.user.findUnique({ where: { id: userId } })
+  private async sendEmailNotification(stockOrder: Partial<Order>, subject: string, message: string, userEmail?: string) {
+    if (!userEmail) {
+      const { userId } = stockOrder
+      const user = await this.prisma.user.findUnique({ where: { id: userId } })
 
-    await this.mailService.sendOrderMessage(user.email, subject, message)
+      await this.mailService.sendOrderMessage(user.email, subject, message)
+    } else {
+      await this.mailService.sendOrderMessage(userEmail, subject, message)
+    }
   }
 
   private async sendCancelNotification(stockOrder: Partial<Order>, canceledBy: CanceledBy) {
