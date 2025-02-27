@@ -4,6 +4,7 @@ import { $Enums } from "@prisma/client"
 import { MailService } from "../mail/mail.service"
 import { CreateStockOrderDto } from "./dto/create-order-dto"
 import { CreatePoolPurchaseDto } from "./dto/create-pool-purshare-dto"
+import { CreateOrderToSellToPool } from "./dto/create-order-to-sell-pool-dto"
 import { CanceledBy } from "../purshared-shares/types"
 
 interface Order {
@@ -246,6 +247,89 @@ export class StockOrdersService {
     }
   }
 
+  async sellStocksToPoolOrder(userId: string, body: CreateOrderToSellToPool) {
+    const { stockId, quantity, offeredPrice } = body
+
+    if (!stockId || !userId) throw new BadRequestException("StockID and UserID is required in order creation.")
+    try {
+      const stockOrder = await this.prisma.$transaction(async (prisma) => {
+        const stock = await prisma.stock.findUnique({ where: { id: stockId } })
+        const user = await prisma.user.findUnique({ where: { id: userId } })
+
+        if (!stock || !user) throw new BadRequestException("Stock or User wasn`t created or properly assigned.")
+
+        // check if user have enough quantity to sell
+        const sellerShare = await prisma.purchasedShare.findFirst({
+          where: { userId, stockId },
+        })
+        if (!sellerShare || sellerShare.quantity < quantity) {
+          throw new BadRequestException("Insufficient shares to sell.")
+        }
+
+        const newSellerQuantity = sellerShare.quantity - quantity
+        const sellerPrice = (100 * offeredPrice) / stock.price
+
+        // if user sells everyting - delete an record from db
+        // else we just update quantity for an user
+        if (newSellerQuantity === 0) {
+          await prisma.purchasedShare.delete({ where: { id: sellerShare.id } })
+        } else {
+          await prisma.purchasedShare.update({
+            where: { id: sellerShare.id },
+            data: {
+              quantity: sellerShare.quantity - quantity
+            }
+          })
+        }
+
+        // price check logic
+        if (sellerPrice < 50) {
+          throw new BadRequestException(`You cant sell shares with price low like this. You need to set min 50% from ${stock.price}.`)
+        } else if (sellerPrice > 90) {
+          throw new BadRequestException(`You cant sell shares with price high like this. You need to set max price, which is ${stock.price} - 10%.`)
+        }
+
+        // update order (create and complete it)
+        const stockOrder = await prisma.orderStock.create({
+          data: {
+            stockId,
+            userId,
+            type: "SELL",
+            status: "COMPLETED",
+            quantity,
+            offeredPrice
+          }
+        })
+
+        // update history
+        await prisma.transactionHistory.create({
+          data: {
+            stockId,
+            userId,
+            orderId: stockOrder.id,
+            type: "SALE",
+            quantity: quantity,
+            price: offeredPrice
+          }
+        })
+
+        return stockOrder
+      })
+
+      this.sendEmailNotification(
+        stockOrder,
+        "Shares Selling Success",
+        "Shares was successfully selled to the stock market. Thank you.")
+        .catch((err) => {
+          console.error(`Failed to send email-notification: ${err.message}`)
+        })
+
+      return stockOrder
+    } catch (error) {
+      throw new BadRequestException(`Failed to make  sell stock-order: ${error.message}`)
+    }
+  }
+
   /**
     |============================
     | UTILS FN
@@ -377,6 +461,13 @@ export class StockOrdersService {
         },
       })
     }
+  }
+
+  private async sendEmailNotification(stockOrder: Partial<Order>, subject: string, message: string) {
+    const { userId } = stockOrder
+    const user = await this.prisma.user.findUnique({ where: { id: userId } })
+
+    await this.mailService.sendOrderMessage(user.email, subject, message)
   }
 
   private async sendCancelNotification(stockOrder: Partial<Order>, canceledBy: CanceledBy) {
