@@ -8,7 +8,7 @@ export class PursharedSharesService {
   async getAllUserSharesById(id: string) {
     return await this.prisma.user.findFirst({
       where: { id },
-      include: { purchasedShares: true }
+      include: { purchasedShares: true, transactions: true }
     })
   }
 }
