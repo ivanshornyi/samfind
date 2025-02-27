@@ -157,6 +157,14 @@ export class StockOrdersService {
         })
       }
 
+      // TO-DO: Implement or not, decrease actual stocks quantity, but we might use market / free on web app
+      // update "free" stocks quantity to a real number, but cant go below 0
+      // const newTotalQuantity = Math.max(stock.totalQuantity - quantity, 0);
+      // await prisma.stock.update({
+      //   where: { id: stockId },
+      //   data: { totalQuantity: newTotalQuantity },
+      // });
+
       return poolOrder
     }).catch((error) => {
       throw new BadRequestException(`Failed to create pool purchase order: ${error.message}`)
