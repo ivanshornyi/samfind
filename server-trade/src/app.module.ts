@@ -12,7 +12,6 @@ import { ConfigModule } from "@nestjs/config"
 import { UserModule } from "./modules/user/user.module"
 import { WalletModule } from "./modules/wallet/wallet.module"
 import { StripeModule } from "./modules/stripe/stripe.module"
-import { AppSettingsModule } from "./modules/appSettings/appSettings.module"
 import { StockModule } from "./modules/stock/stock.module"
 import { StockOrdersModule } from "./modules/orders-stock/orders-stock.module"
 import { TransactionHistoryModule } from "./modules/transaction-history/transaction-history.module"
@@ -30,7 +29,6 @@ import { PursharedSharesModule } from "./modules/purshared-shares/purshared-shar
     PursharedSharesModule,
     StockOrdersModule,
     TransactionHistoryModule,
-    AppSettingsModule
   ],
   controllers: [],
   providers: []
@@ -63,6 +61,6 @@ export class AppModule implements NestModule {
           method: RequestMethod.POST
         }
       )
-      .forRoutes("user", "stripe", "wallet", "share", "app-settings")
+      .forRoutes("user", "stripe", "wallet", "share")
   }
 }
