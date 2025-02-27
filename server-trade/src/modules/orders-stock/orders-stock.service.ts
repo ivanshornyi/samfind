@@ -100,6 +100,9 @@ export class StockOrdersService {
       const user = await prisma.user.findUnique({ where: { id: userId } })
 
       if (!stock || !user) throw new BadRequestException("Stock or User wasn`t created or properly assigned.")
+      if (offeredPrice < stock.price) {
+        throw new BadRequestException(`Offered price (${offeredPrice}) is below the current stock price (${stock.price}).`);
+      }
 
       // check for available shares in the pool
       const purchasedShares = await prisma.purchasedShare.aggregate({
@@ -232,17 +235,17 @@ export class StockOrdersService {
     |============================
   */
 
-  async checkMatchingOrder(prisma, newOrder: Order) {
+  async checkMatchingOrder(prismaProp, newOrder: Order) {
     const { stockId, type, quantity, offeredPrice } = newOrder
 
     if (type === "SELL") {
-      return await prisma.orderStock.findFirst({
+      return await prismaProp.orderStock.findFirst({
         where: {
           stockId,
           type: "BUY",
           status: "PENDING",
           quantity,
-          offeredPrice: { gte: offeredPrice }
+          offeredPrice: { gte: offeredPrice } // greater or equal
         },
         orderBy: [
           { offeredPrice: "desc" }, // the highest price
@@ -250,13 +253,13 @@ export class StockOrdersService {
         ]
       })
     } else if (type === "BUY") {
-      return await prisma.orderStock.findFirst({
+      return await prismaProp.orderStock.findFirst({
         where: {
           stockId,
           type: "SELL",
           status: "PENDING",
           quantity,
-          offeredPrice: { lte: offeredPrice }
+          offeredPrice: { lte: offeredPrice } // less or equal
         },
         orderBy: [
           { offeredPrice: "asc" }, // the minimal price
@@ -268,96 +271,94 @@ export class StockOrdersService {
     return null
   }
 
-  async performTrade(prisma, newOrder: Order, matchingOrder: Order) {
+  async performTrade(prismaProp, newOrder: Order, matchingOrder: Order) {
     const { type: newOrderType, userId: newUserId, stockId, quantity, offeredPrice: newPrice } = newOrder
     const { id: matchingOrderId, userId: matchingUserId, offeredPrice: matchingPrice } = matchingOrder
 
     // determine price of person, who was in query earlier
     const tradePrice = newOrder.createdAt < matchingOrder.createdAt ? newPrice : matchingPrice
 
-    await prisma.$transaction(async (prisma) => {
-      // update of stock-orders status
-      await prisma.orderStock.update({
-        where: { id: newOrder.id },
-        data: { status: "COMPLETED" }
-      })
-      await prisma.orderStock.update({
-        where: { id: matchingOrderId },
-        data: { status: "COMPLETED" }
-      })
+    // update of stock-orders status
+    await prismaProp.orderStock.update({
+      where: { id: newOrder.id },
+      data: { status: "COMPLETED" }
+    })
+    await prismaProp.orderStock.update({
+      where: { id: matchingOrderId },
+      data: { status: "COMPLETED" }
+    })
 
-      // update transaction-history for both orders
+    // update transaction-history for both orders
 
-      // new order history
-      await prisma.transactionHistory.create({
-        data: {
-          stockId,
-          userId: newUserId,
-          orderId: newOrder.id,
-          type: newOrderType === "SELL" ? "SALE" : "PURCHASE",
-          quantity,
-          price: tradePrice
-        }
-      })
-
-      // match order history
-      await prisma.transactionHistory.create({
-        data: {
-          stockId,
-          userId: matchingUserId,
-          orderId: matchingOrderId,
-          type: newOrderType === "SELL" ? "PURCHASE" : "SALE",
-          quantity,
-          price: tradePrice
-        }
-      })
-
-      const sellerId = newOrderType === "SELL" ? newUserId : matchingUserId
-      const buyerId = newOrderType === "SELL" ? matchingUserId : newUserId
-
-      // decrease amount of shares from the seller
-      const sellerShare = await prisma.purchasedShare.findFirst({
-        where: { userId: sellerId, stockId },
-      })
-
-      if (!sellerShare) {
-        throw new Error("Seller does not own any shares.")
-      }
-
-      const newSellerQuantity = sellerShare.quantity - quantity
-
-      if (newSellerQuantity === 0) {
-        // to save some db space
-        await prisma.purchasedShare.delete({ where: { id: sellerShare.id } })
-      } else {
-        // update quantity
-        await prisma.purchasedShare.update({
-          where: { id: sellerShare.id },
-          data: { quantity: newSellerQuantity },
-        })
-        // also send email async (if you send it in transaction - its gonna block, send outside of transaction)
-      }
-
-      // increasing shares in buyer (or create a new buyer record)
-      const buyerShare = await prisma.purchasedShare.findFirst({
-        where: { userId: buyerId, stockId },
-      })
-
-      if (buyerShare) {
-        await prisma.purchasedShare.update({
-          where: { id: buyerShare.id },
-          data: { quantity: buyerShare.quantity + quantity },
-        })
-        // also send email async (if you send it in transaction - its gonna block, send outside of transaction)
-      } else {
-        await prisma.purchasedShare.create({
-          data: {
-            userId: buyerId,
-            stockId,
-            quantity,
-          },
-        })
+    // new order history
+    await prismaProp.transactionHistory.create({
+      data: {
+        stockId,
+        userId: newUserId,
+        orderId: newOrder.id,
+        type: newOrderType === "SELL" ? "SALE" : "PURCHASE",
+        quantity,
+        price: tradePrice
       }
     })
+
+    // match order history
+    await prismaProp.transactionHistory.create({
+      data: {
+        stockId,
+        userId: matchingUserId,
+        orderId: matchingOrderId,
+        type: newOrderType === "SELL" ? "PURCHASE" : "SALE",
+        quantity,
+        price: tradePrice
+      }
+    })
+
+    const sellerId = newOrderType === "SELL" ? newUserId : matchingUserId
+    const buyerId = newOrderType === "SELL" ? matchingUserId : newUserId
+
+    // decrease amount of shares from the seller
+    const sellerShare = await prismaProp.purchasedShare.findFirst({
+      where: { userId: sellerId, stockId },
+    })
+
+    if (!sellerShare) {
+      throw new Error("Seller does not own any shares.")
+    }
+
+    const newSellerQuantity = sellerShare.quantity - quantity
+
+    if (newSellerQuantity === 0) {
+      // to save some db space
+      await prismaProp.purchasedShare.delete({ where: { id: sellerShare.id } })
+    } else {
+      // update quantity
+      await prismaProp.purchasedShare.update({
+        where: { id: sellerShare.id },
+        data: { quantity: newSellerQuantity },
+      })
+      // also send email async (if you send it in transaction - its gonna block, send outside of transaction)
+    }
+
+    // increasing shares in buyer (or create a new buyer record)
+    const buyerShare = await prismaProp.purchasedShare.findFirst({
+      where: { userId: buyerId, stockId },
+    })
+
+    if (buyerShare) {
+      await prismaProp.purchasedShare.update({
+        where: { id: buyerShare.id },
+        data: { quantity: buyerShare.quantity + quantity },
+      })
+      // also send email async (if you send it in transaction - its gonna block, send outside of transaction)
+    } else {
+      await prismaProp.purchasedShare.create({
+        data: {
+          userId: buyerId,
+          stockId,
+          quantity,
+        },
+      })
+    }
   }
 }
