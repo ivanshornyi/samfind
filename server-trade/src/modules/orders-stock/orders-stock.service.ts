@@ -319,7 +319,7 @@ export class StockOrdersService {
       this.sendEmailNotification(
         stockOrder,
         "Shares Selling Success",
-        "Shares was successfully selled to the stock market. Thank you.")
+        "Shares has been successfully sold to the stock market. Thank you.")
         .catch((err) => {
           console.error(`Failed to send email-notification: ${err.message}`)
         })
