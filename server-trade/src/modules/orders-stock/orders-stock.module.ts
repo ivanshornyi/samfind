@@ -5,6 +5,7 @@ import { StockOrdersController } from "./orders-stock.controller";
 import { StockOrdersService } from "./orders-stock.service";
 import { UserModule } from "../user/user.module";
 import { UserService } from "../user/user.service";
+import { MailService } from "../mail/mail.service";
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { UserService } from "../user/user.service";
   providers: [
     PrismaService,
     UserService,
-    StockOrdersService
+    StockOrdersService,
+    MailService
   ],
   exports: [StockOrdersService]
 })

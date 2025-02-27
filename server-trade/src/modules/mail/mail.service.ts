@@ -23,6 +23,21 @@ export class MailService {
     });
   }
 
+  async sendOrderMessage(to: string, subject: string, message: string) {
+    try {
+      const mailOptions = {
+        from: configService.get("MAIL_USER"),
+        to,
+        subject,
+        text: message
+      }
+
+      await this.transporter.sendMail(mailOptions)
+    } catch (error) {
+      throw new BadRequestException(`Failed to send email - ${to}, because of ${error}`)
+    }
+  }
+
   async sendResetCode(to: string, resetCode: string) {
     try {
       const mailOptions = {

@@ -1,8 +1,10 @@
 import { BadRequestException, ConflictException, Injectable } from "@nestjs/common"
 import { PrismaService } from "nestjs-prisma"
 import { $Enums } from "@prisma/client"
+import { MailService } from "../mail/mail.service"
 import { CreateStockOrderDto } from "./dto/create-order-dto"
 import { CreatePoolPurchaseDto } from "./dto/create-pool-purshare-dto"
+import { CanceledBy } from "../purshared-shares/types"
 
 interface Order {
   stockId: string
@@ -19,7 +21,10 @@ interface Order {
 
 @Injectable()
 export class StockOrdersService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mailService: MailService
+  ) { }
 
   async createStockOrder(body: CreateStockOrderDto) {
     const { stockId, userId, type, quantity, offeredPrice, paymentId } = body
@@ -101,7 +106,7 @@ export class StockOrdersService {
 
       if (!stock || !user) throw new BadRequestException("Stock or User wasn`t created or properly assigned.")
       if (offeredPrice < stock.price) {
-        throw new BadRequestException(`Offered price (${offeredPrice}) is below the current stock price (${stock.price}).`);
+        throw new BadRequestException(`Offered price (${offeredPrice}) is below the current stock price (${stock.price}).`)
       }
 
       // check for available shares in the pool
@@ -159,11 +164,11 @@ export class StockOrdersService {
 
       // TO-DO: Implement or not, decrease actual stocks quantity, but we might use market / free on web app
       // update "free" stocks quantity to a real number, but cant go below 0
-      // const newTotalQuantity = Math.max(stock.totalQuantity - quantity, 0);
+      // const newTotalQuantity = Math.max(stock.totalQuantity - quantity, 0)
       // await prisma.stock.update({
       //   where: { id: stockId },
       //   data: { totalQuantity: newTotalQuantity },
-      // });
+      // })
 
       return poolOrder
     }).catch((error) => {
@@ -171,7 +176,7 @@ export class StockOrdersService {
     })
   }
 
-  async cancelStockOrder(id: string) {
+  async cancelStockOrder(id: string, canceledBy: CanceledBy) {
     // TO-DO: Send email after order is canceled | rejected
     // TO-DO: Also / OR make and webhook notification, if will be decided to ALTER model with it
 
@@ -209,6 +214,10 @@ export class StockOrdersService {
         })
 
         return stockOrder
+      })
+
+      this.sendCancelNotification(stockOrder, canceledBy).catch((err) => {
+        console.error(`Failed to send cancel email-notification: ${err.message}`)
       })
 
       return stockOrder
@@ -368,5 +377,22 @@ export class StockOrdersService {
         },
       })
     }
+  }
+
+  private async sendCancelNotification(stockOrder: Partial<Order>, canceledBy: CanceledBy) {
+    const { userId, stockId } = stockOrder
+    const user = await this.prisma.user.findUnique({ where: { id: userId } })
+    const stock = await this.prisma.stock.findUnique({ where: { id: stockId } })
+
+    const subject =
+      canceledBy === "USER"
+        ? "Your stock order has been canceled"
+        : "Your stock order was canceled by the system"
+    const message =
+      canceledBy === "USER"
+        ? `You have canceled your order for ${stock.name}.`
+        : `Your order for ${stock.name} was canceled automatically by the system.`
+
+    await this.mailService.sendOrderMessage(user.email, subject, message)
   }
 }

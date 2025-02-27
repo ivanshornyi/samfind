@@ -14,5 +14,8 @@ model User {
   // maybe we gonna need an externalUserId - we are registering same user from our 2nd backend
   // i dont think we gonna need password, maybe integrate that from 2 services
 
+  // also we need some payments information (because we gonna use Stripe Custom model)
+  // it should be filled from registration form (as user.POST should be a sign-up)
+
   @@map("user")
 }
