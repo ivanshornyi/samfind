@@ -4,6 +4,7 @@ import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { UserService } from "../user/user.service";
 import { MailService } from "../mail/mail.service";
 import { StockService } from "./stock.service";
+import { ValidateIdDto } from "src/common/types/id-validation-dto";
 import { CreateStockDto } from "./dto/create-stock-dto";
 import { UpdateStockDto } from "./dto/update-stock-dto";
 
@@ -26,8 +27,8 @@ export class StockController {
 
   @ApiOperation({ summary: "Get stock item by id" })
   @Get("/:id")
-  async findStockById(@Param("id") id: string) {
-    return await this.stockService.getStockById(id)
+  async findStockById(@Param() params: ValidateIdDto) {
+    return await this.stockService.getStockById(params.id.trim())
   }
 
   @ApiOperation({ summary: "Get all stocks with pagination" })
@@ -42,13 +43,13 @@ export class StockController {
 
   @ApiOperation({ summary: "Update stock by id" })
   @Patch("/:id")
-  async updateStockById(@Param("id") id: string, @Body() updateStockDto: UpdateStockDto) {
-    return await this.stockService.updateStockById(id, updateStockDto)
+  async updateStockById(@Param() params: ValidateIdDto, @Body() updateStockDto: UpdateStockDto) {
+    return await this.stockService.updateStockById(params.id.trim(), updateStockDto)
   }
 
   @ApiOperation({ summary: "Delete a stock with an user" })
   @Delete("/:id")
-  async deleteStockById(@Param("id") id: string) {
-    return await this.stockService.deleteStockById(id)
+  async deleteStockById(@Param() params: ValidateIdDto) {
+    return await this.stockService.deleteStockById(params.id.trim())
   }
 }
