@@ -485,7 +485,7 @@ export class SubscriptionService {
     if (plan.type === LicenseTierType.freemium) {
       await this.prisma.subscription.update({
         where: { id: subscriptionId },
-        data: { planId },
+        data: { planId, isActive: true, isInTrial: false },
       });
       await this.prisma.license.update({
         where: { id: subscription.licenseId },

@@ -260,9 +260,10 @@ model AppSettings {
   sharePrice             Float?
   shareStripeProductId   String?
   shareStripePriceId     String?
+  stripeTaxId            String?
   limitOfSharesPurchased Float?   @default(0)
   currentSharesPurchased Float?   @default(0)
-  earlyBirdPeriod        Boolean
+  earlyBirdPeriod        Boolean  @default(false)
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 

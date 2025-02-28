@@ -21,6 +21,7 @@ import {
   getDate,
   getDaysInMonth,
   getMonth,
+  isSameDay,
   startOfMonth,
 } from "date-fns";
 import { MailService } from "../mail/mail.service";
@@ -61,10 +62,14 @@ interface ICreateSubscription {
   description: string;
 }
 
-interface IUpdateSubscriptionItems {
+export interface IChangeSubscriptionItems {
+  newPriceId?: string;
   subscriptionId: string;
   subscriptionItemId: string;
-  items: { price: string; quantity: number }[];
+  quantity: number;
+  description: string;
+  deleteMember?: boolean;
+  metadata: { [key: string]: string | number };
 }
 
 @Injectable()
@@ -288,23 +293,43 @@ export class StripeService {
 
   private async handleFailedInvoicePayment(invoice: Stripe.Invoice) {
     try {
+      const stripeCustomerId =
+        typeof invoice.customer === "string"
+          ? invoice.customer
+          : invoice.customer.id;
       const invoiceLink = invoice.hosted_invoice_url;
-      const { subscriptionId } = invoice.metadata;
 
-      const subscription = await this.prisma.subscription.findUnique({
-        where: { id: subscriptionId },
-        include: { user: true },
+      const user = await this.prisma.user.findUnique({
+        where: { stripeCustomerId },
       });
 
-      if (!subscription) return;
+      if (!user) return;
 
-      await this.mailService.sendWarningPaymentFailed(
-        subscription.user.email,
-        invoiceLink,
-      );
-      this.logger.log(
-        `Invoice payment failed for user ${subscription?.userId}`,
-      );
+      if (invoice.subscription) {
+        const stripeSubscriptionId =
+          typeof invoice.subscription === "string"
+            ? invoice.subscription
+            : invoice.subscription.id;
+
+        const subscription = await this.prisma.subscription.findFirst({
+          where: { stripeSubscriptionId },
+        });
+        if (!subscription) return;
+
+        const today = new Date();
+        const nextDate = new Date(subscription.nextDate);
+
+        const sameDay = isSameDay(today, nextDate);
+        if (sameDay) {
+          await this.prisma.subscription.update({
+            where: { id: subscription.id },
+            data: { isInTrial: true },
+          });
+        }
+      }
+
+      await this.mailService.sendWarningPaymentFailed(user.email, invoiceLink);
+      this.logger.log(`Invoice payment failed for user ${user?.id}`);
     } catch (error) {
       this.logger.error("Error fail pay invoice license to user", error);
     }
@@ -652,13 +677,21 @@ export class StripeService {
     metadata,
     description,
   }: ICreateSubscription) {
+    let stripeTaxId = null;
+    if (tax) {
+      const appSettings = await this.prisma.appSettings.findFirst({
+        where: {},
+      });
+      stripeTaxId = appSettings?.stripeTaxId;
+    }
+
     return await this.stripe.subscriptions.create({
       customer: stripeCustomerId,
       payment_behavior: "default_incomplete",
       proration_behavior: "always_invoice",
       items,
+      default_tax_rates: stripeTaxId ? [stripeTaxId] : undefined,
       expand: ["latest_invoice.payment_intent"],
-      automatic_tax: tax ? { enabled: true } : undefined,
       metadata,
       description,
     });
@@ -725,14 +758,20 @@ export class StripeService {
       description,
     });
   }
+
+  async addTax({ name, description, percentage }: IAddTax) {
+    return await this.stripe.taxRates.create({
+      display_name: name,
+      description,
+      jurisdiction: "NO",
+      percentage, // VAT 25%
+      inclusive: false, // Чи включено у загальну ціну (false - додається окремо)
+    });
+  }
 }
 
-export interface IChangeSubscriptionItems {
-  newPriceId?: string;
-  subscriptionId: string;
-  subscriptionItemId: string;
-  quantity: number;
+interface IAddTax {
+  name: string;
   description: string;
-  deleteMember?: boolean;
-  metadata: { [key: string]: string | number };
+  percentage: number;
 }
