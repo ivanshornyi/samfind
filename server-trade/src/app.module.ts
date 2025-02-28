@@ -16,6 +16,7 @@ import { StockModule } from "./modules/stock/stock.module"
 import { StockOrdersModule } from "./modules/orders-stock/orders-stock.module"
 import { TransactionHistoryModule } from "./modules/transaction-history/transaction-history.module"
 import { PursharedSharesModule } from "./modules/purshared-shares/purshared-shares.module"
+import { CronModule } from "./modules/cron/cron.module"
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { PursharedSharesModule } from "./modules/purshared-shares/purshared-shar
     WalletModule,
     StripeModule,
     StockModule,
+    CronModule,
     PursharedSharesModule,
     StockOrdersModule,
     TransactionHistoryModule,
