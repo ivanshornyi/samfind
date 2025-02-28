@@ -4,6 +4,7 @@ import { StockOrdersService } from "./orders-stock.service";
 import { CreateStockOrderDto } from "./dto/create-order-dto";
 import { CreatePoolPurchaseDto } from "./dto/create-pool-purshare-dto";
 import { CreateOrderToSellToPool } from "./dto/create-order-to-sell-pool-dto";
+import { OrderType } from "src/common/types/order-type";
 import { CanceledBy } from "../purshared-shares/types";
 
 @ApiTags("StockOrders")
@@ -41,7 +42,7 @@ export class StockOrdersController {
   async getAllStockOrdersWithPagination(
     @Query("page") page: number,
     @Query("limit") limit: number,
-    @Query("order") order: "asc" | "desc"
+    @Query("order") order: OrderType
   ) {
     return await this.stockOrdersService.getAllStockOrdersWithPagination(page, limit, order)
   }

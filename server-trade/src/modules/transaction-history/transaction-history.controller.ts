@@ -1,6 +1,7 @@
 import { Controller, Get, Query } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { TransactionHistoryService } from "./transaction-history.service";
+import { OrderType } from "src/common/types/order-type";
 
 @ApiTags("TransactionHistory")
 @Controller("transaction-history")
@@ -13,7 +14,7 @@ export class TransactionHistoryController {
   async getEntireTransactionHistoryWithPagination(
     @Query("page") page: number,
     @Query("limit") limit: number,
-    @Query("order") order: "asc" | "desc"
+    @Query("order") order: OrderType
   ) {
     return await this.transactionHistoryService.getAllTransactionHistoriesWithPagination(page, limit, order)
   }
@@ -24,7 +25,7 @@ export class TransactionHistoryController {
     @Query("id") id: string,
     @Query("page") page: number,
     @Query("limit") limit: number,
-    @Query("order") order: "asc" | "desc"
+    @Query("order") order: OrderType
   ) {
     return await this.transactionHistoryService.getAllTransactionHistoriesWithPaginationForId(id, page, limit, order)
   }

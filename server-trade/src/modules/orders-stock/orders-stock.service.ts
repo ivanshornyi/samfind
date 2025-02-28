@@ -5,6 +5,7 @@ import { MailService } from "../mail/mail.service"
 import { CreateStockOrderDto } from "./dto/create-order-dto"
 import { CreatePoolPurchaseDto } from "./dto/create-pool-purshare-dto"
 import { CreateOrderToSellToPool } from "./dto/create-order-to-sell-pool-dto"
+import { OrderType } from "src/common/types/order-type"
 import { CanceledBy } from "../purshared-shares/types"
 
 interface Order {
@@ -260,7 +261,7 @@ export class StockOrdersService {
     }
   }
 
-  async getAllStockOrdersWithPagination(page: number, limit: number, order: "asc" | "desc") {
+  async getAllStockOrdersWithPagination(page: number, limit: number, order: OrderType) {
     const stockOrders = await this.prisma.orderStock.findMany({
       skip: (page - 1) * limit,
       take: limit,

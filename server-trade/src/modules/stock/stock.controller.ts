@@ -5,6 +5,7 @@ import { UserService } from "../user/user.service";
 import { MailService } from "../mail/mail.service";
 import { StockService } from "./stock.service";
 import { ValidateIdDto } from "src/common/types/id-validation-dto";
+import { OrderType } from "src/common/types/order-type";
 import { CreateStockDto } from "./dto/create-stock-dto";
 import { UpdateStockDto } from "./dto/update-stock-dto";
 
@@ -36,7 +37,7 @@ export class StockController {
   async findAllStocksWithPagination(
     @Query("page") page: number,
     @Query("limit") limit: number,
-    @Query("order") order: "asc" | "desc"
+    @Query("order") order: OrderType
   ) {
     return await this.stockService.getAllStocksWithPagination(page, limit, order)
   }

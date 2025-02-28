@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from "@nestjs/common"
 import { PrismaService } from "nestjs-prisma"
+import { OrderType } from "src/common/types/order-type"
 import { CreateStockDto } from './dto/create-stock-dto'
 import { UpdateStockDto } from './dto/update-stock-dto'
 
@@ -45,7 +46,7 @@ export class StockService {
     })
   }
 
-  async getAllStocksWithPagination(page: number, limit: number, order: "asc" | "desc") {
+  async getAllStocksWithPagination(page: number, limit: number, order: OrderType) {
     const stocks = await this.prisma.stock.findMany({
       skip: (page - 1) * limit,
       take: limit,

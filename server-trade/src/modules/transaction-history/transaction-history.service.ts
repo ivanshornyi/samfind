@@ -1,11 +1,12 @@
 import { PrismaService } from "nestjs-prisma";
 import { Injectable } from "@nestjs/common";
+import { OrderType } from "src/common/types/order-type";
 
 @Injectable()
 export class TransactionHistoryService {
   constructor(private readonly prisma: PrismaService) { }
 
-  async getAllTransactionHistoriesWithPagination(page: number, limit: number, order: "asc" | "desc") {
+  async getAllTransactionHistoriesWithPagination(page: number, limit: number, order: OrderType) {
     const history = await this.prisma.transactionHistory.findMany({
       skip: (page - 1) * limit,
       take: limit,
@@ -25,7 +26,7 @@ export class TransactionHistoryService {
     }
   }
 
-  async getAllTransactionHistoriesWithPaginationForId(id: string, page: number, limit: number, order: "asc" | "desc") {
+  async getAllTransactionHistoriesWithPaginationForId(id: string, page: number, limit: number, order: OrderType) {
     const history = await this.prisma.transactionHistory.findMany({
       where: { id },
       skip: (page - 1) * limit,
