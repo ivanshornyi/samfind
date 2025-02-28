@@ -267,7 +267,7 @@ export class UserService {
           userInfo.invitedUser = true;
         }
 
-        if (activeLicense.deleteDate) {
+        if (!activeLicense || activeLicense?.deleteDate) {
           userInfo.deletedMember = true;
         }
       }

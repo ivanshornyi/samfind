@@ -62,11 +62,17 @@ export class SubscriptionController {
     return this.subscriptionService.changePlan(changePlanDto);
   }
 
-  @ApiOperation({ summary: "Cancel change Subscription Plan" })
-  @Post("/cancel-change-plan")
-  async cancelChangePlan(@Body() cancelChangePlanDto: CancelChangePlanDto) {
-    return this.subscriptionService.cancelChangePlan(
-      cancelChangePlanDto.subscriptionId,
-    );
+  // @ApiOperation({ summary: "Cancel change Subscription Plan" })
+  // @Post("/cancel-change-plan")
+  // async cancelChangePlan(@Body() cancelChangePlanDto: CancelChangePlanDto) {
+  //   return this.subscriptionService.cancelChangePlan(
+  //     cancelChangePlanDto.subscriptionId,
+  //   );
+  // }
+
+  @ApiOperation({ summary: "Get User Discount History" })
+  @Get("invoice")
+  async getInvoice() {
+    return this.subscriptionService.getInvoice();
   }
 }

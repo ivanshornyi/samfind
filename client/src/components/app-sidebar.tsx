@@ -79,6 +79,7 @@ export const AppSidebar = () => {
           <SidebarGroupContent>
             <SidebarMenu className="space-y-4">
               {!userSubscriptionInfo?.invitedUser &&
+                !userSubscriptionInfo?.deletedMember &&
                 NAVIGATION_ITEMS.map((item) => {
                   const isActive = pathname === item.path;
 
@@ -104,7 +105,8 @@ export const AppSidebar = () => {
                   );
                 })}
 
-              {userSubscriptionInfo?.invitedUser &&
+              {(userSubscriptionInfo?.invitedUser ||
+                userSubscriptionInfo?.deletedMember) &&
                 INVITED_USER_NAVIGATION_ITEMS.map((item) => {
                   const isActive = pathname === item.path;
 

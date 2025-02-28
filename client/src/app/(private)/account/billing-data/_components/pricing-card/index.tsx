@@ -10,11 +10,11 @@ import { AuthContext } from "@/context";
 import {
   useActivateSubscription,
   usePaySubscription,
-  useCancelChangeSubscriptionPlan,
+  // useCancelChangeSubscriptionPlan,
 } from "@/hooks";
 import { CreatePaymentData } from "@/services";
 import { Plan, PlanType } from "@/types";
-import { format } from "date-fns";
+// import { format } from "date-fns";
 import { Check } from "lucide-react";
 import { useContext, useState } from "react";
 import { ChangePlanModal } from "../change-plan-modal";
@@ -27,6 +27,7 @@ interface PricingCardProps {
   subscriptionId?: string;
   nextDate?: string;
   newPlanId?: string;
+  closePlansModal?: () => void;
 }
 
 const PLAN_FEATURES = {
@@ -47,8 +48,9 @@ export const PricingCard = ({
   currentUserPlanId,
   isActive,
   subscriptionId,
-  newPlanId,
+  // newPlanId,
   nextDate,
+  closePlansModal,
 }: PricingCardProps) => {
   const { user } = useContext(AuthContext);
   const {
@@ -59,10 +61,10 @@ export const PricingCard = ({
     mutate: activateSubscriptionMutation,
     isPending: isActivateSubscriptionPending,
   } = useActivateSubscription();
-  const {
-    mutate: cancelChangeSubscriptionPlan,
-    isPending: isCancelChangeSubscriptionPlan,
-  } = useCancelChangeSubscriptionPlan();
+  // const {
+  //   mutate: cancelChangeSubscriptionPlan,
+  //   isPending: isCancelChangeSubscriptionPlan,
+  // } = useCancelChangeSubscriptionPlan();
 
   const [quantity, setQuantity] = useState(1);
 
@@ -187,13 +189,19 @@ export const PricingCard = ({
           currentUserPlanId !== plan.id &&
           subscriptionId && (
             <div className="w-full">
-              {newPlanId === plan.id && (
+              <ChangePlanModal
+                nextDate={nextDate}
+                subscriptionId={subscriptionId}
+                plan={plan}
+                closePlansModal={closePlansModal!}
+              />
+              {/* {newPlanId === plan.id && (
                 <p className="mb-2">
                   Selected as new Plan from{" "}
                   {format(new Date(nextDate), "MMMM dd, yyyy")}
                 </p>
-              )}
-              {newPlanId === plan.id ? (
+              )} */}
+              {/* {newPlanId === plan.id ? (
                 <Button
                   variant={"secondary"}
                   className="w-full"
@@ -209,7 +217,7 @@ export const PricingCard = ({
                   subscriptionId={subscriptionId}
                   plan={plan}
                 />
-              )}
+              )} */}
             </div>
           )}
         {withButton && (

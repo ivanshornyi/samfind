@@ -8,9 +8,10 @@ import { UserLicenseService } from "./user-license.service";
 import { UserLicenseController } from "./user-license.controller";
 import { MailModule } from "../mail/mail.module";
 import { MailService } from "../mail/mail.service";
+import { StripeModule } from "../stripe/stripe.module";
 
 @Module({
-  imports: [PrismaModule, ConfigModule.forRoot(), MailModule],
+  imports: [PrismaModule, ConfigModule.forRoot(), MailModule, StripeModule],
   providers: [UserLicenseService, PrismaService, MailService],
   controllers: [UserLicenseController],
   exports: [],

@@ -31,6 +31,7 @@ import { createHash } from "crypto";
 import { AuthVerificationDto } from "./dto/auth-verification-dto";
 import { SubscriptionService } from "../subscription/subscription.service";
 import { UserLicenseService } from "../user-license/user-license.service";
+import { StripeService } from "../stripe/stripe.service";
 
 type LicenseWithRelations = License & {
   user: User;
@@ -46,6 +47,7 @@ export class AuthService {
     private readonly mailService: MailService,
     private readonly subscriptionService: SubscriptionService,
     private readonly userLicenseService: UserLicenseService,
+    private readonly stripeService: StripeService,
   ) {}
 
   public async signUp(signUpDto: SignUpDto) {
@@ -500,17 +502,20 @@ export class AuthService {
         data: { userId: member.id },
       });
     } else {
-      // Create and pay Invoice for License of invited user
-      const invoice = await this.subscriptionService.payMemberInvoice({
-        memberId: member.id,
-        ownerId: license.ownerId,
-      });
+      const stripeSubscription = await this.stripeService.getSubscriptionById(
+        license.subscription.stripeSubscriptionId,
+      );
 
-      if (invoice.status !== "paid") {
-        throw new BadRequestException(
-          "An error occurred when paying for the License",
-        );
-      }
+      if (!stripeSubscription)
+        throw new NotFoundException("Subscription not found");
+
+      await this.stripeService.changeSubscriptionItems({
+        subscriptionId: license.subscription.stripeSubscriptionId,
+        subscriptionItemId: stripeSubscription.items.data[0].id,
+        quantity: stripeSubscription.items.data[0].quantity + 1,
+        metadata: { memberId: member.id },
+        description: `Plan - ${license.subscription.plan.type} - ${license.subscription.plan.period}. Quantity - ${stripeSubscription.items.data[0].quantity + 1}.`,
+      });
     }
   }
 
