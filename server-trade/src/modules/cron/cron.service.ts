@@ -18,7 +18,6 @@ export class CronService {
       * and cancel old orders.
       */
 
-  // every day at midnight (12AM)
   @Cron("0 0 * * *")
   async handleStockOrdersCleanUp() {
     try {
@@ -26,7 +25,7 @@ export class CronService {
         "Starting cleanup of irrelevant stock orders at 00:00 AM",
       )
 
-      const oneDayAgo = new Date();
+      const oneDayAgo = new Date()
       oneDayAgo.setHours(oneDayAgo.getHours() - 24)
 
 
