@@ -38,6 +38,7 @@ export class CronService {
           },
           status: "PENDING"
         },
+        include: { user: true },
         orderBy: { createdAt: 'asc' }
       })
 
@@ -70,6 +71,17 @@ export class CronService {
         this.logger.log(
           `Successfully canceled ${allStockOrders.length} expired stock orders.`,
         )
+
+        // email notifications to all users
+        const emailPromises = allStockOrders.map((order) =>
+          this.mailService.sendOrderMessage(
+            order.user.email,
+            "Your stock order has been canceled",
+            `Dear user, your stock order (ID: ${order.id}) placed on ${order.createdAt.toISOString()} has been canceled due to being older than 24 hours. Please create a new order if needed.`
+          ))
+
+        await Promise.all(emailPromises)
+        this.logger.log(`Successfully sent cancellation emails to ${allStockOrders.length} users`)
 
       } else {
         this.logger.log("No expired stock orders found to cancel.")
