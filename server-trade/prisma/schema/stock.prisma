@@ -9,5 +9,9 @@ model Stock {
   transactionHistory TransactionHistory[]
   orders             OrderStock[]
 
+  // Probably we gonna need the isCompanyOwnership: boolean - which gonna make that
+  // if this stock will be purchased with % from trade, or without it
+  // EX: Onsio X: false - will not be sold with %, but Apple X: true - we want 5% of the shares trade (revenue / income)
+
   @@map("stock")
 }
