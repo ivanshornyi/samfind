@@ -3,6 +3,13 @@ import { Cron } from "@nestjs/schedule"
 import { PrismaService } from "nestjs-prisma"
 import { MailService } from "../mail/mail.service"
 
+/**
+  |============================
+  | CRON right now is under development
+  | It seems we dont need that job right now, but we might use him later
+  |============================
+*/
+
 @Injectable()
 export class CronService {
   private readonly logger = new Logger(CronService.name)
