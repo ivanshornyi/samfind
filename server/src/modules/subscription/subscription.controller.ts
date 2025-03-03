@@ -5,7 +5,6 @@ import { SubscriptionService } from "./subscription.service";
 import { AddSubscriptionDto } from "./dto/add-subscription-dto";
 import { CreateMemberInvoiceDto } from "./dto/create-member-invoice-dto";
 import { ChangePlanDto } from "./dto/change-plan-dto";
-import { CancelChangePlanDto } from "./dto/cancel-change-plan-dto";
 
 @ApiTags("Subscription")
 @Controller("subscription")

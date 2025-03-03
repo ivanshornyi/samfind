@@ -1,21 +1,16 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import {
-  addMonths,
-  addYears,
-  compareAsc,
-  startOfDay,
-  startOfMonth,
-} from "date-fns";
+import { compareAsc, startOfDay } from "date-fns";
 import { PrismaService } from "../prisma/prisma.service";
 import {
   BalanceType,
   LicenseStatus,
   LicenseTierType,
-  PlanPeriod,
   TransactionType,
   User,
 } from "@prisma/client";
@@ -31,10 +26,16 @@ interface IAddDiscountOnNotUsedPeriod {
   owner: User;
   memberEmail: string;
 }
+
+interface IAddDiscount {
+  discountAmount: number;
+  userId: string;
+}
 @Injectable()
 export class SubscriptionService {
   constructor(
     private readonly prisma: PrismaService,
+    @Inject(forwardRef(() => StripeService))
     private readonly stripeService: StripeService,
   ) {}
 
@@ -512,11 +513,6 @@ export class SubscriptionService {
         subscription.stripeSubscriptionId,
       );
 
-      const updatedStripeSubscription =
-        await this.stripeService.getSubscriptionById(
-          subscription.stripeSubscriptionId,
-        );
-
       const invoiceId =
         typeof stripeSubscription.latest_invoice === "string"
           ? stripeSubscription.latest_invoice
@@ -605,6 +601,42 @@ export class SubscriptionService {
     );
 
     return discountHistory;
+  }
+
+  async addDiscount({ discountAmount, userId }: IAddDiscount) {
+    const subscription = await this.prisma.subscription.findUnique({
+      where: { userId },
+    });
+
+    if (!subscription || !subscription.stripeSubscriptionId)
+      throw new NotFoundException("Subscription not found");
+
+    const discountDb = await this.prisma.discount.findFirst({
+      where: { userId, used: null },
+    });
+
+    const stripeCoupon = await this.stripeService.createCoupon(discountAmount);
+
+    await this.stripeService.updateSubscriptionDiscount(
+      subscription.stripeSubscriptionId,
+      stripeCoupon.id,
+      discountDb?.stripeCouponId,
+    );
+
+    if (discountDb) {
+      await this.prisma.discount.update({
+        where: { id: discountDb.id },
+        data: { stripeCouponId: stripeCoupon.id, amount: discountAmount },
+      });
+    } else {
+      await this.prisma.discount.create({
+        data: {
+          stripeCouponId: stripeCoupon.id,
+          amount: discountAmount,
+          userId,
+        },
+      });
+    }
   }
 
   async getInvoice() {

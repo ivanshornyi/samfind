@@ -7,7 +7,11 @@ import { WalletModule } from "../wallet/wallet.module";
 import { StripeModule } from "../stripe/stripe.module";
 
 @Module({
-  imports: [PrismaModule, WalletModule, forwardRef(() => StripeModule)],
+  imports: [
+    PrismaModule,
+    forwardRef(() => WalletModule),
+    forwardRef(() => StripeModule),
+  ],
   controllers: [ShareController],
   providers: [ShareService],
   exports: [ShareService],

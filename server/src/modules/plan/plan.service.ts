@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 
 import { PrismaService } from "../prisma/prisma.service";
-import { LicenseStatus, LicenseTierType } from "@prisma/client";
+import { LicenseTierType } from "@prisma/client";
 import { StripeService } from "../stripe/stripe.service";
 import { CreatePlanDto } from "./dto/create-plan-dto";
 

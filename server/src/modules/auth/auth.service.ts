@@ -4,7 +4,6 @@ import {
   NotFoundException,
   UnauthorizedException,
   ConflictException,
-  BadRequestException,
 } from "@nestjs/common";
 
 import {
@@ -12,7 +11,6 @@ import {
   LicenseStatus,
   LicenseTierType,
   Plan,
-  PlanPeriod,
   Subscription,
   User,
   UserAccountType,
@@ -29,7 +27,6 @@ import { SendCodeForEmailDto } from "./dto/send-code-for-email.dto";
 
 import { createHash } from "crypto";
 import { AuthVerificationDto } from "./dto/auth-verification-dto";
-import { SubscriptionService } from "../subscription/subscription.service";
 import { UserLicenseService } from "../user-license/user-license.service";
 import { StripeService } from "../stripe/stripe.service";
 
@@ -45,7 +42,6 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly tokenService: TokenService,
     private readonly mailService: MailService,
-    private readonly subscriptionService: SubscriptionService,
     private readonly userLicenseService: UserLicenseService,
     private readonly stripeService: StripeService,
   ) {}

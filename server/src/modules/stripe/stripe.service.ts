@@ -15,15 +15,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { UserService } from "../user/user.service";
 
 import { CreateIntentDto } from "./dto/create-intent-dto";
-import {
-  addMonths,
-  addYears,
-  getDate,
-  getDaysInMonth,
-  getMonth,
-  isSameDay,
-  startOfMonth,
-} from "date-fns";
+import { getDate, getDaysInMonth, getMonth, isSameDay } from "date-fns";
 import { MailService } from "../mail/mail.service";
 import { ShareService } from "../share/share.service";
 
@@ -115,6 +107,10 @@ export class StripeService {
       currency: "eur",
       duration: "once",
     });
+  }
+
+  async deleteCoupon(couponId: string) {
+    return await this.stripe.coupons.del(couponId);
   }
 
   async getUserInvoices(
@@ -766,6 +762,22 @@ export class StripeService {
       jurisdiction: "NO",
       percentage, // VAT 25%
       inclusive: false, // Чи включено у загальну ціну (false - додається окремо)
+    });
+  }
+
+  async updateSubscriptionDiscount(
+    subscriptionId: string,
+    couponId: string,
+    oldCouponId?: string,
+  ) {
+    await this.stripe.subscriptions.update(subscriptionId, {
+      coupon: null,
+    });
+
+    if (oldCouponId) await this.deleteCoupon(oldCouponId);
+
+    await this.stripe.subscriptions.update(subscriptionId, {
+      coupon: couponId,
     });
   }
 }

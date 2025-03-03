@@ -7,10 +7,14 @@ import {
 import { PrismaService } from "../prisma/prisma.service";
 import { UpdateWalletDto } from "./dto/update-user-license-dto";
 import { BalanceType, TransactionType } from "@prisma/client";
+import { SubscriptionService } from "../subscription/subscription.service";
 
 @Injectable()
 export class WalletService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly subscriptionService: SubscriptionService,
+  ) {}
 
   async getUserWallet(userId: string) {
     return await this.prisma.wallet.findUnique({ where: { userId } });
@@ -40,6 +44,11 @@ export class WalletService {
             balanceType: BalanceType.discount,
             description: "Transfer from a bonus balance",
           },
+        });
+
+        await this.subscriptionService.addDiscount({
+          discountAmount,
+          userId: wallet.userId,
         });
       }
 
