@@ -16,6 +16,7 @@ import { CreateSharesInvoiceDto } from "./dto/create-shares-invoice-dto";
 export class ShareService {
   constructor(
     private readonly prisma: PrismaService,
+    @Inject(forwardRef(() => WalletService))
     private readonly walletService: WalletService,
     @Inject(forwardRef(() => StripeService))
     private readonly stripeService: StripeService,

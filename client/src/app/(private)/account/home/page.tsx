@@ -6,7 +6,8 @@ import { AuthContext } from "@/context";
 
 import { useToast } from "@/hooks";
 
-const frontendDomain = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN;
+const frontendDomain =
+  process.env.NEXT_PUBLIC_FRONTEND_DOMAIN || "https://www.onsio.io";
 
 export default function Home() {
   const { user } = useContext(AuthContext);

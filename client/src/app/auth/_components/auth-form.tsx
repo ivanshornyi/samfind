@@ -51,6 +51,11 @@ const validateEmail = (email: string) => {
   return emailRegex.test(email);
 };
 
+const options = [
+  { name: "Yes", value: "yes" },
+  { name: "No", value: "no" },
+];
+
 export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
   const { toast } = useToast();
 
@@ -69,6 +74,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
     lastName: "",
     email: "",
     password: "",
+    norwayValue: "",
   });
   const [passwordInputType, setPasswordInputType] = useState<
     "password" | "text"
@@ -181,7 +187,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
       if (
         formData.firstName === "" ||
         formData.email === "" ||
-        formData.password === ""
+        formData.password === "" ||
+        formData.norwayValue === ""
       ) {
         toast({
           description: "Some fields are empty",
@@ -209,6 +216,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
         password: formData.password.trim(),
         authType: UserAuthType.Email,
         accountType,
+        isFromNorway: formData.norwayValue === "yes",
       };
 
       if (referralCode) {
@@ -440,6 +448,41 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                       )}
                     </button>
                   </div>
+                  {authPageType === "signUp" && (
+                    <div>
+                      <p className="mt-4 text-lg">
+                        {accountType === UserAccountType.Business
+                          ? "Is your company from Norway / Er dette et norsk selskap?"
+                          : "Are you currently living in Norway / Bor du i Norge?"}
+                      </p>
+                      <div className="flex gap-4 mt-4">
+                        {options.map((option) => (
+                          <label
+                            key={option.value}
+                            className="flex items-center gap-2 cursor-pointer"
+                          >
+                            <input
+                              type="radio"
+                              name="norwayValue"
+                              value={option.value}
+                              checked={formData.norwayValue === option.value}
+                              onChange={handleFormInputChange}
+                              className="peer hidden"
+                            />
+                            <div className="w-5 h-5 border-2 border-[#A64CE8] rounded-full flex items-center justify-center ">
+                              <div
+                                className={`w-2.5 h-2.5 ${formData.norwayValue === option.value ? "bg-[#A64CE8]" : "bg-transparent"} rounded-full peer-checked:bg-transparent`}
+                              ></div>
+                            </div>
+                            <span className="peer-checked:text-[#A64CE8] text-[16px] leading-[22px] font-semibold">
+                              {option.name}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {showPasswordError ? (
                     <div className="text-xs mt-2">
                       <p className="font-normal">

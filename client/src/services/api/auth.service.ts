@@ -34,6 +34,7 @@ export type SignUpData = {
   authType: UserAuthType;
   accountType: UserAccountType;
   invitedReferralCode?: number;
+  isFromNorway: boolean;
   organization?: {
     name: string;
     VAT?: string;

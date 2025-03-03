@@ -5,6 +5,7 @@ import {
   ValidateNested,
   IsNumber,
   IsArray,
+  IsBoolean,
 } from "class-validator";
 import { Type } from "class-transformer";
 
@@ -72,4 +73,7 @@ export class SignUpDto extends SignInDto {
   @IsNumber()
   @IsOptional()
   invitedReferralCode?: number;
+
+  @IsBoolean()
+  isFromNorway: boolean;
 }

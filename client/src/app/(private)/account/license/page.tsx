@@ -443,7 +443,8 @@ export default function License() {
           </>
         )}
 
-        {userRoleSubscriptionInfo?.invitedUser && (
+        {(userRoleSubscriptionInfo?.invitedUser ||
+          userRoleSubscriptionInfo?.deletedMember) && (
           <div className="mt-4">
             <UserAccountTypeBox />
 

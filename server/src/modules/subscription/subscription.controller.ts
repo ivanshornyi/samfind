@@ -5,7 +5,6 @@ import { SubscriptionService } from "./subscription.service";
 import { AddSubscriptionDto } from "./dto/add-subscription-dto";
 import { CreateMemberInvoiceDto } from "./dto/create-member-invoice-dto";
 import { ChangePlanDto } from "./dto/change-plan-dto";
-import { CancelChangePlanDto } from "./dto/cancel-change-plan-dto";
 
 @ApiTags("Subscription")
 @Controller("subscription")
@@ -62,11 +61,17 @@ export class SubscriptionController {
     return this.subscriptionService.changePlan(changePlanDto);
   }
 
-  @ApiOperation({ summary: "Cancel change Subscription Plan" })
-  @Post("/cancel-change-plan")
-  async cancelChangePlan(@Body() cancelChangePlanDto: CancelChangePlanDto) {
-    return this.subscriptionService.cancelChangePlan(
-      cancelChangePlanDto.subscriptionId,
-    );
+  // @ApiOperation({ summary: "Cancel change Subscription Plan" })
+  // @Post("/cancel-change-plan")
+  // async cancelChangePlan(@Body() cancelChangePlanDto: CancelChangePlanDto) {
+  //   return this.subscriptionService.cancelChangePlan(
+  //     cancelChangePlanDto.subscriptionId,
+  //   );
+  // }
+
+  @ApiOperation({ summary: "Get User Discount History" })
+  @Get("invoice")
+  async getInvoice() {
+    return this.subscriptionService.getInvoice();
   }
 }

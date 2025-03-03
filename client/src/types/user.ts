@@ -32,6 +32,9 @@ export interface User {
   email: string;
   authType: UserAuthType;
   accountType: UserAccountType;
+  isFromNorway?: boolean;
+  isSale?: boolean;
+  isStaff?: boolean;
   role: UserRole;
   status: UserStatus;
   referralCode: string;

@@ -17,17 +17,18 @@ import { X } from "lucide-react";
 
 import { PricingCard } from "../pricing-card";
 import { CancelSubscriptionModal } from "../cancel-subscription-modal";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "@/context";
 import { PlanType, UserAccountType } from "@/types";
 
 export const ManageSubscriptionModal = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const { data: plans } = useGetPlans();
   const { data: userSubscription } = useGetUserSubscriptionInfo();
   const { user } = useContext(AuthContext);
 
   return (
-    <AlertDialog>
+    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
         <Button variant="ghost" className="text-blue-50">
           Manage subscription
@@ -40,7 +41,10 @@ export const ManageSubscriptionModal = () => {
         "
       >
         <div className="absolute right-5 top-5">
-          <AlertDialogCancel className="shadow-none border-none p-1 rounded-full bg-card">
+          <AlertDialogCancel
+            onClick={() => setIsOpen(false)}
+            className="shadow-none border-none p-1 rounded-full bg-card"
+          >
             <X size={18} />
           </AlertDialogCancel>
         </div>
@@ -71,6 +75,7 @@ export const ManageSubscriptionModal = () => {
                   subscriptionId={userSubscription?.id}
                   newPlanId={userSubscription?.newPlanId}
                   nextDate={userSubscription?.nextDate}
+                  closePlansModal={() => setIsOpen(false)}
                 />
               </div>
             ))}

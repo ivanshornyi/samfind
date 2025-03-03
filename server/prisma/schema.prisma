@@ -40,6 +40,9 @@ model User {
   role                      UserRole
   isVerified                Boolean               @default(false)
   isDeleted                 Boolean               @default(false)
+  isFromNorway              Boolean               @default(false)
+  isSale                    Boolean               @default(false)
+  isStaff                   Boolean               @default(false)
   registrationCode          String?
   registrationCodeExpiresAt DateTime?
   resetCode                 String?               @db.VarChar
@@ -157,21 +160,22 @@ model Plan {
 }
 
 model Subscription {
-  id               String    @id @default(uuid())
-  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId           String    @unique
-  license          License?  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
-  licenseId        String?   @unique
-  plan             Plan      @relation(fields: [planId], references: [id], onDelete: Cascade)
-  planId           String
-  isActive         Boolean
-  isInTrial        Boolean
-  stripeInvoiceIds String[]  @default([])
-  nextDate         DateTime
-  cancelDate       DateTime?
-  newPlanId        String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id                   String    @id @default(uuid())
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId               String    @unique
+  license              License?  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  licenseId            String?   @unique
+  plan                 Plan      @relation(fields: [planId], references: [id], onDelete: Cascade)
+  planId               String
+  isActive             Boolean
+  isInTrial            Boolean
+  stripeSubscriptionId String
+  stripeInvoiceIds     String[]  @default([])
+  nextDate             DateTime
+  cancelDate           DateTime?
+  newPlanId            String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
   @@map("subscription")
 }
@@ -256,9 +260,10 @@ model AppSettings {
   sharePrice             Float?
   shareStripeProductId   String?
   shareStripePriceId     String?
+  stripeTaxId            String?
   limitOfSharesPurchased Float?   @default(0)
   currentSharesPurchased Float?   @default(0)
-  earlyBirdPeriod        Boolean
+  earlyBirdPeriod        Boolean  @default(false)
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 
@@ -290,6 +295,7 @@ model UserShareholdersData {
 
 enum PurchaseType {
   bonus
+  earlyBird
   money
 }
 
