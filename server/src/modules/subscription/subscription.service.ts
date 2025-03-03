@@ -12,20 +12,11 @@ import {
   LicenseStatus,
   LicenseTierType,
   TransactionType,
-  User,
 } from "@prisma/client";
 import { StripeService } from "../stripe/stripe.service";
 import { AddSubscriptionDto } from "./dto/add-subscription-dto";
-import { CreateMemberInvoiceDto } from "./dto/create-member-invoice-dto";
 import Stripe from "stripe";
 import { ChangePlanDto } from "./dto/change-plan-dto";
-
-interface IAddDiscountOnNotUsedPeriod {
-  totalAmount: number;
-  nextDate?: Date;
-  owner: User;
-  memberEmail: string;
-}
 
 interface IAddDiscount {
   discountAmount: number;
@@ -176,50 +167,6 @@ export class SubscriptionService {
     return { url: invoice.hosted_invoice_url };
   }
 
-  async payMemberInvoice({ memberId, ownerId }: CreateMemberInvoiceDto) {
-    const subscription = await this.prisma.subscription.findFirst({
-      where: {
-        userId: ownerId,
-      },
-      include: {
-        user: true,
-        plan: true,
-      },
-    });
-
-    if (!subscription || !subscription.user.stripeCustomerId)
-      throw new NotFoundException("Subscription not found");
-
-    const member = await this.prisma.user.findUnique({
-      where: { id: memberId },
-    });
-
-    if (!member) throw new NotFoundException("User not found");
-
-    const { discountId, discountAmount } = await this.checkDiscount(
-      subscription.userId,
-      subscription.plan.price,
-    );
-
-    const metadata = {
-      quantity: 1,
-      subscriptionId: subscription.id,
-      memberId: member.id,
-      stripeCouponId: discountId,
-      discountAmount,
-    };
-
-    return await this.stripeService.createAndPayInvoice({
-      customerId: subscription.user.stripeCustomerId,
-      priceId: subscription.plan.stripePriceId,
-      quantity: 1,
-      description: `Member License: ${member.email}`,
-      metadata,
-      couponId: discountId,
-      pay: true,
-    });
-  }
-
   async getBillingHistory(userId: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
 
@@ -265,19 +212,6 @@ export class SubscriptionService {
       }));
 
     return invoices;
-  }
-
-  async addDiscountOnNotUsedPeriod({
-    totalAmount,
-    owner,
-    nextDate,
-    memberEmail,
-  }: IAddDiscountOnNotUsedPeriod) {
-    const discountAmount = this.stripeService.calculateDiscount(
-      totalAmount,
-      nextDate,
-    );
-    await this.stripeService.addDiscount(owner, discountAmount, memberEmail);
   }
 
   async cancelSubscription(id: string) {
@@ -391,55 +325,6 @@ export class SubscriptionService {
     return { status: LicenseStatus.active };
   }
 
-  async checkDiscount(userId: string, payAmount: number) {
-    let discountId = undefined;
-    let discountAmount = undefined;
-
-    const wallet = await this.prisma.wallet.findUnique({ where: { userId } });
-
-    if (!wallet || !wallet?.discountAmount)
-      return { discountId, discountAmount };
-
-    if (payAmount >= wallet.discountAmount) {
-      discountAmount = wallet.discountAmount;
-    } else {
-      discountAmount = payAmount;
-    }
-
-    const stripeDiscount =
-      await this.stripeService.createCoupon(discountAmount);
-
-    discountId = stripeDiscount.id;
-
-    await this.prisma.discount.create({
-      data: {
-        userId,
-        amount: discountAmount,
-        stripeCouponId: discountId,
-      },
-    });
-
-    await this.prisma.wallet.update({
-      where: { id: wallet.id },
-      data: {
-        discountAmount: { decrement: discountAmount },
-      },
-    });
-
-    await this.prisma.walletTransaction.create({
-      data: {
-        userId,
-        walletId: wallet.id,
-        amount: discountAmount,
-        transactionType: TransactionType.expense,
-        balanceType: BalanceType.discount,
-        description: "Subscription payment",
-      },
-    });
-
-    return { discountId, discountAmount };
-  }
-
   async changePlan({ planId, subscriptionId }: ChangePlanDto) {
     const subscription = await this.prisma.subscription.findUnique({
       where: { id: subscriptionId },
@@ -538,41 +423,6 @@ export class SubscriptionService {
     return plan;
   }
 
-  // async cancelChangePlan(subscriptionId: string) {
-  //   const subscription = await this.prisma.subscription.findUnique({
-  //     where: { id: subscriptionId },
-  //     include: { plan: true },
-  //   });
-
-  //   if (!subscription) {
-  //     throw new NotFoundException("Subscription not found");
-  //   }
-
-  //   const stripeSubscription = await this.stripeService.getSubscriptionById(
-  //     subscription.stripeSubscriptionId,
-  //   );
-
-  //   if (!stripeSubscription) {
-  //     throw new NotFoundException("Subscription not found");
-  //   }
-
-  //   await this.stripeService.changeSubscriptionItems({
-  //     subscriptionId: stripeSubscription.id,
-  //     subscriptionItemId: stripeSubscription.items.data[0].id,
-  //     newPriceId: subscription.plan.stripePriceId,
-  //     quantity: stripeSubscription.items.data[0].quantity,
-  //     metadata: { newPlan: null },
-  //     description: `Plan - ${license.subscription.plan.type} - ${license.subscription.plan.period}. Quantity - ${stripeSubscription.items.data[0].quantity + 1}.`,
-  //   });
-
-  //   await this.prisma.subscription.update({
-  //     where: { id: subscriptionId },
-  //     data: { newPlanId: null },
-  //   });
-
-  //   return { status: "canalled" };
-  // }
-
   async getDiscountHistory(userId: string) {
     const discountHistory: {
       id: string;
@@ -604,55 +454,66 @@ export class SubscriptionService {
   }
 
   async addDiscount({ discountAmount, userId }: IAddDiscount) {
-    const subscription = await this.prisma.subscription.findUnique({
-      where: { userId },
-    });
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
 
-    if (!subscription || !subscription.stripeSubscriptionId)
+    if (!user || !user.stripeCustomerId)
       throw new NotFoundException("Subscription not found");
 
-    const discountDb = await this.prisma.discount.findFirst({
-      where: { userId, used: null },
-    });
-
-    const stripeCoupon = await this.stripeService.createCoupon(discountAmount);
-
-    await this.stripeService.updateSubscriptionDiscount(
-      subscription.stripeSubscriptionId,
-      stripeCoupon.id,
-      discountDb?.stripeCouponId,
+    await this.stripeService.updateCustomerBalance(
+      user.stripeCustomerId,
+      discountAmount,
     );
 
-    if (discountDb) {
-      await this.prisma.discount.update({
-        where: { id: discountDb.id },
-        data: { stripeCouponId: stripeCoupon.id, amount: discountAmount },
-      });
-    } else {
-      await this.prisma.discount.create({
-        data: {
-          stripeCouponId: stripeCoupon.id,
-          amount: discountAmount,
-          userId,
-        },
-      });
-    }
+    // const subscription = await this.prisma.subscription.findUnique({
+    //   where: { userId },
+    // });
+
+    // if (!subscription || !subscription.stripeSubscriptionId)
+    //   throw new NotFoundException("Subscription not found");
+
+    // const discountDb = await this.prisma.discount.findFirst({
+    //   where: { userId, used: false },
+    // });
+
+    // const stripeCoupon = await this.stripeService.createCoupon(discountAmount);
+
+    // await this.stripeService.updateSubscriptionDiscount(
+    //   subscription.stripeSubscriptionId,
+    //   stripeCoupon.id,
+    //   discountDb?.stripeCouponId,
+    // );
+
+    // if (discountDb) {
+    //   await this.prisma.discount.update({
+    //     where: { id: discountDb.id },
+    //     data: { stripeCouponId: stripeCoupon.id, amount: discountAmount },
+    //   });
+    // } else {
+    //   await this.prisma.discount.create({
+    //     data: {
+    //       stripeCouponId: stripeCoupon.id,
+    //       amount: discountAmount,
+    //       userId,
+    //     },
+    //   });
+    // }
   }
 
   async getInvoice() {
-    const metadata = {
-      quantity: 1,
-      userId: null,
-    };
-    await this.stripeService.updateSubscriptionMetadata(
-      "sub_1Qx35fIQ0ONDLa6ipDSz3ypQ",
-      metadata,
-    );
-    return await this.stripeService.getSubscriptionById(
-      "sub_1Qx35fIQ0ONDLa6ipDSz3ypQ",
-    );
+    // const metadata = {
+    //   quantity: 1,
+    //   userId: null,
+    // };
+    // await this.stripeService.updateSubscriptionMetadata(
+    //   "sub_1Qx35fIQ0ONDLa6ipDSz3ypQ",
+    //   metadata,
+    // );
+    // return await this.stripeService.getSubscriptionById(
+    //   "sub_1Qx35fIQ0ONDLa6ipDSz3ypQ",
+    // );
+    return await this.stripeService.getCustomer("cus_RsI52aPRbvrJlx");
     return await this.stripeService.getInvoiceById(
-      "in_1QwlnEIQ0ONDLa6ixSajagSO",
+      "in_1QyWH1IQ0ONDLa6iT2udZXA9",
     );
   }
 }

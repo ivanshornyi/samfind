@@ -6,9 +6,6 @@ import {
   UserAccountType,
   LicenseStatus,
   PlanPeriod,
-  User,
-  TransactionType,
-  BalanceType,
   PurchaseType,
 } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
@@ -18,6 +15,8 @@ import { CreateIntentDto } from "./dto/create-intent-dto";
 import { getDate, getDaysInMonth, getMonth, isSameDay } from "date-fns";
 import { MailService } from "../mail/mail.service";
 import { ShareService } from "../share/share.service";
+import { WalletService } from "../wallet/wallet.service";
+import { SubscriptionService } from "../subscription/subscription.service";
 
 interface ICreatePaymentSession {
   customerId: string;
@@ -64,6 +63,12 @@ export interface IChangeSubscriptionItems {
   metadata: { [key: string]: string | number };
 }
 
+interface IAddTax {
+  name: string;
+  description: string;
+  percentage: number;
+}
+
 @Injectable()
 export class StripeService {
   private readonly logger = new Logger(StripeService.name);
@@ -76,6 +81,8 @@ export class StripeService {
     private readonly mailService: MailService,
     @Inject(forwardRef(() => ShareService))
     private readonly shareService: ShareService,
+    private readonly walletService: WalletService,
+    private readonly subscriptionService: SubscriptionService,
   ) {
     this.stripe = new Stripe(this.configService.get("STRIPE_SECRET_KEY"), {
       apiVersion: "2024-12-18.acacia",
@@ -84,6 +91,22 @@ export class StripeService {
 
   async createCustomer(email: string, name: string): Promise<Stripe.Customer> {
     return await this.stripe.customers.create({ email, name });
+  }
+
+  async getCustomer(customerId: string) {
+    return (await this.stripe.customers.retrieve(
+      customerId,
+    )) as Stripe.Customer;
+  }
+
+  async updateCustomerBalance(customerId: string, amount: number) {
+    const customer = (await this.getCustomer(customerId)) as Stripe.Customer;
+
+    if (!customer) return;
+
+    return await this.stripe.customers.update(customerId, {
+      balance: customer.balance - amount,
+    });
   }
 
   async createProduct(
@@ -274,7 +297,6 @@ export class StripeService {
 
   async handleEvent(event: Stripe.Event) {
     const invoice = event.data.object as Stripe.Invoice;
-
     switch (event.type) {
       case "invoice.payment_succeeded":
         this.handleSuccessfulInvoicePayment(invoice);
@@ -343,14 +365,8 @@ export class StripeService {
           price: invoice.total,
         });
       } else if (invoice.subscription) {
-        const {
-          userId,
-          userReferralCode,
-          memberId,
-          newPlan,
-          quantity,
-          stripeCouponId,
-        } = invoice.subscription_details.metadata;
+        const { userId, userReferralCode, memberId, newPlan, quantity } =
+          invoice.subscription_details.metadata;
         const metadata = invoice.subscription_details.metadata;
 
         const subscription = await this.prisma.subscription.findUnique({
@@ -521,19 +537,11 @@ export class StripeService {
           );
         }
 
-        if (stripeCouponId) {
-          await this.prisma.discount.updateMany({
-            where: { stripeCouponId },
-            data: {
-              used: true,
-            },
-          });
+        // if (invoice.discount) {
+        //   const couponId = invoice.discount?.coupon?.id;
 
-          await this.updateSubscriptionMetadata(
-            invoice.subscription as string,
-            { stripeCouponId: null },
-          );
-        }
+        //   await this.updateUsedDiscount(couponId, invoice.subtotal);
+        // }
 
         const stripeSubscription = await this.getSubscriptionById(
           invoice.subscription as string,
@@ -592,64 +600,38 @@ export class StripeService {
     }
   }
 
-  async addDiscount(user: User, discountAmount: number, email: string) {
-    const wallet = await this.prisma.wallet.findUnique({
-      where: { userId: user.id },
+  async updateUsedDiscount(stripeCouponId: string, subtotal: number) {
+    const discount = await this.prisma.discount.findFirst({
+      where: { stripeCouponId },
+      include: { user: { include: { wallet: true } } },
     });
 
-    if (!wallet) return;
+    if (!discount) return;
 
-    await this.prisma.wallet.update({
-      where: { userId: user.id },
-      data: { discountAmount: { increment: discountAmount } },
-    });
+    let discountAmount = 0;
 
-    await this.prisma.walletTransaction.create({
-      data: {
-        userId: user.id,
-        walletId: wallet.id,
-        amount: discountAmount,
-        transactionType: TransactionType.income,
-        balanceType: BalanceType.discount,
-        description: `Discount for unused user period user with email - ${email}`,
-      },
-    });
-  }
+    if (discount.amount > subtotal) {
+      discountAmount = discount.amount - subtotal;
 
-  async checkAndAddEarlyBirdBonus(userId: string, amount: number) {
-    const appSettings = await this.prisma.appSettings.findFirst({
-      where: {},
-    });
+      await this.prisma.discount.update({
+        where: { id: discount.id },
+        data: { used: true, amount: subtotal },
+      });
 
-    if (
-      !appSettings ||
-      !appSettings.earlyBirdPeriod ||
-      appSettings.currentSharesPurchased >=
-        appSettings.limitOfSharesPurchased ||
-      amount === 0
-    )
-      return;
+      await this.subscriptionService.addDiscount({
+        discountAmount,
+        userId: discount.userId,
+      });
+    } else {
+      await this.prisma.discount.update({
+        where: { id: discount.id },
+        data: { used: true },
+      });
+    }
 
-    const wallet = await this.prisma.wallet.findUnique({
-      where: { userId },
-    });
-
-    if (!wallet) return;
-
-    await this.prisma.wallet.update({
-      where: { userId },
-      data: { bonusAmount: { increment: amount } },
-    });
-
-    await this.prisma.walletTransaction.create({
-      data: {
-        userId: userId,
-        walletId: wallet.id,
-        amount,
-        transactionType: TransactionType.income,
-        balanceType: BalanceType.bonus,
-        description: `Early Bird Bonus`,
-      },
+    await this.walletService.updateWallet({
+      id: discount.user.wallet.id,
+      discountAmount,
     });
   }
 
@@ -780,10 +762,4 @@ export class StripeService {
       coupon: couponId,
     });
   }
-}
-
-interface IAddTax {
-  name: string;
-  description: string;
-  percentage: number;
 }
