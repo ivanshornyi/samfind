@@ -7,7 +7,9 @@ import { LicenseVerificationService } from "./license-verification.service";
 @ApiTags("User license verification")
 @Controller("license-verification")
 export class LicenseVerificationController {
-  constructor (private readonly licenseVerificationService: LicenseVerificationService) {}
+  constructor(
+    private readonly licenseVerificationService: LicenseVerificationService,
+  ) {}
 
   @ApiOperation({ summary: "" })
   @Get("/check-user/:email")
@@ -17,7 +19,10 @@ export class LicenseVerificationController {
 
   @ApiOperation({ summary: "" })
   @Get("/check-domain/:domain/:userEmail")
-  async checkDomain(@Param("domain") domain: string, @Param("email") email: string) {
+  async checkDomain(
+    @Param("domain") domain: string,
+    @Param("email") email: string,
+  ) {
     return await this.licenseVerificationService.checkByDomain(domain, email);
   }
 }

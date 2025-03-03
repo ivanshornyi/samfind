@@ -13,6 +13,7 @@ import { AddUserLicenseDto } from "./dto/add-user-license-dto";
 import { UpdateUserLicenseDto } from "./dto/update-user-license-dto";
 import { CheckDeviceDto } from "./dto/check-device-dto";
 import { DeleteDeviceIdDto } from "./dto/delete-device-id-dto";
+import { StripeService } from "../stripe/stripe.service";
 
 @Injectable()
 export class UserLicenseService {
@@ -20,6 +21,7 @@ export class UserLicenseService {
     private readonly prisma: PrismaService,
     private readonly mailService: MailService,
     private readonly configService: ConfigService,
+    private readonly stripeService: StripeService,
   ) {}
 
   async addLicense(createUserLicenseDto: AddUserLicenseDto) {
@@ -274,7 +276,9 @@ export class UserLicenseService {
   async deleteMemberFromLicense(id: string) {
     const activeLicense = await this.prisma.activeLicense.findFirst({
       where: { id },
-      include: { license: true },
+      include: {
+        license: { include: { subscription: { include: { plan: true } } } },
+      },
     });
 
     if (!activeLicense || activeLicense.deleteDate) {
@@ -287,6 +291,21 @@ export class UserLicenseService {
       );
     }
 
+    const stripeSubscription = await this.stripeService.getSubscriptionById(
+      activeLicense.license.subscription.stripeSubscriptionId,
+    );
+    if (!stripeSubscription) {
+      throw new NotFoundException("Subscription not found");
+    }
+
+    await this.stripeService.changeSubscriptionItems({
+      subscriptionId: stripeSubscription.id,
+      subscriptionItemId: stripeSubscription.items.data[0].id,
+      quantity: stripeSubscription.items.data[0].quantity - 1,
+      deleteMember: true,
+      metadata: {},
+      description: `Plan - ${activeLicense.license.subscription.plan.type} - ${activeLicense.license.subscription.plan.period}. Quantity - ${stripeSubscription.items.data[0].quantity - 1}.`,
+    });
     await this.prisma.activeLicense.update({
       where: { id: activeLicense.id },
       data: { deleteDate: new Date() },

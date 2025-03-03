@@ -15,14 +15,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { UserService } from "../user/user.service";
 
 import { CreateIntentDto } from "./dto/create-intent-dto";
-import {
-  addMonths,
-  addYears,
-  getDate,
-  getDaysInMonth,
-  getMonth,
-  startOfMonth,
-} from "date-fns";
+import { getDate, getDaysInMonth, getMonth, isSameDay } from "date-fns";
 import { MailService } from "../mail/mail.service";
 import { ShareService } from "../share/share.service";
 
@@ -51,6 +44,24 @@ interface ICreateAndPayInvoice {
   metadata: { [key: string]: string | number };
   couponId?: string;
   pay?: boolean;
+}
+
+interface ICreateSubscription {
+  stripeCustomerId: string;
+  items: { price: string; quantity: number }[];
+  tax: boolean;
+  metadata: { [key: string]: string | number };
+  description: string;
+}
+
+export interface IChangeSubscriptionItems {
+  newPriceId?: string;
+  subscriptionId: string;
+  subscriptionItemId: string;
+  quantity: number;
+  description: string;
+  deleteMember?: boolean;
+  metadata: { [key: string]: string | number };
 }
 
 @Injectable()
@@ -96,6 +107,10 @@ export class StripeService {
       currency: "eur",
       duration: "once",
     });
+  }
+
+  async deleteCoupon(couponId: string) {
+    return await this.stripe.coupons.del(couponId);
   }
 
   async getUserInvoices(
@@ -274,23 +289,43 @@ export class StripeService {
 
   private async handleFailedInvoicePayment(invoice: Stripe.Invoice) {
     try {
+      const stripeCustomerId =
+        typeof invoice.customer === "string"
+          ? invoice.customer
+          : invoice.customer.id;
       const invoiceLink = invoice.hosted_invoice_url;
-      const { subscriptionId } = invoice.metadata;
 
-      const subscription = await this.prisma.subscription.findUnique({
-        where: { id: subscriptionId },
-        include: { user: true },
+      const user = await this.prisma.user.findUnique({
+        where: { stripeCustomerId },
       });
 
-      if (!subscription) return;
+      if (!user) return;
 
-      await this.mailService.sendWarningPaymentFailed(
-        subscription.user.email,
-        invoiceLink,
-      );
-      this.logger.log(
-        `Invoice payment failed for user ${subscription?.userId}`,
-      );
+      if (invoice.subscription) {
+        const stripeSubscriptionId =
+          typeof invoice.subscription === "string"
+            ? invoice.subscription
+            : invoice.subscription.id;
+
+        const subscription = await this.prisma.subscription.findFirst({
+          where: { stripeSubscriptionId },
+        });
+        if (!subscription) return;
+
+        const today = new Date();
+        const nextDate = new Date(subscription.nextDate);
+
+        const sameDay = isSameDay(today, nextDate);
+        if (sameDay) {
+          await this.prisma.subscription.update({
+            where: { id: subscription.id },
+            data: { isInTrial: true },
+          });
+        }
+      }
+
+      await this.mailService.sendWarningPaymentFailed(user.email, invoiceLink);
+      this.logger.log(`Invoice payment failed for user ${user?.id}`);
     } catch (error) {
       this.logger.error("Error fail pay invoice license to user", error);
     }
@@ -298,38 +333,48 @@ export class StripeService {
 
   private async handleSuccessfulInvoicePayment(invoice: Stripe.Invoice) {
     try {
-      const {
-        quantity,
-        userReferralCode,
-        subscriptionId,
-        stripeCouponId,
-        discountAmount,
-        memberId,
-        firstInvoice,
-        share,
-        userId,
-      } = invoice.metadata;
+      const { quantity: quantityShears, share, userId } = invoice.metadata;
 
-      if (share && userId && quantity) {
+      if (share && userId && quantityShears) {
         await this.shareService.byShares({
-          quantity: Number(quantity),
+          quantity: Number(quantityShears),
           purchaseType: PurchaseType.money,
           userId,
           price: invoice.total,
         });
-      } else {
+      } else if (invoice.subscription) {
+        const {
+          userId,
+          userReferralCode,
+          memberId,
+          newPlan,
+          quantity,
+          stripeCouponId,
+        } = invoice.subscription_details.metadata;
+        const metadata = invoice.subscription_details.metadata;
+
         const subscription = await this.prisma.subscription.findUnique({
-          where: { id: subscriptionId },
-          include: { plan: true, user: true, license: true },
+          where: { userId },
+          include: {
+            plan: true,
+            user: true,
+            license: {
+              include: {
+                _count: {
+                  select: {
+                    activeLicenses: {
+                      where: {
+                        deleteDate: null,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         });
 
         if (!subscription) return;
-
-        // check Early Bird Bonus
-        await this.checkAndAddEarlyBirdBonus(
-          subscription.userId,
-          invoice.total,
-        );
 
         let licenseId = subscription.licenseId;
 
@@ -346,6 +391,12 @@ export class StripeService {
             subscription.user,
             discountAmount,
           );
+
+          delete metadata.userReferralCode;
+          await this.updateSubscriptionMetadata(
+            invoice.subscription as string,
+            { userReferralCode: null },
+          );
         }
 
         if (subscription.licenseId && memberId) {
@@ -353,7 +404,7 @@ export class StripeService {
             where: { id: memberId },
           });
           if (!member) return;
-
+          console.log(member);
           await this.prisma.activeLicense.create({
             data: {
               userId: memberId,
@@ -361,36 +412,41 @@ export class StripeService {
             },
           });
 
-          const discountAmount = this.calculateDiscount(
-            subscription.plan.price,
-            subscription.plan.period === PlanPeriod.yearly
-              ? new Date(subscription.nextDate)
-              : undefined,
+          await this.updateSubscriptionMetadata(
+            invoice.subscription as string,
+            { memberId: null },
           );
-
-          if (discountAmount > 0) {
-            await this.addDiscount(
-              subscription.user,
-              discountAmount,
-              member.email,
-            );
-          }
         } else if (
           subscription.user.accountType === UserAccountType.private &&
-          firstInvoice &&
+          newPlan &&
           subscription.license
         ) {
-          await this.prisma.license.update({
-            where: {
-              ownerId: subscription.userId,
-            },
-            data: {
-              status: LicenseStatus.active,
-              limit: Number(quantity),
-              tierType: subscription.plan.type,
-            },
+          const plan = await this.prisma.plan.findUnique({
+            where: { id: newPlan },
           });
-          if (Number(quantity) > 1) {
+          if (!plan) return;
+
+          await this.prisma.$transaction([
+            this.prisma.license.update({
+              where: {
+                ownerId: subscription.userId,
+              },
+              data: {
+                status: LicenseStatus.active,
+                limit: Number(quantity),
+                tierType: plan.type,
+              },
+            }),
+            this.prisma.subscription.update({
+              where: { id: subscription.id },
+              data: { newPlanId: null, planId: newPlan },
+            }),
+          ]);
+
+          if (
+            Number(quantity) > 1 &&
+            subscription.license._count.activeLicenses <= 1
+          ) {
             const data = Array.from({ length: Number(quantity) - 1 }, () => ({
               licenseId: subscription.license.id,
             }));
@@ -399,94 +455,110 @@ export class StripeService {
               data,
             });
           }
+
+          await this.updateSubscriptionMetadata(
+            invoice.subscription as string,
+            { newPlan: null },
+          );
         } else if (
           subscription.user.accountType === UserAccountType.business &&
-          !subscription.licenseId
+          newPlan
         ) {
-          const license = await this.prisma.license.create({
-            data: {
-              ownerId: subscription.userId,
-              status: LicenseStatus.active,
-              limit: Number(quantity),
-              tierType: subscription.plan.type,
-            },
+          const plan = await this.prisma.plan.findUnique({
+            where: { id: newPlan },
           });
-          licenseId = license.id;
-          await this.prisma.activeLicense.create({
-            data: {
-              userId: subscription.userId,
-              licenseId: license.id,
-            },
-          });
-          if (Number(quantity) > 1) {
-            const data = Array.from({ length: Number(quantity) - 1 }, () => ({
-              licenseId: subscription.license.id,
-            }));
+          if (!plan) return;
 
-            await this.prisma.activeLicense.createMany({
-              data,
+          if (!subscription.licenseId) {
+            const license = await this.prisma.license.create({
+              data: {
+                ownerId: subscription.userId,
+                status: LicenseStatus.active,
+                limit: Number(quantity),
+                tierType: subscription.plan.type,
+              },
             });
+            licenseId = license.id;
+
+            await this.prisma.activeLicense.create({
+              data: {
+                userId: subscription.userId,
+                licenseId,
+              },
+            });
+            if (Number(quantity) > 1) {
+              const data = Array.from({ length: Number(quantity) - 1 }, () => ({
+                licenseId: licenseId,
+              }));
+
+              await this.prisma.activeLicense.createMany({
+                data,
+              });
+            }
+          } else {
+            await this.prisma.$transaction([
+              this.prisma.license.update({
+                where: {
+                  ownerId: subscription.userId,
+                },
+                data: {
+                  status: LicenseStatus.active,
+                  limit: Number(quantity),
+                  tierType: plan.type,
+                },
+              }),
+              this.prisma.subscription.update({
+                where: { id: subscription.id },
+                data: { newPlanId: null, planId: newPlan },
+              }),
+            ]);
+            licenseId = subscription.licenseId;
           }
+
+          await this.updateSubscriptionMetadata(
+            invoice.subscription as string,
+            { newPlan: null },
+          );
         }
 
-        if (stripeCouponId && discountAmount) {
+        if (stripeCouponId) {
           await this.prisma.discount.updateMany({
             where: { stripeCouponId },
             data: {
               used: true,
             },
           });
-        }
 
-        if (firstInvoice) {
-          const totalAmount =
-            quantity && Number(quantity) > 1
-              ? subscription.plan.price * Number(quantity)
-              : subscription.plan.price;
-
-          const discountAmount = this.calculateDiscount(
-            totalAmount,
-            subscription.plan.period === PlanPeriod.yearly
-              ? new Date(subscription.nextDate)
-              : undefined,
-          );
-
-          if (discountAmount === 0) return;
-
-          await this.addDiscount(
-            subscription.user,
-            discountAmount,
-            subscription.user.email,
+          await this.updateSubscriptionMetadata(
+            invoice.subscription as string,
+            { stripeCouponId: null },
           );
         }
 
-        if (!memberId) {
-          const nextDate =
-            subscription.plan.period === PlanPeriod.monthly
-              ? startOfMonth(addMonths(new Date(), 1)).toISOString()
-              : startOfMonth(addYears(new Date(), 1)).toISOString();
-          await this.prisma.subscription.update({
-            where: { id: subscription.id },
+        const stripeSubscription = await this.getSubscriptionById(
+          invoice.subscription as string,
+        );
+        await this.prisma.subscription.update({
+          where: { id: subscription.id },
+          data: {
+            licenseId,
+            isActive: true,
+            isInTrial: false,
+            nextDate: new Date(stripeSubscription.current_period_end * 1000),
+            cancelDate: null,
+            stripeInvoiceIds: [...subscription.stripeInvoiceIds, invoice.id],
+          },
+        });
+
+        if (!subscription.isActive) {
+          await this.prisma.license.update({
+            where: {
+              ownerId: subscription.userId,
+            },
             data: {
-              licenseId,
-              isActive: true,
-              isInTrial: false,
-              nextDate,
-              cancelDate: null,
-              stripeInvoiceIds: [...subscription.stripeInvoiceIds, invoice.id],
+              status: "active",
             },
           });
-
-          if (!firstInvoice && !subscription.isActive) {
-            await this.prisma.license.update({
-              where: {
-                ownerId: subscription.userId,
-              },
-              data: {
-                status: "active",
-              },
-            });
-          }
         }
 
         this.logger.log(`Invoice payed for user ${subscription?.userId}`);
@@ -580,4 +652,138 @@ export class StripeService {
       },
     });
   }
+
+  async createSubscriptionPrice(
+    amount: number,
+    productId: string,
+    period: PlanPeriod,
+  ) {
+    return await this.stripe.prices.create({
+      unit_amount: amount,
+      currency: "eur",
+      recurring: { interval: period === PlanPeriod.monthly ? "month" : "year" },
+      product: productId,
+    });
+  }
+
+  async createSubscription({
+    stripeCustomerId,
+    items,
+    tax,
+    metadata,
+    description,
+  }: ICreateSubscription) {
+    let stripeTaxId = null;
+    if (tax) {
+      const appSettings = await this.prisma.appSettings.findFirst({
+        where: {},
+      });
+      stripeTaxId = appSettings?.stripeTaxId;
+    }
+
+    return await this.stripe.subscriptions.create({
+      customer: stripeCustomerId,
+      payment_behavior: "default_incomplete",
+      proration_behavior: "always_invoice",
+      items,
+      default_tax_rates: stripeTaxId ? [stripeTaxId] : undefined,
+      expand: ["latest_invoice.payment_intent"],
+      metadata,
+      description,
+    });
+  }
+
+  async getInvoiceById(invoiceId: string) {
+    return await this.stripe.invoices.retrieve(invoiceId);
+  }
+
+  async getSubscriptionById(subscriptionId: string) {
+    return await this.stripe.subscriptions.retrieve(subscriptionId);
+  }
+
+  async cancelSubscriptionById(subscriptionId: string) {
+    return await this.stripe.subscriptions.cancel(subscriptionId);
+  }
+
+  async updateSubscriptionMetadata(
+    subscriptionId: string,
+    metadata: { [key: string]: string | number },
+  ) {
+    this.stripe.subscriptions.update(subscriptionId, {
+      metadata,
+    });
+  }
+
+  async putSubscriptionOnPause(subscriptionId: string) {
+    await this.stripe.subscriptions.update(subscriptionId, {
+      pause_collection: {
+        behavior: "keep_as_draft", // Зупиняє платежі, але зберігає підписку
+      },
+    });
+  }
+
+  async activeSubscription(subscriptionId: string) {
+    await this.stripe.subscriptions.update(subscriptionId, {
+      pause_collection: null, // Відновлює підписку
+    });
+  }
+
+  async changeSubscriptionItems({
+    subscriptionId,
+    subscriptionItemId,
+    newPriceId,
+    quantity,
+    metadata,
+    description,
+    deleteMember,
+  }: IChangeSubscriptionItems) {
+    await this.stripe.subscriptions.update(subscriptionId, {
+      items: [
+        {
+          id: subscriptionItemId,
+          price: newPriceId,
+          quantity,
+        },
+      ],
+      proration_behavior: metadata.memberId
+        ? "always_invoice"
+        : deleteMember
+          ? "none"
+          : undefined,
+      metadata,
+      description,
+    });
+  }
+
+  async addTax({ name, description, percentage }: IAddTax) {
+    return await this.stripe.taxRates.create({
+      display_name: name,
+      description,
+      jurisdiction: "NO",
+      percentage, // VAT 25%
+      inclusive: false, // Чи включено у загальну ціну (false - додається окремо)
+    });
+  }
+
+  async updateSubscriptionDiscount(
+    subscriptionId: string,
+    couponId: string,
+    oldCouponId?: string,
+  ) {
+    await this.stripe.subscriptions.update(subscriptionId, {
+      coupon: null,
+    });
+
+    if (oldCouponId) await this.deleteCoupon(oldCouponId);
+
+    await this.stripe.subscriptions.update(subscriptionId, {
+      coupon: couponId,
+    });
+  }
+}
+
+interface IAddTax {
+  name: string;
+  description: string;
+  percentage: number;
 }

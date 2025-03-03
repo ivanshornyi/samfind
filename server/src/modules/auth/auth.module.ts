@@ -4,19 +4,14 @@ import { JwtModule } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 
 import { PrismaModule } from "../prisma/prisma.module";
-import { PrismaService } from "../prisma/prisma.service";
 
 import { AuthService } from "./auth.service";
 import { AuthController } from "./auth.controller";
-import { UserService } from "../user/user.service";
 import { TokenService } from "./token.service";
-import { MailService } from "../mail/mail.service";
-import { SubscriptionService } from "../subscription/subscription.service";
-import { SubscriptionModule } from "../subscription/subscription.module";
-import { StripeService } from "../stripe/stripe.service";
-import { UserLicenseService } from "../user-license/user-license.service";
-import { ShareService } from "../share/share.service";
-import { WalletService } from "../wallet/wallet.service";
+import { UserModule } from "../user/user.module";
+import { MailModule } from "../mail/mail.module";
+import { UserLicenseModule } from "../user-license/user-license.module";
+import { StripeModule } from "../stripe/stripe.module";
 
 @Module({
   imports: [
@@ -29,21 +24,13 @@ import { WalletService } from "../wallet/wallet.service";
       },
     }),
     PrismaModule,
-    SubscriptionModule,
+    UserModule,
+    MailModule,
+    UserLicenseModule,
+    StripeModule,
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    UserService,
-    TokenService,
-    MailService,
-    PrismaService,
-    SubscriptionService,
-    StripeService,
-    UserLicenseService,
-    ShareService,
-    WalletService,
-  ],
+  providers: [AuthService, TokenService],
   exports: [TokenService],
 })
 export class AuthModule {}
