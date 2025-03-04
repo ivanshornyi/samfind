@@ -61,6 +61,7 @@ export const ManageSubscriptionModal = () => {
         <div className="flex gap-2 flex-wrap justify-around md:flex-nowrap">
           {plans
             ?.filter((plan) => {
+              if (plan.type === PlanType.EarlyBird) return false;
               return user?.accountType === UserAccountType.Business
                 ? plan.type !== PlanType.Freemium
                 : true;

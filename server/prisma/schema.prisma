@@ -79,6 +79,7 @@ enum LicenseStatus {
 enum LicenseTierType {
   freemium
   standard
+  earlyBird
 }
 
 model License {

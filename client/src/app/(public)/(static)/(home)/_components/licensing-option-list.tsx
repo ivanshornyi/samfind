@@ -12,48 +12,50 @@ export const LicensingOptionList = () => {
 
   useEffect(() => {
     if (plans?.length) {
-      const newPlanOptions: LicensingOptionType[] = plans.map((plan) => {
-        if (plan.type === PlanType.Freemium) {
-          return {
-            id: plan.id,
-            title: "Freemium",
-            period: plan.period,
-            tierType: plan.type,
-            description: "Essential features for personal and community use",
-            price: 0,
-            buttonText: "Get Started Free",
-            buttonVariant: "secondary",
-            features: [
-              "Essential features",
-              "Community access",
-              "Basic support",
-            ],
-            footerText: "Community Edition",
-            isPremium: false,
-          };
-        } else
-          return {
-            id: plan.id,
-            title:
-              plan.type +
-              "  " +
-              `${plan.period === PlanPeriod.Monthly ? "Monthly" : "Yearly"}`,
-            tierType: plan.type,
-            period: plan.period,
-            description:
-              "Boost your capabilities with premium features and priority support.",
-            price: plan.price / 100,
-            buttonText: "Buy Standard",
-            buttonVariant: "default",
-            features: [
-              "Enhanced capabilities",
-              "Priority updates",
-              "Premium support",
-            ],
-            footerText: undefined,
-            isPremium: true,
-          };
-      });
+      const newPlanOptions: LicensingOptionType[] = plans
+        .filter((plan) => plan.type !== PlanType.EarlyBird)
+        .map((plan) => {
+          if (plan.type === PlanType.Freemium) {
+            return {
+              id: plan.id,
+              title: "Freemium",
+              period: plan.period,
+              tierType: plan.type,
+              description: "Essential features for personal and community use",
+              price: 0,
+              buttonText: "Get Started Free",
+              buttonVariant: "secondary",
+              features: [
+                "Essential features",
+                "Community access",
+                "Basic support",
+              ],
+              footerText: "Community Edition",
+              isPremium: false,
+            };
+          } else
+            return {
+              id: plan.id,
+              title:
+                plan.type +
+                "  " +
+                `${plan.period === PlanPeriod.Monthly ? "Monthly" : "Yearly"}`,
+              tierType: plan.type,
+              period: plan.period,
+              description:
+                "Boost your capabilities with premium features and priority support.",
+              price: plan.price / 100,
+              buttonText: "Buy Standard",
+              buttonVariant: "default",
+              features: [
+                "Enhanced capabilities",
+                "Priority updates",
+                "Premium support",
+              ],
+              footerText: undefined,
+              isPremium: true,
+            };
+        });
 
       setPlanOptions(newPlanOptions);
     }

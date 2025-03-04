@@ -78,7 +78,12 @@ export class SubscriptionService {
       });
     }
 
-    const items = [{ quantity, price: plan.stripePriceId }];
+    const items = [
+      {
+        quantity,
+        price: plan.stripePriceId,
+      },
+    ];
     const metadata = {
       quantity,
       userReferralCode,
