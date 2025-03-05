@@ -4,12 +4,14 @@ import { PrismaService } from "../prisma/prisma.service";
 import { AddAppSettingsDto } from "./dto/add-app-settings-dto";
 import { StripeService } from "../stripe/stripe.service";
 import { AddTaxDto } from "./dto/add-tax-dto";
+import { SubscriptionService } from "../subscription/subscription.service";
 
 @Injectable()
 export class AppSettingsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly stripeService: StripeService,
+    private readonly subscriptionService: SubscriptionService,
   ) {}
 
   async addSettings(data: AddAppSettingsDto) {
@@ -45,6 +47,13 @@ export class AppSettingsService {
         where: { id: appSettings.id },
         data: { ...data, shareStripePriceId, shareStripeProductId },
       });
+    }
+
+    if (
+      data.earlyBirdPeriod === false ||
+      data.limitOfSharesPurchased === appSettings?.currentSharesPurchased
+    ) {
+      await this.subscriptionService.transformEarlyBirdToStandardSubscriptions();
     }
 
     return await this.prisma.appSettings.findFirst({

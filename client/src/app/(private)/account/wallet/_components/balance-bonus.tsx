@@ -1,61 +1,12 @@
-import { Button, Input } from "@/components";
-import { BalanceType } from "@/types";
 import * as Popover from "@radix-ui/react-popover";
-import { CircleCheckBig, CircleX, Info } from "lucide-react";
-import { useState } from "react";
+import { Info } from "lucide-react";
+import { ConvertToDiscountModal } from "./convert-to-discount-modal";
 
 interface BalanceInfoProps {
   balance: number;
-  transferBonusToDiscount: (amount: number) => void;
-  sharePrice?: number;
 }
 
-export const BalanceBonus = ({
-  balance,
-  transferBonusToDiscount,
-  sharePrice,
-}: BalanceInfoProps) => {
-  const [showConvert, setShowConvert] = useState(false);
-  const [convertAmount, setConvertAmount] = useState("");
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value;
-
-    value = value.replace(/[^0-9.]/g, "");
-
-    const dotCount = (value.match(/\./g) || []).length;
-    if (dotCount > 1) {
-      return;
-    }
-
-    if (value.includes(".")) {
-      const [integer, decimal] = value.split(".");
-      if (decimal.length > 2) {
-        value = `${integer}.${decimal.slice(0, 2)}`;
-      }
-    }
-
-    const numericValue = parseFloat(value);
-
-    if (!isNaN(numericValue)) {
-      if (numericValue < 0) {
-        value = "0";
-      } else if (numericValue > balance) {
-        value = balance.toFixed(2);
-      }
-    }
-
-    setConvertAmount(value);
-  };
-
-  const onClickTransfer = () => {
-    const amount = Number(convertAmount) * 100;
-    if (isNaN(amount) || amount <= 0) return;
-    transferBonusToDiscount(Number(amount));
-    setConvertAmount("");
-    setShowConvert(false);
-  };
-
+export const BalanceBonus = ({ balance }: BalanceInfoProps) => {
   return (
     <div className="flex flex-col justify-between items-start rounded-2xl bg-[#242424] relative w-full h-[260px] p-4">
       <div>
@@ -85,9 +36,11 @@ export const BalanceBonus = ({
         </p>
 
         <p className="text-2xl sm:text-[32px] sm:leading-[43px] font-semibold text-[#CE9DF3] text-nowrap mb-2 md:mb-4 md:mt-2">
-          €{balance}
+          €{balance / 100}
         </p>
-        <div></div>
+        <div className="flex">
+          <ConvertToDiscountModal />
+        </div>
       </div>
     </div>
   );
