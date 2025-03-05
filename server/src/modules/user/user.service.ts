@@ -181,18 +181,20 @@ export class UserService {
     return user;
   }
 
-  async findUserByEmail(
-    email: string,
-    authType: UserAuthType,
-  ): Promise<User | null> {
+  async findUserByEmail(email: string, authType: UserAuthType) {
     const user = await this.prisma.user.findFirst({
       where: {
         email,
         authType,
       },
+      include: { activeLicenses: { include: { license: true } } },
     });
-
-    return user;
+    const licenseType = user.activeLicenses.length
+      ? user.activeLicenses[0].license.status === LicenseStatus.active
+        ? user.activeLicenses[0].license.tierType
+        : null
+      : null;
+    return { ...user, activeLicenses: undefined, licenseType };
   }
 
   async updateUser(

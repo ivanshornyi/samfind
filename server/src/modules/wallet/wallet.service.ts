@@ -29,14 +29,20 @@ export class WalletService {
 
     if (!wallet) throw new NotFoundException("Wallet not found");
 
-    const stripeUser = await this.stripeService.getCustomer(
-      wallet.user.stripeCustomerId,
-    );
-    if (!stripeUser) throw new NotFoundException("Stripe User not found");
+    let discountAmount = wallet.discountAmount;
+
+    if (wallet.user.stripeCustomerId) {
+      const stripeUser = await this.stripeService.getCustomer(
+        wallet.user.stripeCustomerId,
+      );
+      if (!stripeUser) throw new NotFoundException("Stripe User not found");
+
+      discountAmount = Math.abs(stripeUser.balance);
+    }
 
     return {
       ...wallet,
-      discountAmount: Math.abs(stripeUser.balance),
+      discountAmount,
       user: undefined,
     };
   }

@@ -8,7 +8,7 @@ import {
 } from "@/hooks";
 import { BalanceType, Wallet } from "@/types";
 
-import { BalanceInfo, BuyShares } from "./_components";
+import { BalanceBonus, BalanceInfo, BuyShares } from "./_components";
 
 export default function WalletPage() {
   const [wallet, setWallet] = useState<Wallet | null>(null);
@@ -44,6 +44,8 @@ export default function WalletPage() {
           Your Earnings & Investments in One Place
         </p>
         <div className="flex justify-center gap-4 mt-10">
+          {/* <BalanceBonus balance={wallet?.bonusAmount || 0} />
+          <BalanceBonus balance={wallet?.bonusAmount || 0} /> */}
           <BalanceInfo
             transferBonusToDiscount={transferBonusToDiscount}
             balance={(wallet?.bonusAmount || 0) / 100}
