@@ -40,6 +40,9 @@ export default function WalletPage() {
     <div className="mx-auto max-w-[1000px]">
       <div className="w-full">
         <h2 className="text-[32px] leading-[44px] font-semibold">Wallet</h2>
+        <p className="text-[20px] leading-[27px] font-semibold mt-3">
+          Your Earnings & Investments in One Place
+        </p>
         <div className="flex justify-center gap-4 mt-10">
           <BalanceInfo
             transferBonusToDiscount={transferBonusToDiscount}

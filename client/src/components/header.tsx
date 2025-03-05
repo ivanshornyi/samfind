@@ -27,8 +27,8 @@ export const NAVIGATION_ITEMS = [
     path: "/faq",
   },
   {
-    title: "Contact",
-    path: "/contact",
+    title: "Invest",
+    path: "/invest",
   },
   // {
   //   title: "License Management",

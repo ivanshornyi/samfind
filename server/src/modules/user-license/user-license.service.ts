@@ -301,7 +301,12 @@ export class UserLicenseService {
     await this.stripeService.changeSubscriptionItems({
       subscriptionId: stripeSubscription.id,
       subscriptionItemId: stripeSubscription.items.data[0].id,
-      quantity: stripeSubscription.items.data[0].quantity - 1,
+      quantity:
+        stripeSubscription.items.data[0].quantity -
+        (activeLicense.license.subscription.plan.type ===
+        LicenseTierType.earlyBird
+          ? 6
+          : 1),
       deleteMember: true,
       metadata: {},
       description: `Plan - ${activeLicense.license.subscription.plan.type} - ${activeLicense.license.subscription.plan.period}. Quantity - ${stripeSubscription.items.data[0].quantity - 1}.`,

@@ -1,6 +1,10 @@
 "udr client";
 
-import { useGetPlans, useGetUserSubscriptionInfo } from "@/hooks";
+import {
+  useGetAppSettings,
+  useGetPlans,
+  useGetUserSubscriptionInfo,
+} from "@/hooks";
 
 import {
   AlertDialog,
@@ -26,6 +30,7 @@ export const ManageSubscriptionModal = () => {
   const { data: plans } = useGetPlans();
   const { data: userSubscription } = useGetUserSubscriptionInfo();
   const { user } = useContext(AuthContext);
+  const { data: appSettings } = useGetAppSettings();
 
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
@@ -61,7 +66,20 @@ export const ManageSubscriptionModal = () => {
         <div className="flex gap-2 flex-wrap justify-around md:flex-nowrap">
           {plans
             ?.filter((plan) => {
-              if (plan.type === PlanType.EarlyBird) return false;
+              if (
+                plan.type === PlanType.EarlyBird &&
+                (!appSettings?.earlyBirdPeriod ||
+                  appSettings.limitOfSharesPurchased! <=
+                    appSettings.currentSharesPurchased!)
+              )
+                return false;
+              if (
+                plan.type !== PlanType.EarlyBird &&
+                appSettings?.earlyBirdPeriod &&
+                appSettings.limitOfSharesPurchased! >
+                  appSettings.currentSharesPurchased!
+              )
+                return false;
               return user?.accountType === UserAccountType.Business
                 ? plan.type !== PlanType.Freemium
                 : true;

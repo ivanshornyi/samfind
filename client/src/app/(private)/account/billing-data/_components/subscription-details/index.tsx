@@ -21,7 +21,6 @@ interface SubscriptionDetailsProps {
 
 export const SubscriptionDetails = ({
   plan,
-  planType,
   isActive,
   renewalDate,
   price,
@@ -68,7 +67,7 @@ export const SubscriptionDetails = ({
           </Link>
         </div>
 
-        {planType !== PlanType.EarlyBird && <ManageSubscriptionModal />}
+        <ManageSubscriptionModal />
       </div>
     </div>
   );

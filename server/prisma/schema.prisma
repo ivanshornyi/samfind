@@ -281,7 +281,9 @@ model UserShareholdersData {
   user                 User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId               String          @unique
   shareholderType      ShareholderType
-  name                 String
+  firstName            String
+  lastName             String
+  countryCode          String
   identificationNumber String
   email                String
   address              String

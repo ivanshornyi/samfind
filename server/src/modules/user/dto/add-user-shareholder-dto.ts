@@ -10,7 +10,13 @@ export class AddUserShareholderDataDto {
   shareholderType: ShareholderType;
 
   @IsString()
-  name: string;
+  firstName: string;
+
+  @IsString()
+  lastName: string;
+
+  @IsString()
+  countryCode: string;
 
   @IsString()
   identificationNumber: string;

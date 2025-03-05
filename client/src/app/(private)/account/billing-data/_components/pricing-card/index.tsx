@@ -18,6 +18,7 @@ import { Plan, PlanType } from "@/types";
 import { Check } from "lucide-react";
 import { useContext, useState } from "react";
 import { ChangePlanModal } from "../change-plan-modal";
+import { EarlyBirdModal } from "../early-bird-modal/early-bird-modal";
 
 interface PricingCardProps {
   plan: Plan;
@@ -169,7 +170,9 @@ export const PricingCard = ({
             </span>
           </div>
         </div>
-
+        {plan.type === PlanType.EarlyBird && (
+          <p className="mb-3">Exclusive perks for shareholders:</p>
+        )}
         <ul className="space-y-4">
           {PLAN_FEATURES[plan.type]?.features.map((feature) => (
             <li
@@ -235,24 +238,24 @@ export const PricingCard = ({
             </div>
           )}
         {withButton && (
-          <Button
-            variant={plan.type === PlanType.EarlyBird ? "purple" : "secondary"}
-            className="w-full"
-            // className={`w-full rounded-full ${
-            //   isFreemium
-            //     ? "bg-transparent border border-[#383838] text-white"
-            //     : "bg-gradient-to-r from-[#8F40E5] to-[#6E40E5] hover:opacity-90 text-white"
-            //   }
-            // `}
-            onClick={paySubscription}
-            disabled={isPaySubscriptionPending || isFreemium}
-          >
-            {isFreemium
-              ? "Active subscription"
-              : isPaySubscriptionPending
-                ? "Processing..."
-                : "Get started"}
-          </Button>
+          <>
+            {plan.type === PlanType.EarlyBird ? (
+              <EarlyBirdModal planId={plan.id} />
+            ) : (
+              <Button
+                variant={"secondary"}
+                className="w-full"
+                onClick={paySubscription}
+                disabled={isPaySubscriptionPending || isFreemium}
+              >
+                {isFreemium
+                  ? "Active subscription"
+                  : isPaySubscriptionPending
+                    ? "Processing..."
+                    : "Get started"}
+              </Button>
+            )}
+          </>
         )}
       </CardFooter>
     </Card>
