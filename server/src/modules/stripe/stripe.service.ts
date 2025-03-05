@@ -492,7 +492,9 @@ export class StripeService {
               },
               data: {
                 status: LicenseStatus.active,
-                limit: isEarlyBirdNew ? 1 : Number(quantity),
+                limit: isEarlyBirdNew
+                  ? 1
+                  : Number(quantity) || subscription.license.limit,
                 tierType: plan.type,
               },
             }),

@@ -29,6 +29,10 @@ const customStyles: any = {
     font: "sans-serif",
     fontFamily: "sans-serif",
   }),
+  input: (provided: any) => ({
+    ...provided,
+    color: "#FFFFFF",
+  }),
   indicatorSeparator: () => ({
     display: "none",
   }),

@@ -192,7 +192,11 @@ export const EarlyBirdModal = ({ planId }: EarlyBirdModalProps) => {
                 <p className="text-[15px] leading-[18px] mb-2">
                   Number of shares
                 </p>
-                <QuantitySelector value={quantity} onChange={changeQuantity} />
+                <QuantitySelector
+                  value={quantity}
+                  onChange={changeQuantity}
+                  minValue={6}
+                />
               </div>
               <div className="flex flex-col items-center w-[100px]">
                 <p className="text-[15px] leading-[18px]">Total</p>

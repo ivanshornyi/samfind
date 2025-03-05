@@ -11,6 +11,7 @@ import { BySharesDto } from "./dto/by-shares-dto";
 import { PurchaseType } from "@prisma/client";
 import { StripeService } from "../stripe/stripe.service";
 import { CreateSharesInvoiceDto } from "./dto/create-shares-invoice-dto";
+import { SubscriptionService } from "../subscription/subscription.service";
 
 @Injectable()
 export class ShareService {
@@ -20,6 +21,7 @@ export class ShareService {
     private readonly walletService: WalletService,
     @Inject(forwardRef(() => StripeService))
     private readonly stripeService: StripeService,
+    private readonly subscriptionService: SubscriptionService,
   ) {}
 
   async byShares({ quantity, price, purchaseType, userId }: BySharesDto) {
@@ -67,6 +69,14 @@ export class ShareService {
         },
       }),
     ]);
+
+    if (
+      appSettings.currentSharesPurchased + price * quantity >=
+        appSettings.limitOfSharesPurchased &&
+      appSettings.earlyBirdPeriod
+    ) {
+      await this.subscriptionService.transformEarlyBirdToStandardSubscriptions();
+    }
 
     await this.walletService.updateWallet({
       id: user.wallet.id,

@@ -11,6 +11,7 @@ import {
   BalanceType,
   LicenseStatus,
   LicenseTierType,
+  PlanPeriod,
   TransactionType,
 } from "@prisma/client";
 import { StripeService } from "../stripe/stripe.service";
@@ -337,6 +338,7 @@ export class SubscriptionService {
   async changePlan({ planId, subscriptionId }: ChangePlanDto) {
     const subscription = await this.prisma.subscription.findUnique({
       where: { id: subscriptionId },
+      include: { plan: true },
     });
 
     if (!subscription) {
@@ -355,7 +357,7 @@ export class SubscriptionService {
       where: { id: planId },
     });
 
-    if (!subscription) {
+    if (!plan) {
       throw new NotFoundException("Plan not found");
     }
 
@@ -372,7 +374,10 @@ export class SubscriptionService {
       subscriptionId: stripeSubscription.id,
       subscriptionItemId: stripeSubscription.items.data[0].id,
       newPriceId: plan.stripePriceId,
-      quantity: stripeSubscription.items.data[0].quantity,
+      quantity:
+        subscription.plan.type === LicenseTierType.earlyBird
+          ? stripeSubscription.items.data[0].quantity / 6
+          : stripeSubscription.items.data[0].quantity,
       metadata: { newPlan: plan.id },
       description: `Plan - ${plan.type} - ${plan.period}. Quantity - ${stripeSubscription.items.data[0].quantity}.`,
     });
@@ -386,7 +391,10 @@ export class SubscriptionService {
         where: { id: subscription.licenseId },
         data: { tierType: LicenseTierType.freemium },
       });
-    } else if (difference < 0) {
+    } else if (
+      difference < 0 &&
+      subscription.plan.type !== LicenseTierType.earlyBird
+    ) {
       await this.prisma.subscription.update({
         where: { id: subscriptionId },
         data: { newPlanId: planId },
@@ -472,40 +480,42 @@ export class SubscriptionService {
       user.stripeCustomerId,
       discountAmount,
     );
+  }
 
-    // const subscription = await this.prisma.subscription.findUnique({
-    //   where: { userId },
-    // });
+  async transformEarlyBirdToStandardSubscriptions() {
+    const earlyBirdPlan = await this.prisma.plan.findFirst({
+      where: { type: LicenseTierType.earlyBird },
+    });
+    const freePlan = await this.prisma.plan.findFirst({
+      where: { type: LicenseTierType.freemium },
+    });
+    const standardMonthlyPlan = await this.prisma.plan.findFirst({
+      where: { type: LicenseTierType.standard, period: PlanPeriod.monthly },
+    });
 
-    // if (!subscription || !subscription.stripeSubscriptionId)
-    //   throw new NotFoundException("Subscription not found");
+    if (!earlyBirdPlan || !standardMonthlyPlan || !freePlan) return;
 
-    // const discountDb = await this.prisma.discount.findFirst({
-    //   where: { userId, used: false },
-    // });
+    const earlyBirdList = await this.prisma.subscription.findMany({
+      where: { planId: earlyBirdPlan.id },
+    });
 
-    // const stripeCoupon = await this.stripeService.createCoupon(discountAmount);
+    if (!earlyBirdList.length) return;
 
-    // await this.stripeService.updateSubscriptionDiscount(
-    //   subscription.stripeSubscriptionId,
-    //   stripeCoupon.id,
-    //   discountDb?.stripeCouponId,
-    // );
+    for (let i = 0; i < earlyBirdList.length; i++) {
+      const subscription = earlyBirdList[i];
 
-    // if (discountDb) {
-    //   await this.prisma.discount.update({
-    //     where: { id: discountDb.id },
-    //     data: { stripeCouponId: stripeCoupon.id, amount: discountAmount },
-    //   });
-    // } else {
-    //   await this.prisma.discount.create({
-    //     data: {
-    //       stripeCouponId: stripeCoupon.id,
-    //       amount: discountAmount,
-    //       userId,
-    //     },
-    //   });
-    // }
+      if (subscription.isActive) {
+        await this.changePlan({
+          planId: standardMonthlyPlan.id,
+          subscriptionId: subscription.id,
+        });
+      } else {
+        await this.changePlan({
+          planId: freePlan.id,
+          subscriptionId: subscription.id,
+        });
+      }
+    }
   }
 
   async getInvoice() {
