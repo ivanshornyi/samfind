@@ -18,6 +18,7 @@ import { Plan, PlanType } from "@/types";
 import { Check } from "lucide-react";
 import { useContext, useState } from "react";
 import { ChangePlanModal } from "../change-plan-modal";
+import { EarlyBirdModal } from "../early-bird-modal/early-bird-modal";
 
 interface PricingCardProps {
   plan: Plan;
@@ -31,14 +32,28 @@ interface PricingCardProps {
 }
 
 const PLAN_FEATURES = {
-  standard: [
-    "Unlimited projects",
-    "Priority support",
-    "Advanced analytics",
-    "Custom integrations",
-    "Team collaboration",
-  ],
-  freemium: ["Essential features", "Community access", "Basic support"],
+  standard: {
+    features: [
+      "Internet Search, Deep research, Advanced online Chat",
+      "Access to our platform (web, mobile, desktop)",
+      "Premium support",
+    ],
+    title:
+      "Boost your capabilities with premium features and priority support.",
+  },
+  freemium: {
+    features: ["Essential features", "Community access", "Basic support"],
+    title: "Essential features for personal and community use",
+  },
+  earlyBird: {
+    features: [
+      "All the benefits of a monthly subscription",
+      "Free access to our platform (web, mobile, desktop)",
+      "The potential to sell shares later for profit",
+      "Be part of the company’s growth",
+    ],
+    title: "6 shares = 1 month of using all Onsio tools for free",
+  },
   // Add other plan types if needed
 };
 
@@ -114,25 +129,25 @@ export const PricingCard = ({
 
   return (
     <Card
-      className={`relative border-none rounded-3xl overflow-hidden w-full max-w-[360px] flex-1 ${
+      className={`relative border-none rounded-3xl overflow-hidden w-full max-w-[360px] flex-1  ${
         plan.price === 225 ? "bg-[#28282C]" : "bg-[#292832]"
-      }`}
+      } ${plan.type === PlanType.EarlyBird ? "bg-transparent gradient-border-modal" : ""}`}
     >
       {isPaySubscriptionPending && <FullScreenLoader />}
       <CardHeader className="space-y-4">
         <h3 className="text-2xl font-semibold capitalize">
           {plan.type} {plan.period}
         </h3>
-        <p className="text-[#C4C4C4] text-sm">
-          {plan.type === PlanType.Freemium
-            ? "Essential features for personal and community use"
-            : "Boost your capabilities with premium features and priority support."}
+        <p
+          className={`${plan.type === PlanType.EarlyBird ? "text-[#CE9DF3]" : "text-[#C4C4C4]"} text-sm max-w-[250px]`}
+        >
+          {PLAN_FEATURES[plan.type]?.title}
         </p>
       </CardHeader>
 
       <CardContent>
         <div className="mb-8">
-          {withButton && (
+          {withButton && plan.type === PlanType.Standard && (
             <div className="flex items-center gap-2 mt-3">
               <label>Quantity</label>
               <input
@@ -150,14 +165,16 @@ export const PricingCard = ({
               {formatPrice(plan.price)}
             </span>
             <span className="text-[#C4C4C4] text-sm ml-2">
-              {plan.period === "monthly" && <span>/month</span>}
-              {plan.period === "yearly" && <span>/year</span>}
+              {plan.period === "monthly" && <span>/billed monthly</span>}
+              {plan.period === "yearly" && <span>/billed yearly</span>}
             </span>
           </div>
         </div>
-
+        {plan.type === PlanType.EarlyBird && (
+          <p className="mb-3">Exclusive perks for shareholders:</p>
+        )}
         <ul className="space-y-4">
-          {PLAN_FEATURES[plan.type]?.map((feature) => (
+          {PLAN_FEATURES[plan.type]?.features.map((feature) => (
             <li
               key={feature}
               className="flex items-center text-sm text-[#C4C4C4]"
@@ -221,21 +238,24 @@ export const PricingCard = ({
             </div>
           )}
         {withButton && (
-          <Button
-            className={`w-full rounded-full ${
-              isFreemium
-                ? "bg-transparent border border-[#383838] text-white"
-                : "bg-gradient-to-r from-[#8F40E5] to-[#6E40E5] hover:opacity-90 text-white"
-            }`}
-            onClick={paySubscription}
-            disabled={isPaySubscriptionPending || isFreemium}
-          >
-            {isFreemium
-              ? "Active subscription"
-              : isPaySubscriptionPending
-                ? "Processing..."
-                : "Get started"}
-          </Button>
+          <>
+            {plan.type === PlanType.EarlyBird ? (
+              <EarlyBirdModal planId={plan.id} />
+            ) : (
+              <Button
+                variant={"secondary"}
+                className="w-full"
+                onClick={paySubscription}
+                disabled={isPaySubscriptionPending || isFreemium}
+              >
+                {isFreemium
+                  ? "Active subscription"
+                  : isPaySubscriptionPending
+                    ? "Processing..."
+                    : "Get started"}
+              </Button>
+            )}
+          </>
         )}
       </CardFooter>
     </Card>

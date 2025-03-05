@@ -7,6 +7,7 @@ import {
   LicenseStatus,
   PlanPeriod,
   PurchaseType,
+  LicenseTierType,
 } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { UserService } from "../user/user.service";
@@ -43,6 +44,7 @@ interface ICreateAndPayInvoice {
   metadata: { [key: string]: string | number };
   couponId?: string;
   pay?: boolean;
+  tax?: boolean;
 }
 
 interface ICreateSubscription {
@@ -99,13 +101,19 @@ export class StripeService {
     )) as Stripe.Customer;
   }
 
-  async updateCustomerBalance(customerId: string, amount: number) {
+  async updateCustomerBalance(
+    customerId: string,
+    amount: number,
+    decrement?: boolean,
+  ) {
     const customer = (await this.getCustomer(customerId)) as Stripe.Customer;
 
     if (!customer) return;
 
     return await this.stripe.customers.update(customerId, {
-      balance: customer.balance - amount,
+      balance: decrement
+        ? customer.balance + amount
+        : customer.balance - amount,
     });
   }
 
@@ -215,14 +223,38 @@ export class StripeService {
     couponId,
     metadata,
     pay,
+    tax,
   }: ICreateAndPayInvoice) {
+    let stripeTaxId = null;
+
+    if (tax) {
+      const appSettings = await this.prisma.appSettings.findFirst({
+        where: {},
+      });
+      stripeTaxId = appSettings?.stripeTaxId;
+    }
+
+    const customer = await this.getCustomer(customerId);
+    if (!customer) return;
+    const customerBalance = customer.balance;
+
+    if (customerBalance < 0) {
+      await this.updateCustomerBalance(
+        customerId,
+        Math.abs(customerBalance),
+        true,
+      );
+      const customer = await this.getCustomer(customerId);
+      console.log(customer);
+    }
+
     const invoice = await this.stripe.invoices.create({
       customer: customerId,
       description,
       metadata,
       currency: "eur",
       collection_method: "charge_automatically",
-      automatic_tax: metadata.subscriptionId ? { enabled: true } : undefined,
+      default_tax_rates: stripeTaxId ? [stripeTaxId] : undefined,
     });
 
     await this.createInvoiceItem({
@@ -245,6 +277,10 @@ export class StripeService {
     await this.stripe.invoices.finalizeInvoice(invoice.id);
     if (pay) {
       await this.stripe.invoices.pay(invoice.id);
+    }
+
+    if (customerBalance < 0) {
+      await this.updateCustomerBalance(customerId, Math.abs(customerBalance));
     }
 
     const retrieveInvoice = await this.stripe.invoices.retrieve(invoice.id);
@@ -356,18 +392,23 @@ export class StripeService {
   private async handleSuccessfulInvoicePayment(invoice: Stripe.Invoice) {
     try {
       const { quantity: quantityShears, share, userId } = invoice.metadata;
+      const appSettings = await this.prisma.appSettings.findFirst({
+        where: {},
+      });
 
       if (share && userId && quantityShears) {
+        if (!appSettings || !appSettings.sharePrice) return;
         await this.shareService.byShares({
           quantity: Number(quantityShears),
           purchaseType: PurchaseType.money,
           userId,
-          price: invoice.total,
+          price: appSettings.sharePrice,
         });
       } else if (invoice.subscription) {
         const { userId, userReferralCode, memberId, newPlan, quantity } =
           invoice.subscription_details.metadata;
         const metadata = invoice.subscription_details.metadata;
+        let isEarlyBirdNew = false;
 
         const subscription = await this.prisma.subscription.findUnique({
           where: { userId },
@@ -420,7 +461,7 @@ export class StripeService {
             where: { id: memberId },
           });
           if (!member) return;
-          console.log(member);
+
           await this.prisma.activeLicense.create({
             data: {
               userId: memberId,
@@ -442,6 +483,8 @@ export class StripeService {
           });
           if (!plan) return;
 
+          isEarlyBirdNew = plan.type === LicenseTierType.earlyBird;
+
           await this.prisma.$transaction([
             this.prisma.license.update({
               where: {
@@ -449,7 +492,7 @@ export class StripeService {
               },
               data: {
                 status: LicenseStatus.active,
-                limit: Number(quantity),
+                limit: isEarlyBirdNew ? 1 : Number(quantity),
                 tierType: plan.type,
               },
             }),
@@ -460,6 +503,7 @@ export class StripeService {
           ]);
 
           if (
+            !isEarlyBirdNew &&
             Number(quantity) > 1 &&
             subscription.license._count.activeLicenses <= 1
           ) {
@@ -474,7 +518,7 @@ export class StripeService {
 
           await this.updateSubscriptionMetadata(
             invoice.subscription as string,
-            { newPlan: null },
+            { newPlan: null, quantity: null },
           );
         } else if (
           subscription.user.accountType === UserAccountType.business &&
@@ -485,12 +529,14 @@ export class StripeService {
           });
           if (!plan) return;
 
+          isEarlyBirdNew = plan.type === LicenseTierType.earlyBird;
+
           if (!subscription.licenseId) {
             const license = await this.prisma.license.create({
               data: {
                 ownerId: subscription.userId,
                 status: LicenseStatus.active,
-                limit: Number(quantity),
+                limit: isEarlyBirdNew ? 1 : Number(quantity),
                 tierType: subscription.plan.type,
               },
             });
@@ -502,7 +548,7 @@ export class StripeService {
                 licenseId,
               },
             });
-            if (Number(quantity) > 1) {
+            if (!isEarlyBirdNew && Number(quantity) > 1) {
               const data = Array.from({ length: Number(quantity) - 1 }, () => ({
                 licenseId: licenseId,
               }));
@@ -519,7 +565,7 @@ export class StripeService {
                 },
                 data: {
                   status: LicenseStatus.active,
-                  limit: Number(quantity),
+                  limit: isEarlyBirdNew ? 1 : Number(quantity),
                   tierType: plan.type,
                 },
               }),
@@ -533,7 +579,7 @@ export class StripeService {
 
           await this.updateSubscriptionMetadata(
             invoice.subscription as string,
-            { newPlan: null },
+            { newPlan: null, quantity: null },
           );
         }
 
@@ -546,6 +592,39 @@ export class StripeService {
         const stripeSubscription = await this.getSubscriptionById(
           invoice.subscription as string,
         );
+
+        if (
+          subscription.plan.type === LicenseTierType.earlyBird &&
+          (!newPlan || subscription.plan.id === newPlan)
+        ) {
+          if (!appSettings || !appSettings.sharePrice) return;
+
+          await this.shareService.byShares({
+            quantity: memberId ? 6 : stripeSubscription.items.data[0].quantity,
+            purchaseType: PurchaseType.earlyBird,
+            userId,
+            price: appSettings.sharePrice,
+          });
+        }
+
+        if (isEarlyBirdNew && stripeSubscription.items.data[0].quantity > 6) {
+          if (!appSettings || !appSettings.sharePrice) return;
+
+          await this.updateCustomerBalance(
+            subscription.user.stripeCustomerId,
+            (stripeSubscription.items.data[0].quantity - 6) *
+              appSettings.sharePrice,
+          );
+          await this.changeSubscriptionItems({
+            subscriptionId: stripeSubscription.id,
+            subscriptionItemId: stripeSubscription.items.data[0].id,
+            quantity: 6,
+            deleteMember: true,
+            metadata: {},
+            description: stripeSubscription.description,
+          });
+        }
+
         await this.prisma.subscription.update({
           where: { id: subscription.id },
           data: {

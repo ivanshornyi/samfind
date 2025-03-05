@@ -4,9 +4,11 @@ import Link from "next/link";
 
 import { ManageSubscriptionModal } from "../manage-subscription-modal/manage-subscription-modal";
 import { UserAccountTypeBox } from "@/components";
+import { PlanType } from "@/types";
 
 interface SubscriptionDetailsProps {
   plan: string;
+  planType?: PlanType;
   isActive: boolean;
   renewalDate: string;
   price: number;

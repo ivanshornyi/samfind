@@ -197,7 +197,7 @@ const addUserShareholderData = async (
   data: Omit<UserShareholderData, "id" | "createdAt" | "updatedAt">
 ) => {
   try {
-    await apiClient.post(`/shareholder`, {
+    await apiClient.post(`/user/shareholder`, {
       ...data,
     });
   } catch (error) {

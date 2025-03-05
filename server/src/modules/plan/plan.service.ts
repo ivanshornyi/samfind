@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 
 import { PrismaService } from "../prisma/prisma.service";
 import { LicenseTierType } from "@prisma/client";
@@ -15,15 +15,27 @@ export class PlanService {
   async addPlan({ type, period, price }: CreatePlanDto) {
     let stripePriceId = undefined;
     let stripeProductId = undefined;
+    let planePrice = price;
+
+    if (type === LicenseTierType.earlyBird) {
+      const appSettings = await this.prisma.appSettings.findFirst({
+        where: {},
+      });
+      if (!appSettings || !appSettings.sharePrice)
+        throw new NotFoundException("Share Price not found");
+
+      planePrice = appSettings.sharePrice;
+    }
 
     const planName = "plan-" + type + "-" + period;
-    const description = "price" + price / 100 + "€";
+    const description = "price" + planePrice / 100 + "€";
+
     const product = await this.stripeService.createProduct(
       planName,
       description,
     );
     const productPrice = await this.stripeService.createSubscriptionPrice(
-      price,
+      planePrice,
       product.id,
       period,
     );
@@ -34,7 +46,7 @@ export class PlanService {
       data: {
         type,
         period,
-        price,
+        price: type === LicenseTierType.earlyBird ? planePrice * 6 : planePrice,
         stripePriceId,
         stripeProductId,
       },

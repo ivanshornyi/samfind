@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useGetAppSettings,
   useGetPlans,
   useGetUserLicenses,
   useGetUserSubscriptionInfo,
@@ -11,12 +12,13 @@ import { PricingCard } from "./_components/pricing-card";
 
 import { format } from "date-fns";
 import { PlanPeriod, PlanType } from "@/types";
-import { BonusHistoryModal } from "./_components/bonus-history-modal";
+// import { BonusHistoryModal } from "./_components/bonus-history-modal";
 
 export default function BillingData() {
   const { data: plans, isPending: isPlansPending } = useGetPlans();
   const { data: userLicense, isPending: isUserLicensePending } =
     useGetUserLicenses();
+  const { data: appSettings } = useGetAppSettings();
 
   const {
     data: userSubscriptionInfo,
@@ -46,6 +48,9 @@ export default function BillingData() {
             userLicense.tierType !== "freemium" && (
               <div className="w-full overflow-x-auto">
                 <SubscriptionDetails
+                  planType={
+                    userSubscriptionInfo.plan?.type as unknown as PlanType
+                  }
                   plan={`${userSubscriptionInfo.plan?.type} ${userSubscriptionInfo.plan?.period}`}
                   isActive={userSubscriptionInfo.isActive}
                   renewalDate={
@@ -74,6 +79,23 @@ export default function BillingData() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                 {plans
                   ?.filter((plan) => plan.type !== PlanType.Freemium)
+                  .filter((plan) => {
+                    if (
+                      plan.type === PlanType.EarlyBird &&
+                      (!appSettings?.earlyBirdPeriod ||
+                        appSettings.limitOfSharesPurchased! <=
+                          appSettings.currentSharesPurchased!)
+                    )
+                      return false;
+                    return true;
+                  })
+                  .sort((a, b) =>
+                    a.type === PlanType.EarlyBird
+                      ? -1
+                      : b.type === PlanType.EarlyBird
+                        ? 1
+                        : 0
+                  )
                   .map((plan) => (
                     <div key={plan.id} className="flex">
                       <PricingCard plan={plan} withButton={true} />
@@ -88,7 +110,7 @@ export default function BillingData() {
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold">
               Payment history
             </h2>
-            <BonusHistoryModal />
+            {/* <BonusHistoryModal /> */}
           </div>
           <div className="w-full overflow-x-auto">
             <div className="min-w-[600px]">

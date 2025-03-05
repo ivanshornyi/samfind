@@ -70,13 +70,15 @@ export interface UserShareholderData {
   id: string;
   userId: string;
   shareholderType: ShareholderType;
-  name: string;
+  firstName: string;
+  lastName: string;
   identificationNumber: string;
   email: string;
   address: string;
   postcode: string;
   city: string;
   country: string;
+  countryCode: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -78,7 +78,12 @@ export class SubscriptionService {
       });
     }
 
-    const items = [{ quantity, price: plan.stripePriceId }];
+    const items = [
+      {
+        quantity,
+        price: plan.stripePriceId,
+      },
+    ];
     const metadata = {
       quantity,
       userReferralCode,
@@ -92,7 +97,9 @@ export class SubscriptionService {
         items,
         tax: user.isFromNorway,
         metadata,
-        description: `Plan - ${plan.type} - ${plan.period}. Quantity - ${quantity}.`,
+        description: `Plan - ${plan.type} - ${plan.period}. Quantity - ${
+          plan.type === LicenseTierType.earlyBird ? 1 : quantity
+        }.`,
       });
 
       invoiceId =
@@ -122,7 +129,9 @@ export class SubscriptionService {
         items,
         tax: user.isFromNorway,
         metadata,
-        description: `Plan - ${plan.type} - ${plan.period}. Quantity - ${quantity}.`,
+        description: `Plan - ${plan.type} - ${plan.period}. Quantity - ${
+          plan.type === LicenseTierType.earlyBird ? 1 : quantity
+        }.`,
       });
 
       invoiceId =

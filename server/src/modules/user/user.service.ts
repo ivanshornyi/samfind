@@ -433,10 +433,15 @@ export class UserService {
     });
 
     if (shareholderData) {
-      throw new BadRequestException("Data already added");
+      this.prisma.userShareholdersData.update({
+        where: { id: shareholderData.id },
+        data,
+      });
+    } else {
+      await this.prisma.userShareholdersData.create({ data });
     }
 
-    return await this.prisma.userShareholdersData.create({ data });
+    return data;
   }
 
   async getUserShareholderData(userId: string) {

@@ -16,7 +16,6 @@ import { X } from "lucide-react";
 import { useCreateSharesInvoice, useBuyShares } from "@/hooks";
 import { PurchaseType } from "@/types/share";
 import { AuthContext } from "@/context";
-import { ShareholderForm } from "./shareholder-form";
 
 interface BuySharesProps {
   bonusAmount: number;

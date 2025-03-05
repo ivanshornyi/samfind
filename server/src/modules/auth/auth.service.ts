@@ -508,7 +508,11 @@ export class AuthService {
       await this.stripeService.changeSubscriptionItems({
         subscriptionId: license.subscription.stripeSubscriptionId,
         subscriptionItemId: stripeSubscription.items.data[0].id,
-        quantity: stripeSubscription.items.data[0].quantity + 1,
+        quantity:
+          stripeSubscription.items.data[0].quantity +
+          (license.subscription.plan.type === LicenseTierType.earlyBird
+            ? 6
+            : 1),
         metadata: { memberId: member.id },
         description: `Plan - ${license.subscription.plan.type} - ${license.subscription.plan.period}. Quantity - ${stripeSubscription.items.data[0].quantity + 1}.`,
       });
