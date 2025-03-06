@@ -150,10 +150,11 @@ export const useAddUserShareholderData = () => {
   });
 };
 
-export const useGetUserShareholderData = (userId?: string | null) => {
+export const useGetUserShareholderData = () => {
+  const { user } = useContext(AuthContext);
   return useQuery({
-    queryFn: () => UserApiService.getUserShareholderData(userId!),
-    queryKey: ["user-shareholder-data", userId],
-    enabled: !!userId,
+    queryFn: () => UserApiService.getUserShareholderData(user!.id),
+    queryKey: ["user-shareholder-data", user],
+    enabled: !!user,
   });
 };

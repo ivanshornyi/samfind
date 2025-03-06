@@ -5,11 +5,16 @@ import { BuyShares } from "./buy-shares-modal";
 interface BalanceInfoProps {
   balance: number;
   sharePrice: number;
+  bonusAmount: number;
 }
 
-export const BalanceShares = ({ balance, sharePrice }: BalanceInfoProps) => {
+export const BalanceShares = ({
+  balance,
+  sharePrice,
+  bonusAmount,
+}: BalanceInfoProps) => {
   return (
-    <div className="flex flex-col justify-between items-start rounded-2xl bg-[#242424] relative w-full h-[260px] p-4">
+    <div className="flex flex-col justify-between items-start rounded-2xl bg-[#242424] relative w-full h-[260px] p-8">
       <div className="w-full">
         <Popover.Root>
           <Popover.Trigger className="absolute top-4 right-5">
@@ -52,7 +57,7 @@ export const BalanceShares = ({ balance, sharePrice }: BalanceInfoProps) => {
         </div>
 
         <div className="flex gap-2 w-full mt-4">
-          <BuyShares sharePrice={sharePrice} bonusAmount={balance} />
+          <BuyShares sharePrice={sharePrice} bonusAmount={bonusAmount} />
         </div>
       </div>
     </div>

@@ -19,7 +19,8 @@ import { BalanceInfo, ReferralInfo, SharePopover } from "./_components";
 
 import { format } from "date-fns";
 
-const frontendDomain = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN;
+const frontendDomain =
+  process.env.NEXT_PUBLIC_FRONTEND_DOMAIN || "https://www.onsio.io";
 
 export default function InvitedFriends() {
   const [bonusAmount, setBonusAmount] = useState(0);
