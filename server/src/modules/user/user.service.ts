@@ -189,7 +189,8 @@ export class UserService {
       },
       include: { activeLicenses: { include: { license: true } } },
     });
-    const licenseType = user.activeLicenses.length
+    if (!user) return null;
+    const licenseType = user?.activeLicenses?.length
       ? user.activeLicenses[0].license.status === LicenseStatus.active
         ? user.activeLicenses[0].license.tierType
         : null

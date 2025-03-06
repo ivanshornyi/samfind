@@ -1,31 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  useGetAppSettings,
-  useGetUserWallet,
-  useUpdateUserWallet,
-} from "@/hooks";
-import { BalanceType, Wallet } from "@/types";
+import { useGetAppSettings, useGetUserWallet } from "@/hooks";
+import { Wallet } from "@/types";
 
-import { BalanceBonus, BalanceInfo, BuyShares } from "./_components";
+import { BalanceBonus } from "./_components";
+import { BalanceShares } from "./_components/balance-shares";
+import { BalanceDiscount } from "./_components/balance-discount";
 
 export default function WalletPage() {
   const [wallet, setWallet] = useState<Wallet | null>(null);
   const [sharePrice, setSharePrice] = useState(0);
 
   const { data: userWallet } = useGetUserWallet();
-  const { mutate: updateUserWallet } = useUpdateUserWallet();
   const { data: appSettings } = useGetAppSettings();
-
-  const transferBonusToDiscount = (amount: number) => {
-    if (!wallet) return;
-    updateUserWallet({
-      id: wallet.id,
-      bonusAmount: wallet.bonusAmount - amount,
-      discountAmount: wallet.discountAmount + amount,
-    });
-  };
 
   useEffect(() => {
     if (userWallet) setWallet(userWallet);
@@ -44,33 +32,18 @@ export default function WalletPage() {
           Your Earnings & Investments in One Place
         </p>
         <div className="flex justify-center gap-4 mt-10">
-          {/* <BalanceBonus balance={wallet?.bonusAmount || 0} />
-          <BalanceBonus balance={wallet?.bonusAmount || 0} /> */}
-          <BalanceInfo
-            transferBonusToDiscount={transferBonusToDiscount}
-            balance={(wallet?.bonusAmount || 0) / 100}
-            balanceType={BalanceType.Bonus}
-          />
-          <BalanceInfo
-            transferBonusToDiscount={transferBonusToDiscount}
-            balance={(wallet?.discountAmount || 0) / 100}
-            balanceType={BalanceType.Discount}
-          />
-          <BalanceInfo
+          <BalanceBonus
+            balance={wallet?.bonusAmount || 0}
             sharePrice={sharePrice}
-            transferBonusToDiscount={transferBonusToDiscount}
+          />
+          <BalanceShares
             balance={wallet?.sharesAmount || 0}
-            balanceType={BalanceType.Shares}
+            sharePrice={sharePrice}
           />
         </div>
-        {sharePrice && (
-          <div className="flex justify-center mt-10">
-            <BuyShares
-              sharePrice={sharePrice}
-              bonusAmount={wallet?.bonusAmount || 0}
-            />
-          </div>
-        )}
+        <div className="mt-4">
+          <BalanceDiscount balance={wallet?.discountAmount || 0} />
+        </div>
       </div>
     </div>
   );
