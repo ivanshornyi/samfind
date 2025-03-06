@@ -12,6 +12,19 @@ export default {
       screens: {
         ml: "896px",
       },
+      borderColor: {
+        customGreyButton: "#A8A8A8"
+      },
+      backgroundColor: {
+        customBlackTags: "#242424"
+      },
+      textColor: {
+        customPinkSubText: "#CE9DF3",
+        customSaturedPinkButtonText: "#8F40E5"
+      },
+      backdropBlur: {
+        customPinkButtonBGRGBA: "blur(14.10px)"
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
