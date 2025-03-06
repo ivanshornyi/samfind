@@ -162,7 +162,7 @@ export const EarlyBirdModal = ({ planId }: EarlyBirdModalProps) => {
       </AlertDialogTrigger>
       <AlertDialogContent
         className="
-          w-full max-w-[526px] overflow-auto rounded-none  md:rounded-[30px]
+          w-full max-w-[591px] overflow-auto rounded-none  md:rounded-[30px]
         "
       >
         <div className="absolute right-5 top-5">
@@ -206,16 +206,32 @@ export const EarlyBirdModal = ({ planId }: EarlyBirdModalProps) => {
               </div>
             </div>
 
-            <ul className="space-y-4 mt-8">
-              <li className="flex items-center text-sm">
-                <Check className="w-4 h-4 mr-3" />
-                <span className="text-[#8F40E5] mr-1">
+            <ul className="space-y-4 mt-8 text-[15px] leading-[18px] font-semibold">
+              <li className="flex items-center gap-4">
+                <Check className="w-4 h-4" />
+                <span className="text-[#CE9DF3] mr-1">
                   [{Math.floor(quantity / 6)}]
                 </span>
                 month of subscription for free!
               </li>
-              <li className="flex items-center text-sm">
-                <Check className="w-4 h-4 mr-3" />
+              <li className="flex items-center gap-4">
+                <Check className="w-4 h-4" />
+                <span>
+                  You could potentially earn
+                  <span className="text-[#CE9DF3] mx-1">
+                    [€
+                    {Math.round(
+                      (((sharePrice / 0.01416) * 100) / 100) * 5 * quantity
+                    )
+                      .toLocaleString("en-US")
+                      .replace(/,/g, " ")}
+                    ]
+                  </span>
+                  if our company captures just 5% of OpenAI’s value.
+                </span>
+              </li>
+              <li className="flex items-center gap-4">
+                <Check className="w-4 h-4" />
                 Own shares & benefit from company growth!
               </li>
             </ul>
@@ -235,8 +251,8 @@ export const EarlyBirdModal = ({ planId }: EarlyBirdModalProps) => {
         {stage === 1 && (
           <div className="mt-8">
             <div className="flex gap-2 bg-[#363637] rounded-2xl px-4 py-2">
-              <Info color="#BEB8FF" />
-              <p className="text-[#BEB8FF]">
+              <Info color="#CE9DF3" />
+              <p className="text-[#CE9DF3]">
                 With Early Bird Access, your shares is converted into free
                 access to the platform.
               </p>

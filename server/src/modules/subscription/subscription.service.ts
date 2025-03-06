@@ -96,7 +96,8 @@ export class SubscriptionService {
       const stripeSubscription = await this.stripeService.createSubscription({
         stripeCustomerId,
         items,
-        tax: user.isFromNorway,
+        tax:
+          plan.type === LicenseTierType.earlyBird ? false : user.isFromNorway,
         metadata,
         description: `Plan - ${plan.type} - ${plan.period}. Quantity - ${
           plan.type === LicenseTierType.earlyBird ? 1 : quantity

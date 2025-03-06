@@ -7,8 +7,8 @@ interface BalanceInfoProps {
 
 export const BalanceDiscount = ({ balance }: BalanceInfoProps) => {
   return (
-    <div className="flex flex-col justify-between items-start rounded-2xl bg-[#242424] relative w-[260px] h-[171px] p-4">
-      <div>
+    <div className="flex flex-col justify-between items-start rounded-2xl bg-[#242424] relative w-[340px] h-[171px] p-8">
+      <div className="w-full">
         <Popover.Root>
           <Popover.Trigger className="absolute top-4 right-5">
             <Info size={14} />

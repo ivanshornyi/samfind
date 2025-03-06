@@ -13,7 +13,7 @@ import {
   Input,
 } from "@/components";
 
-import { X } from "lucide-react";
+import { CirclePlus, Info, X } from "lucide-react";
 import {
   useCreateSharesInvoice,
   useBuyShares,
@@ -23,13 +23,21 @@ import {
 } from "@/hooks";
 import { PurchaseType } from "@/types/share";
 import { AuthContext } from "@/context";
-import { ShareholderType, UserShareholderData } from "@/types";
+import { ShareholderType, UserAccountType, UserShareholderData } from "@/types";
 import { ShareholderForm } from "@/components/shareholder-form";
+import { SelectComponent } from "@/components/ui/select";
 
 const validateEmail = (email: string) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 };
+
+const orderOptions = [
+  {
+    value: "Buy",
+    label: "Buy",
+  },
+];
 
 interface BuySharesProps {
   bonusAmount: number;
@@ -43,10 +51,11 @@ export const BuyShares = ({
   fromBonusPage,
 }: BuySharesProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [bonusSharesQuantity, setBonusSharesQuantity] = useState(0);
-  const [moneySharesQuantity, setMoneySharesQuantity] = useState(0);
+  const [bonusSharesQuantity, setBonusSharesQuantity] = useState("");
+  const [moneySharesQuantity, setMoneySharesQuantity] = useState("");
   const [stage, setStage] = useState(1);
   const [pending, setPending] = useState(false);
+  const [isBonusOpen, setIsBonusOpen] = useState(false);
 
   const { user } = useContext(AuthContext);
 
@@ -73,6 +82,7 @@ export const BuyShares = ({
     useCreateSharesInvoice();
   const { mutate: payByBonus, isPending: isPayByBonusPending } = useBuyShares();
   const { data: shareholderData } = useGetUserShareholderData();
+
   const {
     mutate: addShareholderData,
     isPending: isAddShareholderDataPending,
@@ -80,18 +90,18 @@ export const BuyShares = ({
   } = useAddUserShareholderData();
 
   const buyShares = () => {
-    if (bonusSharesQuantity && user) {
+    if (Number(bonusSharesQuantity) && user) {
       payByBonus({
-        quantity: bonusSharesQuantity,
+        quantity: Number(bonusSharesQuantity),
         price: sharePrice,
         userId: user?.id,
         purchaseType: PurchaseType.Bonus,
       });
     }
-    if (moneySharesQuantity && user) {
+    if (Number(bonusSharesQuantity) && user) {
       createInvoice({
         userId: user.id,
-        quantity: moneySharesQuantity,
+        quantity: Number(moneySharesQuantity),
       });
     }
   };
@@ -139,9 +149,10 @@ export const BuyShares = ({
     setIsModalOpen(false);
     setFormData(initShareholderData);
     setStage(1);
-    setBonusSharesQuantity(0);
-    setMoneySharesQuantity(0);
+    setBonusSharesQuantity("");
+    setMoneySharesQuantity("");
     setPending(false);
+    setIsBonusOpen(false);
   }, [initShareholderData]);
 
   useEffect(() => {
@@ -224,52 +235,152 @@ export const BuyShares = ({
                 </div>
               </div>
             </div>
-
             <div className="mt-4">
-              <p className="text-base md:text-xl font-normal text-nowrap">{`Buy for Bonus - ${bonusAmount / 100}€`}</p>
-              <div className="flex items-center justify-start gap-4 mt-4">
-                <div className="w-[100px]">
-                  <Input
-                    name="bonusShares"
-                    type="number"
-                    max={Math.floor(bonusAmount / sharePrice)}
-                    min={0}
-                    value={bonusSharesQuantity}
-                    onChange={(e) =>
-                      setBonusSharesQuantity(Number(e.target.value))
-                    }
-                  />
-                </div>
+              <p className="text-[16px] leading-[22px] text-disabled mb-2">
+                Order Type
+              </p>
+              <SelectComponent
+                options={orderOptions}
+                value={orderOptions[0]}
+                onChange={(value) => console.log(value)}
+                optionColor="#00DC2C"
+                placeholder="Select order type"
+              />
+            </div>
+            <div className="mt-4 pb-4 border-b border-[#363637]">
+              <p className="text-[16px] leading-[22px] text-disabled mb-2">
+                Quantity
+              </p>
+              <Input
+                name="moneySharesQuantity"
+                type="text"
+                onBlur={() => {
+                  if (moneySharesQuantity === "") {
+                    setMoneySharesQuantity("0");
+                  }
+                }}
+                value={moneySharesQuantity}
+                onChange={(e) => {
+                  const newValue = e.target.value.replace(/\D/g, "");
 
-                <p className="w-[150px]">{`X ${sharePrice / 100}€ = ${(sharePrice * bonusSharesQuantity) / 100}€`}</p>
+                  const numericValue =
+                    newValue === "" ? 0 : parseInt(newValue, 10);
+                  setMoneySharesQuantity(String(Math.max(0, numericValue)));
+                }}
+              />
+            </div>
+            {user?.isFromNorway &&
+            user.accountType === UserAccountType.Private ? null : (
+              <div className="mt-4 pb-4 border-b border-[#363637]">
+                {isBonusOpen ? (
+                  <div>
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-[16px] leading-[22px] font-semibold">
+                        Enter the desired quantity of shares
+                      </h3>
+                      <p
+                        className="cursor-pointer underline"
+                        onClick={() => setIsBonusOpen(false)}
+                      >
+                        Close
+                      </p>
+                    </div>
+                    <p className="text-[16px] leading-[22px] text-disabled mt-2">
+                      <span className="font-bold">€{bonusAmount / 100}</span>{" "}
+                      bonuses Available = {Math.floor(bonusAmount / sharePrice)}{" "}
+                      shares max
+                    </p>
+                    <div className="flex gap-4 items-center mt-2">
+                      <Input
+                        name="bonusSharesQuantity"
+                        type="text"
+                        onBlur={() => {
+                          if (bonusSharesQuantity === "") {
+                            setBonusSharesQuantity("0");
+                          }
+                        }}
+                        value={bonusSharesQuantity}
+                        onChange={(e) => {
+                          const newValue = e.target.value.replace(/\D/g, "");
+
+                          let numericValue =
+                            newValue === "" ? 0 : parseInt(newValue, 10);
+
+                          if (
+                            numericValue > Math.floor(bonusAmount / sharePrice)
+                          )
+                            numericValue = Math.floor(bonusAmount / sharePrice);
+
+                          setBonusSharesQuantity(
+                            String(Math.max(0, numericValue))
+                          );
+                        }}
+                      />
+                      <p
+                        onClick={() =>
+                          setBonusSharesQuantity(
+                            String(Math.floor(bonusAmount / sharePrice))
+                          )
+                        }
+                        className="text-[#CE9DF3] cursor-pointer"
+                      >
+                        Max
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex gap-4 items-center">
+                    <p
+                      className="flex items-center gap-2 text-[#CE9DF3] cursor-pointer"
+                      onClick={() => setIsBonusOpen(true)}
+                    >
+                      <CirclePlus size={20} />
+                      Convert bonuses to shares
+                    </p>
+                    <Info size={18} className="text-disabled" />
+                  </div>
+                )}
+              </div>
+            )}
+            <div className="mt-4 flex flex-col gap-2 text-[16px] leading-[22px] font-semibold pb-4 border-b border-[#363637]">
+              <div className="flex justify-between">
+                <p>Order Value</p>
+                <p>
+                  €
+                  {((Number(moneySharesQuantity) +
+                    Number(bonusSharesQuantity)) *
+                    sharePrice) /
+                    100}
+                </p>
+              </div>
+              <div className="flex justify-between">
+                <p>Commission</p>
+                <p>€0</p>
+              </div>
+              <div className="flex justify-between text-[#CE9DF3]">
+                <p>Bonuses applied</p>
+                <p>
+                  {Number(bonusSharesQuantity) > 0
+                    ? `-€${(Number(bonusSharesQuantity) * sharePrice) / 100}`
+                    : "€0"}
+                </p>
               </div>
             </div>
-            <div className="mt-4">
-              <p className="text-base md:text-xl font-normal text-nowrap">
-                Buy for Money
-              </p>
-              <div className="flex items-center justify-start gap-4 mt-4">
-                <div className="w-[100px]">
-                  <Input
-                    name="bonusShares"
-                    type="number"
-                    min={0}
-                    value={moneySharesQuantity}
-                    onChange={(e) =>
-                      setMoneySharesQuantity(Number(e.target.value))
-                    }
-                  />
-                </div>
-
-                <p className="w-[150px]">{`X ${sharePrice / 100}€ = ${(sharePrice * moneySharesQuantity) / 100}€`}</p>
+            <div className="mt-4 flex justify-between items-center text-[20px] leading-[27px] font-semibold">
+              <div>
+                <p>Total Amount</p>
+                <p className="text-[16px] leading-[22px] text-disabled">
+                  (including fees)
+                </p>
               </div>
+              <p>€{(Number(moneySharesQuantity) * sharePrice) / 100}</p>
             </div>
           </>
         ) : (
           <ShareholderForm formData={formData} updateField={updateField} />
         )}
 
-        <AlertDialogFooter className="flex gap-6 w-full">
+        <AlertDialogFooter className="flex mt-4 gap-6 w-full">
           <Button
             onClick={() =>
               stage === 1 && !shareholderData ? setStage(2) : submit()
@@ -277,7 +388,9 @@ export const BuyShares = ({
             variant={"purple"}
             className="w-full"
             loading={pending}
-            disabled={!bonusSharesQuantity && !moneySharesQuantity}
+            disabled={
+              !Number(bonusSharesQuantity) && !Number(moneySharesQuantity)
+            }
           >
             {stage === 1 && !shareholderData ? "Next" : "Confirm"}
           </Button>

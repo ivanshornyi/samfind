@@ -7,6 +7,7 @@ import { Wallet } from "@/types";
 import { BalanceBonus } from "./_components";
 import { BalanceShares } from "./_components/balance-shares";
 import { BalanceDiscount } from "./_components/balance-discount";
+import { MaximizeInfo } from "./_components/maximize-info";
 
 export default function WalletPage() {
   const [wallet, setWallet] = useState<Wallet | null>(null);
@@ -39,10 +40,12 @@ export default function WalletPage() {
           <BalanceShares
             balance={wallet?.sharesAmount || 0}
             sharePrice={sharePrice}
+            bonusAmount={wallet?.bonusAmount || 0}
           />
         </div>
-        <div className="mt-4">
+        <div className="mt-4 flex gap-4">
           <BalanceDiscount balance={wallet?.discountAmount || 0} />
+          <MaximizeInfo />
         </div>
       </div>
     </div>

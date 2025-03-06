@@ -57,7 +57,8 @@ import {
   // Search,
 } from "lucide-react";
 
-const frontendDomain = process.env.NEXT_PUBLIC_FRONTEND_DOMAIN;
+const frontendDomain =
+  process.env.NEXT_PUBLIC_FRONTEND_DOMAIN || "https://www.onsio.io";
 
 const headers = {
   name: "name",
