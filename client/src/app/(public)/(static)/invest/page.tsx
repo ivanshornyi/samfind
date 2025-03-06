@@ -1,6 +1,6 @@
 'use client'
 
-import { InvestCalcPrice, InvestFAQ, InvestHero, Office, SocialNetworks } from "./_components";
+import { InvestCalcPrice, InvestFAQ, InvestHero, SocialNetworks } from "./_components";
 
 export default function Contact() {
   return (
@@ -8,8 +8,7 @@ export default function Contact() {
       <InvestHero />
       <InvestCalcPrice sharePrice={1.57} />
       <InvestFAQ />
-      {/* <Office />
-      <SocialNetworks /> */}
+      <SocialNetworks />
     </>
   )
 }

@@ -31,10 +31,10 @@ export function InvestCalcPrice({ sharePrice }: Props): React.ReactNode {
 
   return (
     <section aria-label="investment-calculation-section" className="px-[22px] mt-[145px]">
-      <div aria-label="wrapper" className="flex flex-col gap-[40px] max-w-[1440px] mx-auto py-[90px] px-[280px] bg-customBlackTags rounded-[20px] relative">
+      <div aria-label="wrapper" className="flex flex-col gap-[40px] max-w-[1440px] mx-auto py-[90px] px-[280px] bg-customBlackTags rounded-[20px] relative z-[3]">
         <div
           aria-label="bg-ball"
-          className="absolute top-[-15%] left-[40%] w-[301px] h-[827px] rounded-[830px] bg-customBoulderBallPinkBGRGBA blur-customBoulderBallPinkBGRGBA rotate-[98deg]"
+          className="absolute opacity-[75%] z-[-1] top-[-15%] left-[40%] w-[301px] h-[827px] rounded-[830px] bg-customBoulderBallPinkBGRGBA blur-customBoulderBallPinkBGRGBA rotate-[98deg]"
         />
         <div className="flex flex-col gap-[16px]">
           <h2 className="text-white text-[48px] font-[600]">Curious about your future gains?</h2>
