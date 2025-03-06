@@ -79,11 +79,3 @@ export function InvestCalcPrice({ sharePrice }: Props): React.ReactNode {
     </section >
   )
 }
-
-// width: 301.066px;
-// height: 827.558px;
-// transform: rotate(96.93deg);
-
-// border - radius: 827.558px;
-// background: rgba(53, 27, 147, 0.43);
-// filter: blur(72.76499938964844px);
