@@ -244,8 +244,6 @@ export class StripeService {
         Math.abs(customerBalance),
         true,
       );
-      const customer = await this.getCustomer(customerId);
-      console.log(customer);
     }
 
     const invoice = await this.stripe.invoices.create({

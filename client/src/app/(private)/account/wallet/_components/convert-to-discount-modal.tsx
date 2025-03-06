@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   AlertDialog,
@@ -14,14 +14,7 @@ import {
 } from "@/components";
 
 import { X } from "lucide-react";
-import {
-  useCreateSharesInvoice,
-  useBuyShares,
-  useUpdateUserWallet,
-  useGetUserWallet,
-} from "@/hooks";
-import { PurchaseType } from "@/types/share";
-import { AuthContext } from "@/context";
+import { useUpdateUserWallet, useGetUserWallet } from "@/hooks";
 import { Wallet } from "@/types";
 
 export const ConvertToDiscountModal = () => {
@@ -30,10 +23,17 @@ export const ConvertToDiscountModal = () => {
   const [wallet, setWallet] = useState<Wallet | null>(null);
 
   const { data: userWallet } = useGetUserWallet();
-  const { mutate: updateUserWallet } = useUpdateUserWallet();
+  const {
+    mutate: updateUserWallet,
+    isSuccess,
+    isPending,
+  } = useUpdateUserWallet();
 
-  const transferBonusToDiscount = (amount: number) => {
+  const transferBonusToDiscount = () => {
     if (!wallet) return;
+    const amount = Number(convertAmount) * 100;
+    if (isNaN(amount) || amount <= 0) return;
+
     updateUserWallet({
       id: wallet.id,
       bonusAmount: wallet.bonusAmount - amount,
@@ -63,29 +63,47 @@ export const ConvertToDiscountModal = () => {
     if (!isNaN(numericValue)) {
       if (numericValue < 0) {
         value = "0";
-      } else if (numericValue > wallet!.bonusAmount) {
-        value = wallet!.bonusAmount.toFixed(2);
+      } else if (numericValue > wallet!.bonusAmount / 100) {
+        value = (wallet!.bonusAmount / 100).toFixed(2);
       }
     }
 
     setConvertAmount(value);
   };
 
+  const handleClickMax = () => {
+    setConvertAmount((wallet!.bonusAmount / 100).toFixed(2));
+  };
+
+  const onClose = () => {
+    setIsModalOpen(false);
+    setConvertAmount("");
+    setWallet(null);
+  };
+
   useEffect(() => {
     if (userWallet) setWallet(userWallet);
   }, [userWallet]);
 
+  useEffect(() => {
+    if (isSuccess && Number(convertAmount) > 0) onClose();
+  }, [isSuccess, convertAmount]);
+
   return (
     <AlertDialog open={isModalOpen}>
-      <AlertDialogTrigger asChild>
-        <Button onClick={() => setIsModalOpen(true)} variant="saveProfile">
+      <AlertDialogTrigger className="w-full" asChild>
+        <Button
+          className="w-full"
+          onClick={() => setIsModalOpen(true)}
+          variant="saveProfile"
+        >
           Apply as Discount
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="w-full max-w-[590px] max-h-[95vh] overflow-y-auto">
         <div className="absolute right-1 top-1">
           <AlertDialogCancel
-            onClick={() => setIsModalOpen(false)}
+            onClick={onClose}
             className="shadow-none border-none p-3"
           >
             <X size={18} />
@@ -101,29 +119,48 @@ export const ConvertToDiscountModal = () => {
           </AlertDialogDescription>
         </AlertDialogHeader>
 
-        <div className="mt-4">
-          <Input
-            name="convertAmount"
-            type="text"
-            value={convertAmount}
-            onChange={handleInputChange}
-            placeholder="0.00"
-          />
+        <p className="mt-5 text-[16px] leading-[22px] font-semibold">
+          Enter the desired amount
+        </p>
+        <div className="mt-2 flex items-center justify-between">
+          <div className="flex-1">
+            <Input
+              name="convertAmount"
+              type="text"
+              value={convertAmount}
+              onChange={handleInputChange}
+              placeholder="0.00"
+            />
+          </div>
+
+          <div className="flex items-center flex-1 ml-4 gap-2">
+            <p
+              onClick={handleClickMax}
+              className="text-[20px] leading-[27px] font-semibold text-[#CE9DF3] cursor-pointer p-0"
+            >
+              Max
+            </p>
+            <p className="text-[16px] leading-[22px] text-disabled p-0">
+              <span className="font-bold">
+                {" "}
+                €{(wallet?.bonusAmount || 0) / 100}
+              </span>
+              {"  "} bonuses Available
+            </p>
+          </div>
         </div>
 
-        {/* <ShareholderForm /> */}
-
-        <AlertDialogFooter className="flex gap-6 w-full">
-          {/* <Button
+        <AlertDialogFooter className="flex mt-8 w-full">
+          <Button
             onClick={transferBonusToDiscount}
             variant="purple"
             className="w-full"
             withLoader
-            loading={pending}
-            disabled={!bonusSharesQuantity && !moneySharesQuantity}
+            loading={isPending}
+            disabled={!convertAmount}
           >
-            Buy
-          </Button> */}
+            Confirm
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

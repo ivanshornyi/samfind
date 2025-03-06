@@ -1,15 +1,21 @@
 import * as Popover from "@radix-ui/react-popover";
 import { Info } from "lucide-react";
 import { ConvertToDiscountModal } from "./convert-to-discount-modal";
+import { BuyShares } from "./buy-shares-modal";
+import { useContext } from "react";
+import { AuthContext } from "@/context";
+import { UserAccountType } from "@/types";
 
 interface BalanceInfoProps {
   balance: number;
+  sharePrice: number;
 }
 
-export const BalanceBonus = ({ balance }: BalanceInfoProps) => {
+export const BalanceBonus = ({ balance, sharePrice }: BalanceInfoProps) => {
+  const { user } = useContext(AuthContext);
   return (
     <div className="flex flex-col justify-between items-start rounded-2xl bg-[#242424] relative w-full h-[260px] p-4">
-      <div>
+      <div className="w-full">
         <Popover.Root>
           <Popover.Trigger className="absolute top-4 right-5">
             <Info size={14} />
@@ -31,15 +37,23 @@ export const BalanceBonus = ({ balance }: BalanceInfoProps) => {
         <p className="text-[20px] leading-[27px] font-semibold">
           Your bonus balance
         </p>
-        <p className="text-[16px] leading-[22px] mt-4">
+        <p className="text-[16px] leading-[22px] mt-8">
           Total amount of bonuses from referrals
         </p>
 
         <p className="text-2xl sm:text-[32px] sm:leading-[43px] font-semibold text-[#CE9DF3] text-nowrap mb-2 md:mb-4 md:mt-2">
           €{balance / 100}
         </p>
-        <div className="flex">
-          <ConvertToDiscountModal />
+        <div className="flex gap-2 w-full mt-8">
+          <div className="flex-1 w-full">
+            <ConvertToDiscountModal />
+          </div>
+          {user?.isFromNorway &&
+          user?.accountType === UserAccountType.Private ? null : (
+            <div className="flex-1  w-full">
+              <BuyShares sharePrice={sharePrice} bonusAmount={balance} />
+            </div>
+          )}
         </div>
       </div>
     </div>
