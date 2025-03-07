@@ -6,6 +6,7 @@ export enum LicenseStatus {
 export enum LicenseTierType {
   Freemium = "freemium",
   Standard = "standard",
+  EarlyBird = "earlyBird",
 }
 
 export interface License {

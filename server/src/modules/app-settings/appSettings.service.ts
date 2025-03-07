@@ -72,24 +72,38 @@ export class AppSettingsService {
       where: {},
     });
 
-    if (appSettings?.stripeTaxId)
+    if (appSettings?.stripeTaxAddedId)
       throw new BadRequestException("Tax already added");
 
-    const tax = await this.stripeService.addTax(data);
+    const taxInclusive = await this.stripeService.addTax({
+      ...data,
+      inclusive: true,
+    });
+    const taxAdded = await this.stripeService.addTax({
+      ...data,
+      inclusive: false,
+    });
 
-    if (!tax) throw new BadRequestException("Something went wrong");
+    if (!taxInclusive || !taxAdded)
+      throw new BadRequestException("Something went wrong");
 
     if (!appSettings) {
       await this.prisma.appSettings.create({
-        data: { stripeTaxId: tax.id },
+        data: {
+          stripeTaxAddedId: taxAdded.id,
+          stripeTaxInclusive: taxInclusive.id,
+        },
       });
     } else {
       await this.prisma.appSettings.update({
         where: { id: appSettings.id },
-        data: { stripeTaxId: tax.id },
+        data: {
+          stripeTaxAddedId: taxAdded.id,
+          stripeTaxInclusive: taxInclusive.id,
+        },
       });
     }
 
-    return tax;
+    return data;
   }
 }

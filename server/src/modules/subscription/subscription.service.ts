@@ -13,6 +13,7 @@ import {
   LicenseTierType,
   PlanPeriod,
   TransactionType,
+  UserAccountType,
 } from "@prisma/client";
 import { StripeService } from "../stripe/stripe.service";
 import { AddSubscriptionDto } from "./dto/add-subscription-dto";
@@ -92,12 +93,18 @@ export class SubscriptionService {
       newPlan: plan.id,
     };
 
+    const tax =
+      plan.type === LicenseTierType.earlyBird || !user.isFromNorway
+        ? undefined
+        : user.accountType === UserAccountType.business
+          ? "added"
+          : "inclusive";
+
     if (!subscription) {
       const stripeSubscription = await this.stripeService.createSubscription({
         stripeCustomerId,
         items,
-        tax:
-          plan.type === LicenseTierType.earlyBird ? false : user.isFromNorway,
+        tax,
         metadata,
         description: `Plan - ${plan.type} - ${plan.period}. Quantity - ${
           plan.type === LicenseTierType.earlyBird ? 1 : quantity
@@ -129,7 +136,7 @@ export class SubscriptionService {
       const stripeSubscription = await this.stripeService.createSubscription({
         stripeCustomerId,
         items,
-        tax: user.isFromNorway,
+        tax,
         metadata,
         description: `Plan - ${plan.type} - ${plan.period}. Quantity - ${
           plan.type === LicenseTierType.earlyBird ? 1 : quantity

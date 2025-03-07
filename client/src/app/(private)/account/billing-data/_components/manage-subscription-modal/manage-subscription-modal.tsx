@@ -1,10 +1,6 @@
 "udr client";
 
-import {
-  useGetAppSettings,
-  useGetPlans,
-  useGetUserSubscriptionInfo,
-} from "@/hooks";
+import { useGetPlans, useGetUserSubscriptionInfo } from "@/hooks";
 
 import {
   AlertDialog,
@@ -23,14 +19,13 @@ import { PricingCard } from "../pricing-card";
 import { CancelSubscriptionModal } from "../cancel-subscription-modal";
 import { useContext, useState } from "react";
 import { AuthContext } from "@/context";
-import { PlanType, UserAccountType } from "@/types";
+import { LicenseTierType, PlanType, UserAccountType } from "@/types";
 
 export const ManageSubscriptionModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { data: plans } = useGetPlans();
   const { data: userSubscription } = useGetUserSubscriptionInfo();
   const { user } = useContext(AuthContext);
-  const { data: appSettings } = useGetAppSettings();
 
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
@@ -68,18 +63,15 @@ export const ManageSubscriptionModal = () => {
             ?.filter((plan) => {
               if (
                 plan.type === PlanType.EarlyBird &&
-                (!appSettings?.earlyBirdPeriod ||
-                  appSettings.limitOfSharesPurchased! <=
-                    appSettings.currentSharesPurchased!)
+                userSubscription?.plan.type !== LicenseTierType.EarlyBird
               )
                 return false;
               if (
                 plan.type !== PlanType.EarlyBird &&
-                appSettings?.earlyBirdPeriod &&
-                appSettings.limitOfSharesPurchased! >
-                  appSettings.currentSharesPurchased!
+                userSubscription?.plan.type === LicenseTierType.EarlyBird
               )
                 return false;
+
               return user?.accountType === UserAccountType.Business
                 ? plan.type !== PlanType.Freemium
                 : true;

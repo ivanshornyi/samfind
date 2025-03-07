@@ -136,7 +136,7 @@ export class ShareService {
       quantity,
       description: `Shares. Quantity - ${quantity}.`,
       metadata,
-      tax: false,
+      // tax: false,
     });
 
     return { url: invoice.hosted_invoice_url };
