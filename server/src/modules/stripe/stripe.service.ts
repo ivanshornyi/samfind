@@ -400,7 +400,7 @@ export class StripeService {
 
       if (share && userId && quantityShears) {
         if (!appSettings || !appSettings.sharePrice) return;
-        await this.shareService.byShares({
+        await this.shareService.buyShares({
           quantity: Number(quantityShears),
           purchaseType: PurchaseType.money,
           userId,
@@ -603,7 +603,7 @@ export class StripeService {
         ) {
           if (!appSettings || !appSettings.sharePrice) return;
 
-          await this.shareService.byShares({
+          await this.shareService.buyShares({
             quantity: memberId ? 6 : stripeSubscription.items.data[0].quantity,
             purchaseType: PurchaseType.earlyBird,
             userId,

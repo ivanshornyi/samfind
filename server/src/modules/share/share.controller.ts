@@ -12,8 +12,8 @@ export class ShareController {
 
   @ApiOperation({ summary: "By Shares by Bonus" })
   @Post("/buy")
-  async byShares(@Body() bySharesDto: BySharesDto) {
-    return await this.shareService.byShares(bySharesDto);
+  async buyShares(@Body() bySharesDto: BySharesDto) {
+    return await this.shareService.buyShares(bySharesDto);
   }
 
   @ApiOperation({ summary: "Create Invoice to buy" })

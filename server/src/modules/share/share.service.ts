@@ -24,7 +24,7 @@ export class ShareService {
     private readonly subscriptionService: SubscriptionService,
   ) {}
 
-  async byShares({ quantity, price, purchaseType, userId }: BySharesDto) {
+  async buyShares({ quantity, price, purchaseType, userId }: BySharesDto) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: { wallet: true },
