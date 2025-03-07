@@ -18,7 +18,7 @@ type Link = {
   href: string;
 };
 
-const links: { menu: Link[]; legals: Link[] } = {
+const links: { menu: Link[]; legals: Link[], system: Link[], info: Link[] } = {
   menu: [
     { label: "Pricing", href: "/#pricing" },
     { label: "About", href: "/about" },
@@ -27,6 +27,15 @@ const links: { menu: Link[]; legals: Link[] } = {
     { label: "License Management", href: "/license-management" },
   ],
   legals: [
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Terms of Use", href: "/terms" },
+    { label: "Cookie Policy", href: "/cookies" },
+  ],
+  system: [
+    { label: "Onsio App", href: "/" },
+    { label: "Onsio Software", href: "/" }
+  ],
+  info: [
     { label: "Privacy Policy", href: "/privacy" },
     { label: "Terms of Use", href: "/terms" },
     { label: "Cookie Policy", href: "/cookies" },
@@ -115,10 +124,18 @@ const FooterSection = ({ title, links }: { title: string; links: Link[] }) => {
   );
 };
 
+// width: 727.148px;
+// height: 827.558px;
+// transform: rotate(88.599deg);
+
 export const Footer = () => {
   return (
-    <footer className="text-white py-[14px] sm:py-10 sm:pb-[60px] px-5 sm:px-6 text-nowrap">
-      <div className="mx-auto flex flex-col lg:flex-row gap-10">
+    <footer className="text-white py-[14px] sm:py-10 sm:pb-[60px] px-5 sm:px-6 text-nowrap relative overflow-hidden">
+      <div
+        aria-label="bg-footer-ball"
+        className="absolute z-[-1] top-[28%] left-[25%] w-[800px] h-[827px] rounded-[830px] bg-customBoulderBallPinkBGRGBA blur-customBoulderBallPinkBGRGBA"
+      />
+      <div className="mx-auto flex flex-col lg:flex-row gap-10 justify-between">
         <div className="flex flex-col lg:block space-y-[30px] lg:space-y-[122px]">
           <Link href="/">
             <Image src={Logo} width={110} height={28} alt="" />
@@ -166,6 +183,8 @@ export const Footer = () => {
 
         <div className="flex flex-row xl:gap-12">
           <FooterSection title="Menu" links={links.menu} />
+          <FooterSection title="System" links={links.system} />
+          <FooterSection title="Info" links={links.info} />
           {/* <FooterSection title="Legals" links={links.legals} /> */}
         </div>
 

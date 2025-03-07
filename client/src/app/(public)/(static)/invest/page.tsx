@@ -1,10 +1,14 @@
-import { Office, SocialNetworks } from "./_components";
+'use client'
+
+import { InvestCalcPrice, InvestFAQ, InvestHero, SocialNetworks } from "./_components";
 
 export default function Contact() {
   return (
-    <div className="w-full">
-      <Office />
+    <>
+      <InvestHero />
+      <InvestCalcPrice sharePrice={1.57} />
+      <InvestFAQ />
       <SocialNetworks />
-    </div>
-  );
+    </>
+  )
 }
