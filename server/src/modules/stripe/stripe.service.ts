@@ -18,6 +18,7 @@ import { MailService } from "../mail/mail.service";
 import { ShareService } from "../share/share.service";
 import { WalletService } from "../wallet/wallet.service";
 import { SubscriptionService } from "../subscription/subscription.service";
+import { HttpService } from "@nestjs/axios";
 
 interface ICreatePaymentSession {
   customerId: string;
@@ -86,6 +87,7 @@ export class StripeService {
     private readonly shareService: ShareService,
     private readonly walletService: WalletService,
     private readonly subscriptionService: SubscriptionService,
+    private readonly httpService: HttpService,
   ) {
     this.stripe = new Stripe(this.configService.get("STRIPE_SECRET_KEY"), {
       apiVersion: "2024-12-18.acacia",
@@ -384,6 +386,24 @@ export class StripeService {
         }
       }
 
+      if (invoice.metadata.trading) {
+        const baseUrl = this.configService.get("TRADING_API_URL");
+        if (baseUrl)
+          this.httpService.post(
+            baseUrl,
+            {
+              message: "fail",
+              status: false,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${this.configService.get("DEVICE_SECRET")}`,
+                "Content-Type": "application/json",
+              },
+            },
+          );
+      }
+
       await this.mailService.sendWarningPaymentFailed(user.email, invoiceLink);
       this.logger.log(`Invoice payment failed for user ${user?.id}`);
     } catch (error) {
@@ -393,7 +413,12 @@ export class StripeService {
 
   private async handleSuccessfulInvoicePayment(invoice: Stripe.Invoice) {
     try {
-      const { quantity: quantityShears, share, userId } = invoice.metadata;
+      const {
+        quantity: quantityShears,
+        share,
+        userId,
+        stockId,
+      } = invoice.metadata;
       const appSettings = await this.prisma.appSettings.findFirst({
         where: {},
       });
@@ -405,6 +430,8 @@ export class StripeService {
           purchaseType: PurchaseType.money,
           userId,
           price: appSettings.sharePrice,
+          stockId,
+          invoiceId: invoice.id,
         });
       } else if (invoice.subscription) {
         const { userId, userReferralCode, memberId, newPlan, quantity } =

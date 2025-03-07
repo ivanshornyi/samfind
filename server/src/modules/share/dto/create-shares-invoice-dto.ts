@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from "class-validator";
+import { IsNumber, IsString, IsBoolean, IsOptional } from "class-validator";
 
 export class CreateSharesInvoiceDto {
   @IsString()
@@ -6,4 +6,12 @@ export class CreateSharesInvoiceDto {
 
   @IsNumber()
   quantity: number;
+
+  @IsOptional()
+  @IsBoolean()
+  trading?: boolean;
+
+  @IsOptional()
+  @IsString()
+  stockId?: string;
 }

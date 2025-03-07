@@ -98,7 +98,7 @@ export const BuyShares = ({
         purchaseType: PurchaseType.Bonus,
       });
     }
-    if (Number(bonusSharesQuantity) && user) {
+    if (Number(moneySharesQuantity) && user) {
       createInvoice({
         userId: user.id,
         quantity: Number(moneySharesQuantity),
