@@ -3,5 +3,6 @@ import BgVioletEllipse from "./bg-violet-ellipse.png";
 import AppstoreImage from "./app-store.png";
 import WindowsImage from "./windows.png";
 import PlaymarketImage from "./playmarket.png";
+import InverstmentBGCircleImage from './investment-page-bg-circle.png'
 
-export { Logo, BgVioletEllipse, AppstoreImage, WindowsImage, PlaymarketImage };
+export { Logo, BgVioletEllipse, AppstoreImage, WindowsImage, PlaymarketImage, InverstmentBGCircleImage };

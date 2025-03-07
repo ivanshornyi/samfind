@@ -27,6 +27,8 @@ export interface UpdateUserData {
   email?: string;
   password?: string;
   status?: UserStatus;
+  languageName?: string;
+  languageCode?: string;
 }
 
 export interface UpdateUserWalletData {

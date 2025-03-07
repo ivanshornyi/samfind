@@ -12,6 +12,29 @@ export default {
       screens: {
         ml: "896px",
       },
+      borderColor: {
+        customGreyButton: "#A8A8A8",
+        customWhiteManager: "#BEB8FF"
+      },
+      backgroundColor: {
+        customBlackTags: "#242424",
+        customBlackManagerBG: "#242424",
+        customCardBG: "#28282C",
+        customBoulderBallPinkBGRGBA: "rgba(53, 27, 147, 0.43)"
+      },
+      textColor: {
+        customGreyCoalSubText: "#A8A8A8",
+        customGreyColorSubText: "#DCDCDC",
+        customPinkSubText: "#CE9DF3",
+        customSaturedPinkButtonText: "#8F40E5"
+      },
+      backdropBlur: {
+        customPinkButtonBGRGBA: "blur(14.10px)",
+        customBoulderBallPinkBGRGBA: "blur(72.76px)"
+      },
+      blur: {
+        customBoulderBallPinkBGRGBA: "72.76px"
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",

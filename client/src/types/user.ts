@@ -43,6 +43,8 @@ export interface User {
   organizationId?: string;
   invitedReferralCode?: number;
   organization?: Organization;
+  languageName?: string;
+  languageCode?: string;
 }
 
 export interface Wallet {
