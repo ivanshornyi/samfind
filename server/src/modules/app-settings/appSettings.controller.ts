@@ -5,7 +5,7 @@ import { AppSettingsService } from "./appSettings.service";
 import { AddAppSettingsDto } from "./dto/add-app-settings-dto";
 import { AddTaxDto } from "./dto/add-tax-dto";
 
-@ApiTags("Share")
+@ApiTags("App Settings")
 @Controller("app-settings")
 export class AppSettingsController {
   constructor(private readonly appSettingsService: AppSettingsService) {}
@@ -26,5 +26,11 @@ export class AppSettingsController {
   @Get("/")
   async getAppSettings() {
     return await this.appSettingsService.getAppSettings();
+  }
+
+  @ApiOperation({ summary: "Create Share Price" })
+  @Get("/share-price")
+  async getSharePrice() {
+    return await this.appSettingsService.getSharePrice();
   }
 }

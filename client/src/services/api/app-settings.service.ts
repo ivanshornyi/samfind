@@ -13,6 +13,17 @@ const getAppSettings = async () => {
   }
 };
 
+const getSharePrice = async () => {
+  try {
+    const response = await apiClient.get(`/app-settings/share-price`);
+
+    return response.data as { sharePrice?: number };
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 export const AppSettingsApiService = {
   getAppSettings,
+  getSharePrice,
 };

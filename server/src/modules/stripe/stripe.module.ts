@@ -10,6 +10,7 @@ import { MailModule } from "../mail/mail.module";
 import { ShareModule } from "../share/share.module";
 import { WalletModule } from "../wallet/wallet.module";
 import { SubscriptionModule } from "../subscription/subscription.module";
+import { HttpModule } from "@nestjs/axios";
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { SubscriptionModule } from "../subscription/subscription.module";
     forwardRef(() => ShareModule),
     WalletModule,
     SubscriptionModule,
+    HttpModule,
   ],
   controllers: [StripeController],
   providers: [StripeService],

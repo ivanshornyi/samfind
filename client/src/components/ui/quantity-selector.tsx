@@ -36,7 +36,7 @@ export const QuantitySelector = ({
   };
 
   return (
-    <div className="flex items-center border border-purple-500 rounded-full px-4 py-2 space-x-4">
+    <div className="flex items-center rounded-[16px] border border-customWhiteManager px-4 py-2 space-x-4">
       <button
         onClick={() => onChange(Math.max(minValue, value - 1))}
         className="text-white"

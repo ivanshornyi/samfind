@@ -32,7 +32,7 @@ export default function WalletPage() {
         <p className="text-[20px] leading-[27px] font-semibold mt-3">
           Your Earnings & Investments in One Place
         </p>
-        <div className="flex justify-center gap-4 mt-10">
+        <div className="flex justify-center gap-4 mt-10 max-w-full md:flex-nowrap flex-wrap">
           <BalanceBonus
             balance={wallet?.bonusAmount || 0}
             sharePrice={sharePrice}
@@ -43,7 +43,7 @@ export default function WalletPage() {
             bonusAmount={wallet?.bonusAmount || 0}
           />
         </div>
-        <div className="mt-4 flex gap-4">
+        <div className="mt-4 flex gap-4 max-w-full md:flex-nowrap flex-wrap">
           <BalanceDiscount balance={wallet?.discountAmount || 0} />
           <MaximizeInfo />
         </div>

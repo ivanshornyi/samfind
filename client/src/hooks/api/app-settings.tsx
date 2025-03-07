@@ -7,3 +7,10 @@ export const useGetAppSettings = () => {
     queryKey: ["app-settings"],
   });
 };
+
+export const useGetAppSharePrice = () => {
+  return useQuery({
+    queryFn: () => AppSettingsApiService.getSharePrice(),
+    queryKey: ["share-price"],
+  });
+};

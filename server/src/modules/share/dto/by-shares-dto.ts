@@ -1,5 +1,5 @@
 import { PurchaseType } from "@prisma/client";
-import { IsEnum, IsNumber, IsString } from "class-validator";
+import { IsEnum, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class BySharesDto {
   @IsString()
@@ -13,4 +13,12 @@ export class BySharesDto {
 
   @IsEnum(PurchaseType)
   purchaseType: PurchaseType;
+
+  @IsOptional()
+  @IsString()
+  stockId?: string;
+
+  @IsOptional()
+  @IsString()
+  invoiceId?: string;
 }

@@ -7,8 +7,8 @@ import { Send } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 const options = [
-  { label: "Support & Technical", value: "Support & Technical" },
   { label: "Investment Opportunities", value: "Investment Opportunities" },
+  { label: "Support & Technical", value: "Support & Technical" },
   { label: "Payment & Invoicing", value: "Payment & Invoicing" },
   { label: "General Questions", value: "General Questions" },
 ];

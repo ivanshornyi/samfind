@@ -106,4 +106,12 @@ export class AppSettingsService {
 
     return data;
   }
+
+  async getSharePrice() {
+    const appSettings = await this.prisma.appSettings.findFirst({
+      where: {},
+    });
+
+    return { sharePrice: appSettings?.sharePrice };
+  }
 }

@@ -12,6 +12,8 @@ import { PurchaseType } from "@prisma/client";
 import { StripeService } from "../stripe/stripe.service";
 import { CreateSharesInvoiceDto } from "./dto/create-shares-invoice-dto";
 import { SubscriptionService } from "../subscription/subscription.service";
+import { HttpService } from "@nestjs/axios";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class ShareService {
@@ -22,9 +24,18 @@ export class ShareService {
     @Inject(forwardRef(() => StripeService))
     private readonly stripeService: StripeService,
     private readonly subscriptionService: SubscriptionService,
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
   ) {}
 
-  async byShares({ quantity, price, purchaseType, userId }: BySharesDto) {
+  async buyShares({
+    quantity,
+    price,
+    purchaseType,
+    userId,
+    stockId,
+    invoiceId,
+  }: BySharesDto) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: { wallet: true },
@@ -86,9 +97,36 @@ export class ShareService {
           ? user.wallet.bonusAmount - quantity * price
           : undefined,
     });
+
+    const baseUrl = this.configService.get("TRADING_API_URL");
+    if (baseUrl)
+      this.httpService.post(
+        baseUrl,
+        {
+          message: "success",
+          status: true,
+          price,
+          quantity,
+          userId,
+          stockId,
+          externalUserId: userId,
+          paymentId: invoiceId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${this.configService.get("DEVICE_SECRET")}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
   }
 
-  async createInvoiceToByShares({ userId, quantity }: CreateSharesInvoiceDto) {
+  async createInvoiceToByShares({
+    userId,
+    quantity,
+    trading,
+    stockId,
+  }: CreateSharesInvoiceDto) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -128,6 +166,8 @@ export class ShareService {
       quantity,
       share: "true",
       userId,
+      trading: trading ? "true" : undefined,
+      stockId,
     };
 
     const invoice = await this.stripeService.createAndPayInvoice({

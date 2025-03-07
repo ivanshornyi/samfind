@@ -13,6 +13,7 @@ import Image from "next/image";
 import { Button, Input } from "@/components";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ContactForm } from "./contact-form";
+import { usePathname } from "next/navigation";
 
 const options = [
   { name: "What can this platform do?", value: "aboutPlatform" },
@@ -34,6 +35,12 @@ export default function ChatBot() {
   const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
   const [showQuestions, setShowQuestions] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (pathname.includes("invest")) setStage("contact");
+  }, [pathname]);
 
   useEffect(() => {
     if (stage !== "chat" || (!messages.length && !option)) return;
@@ -91,7 +98,7 @@ export default function ChatBot() {
 
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0" />
-          <Dialog.Content className="fixed bottom-8 right-8 w-full sm:w-[570px] max-h-[700px] p-6 backdrop-blur-2xl rounded-[30px] bg-black/30">
+          <Dialog.Content className="z-20 fixed bottom-8 right-8 w-full sm:w-[570px] max-h-[700px] p-6 backdrop-blur-2xl rounded-[30px] bg-black/30">
             <div className="absolute right-1 top-1">
               <Dialog.Close
                 onClick={() => {

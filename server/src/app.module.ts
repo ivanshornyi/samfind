@@ -98,6 +98,10 @@ export class AppModule implements NestModule {
           path: "/mail/support",
           method: RequestMethod.POST,
         },
+        {
+          path: "/app-settings/share-price",
+          method: RequestMethod.GET,
+        },
       )
       .forRoutes(
         "user",
