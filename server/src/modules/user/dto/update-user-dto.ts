@@ -70,11 +70,11 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsString()
-  languageName?: string;
+  languageCode?: string;
 
   @IsOptional()
   @IsString()
-  languageCode?: string;
+  languageName?: string;
 
   // @IsString()
   // @IsOptional()
