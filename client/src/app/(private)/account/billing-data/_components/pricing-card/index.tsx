@@ -5,6 +5,7 @@ import {
   CardFooter,
   CardHeader,
   FullScreenLoader,
+  QuantitySelector,
 } from "@/components";
 import { AuthContext } from "@/context";
 import {
@@ -104,16 +105,6 @@ export const PricingCard = ({
     paySubscriptionMutation(payment);
   };
 
-  const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = Number(event.target.value);
-
-    if (newValue < 1 || isNaN(newValue)) {
-      setQuantity(1);
-    } else {
-      setQuantity(newValue);
-    }
-  };
-
   const formatPrice = (
     price: number,
     currency: string = "EUR",
@@ -125,6 +116,10 @@ export const PricingCard = ({
       minimumFractionDigits: price % 100 === 0 ? 0 : 2,
       maximumFractionDigits: 2,
     }).format(price / 100);
+  };
+
+  const changeQuantity = (val: number) => {
+    setQuantity(val < 1 ? 1 : val);
   };
 
   return (
@@ -150,12 +145,10 @@ export const PricingCard = ({
           {withButton && plan.type === PlanType.Standard && (
             <div className="flex items-center gap-2 mt-3">
               <label>Quantity</label>
-              <input
-                type="number"
-                min={1}
-                className="w-[80px] rounded-xl px-4 py-2 bg-background text-center"
+              <QuantitySelector
                 value={quantity}
-                onChange={handleQuantityChange}
+                onChange={changeQuantity}
+                minValue={1}
               />
             </div>
           )}

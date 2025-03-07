@@ -1,14 +1,21 @@
-'use client'
+"use client";
 
-import { InvestCalcPrice, InvestFAQ, InvestHero, SocialNetworks } from "./_components";
+import { useGetAppSharePrice } from "@/hooks";
+import {
+  InvestCalcPrice,
+  InvestFAQ,
+  InvestHero,
+  SocialNetworks,
+} from "./_components";
 
 export default function Contact() {
+  const { data } = useGetAppSharePrice();
   return (
     <>
       <InvestHero />
-      <InvestCalcPrice sharePrice={1.57} />
+      <InvestCalcPrice sharePrice={(data?.sharePrice || 0) / 100} />
       <InvestFAQ />
       <SocialNetworks />
     </>
-  )
+  );
 }

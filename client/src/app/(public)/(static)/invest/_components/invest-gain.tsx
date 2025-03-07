@@ -1,5 +1,6 @@
 "use client";
 
+import { QuantitySelector } from "@/components";
 import { useEffect, useState } from "react";
 
 interface Props {
@@ -12,13 +13,9 @@ export function InvestCalcPrice({ sharePrice }: Props): React.ReactNode {
   const [amountOfShare, setAmountOfShare] = useState<number>(1);
   const [calculatedPrice, setCalculatedPrice] = useState<number>(0);
 
-  function handleIncreaseShare(): void {
-    setAmountOfShare((prev) => prev + 1);
-  }
-
-  function handleDecreaseShare(): void {
-    setAmountOfShare((prev) => prev - 1);
-  }
+  const changeQuantity = (val: number) => {
+    setAmountOfShare(val < 1 ? 1 : val);
+  };
 
   function handleCalculatePrice(): void {
     const result = (((sharePrice / 0.01416) * 100) / 100) * 5 * amountOfShare;
@@ -27,7 +24,7 @@ export function InvestCalcPrice({ sharePrice }: Props): React.ReactNode {
 
   useEffect(() => {
     handleCalculatePrice();
-  }, [amountOfShare]);
+  }, [amountOfShare, sharePrice]);
 
   return (
     <section
@@ -63,28 +60,13 @@ export function InvestCalcPrice({ sharePrice }: Props): React.ReactNode {
               <p className="text-customGreyColorSubText text-[15px] font-[600] leading-[18px]">
                 Number of shares
               </p>
-              <div
-                aria-label="amount calc"
-                className="flex gap-[8px] items-center min-h-[44px] p-[8px] w-fit rounded-[16px] border border-customWhiteManager bg-customBlackManagerBG"
-              >
-                <button
-                  className="text-white text-[24px] font-[400] leading-[17.6px] w-[24px]"
-                  onClick={() => handleDecreaseShare()}
-                >
-                  -
-                </button>
-                <p className="text-white text-[16px] font-[400] leading-[17.6px] w-[32px] text-center">
-                  {amountOfShare}
-                </p>
-                <button
-                  className="text-white text-[24px] font-[400] leading-[17.6px] w-[24px]"
-                  onClick={() => handleIncreaseShare()}
-                >
-                  +
-                </button>
-              </div>
+              <QuantitySelector
+                value={amountOfShare}
+                onChange={changeQuantity}
+                minValue={1}
+              />
             </div>
-            <div className="flex flex-col gap-[20px]">
+            <div className="flex flex-col gap-[20px] min-w-[91px]">
               <p className="text-customGreyColorSubText text-[15px] font-[600] leading-[18px]">
                 Total
               </p>
