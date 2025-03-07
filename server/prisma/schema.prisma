@@ -56,6 +56,8 @@ model User {
   organizationId            String?
   licenseId                 String?
   stripeCustomerId          String?               @unique
+  languageName              String?  
+  languageCode              String?             
   createdAt                 DateTime              @default(now())
   organization              Organization?         @relation(fields: [organizationId], references: [id])
   UserReferral              UserReferral[]

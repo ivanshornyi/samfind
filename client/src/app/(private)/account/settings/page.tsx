@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 "use client";
 
 import React, { useContext, useEffect, useState } from "react";
-
+import * as i18nLanguages from "@cospired/i18n-iso-languages";
 import {
   Button,
   FullScreenLoader,
@@ -24,6 +25,18 @@ import { useQueryClient } from "@tanstack/react-query";
 import { DeleteAccount } from "./_components";
 import { UserAccountType } from "@/types";
 import { X } from "lucide-react";
+import { SelectComponent } from "@/components/ui/select";
+
+i18nLanguages.registerLocale(
+  require("@cospired/i18n-iso-languages/langs/en.json")
+);
+
+const languageOptions = Object.keys(i18nLanguages.getNames("en")).map(
+  (code) => ({
+    value: code,
+    label: i18nLanguages.getName(code, "en")!,
+  })
+);
 
 export default function Settings() {
   const { toast } = useToast();
@@ -31,6 +44,7 @@ export default function Settings() {
   const [editName, setEditName] = useState(false);
   const [editOrganization, setEditOrganization] = useState(false);
   const [editPassword, setEditPassword] = useState(false);
+  const [editLanguage, setEditLanguage] = useState(false);
   const [userFormData, setUserFormData] = useState({
     firstName: "",
     lastName: "",
@@ -52,6 +66,10 @@ export default function Settings() {
     businessOrganizationNumber: "",
     VAT: "",
   });
+  const [language, setLanguage] = useState<null | {
+    value: string;
+    label: string;
+  }>(null);
 
   const [mobileIs, setMobileIds] = useState<string[]>([]);
   const [desktopIs, setDesktopIds] = useState<string[]>([]);
@@ -134,6 +152,28 @@ export default function Settings() {
     setEditName(false);
   };
 
+  const handleSaveLanguageSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!language || !language.label || !language.label) {
+      toast({
+        description: "Please select language",
+        variant: "default",
+      });
+      return;
+    }
+
+    if (user)
+      updateUserDataMutation({
+        id: user.id,
+        userData: {
+          languageName: language.label,
+          languageCode: language.value,
+        },
+      });
+    setEditLanguage(false);
+  };
+
   const handleEditCancelSetting = () => {
     if (editName && user)
       setUserFormData({
@@ -141,6 +181,19 @@ export default function Settings() {
         lastName: user.lastName,
       });
     setEditName(!editName);
+  };
+
+  const handleEditCancelLanguage = () => {
+    if (editLanguage && user)
+      setLanguage(
+        user.languageName && user.languageCode
+          ? {
+              value: user.languageCode,
+              label: user.languageName,
+            }
+          : null
+      );
+    setEditLanguage(!editLanguage);
   };
 
   const handleEditCancelOrganization = () => {
@@ -203,6 +256,13 @@ export default function Settings() {
         firstName: user.firstName,
         lastName: user.lastName,
       });
+
+      if (user.languageCode && user.languageName) {
+        setLanguage({
+          value: user.languageCode,
+          label: user.languageName,
+        });
+      }
     }
   }, [user]);
 
@@ -227,7 +287,6 @@ export default function Settings() {
   }, [organization]);
 
   useEffect(() => {
-    console.log(activeLicense);
     if (activeLicense) {
       setDesktopIds(activeLicense.desktopIds);
       setMobileIds(activeLicense.mobileIds);
@@ -304,6 +363,45 @@ export default function Settings() {
                 className="mt-2 w-[148px]"
                 variant="saveProfile"
                 onClick={handleSaveSettingsSubmit}
+              >
+                Save
+              </Button>
+            )}
+          </div>
+          <div className="w-full mt-6 pb-2 border-b border-[#444444]">
+            <div className="flex justify-between items-start w-full">
+              <div className="w-full">
+                <div className="flex gap-2">
+                  <div className="w-full">
+                    <p className="text-[16px] leading-[22px] font-semibold">
+                      What is your native language?
+                    </p>
+                    <div className="w-full max-w-[220px] mt-2">
+                      {editLanguage ? (
+                        <SelectComponent
+                          options={languageOptions}
+                          value={language}
+                          onChange={(value) => setLanguage(value)}
+                          placeholder="Select language"
+                        />
+                      ) : (
+                        <p className="text-[14px] leading-[29px] text-disabled font-medium">
+                          {language?.label}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <Button variant="edit" onClick={handleEditCancelLanguage}>
+                {editLanguage ? "Cancel" : "Edit"}
+              </Button>
+            </div>
+            {editLanguage && (
+              <Button
+                className="mt-2 w-[148px]"
+                variant="saveProfile"
+                onClick={handleSaveLanguageSubmit}
               >
                 Save
               </Button>
