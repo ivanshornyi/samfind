@@ -44,13 +44,13 @@ interface ICreateAndPayInvoice {
   metadata: { [key: string]: string | number };
   couponId?: string;
   pay?: boolean;
-  tax?: boolean;
+  tax?: "inclusive" | "added";
 }
 
 interface ICreateSubscription {
   stripeCustomerId: string;
   items: { price: string; quantity: number }[];
-  tax: boolean;
+  tax?: "inclusive" | "added";
   metadata: { [key: string]: string | number };
   description: string;
 }
@@ -69,6 +69,7 @@ interface IAddTax {
   name: string;
   description: string;
   percentage: number;
+  inclusive: boolean;
 }
 
 @Injectable()
@@ -231,7 +232,10 @@ export class StripeService {
       const appSettings = await this.prisma.appSettings.findFirst({
         where: {},
       });
-      stripeTaxId = appSettings?.stripeTaxId;
+      stripeTaxId =
+        tax === "added"
+          ? appSettings?.stripeTaxAddedId
+          : appSettings?.stripeTaxInclusive;
     }
 
     const customer = await this.getCustomer(customerId);
@@ -739,7 +743,10 @@ export class StripeService {
       const appSettings = await this.prisma.appSettings.findFirst({
         where: {},
       });
-      stripeTaxId = appSettings?.stripeTaxId;
+      stripeTaxId =
+        tax === "added"
+          ? appSettings?.stripeTaxAddedId
+          : appSettings?.stripeTaxInclusive;
     }
 
     return await this.stripe.subscriptions.create({
@@ -816,13 +823,13 @@ export class StripeService {
     });
   }
 
-  async addTax({ name, description, percentage }: IAddTax) {
+  async addTax({ name, description, percentage, inclusive }: IAddTax) {
     return await this.stripe.taxRates.create({
       display_name: name,
       description,
       jurisdiction: "NO",
       percentage, // VAT 25%
-      inclusive: false, // Чи включено у загальну ціну (false - додається окремо)
+      inclusive, // Чи включено у загальну ціну (false - додається окремо)
     });
   }
 
