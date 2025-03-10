@@ -16,7 +16,7 @@ import { HttpModule } from "@nestjs/axios";
   imports: [
     ConfigModule.forRoot(),
     PrismaModule,
-    UserModule,
+    forwardRef(() => UserModule),
     MailModule,
     forwardRef(() => ShareModule),
     WalletModule,

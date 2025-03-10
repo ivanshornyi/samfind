@@ -6,9 +6,14 @@ import { BuyShares } from "./buy-shares-modal";
 interface BalanceInfoProps {
   balance: number;
   sharePrice: number;
+  isEarlyBird: boolean;
 }
 
-export const BalanceBonus = ({ balance, sharePrice }: BalanceInfoProps) => {
+export const BalanceBonus = ({
+  balance,
+  sharePrice,
+  isEarlyBird,
+}: BalanceInfoProps) => {
   return (
     <div className="flex flex-col justify-between items-start rounded-2xl bg-[#242424] relative w-full h-[260px] p-8">
       <div className="w-full">
@@ -50,6 +55,7 @@ export const BalanceBonus = ({ balance, sharePrice }: BalanceInfoProps) => {
               sharePrice={sharePrice}
               bonusAmount={balance}
               fromBonusPage
+              isEarlyBird={isEarlyBird}
             />
           </div>
         </div>

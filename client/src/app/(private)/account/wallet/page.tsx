@@ -12,7 +12,7 @@ import { MaximizeInfo } from "./_components/maximize-info";
 export default function WalletPage() {
   const [wallet, setWallet] = useState<Wallet | null>(null);
   const [sharePrice, setSharePrice] = useState(0);
-
+  const [isEarlyBird, setIsEarlyBird] = useState(false);
   const { data: userWallet } = useGetUserWallet();
   const { data: appSettings } = useGetAppSettings();
 
@@ -21,8 +21,16 @@ export default function WalletPage() {
   }, [userWallet]);
 
   useEffect(() => {
-    if (appSettings && appSettings.sharePrice)
-      setSharePrice(appSettings.sharePrice);
+    if (appSettings) {
+      if (appSettings.sharePrice) setSharePrice(appSettings.sharePrice);
+
+      if (
+        appSettings.earlyBirdPeriod &&
+        Number(appSettings.limitOfSharesPurchased) >
+          Number(appSettings.currentSharesPurchased)
+      )
+        setIsEarlyBird(true);
+    }
   }, [appSettings]);
 
   return (
@@ -36,11 +44,13 @@ export default function WalletPage() {
           <BalanceBonus
             balance={wallet?.bonusAmount || 0}
             sharePrice={sharePrice}
+            isEarlyBird={isEarlyBird}
           />
           <BalanceShares
             balance={wallet?.sharesAmount || 0}
             sharePrice={sharePrice}
             bonusAmount={wallet?.bonusAmount || 0}
+            isEarlyBird={isEarlyBird}
           />
         </div>
         <div className="mt-4 flex gap-4 max-w-full md:flex-nowrap flex-wrap">

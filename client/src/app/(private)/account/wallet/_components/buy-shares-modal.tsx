@@ -13,7 +13,7 @@ import {
   Input,
 } from "@/components";
 
-import { CirclePlus, Info, X } from "lucide-react";
+import { Check, CirclePlus, Info, X } from "lucide-react";
 import {
   useCreateSharesInvoice,
   useBuyShares,
@@ -42,6 +42,7 @@ const orderOptions = [
 interface BuySharesProps {
   bonusAmount: number;
   sharePrice: number;
+  isEarlyBird: boolean;
   fromBonusPage?: boolean;
 }
 
@@ -49,6 +50,7 @@ export const BuyShares = ({
   bonusAmount,
   sharePrice,
   fromBonusPage,
+  isEarlyBird,
 }: BuySharesProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [bonusSharesQuantity, setBonusSharesQuantity] = useState("");
@@ -249,7 +251,9 @@ export const BuyShares = ({
             </div>
             <div className="mt-4 pb-4 border-b border-[#363637]">
               <p className="text-[16px] leading-[22px] text-disabled mb-2">
-                Quantity
+                {isEarlyBird
+                  ? "Quantity (6 shares = 1 month free)"
+                  : "Quantity"}
               </p>
               <Input
                 name="moneySharesQuantity"
@@ -269,6 +273,40 @@ export const BuyShares = ({
                 }}
               />
             </div>
+            <ul className="space-y-4 mt-6 text-[15px] leading-[18px] font-semibold">
+              {isEarlyBird ? (
+                <li className="flex items-center gap-4">
+                  <Check className="w-4 h-4" />
+                  <p>
+                    <span className="text-[#CE9DF3] mr-2">
+                      {Math.floor(Number(moneySharesQuantity) / 6)}
+                    </span>
+                    month of subscription for free!
+                  </p>
+                </li>
+              ) : null}
+              <li className="flex items-center gap-4">
+                <Check className="w-4 h-4" />
+                <span>
+                  You could potentially earn
+                  <span className="text-[#CE9DF3] mx-1">
+                    €
+                    {Math.round(
+                      (((sharePrice / 0.01416) * 100) / 100) *
+                        5 *
+                        Number(moneySharesQuantity)
+                    )
+                      .toLocaleString("en-US")
+                      .replace(/,/g, " ")}
+                  </span>
+                  if our company reaches just 5% of OpenAI’s value.
+                </span>
+              </li>
+              <li className="flex items-center gap-4">
+                <Check className="w-4 h-4" />
+                Own shares & benefit from company growth!
+              </li>
+            </ul>
 
             <div className="mt-4 pb-4 border-b border-[#363637]">
               {isBonusOpen ? (

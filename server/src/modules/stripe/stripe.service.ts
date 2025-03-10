@@ -81,6 +81,7 @@ export class StripeService {
   constructor(
     private readonly configService: ConfigService,
     private readonly prisma: PrismaService,
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly mailService: MailService,
     @Inject(forwardRef(() => ShareService))
@@ -427,7 +428,20 @@ export class StripeService {
         const user = await this.prisma.user.findUnique({
           where: { id: userId },
         });
-        if (!appSettings || !appSettings.sharePrice || !user) return;
+        if (!appSettings || !appSettings.sharePrice || !user?.stripeCustomerId)
+          return;
+
+        if (
+          appSettings.earlyBirdPeriod &&
+          appSettings.currentSharesPurchased <
+            appSettings.limitOfSharesPurchased
+        ) {
+          await this.updateCustomerDiscountForPurchasedShares(
+            user.stripeCustomerId,
+            Number(quantityShears),
+            appSettings.sharePrice,
+          );
+        }
         await this.shareService.buyShares({
           quantity: Number(quantityShears),
           purchaseType: PurchaseType.money,
@@ -617,12 +631,6 @@ export class StripeService {
           );
         }
 
-        // if (invoice.discount) {
-        //   const couponId = invoice.discount?.coupon?.id;
-
-        //   await this.updateUsedDiscount(couponId, invoice.subtotal);
-        // }
-
         const stripeSubscription = await this.getSubscriptionById(
           invoice.subscription as string,
         );
@@ -644,10 +652,10 @@ export class StripeService {
         if (isEarlyBirdNew && stripeSubscription.items.data[0].quantity > 6) {
           if (!appSettings || !appSettings.sharePrice) return;
 
-          await this.updateCustomerBalance(
+          await this.updateCustomerDiscountForPurchasedShares(
             subscription.user.stripeCustomerId,
-            (stripeSubscription.items.data[0].quantity - 6) *
-              appSettings.sharePrice,
+            stripeSubscription.items.data[0].quantity - 6,
+            appSettings.sharePrice,
           );
           await this.changeSubscriptionItems({
             subscriptionId: stripeSubscription.id,
@@ -687,6 +695,18 @@ export class StripeService {
     } catch (error) {
       this.logger.error("Error paying invoice to user", error);
     }
+  }
+
+  async updateCustomerDiscountForPurchasedShares(
+    stripeCustomerId: string,
+    sharesCount: number,
+    sharePrice: number,
+  ) {
+    const validSharesCount = Math.floor(sharesCount / 6) * 6;
+    await this.updateCustomerBalance(
+      stripeCustomerId,
+      validSharesCount * sharePrice,
+    );
   }
 
   calculateDiscount(totalAmount: number, nextDate?: Date): number {

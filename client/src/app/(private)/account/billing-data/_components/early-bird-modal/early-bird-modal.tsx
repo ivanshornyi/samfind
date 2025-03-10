@@ -7,7 +7,6 @@ import {
   usePaySubscription,
   useAddUserShareholderData,
 } from "@/hooks";
-import { useRouter } from "next/navigation";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -18,7 +17,7 @@ import {
   Button,
   QuantitySelector,
 } from "@/components";
-import { ArrowUpRight, Check, Info, X } from "lucide-react";
+import { Check, Info, X } from "lucide-react";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/context";
 import { ShareholderType, UserShareholderData } from "@/types";
@@ -58,8 +57,6 @@ export const EarlyBirdModal = ({ planId }: EarlyBirdModalProps) => {
     useState<Omit<UserShareholderData, "id" | "createdAt" | "updatedAt">>(
       initShareholderData
     );
-
-  const router = useRouter();
 
   const { data: appSettings } = useGetAppSettings();
   const {
@@ -181,6 +178,14 @@ export const EarlyBirdModal = ({ planId }: EarlyBirdModalProps) => {
         </AlertDialogHeader>
         {stage === 1 ? (
           <>
+            {user?.invitedReferralCode && (
+              <div className="my-4 flex items-center gap-2 bg-[#363637] rounded-2xl px-4 py-2">
+                <Info color="#BEB8FF" />
+                <p className="text-[#BEB8FF]">
+                  You&apos;ve got a 10% bonus via referral link!
+                </p>
+              </div>
+            )}
             <div className="flex mt-8 justify-between">
               <div className="flex flex-col items-center">
                 <p className="text-[15px] leading-[18px]">Price per 1 share</p>
@@ -209,25 +214,26 @@ export const EarlyBirdModal = ({ planId }: EarlyBirdModalProps) => {
             <ul className="space-y-4 mt-8 text-[15px] leading-[18px] font-semibold">
               <li className="flex items-center gap-4">
                 <Check className="w-4 h-4" />
-                <span className="text-[#CE9DF3] mr-1">
-                  [{Math.floor(quantity / 6)}]
-                </span>
-                month of subscription for free!
+                <p>
+                  <span className="text-[#CE9DF3] mr-2">
+                    {Math.floor(quantity / 6)}
+                  </span>
+                  month of subscription for free!
+                </p>
               </li>
               <li className="flex items-center gap-4">
                 <Check className="w-4 h-4" />
                 <span>
                   You could potentially earn
                   <span className="text-[#CE9DF3] mx-1">
-                    [€
+                    €
                     {Math.round(
                       (((sharePrice / 0.01416) * 100) / 100) * 5 * quantity
                     )
                       .toLocaleString("en-US")
                       .replace(/,/g, " ")}
-                    ]
                   </span>
-                  if our company captures just 5% of OpenAI’s value.
+                  if our company reaches just 5% of OpenAI’s value.
                 </span>
               </li>
               <li className="flex items-center gap-4">
@@ -257,16 +263,6 @@ export const EarlyBirdModal = ({ planId }: EarlyBirdModalProps) => {
                 access to the platform.
               </p>
             </div>
-            <Button
-              className="mt-8"
-              onClick={() => router.push("/invest")}
-              rightIcon={
-                <ArrowUpRight style={{ width: "20px", height: "20px" }} />
-              }
-              variant="ghost"
-            >
-              Become a Key Investor
-            </Button>
           </div>
         )}
       </AlertDialogContent>
