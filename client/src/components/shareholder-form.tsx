@@ -200,12 +200,12 @@ export const ShareholderForm = ({
             />
           </div>
           <div className="w-full">
-            <SelectComponent
-              options={cityOptions}
-              value={selectedCity}
-              onChange={(value) => handleFormSelectChange("city", value)}
-              placeholder="Select city"
-              isDisabled={!selectedCountry}
+            <Input
+              id="city"
+              name="city"
+              placeholder="City"
+              value={formData.city}
+              onChange={handleFormInputChange}
             />
           </div>
         </div>

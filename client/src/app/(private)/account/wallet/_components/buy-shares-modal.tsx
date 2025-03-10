@@ -23,7 +23,7 @@ import {
 } from "@/hooks";
 import { PurchaseType } from "@/types/share";
 import { AuthContext } from "@/context";
-import { ShareholderType, UserAccountType, UserShareholderData } from "@/types";
+import { ShareholderType, UserShareholderData } from "@/types";
 import { ShareholderForm } from "@/components/shareholder-form";
 import { SelectComponent } from "@/components/ui/select";
 
@@ -269,79 +269,76 @@ export const BuyShares = ({
                 }}
               />
             </div>
-            {user?.isFromNorway &&
-            user.accountType === UserAccountType.Private ? null : (
-              <div className="mt-4 pb-4 border-b border-[#363637]">
-                {isBonusOpen ? (
-                  <div>
-                    <div className="flex justify-between items-center">
-                      <h3 className="text-[16px] leading-[22px] font-semibold">
-                        Enter the desired quantity of shares
-                      </h3>
-                      <p
-                        className="cursor-pointer underline"
-                        onClick={() => setIsBonusOpen(false)}
-                      >
-                        Close
-                      </p>
-                    </div>
-                    <p className="text-[16px] leading-[22px] text-disabled mt-2">
-                      <span className="font-bold">€{bonusAmount / 100}</span>{" "}
-                      bonuses Available = {Math.floor(bonusAmount / sharePrice)}{" "}
-                      shares max
-                    </p>
-                    <div className="flex gap-4 items-center mt-2">
-                      <Input
-                        name="bonusSharesQuantity"
-                        type="text"
-                        onBlur={() => {
-                          if (bonusSharesQuantity === "") {
-                            setBonusSharesQuantity("0");
-                          }
-                        }}
-                        value={bonusSharesQuantity}
-                        onChange={(e) => {
-                          const newValue = e.target.value.replace(/\D/g, "");
 
-                          let numericValue =
-                            newValue === "" ? 0 : parseInt(newValue, 10);
-
-                          if (
-                            numericValue > Math.floor(bonusAmount / sharePrice)
-                          )
-                            numericValue = Math.floor(bonusAmount / sharePrice);
-
-                          setBonusSharesQuantity(
-                            String(Math.max(0, numericValue))
-                          );
-                        }}
-                      />
-                      <p
-                        onClick={() =>
-                          setBonusSharesQuantity(
-                            String(Math.floor(bonusAmount / sharePrice))
-                          )
-                        }
-                        className="text-[#CE9DF3] cursor-pointer"
-                      >
-                        Max
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex gap-4 items-center">
+            <div className="mt-4 pb-4 border-b border-[#363637]">
+              {isBonusOpen ? (
+                <div>
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-[16px] leading-[22px] font-semibold">
+                      Enter the desired quantity of shares
+                    </h3>
                     <p
-                      className="flex items-center gap-2 text-[#CE9DF3] cursor-pointer"
-                      onClick={() => setIsBonusOpen(true)}
+                      className="cursor-pointer underline"
+                      onClick={() => setIsBonusOpen(false)}
                     >
-                      <CirclePlus size={20} />
-                      Convert bonuses to shares
+                      Close
                     </p>
-                    <Info size={18} className="text-disabled" />
                   </div>
-                )}
-              </div>
-            )}
+                  <p className="text-[16px] leading-[22px] text-disabled mt-2">
+                    <span className="font-bold">€{bonusAmount / 100}</span>{" "}
+                    bonuses Available = {Math.floor(bonusAmount / sharePrice)}{" "}
+                    shares max
+                  </p>
+                  <div className="flex gap-4 items-center mt-2">
+                    <Input
+                      name="bonusSharesQuantity"
+                      type="text"
+                      onBlur={() => {
+                        if (bonusSharesQuantity === "") {
+                          setBonusSharesQuantity("0");
+                        }
+                      }}
+                      value={bonusSharesQuantity}
+                      onChange={(e) => {
+                        const newValue = e.target.value.replace(/\D/g, "");
+
+                        let numericValue =
+                          newValue === "" ? 0 : parseInt(newValue, 10);
+
+                        if (numericValue > Math.floor(bonusAmount / sharePrice))
+                          numericValue = Math.floor(bonusAmount / sharePrice);
+
+                        setBonusSharesQuantity(
+                          String(Math.max(0, numericValue))
+                        );
+                      }}
+                    />
+                    <p
+                      onClick={() =>
+                        setBonusSharesQuantity(
+                          String(Math.floor(bonusAmount / sharePrice))
+                        )
+                      }
+                      className="text-[#CE9DF3] cursor-pointer"
+                    >
+                      Max
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex gap-4 items-center">
+                  <p
+                    className="flex items-center gap-2 text-[#CE9DF3] cursor-pointer"
+                    onClick={() => setIsBonusOpen(true)}
+                  >
+                    <CirclePlus size={20} />
+                    Convert bonuses to shares
+                  </p>
+                  <Info size={18} className="text-disabled" />
+                </div>
+              )}
+            </div>
+
             <div className="mt-4 flex flex-col gap-2 text-[16px] leading-[22px] font-semibold pb-4 border-b border-[#363637]">
               <div className="flex justify-between">
                 <p>Order Value</p>
