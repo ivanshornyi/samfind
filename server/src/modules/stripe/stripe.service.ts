@@ -424,7 +424,10 @@ export class StripeService {
       });
 
       if (share && userId && quantityShears) {
-        if (!appSettings || !appSettings.sharePrice) return;
+        const user = await this.prisma.user.findUnique({
+          where: { id: userId },
+        });
+        if (!appSettings || !appSettings.sharePrice || !user) return;
         await this.shareService.buyShares({
           quantity: Number(quantityShears),
           purchaseType: PurchaseType.money,

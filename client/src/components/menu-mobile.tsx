@@ -17,7 +17,6 @@ import { Close as CloseSheet } from "@radix-ui/react-dialog";
 import Image from "next/image";
 import Link from "next/link";
 import { useContext } from "react";
-import { User } from "lucide-react";
 
 export const MenuMobile = () => {
   const { isLoggedIn, user } = useContext(AuthContext);

@@ -40,9 +40,7 @@ export const LogoutModal = () => {
           <AlertDialogTitle className="text-[32px] leading-[44px] font-semibold">
             Are you sure you want to log out?
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-[20px] leading-[27px]">
-            Any unsaved changes will be lost.
-          </AlertDialogDescription>
+          <AlertDialogDescription className="text-[20px] leading-[27px]"></AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter className="flex gap-6 w-full">
