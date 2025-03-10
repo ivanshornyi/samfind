@@ -6,12 +6,14 @@ interface BalanceInfoProps {
   balance: number;
   sharePrice: number;
   bonusAmount: number;
+  isEarlyBird: boolean;
 }
 
 export const BalanceShares = ({
   balance,
   sharePrice,
   bonusAmount,
+  isEarlyBird,
 }: BalanceInfoProps) => {
   return (
     <div className="flex flex-col justify-between items-start rounded-2xl bg-[#242424] relative w-full h-[260px] p-8 min-w-[380px]">
@@ -57,7 +59,11 @@ export const BalanceShares = ({
         </div>
 
         <div className="flex gap-2 w-full mt-4">
-          <BuyShares sharePrice={sharePrice} bonusAmount={bonusAmount} />
+          <BuyShares
+            sharePrice={sharePrice}
+            bonusAmount={bonusAmount}
+            isEarlyBird={isEarlyBird}
+          />
         </div>
       </div>
     </div>

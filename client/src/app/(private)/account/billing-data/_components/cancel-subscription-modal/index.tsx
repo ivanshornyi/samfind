@@ -12,6 +12,12 @@ import { AlertDialogCancel } from "@radix-ui/react-alert-dialog";
 import { format } from "date-fns";
 import { useCancelSubscription } from "@/hooks";
 
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+
+  return format(date, "MMMM dd, yyyy");
+};
+
 interface CancelSubscriptionModalProps {
   nexDate: string;
   subscriptionId: string;
@@ -26,7 +32,6 @@ export const CancelSubscriptionModal = ({
     isPending: isCancelSubscriptionPending,
   } = useCancelSubscription();
 
-  const monthName = format(new Date(nexDate), "MMMM", { locale: undefined });
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -49,7 +54,7 @@ export const CancelSubscriptionModal = ({
         <p className="text-[#C4C4C4] text-[16px] leading-[22px] mt-2">
           If you cancel, you’ll lose access to all the benefits of your
           subscription. Your subscription is active until the next billing date:
-          {monthName} 1st.
+          {formatDate(nexDate)}.
         </p>
 
         <div className="flex gap-4 mt-8">

@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
@@ -22,10 +24,16 @@ import { UpdateUserDto } from "./dto/update-user-dto";
 
 import { createHash } from "crypto";
 import { AddUserShareholderDataDto } from "./dto/add-user-shareholder-dto";
+import { StripeService } from "../stripe/stripe.service";
+import { addMonths } from "date-fns";
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(forwardRef(() => StripeService))
+    private readonly stripeService: StripeService,
+  ) {}
 
   async findAll(findUserDto: FindUserDto): Promise<User[]> {
     const { name, limit, offset } = findUserDto;
@@ -70,9 +78,7 @@ export class UserService {
       where: { referralCode },
     });
 
-    if (!user || !userReferral || !user.wallet) {
-      throw new NotFoundException("User not found");
-    }
+    if (!user || !userReferral || !user.wallet) return;
 
     await this.prisma.wallet.update({
       where: { id: user.wallet.id },
@@ -341,6 +347,7 @@ export class UserService {
         plan: true,
         isActive: true,
         newPlanId: true,
+        user: true,
         license: {
           select: {
             limit: true,
@@ -363,7 +370,27 @@ export class UserService {
       throw new NotFoundException("Subscription was not found");
     }
 
-    return subscription;
+    const stripeUser = await this.stripeService.getCustomer(
+      subscription.user.stripeCustomerId,
+    );
+    if (!stripeUser) throw new NotFoundException("Stripe User not found");
+
+    const discountAmount = Math.abs(stripeUser.balance);
+
+    let nextDate = subscription.nextDate;
+
+    if (discountAmount > 0) {
+      const additionalMoths = Math.floor(
+        discountAmount /
+          (subscription.plan.price *
+            subscription.license._count.activeLicenses),
+      );
+
+      if (additionalMoths > 0)
+        nextDate = addMonths(new Date(nextDate), additionalMoths);
+    }
+
+    return { ...subscription, user: undefined, nextDate };
   }
 
   private hashPassword(password: string): string {

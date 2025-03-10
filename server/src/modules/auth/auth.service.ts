@@ -450,7 +450,7 @@ export class AuthService {
 
       if (
         !organizationEmails.includes(authVerificationDto.email) &&
-        !organizationDomains.includes(emailDomainPart)
+        organizationDomains.every((domain) => !domain.includes(emailDomainPart))
       ) {
         throw new ConflictException("This email does not have access");
       }

@@ -2,17 +2,18 @@ import * as Popover from "@radix-ui/react-popover";
 import { Info } from "lucide-react";
 import { ConvertToDiscountModal } from "./convert-to-discount-modal";
 import { BuyShares } from "./buy-shares-modal";
-import { useContext } from "react";
-import { AuthContext } from "@/context";
-import { UserAccountType } from "@/types";
 
 interface BalanceInfoProps {
   balance: number;
   sharePrice: number;
+  isEarlyBird: boolean;
 }
 
-export const BalanceBonus = ({ balance, sharePrice }: BalanceInfoProps) => {
-  const { user } = useContext(AuthContext);
+export const BalanceBonus = ({
+  balance,
+  sharePrice,
+  isEarlyBird,
+}: BalanceInfoProps) => {
   return (
     <div className="flex flex-col justify-between items-start rounded-2xl bg-[#242424] relative w-full h-[260px] p-8">
       <div className="w-full">
@@ -48,12 +49,15 @@ export const BalanceBonus = ({ balance, sharePrice }: BalanceInfoProps) => {
           <div className="flex-1 w-full">
             <ConvertToDiscountModal />
           </div>
-          {user?.isFromNorway &&
-          user?.accountType === UserAccountType.Private ? null : (
-            <div className="flex-1  w-full">
-              <BuyShares sharePrice={sharePrice} bonusAmount={balance} />
-            </div>
-          )}
+
+          <div className="flex-1  w-full">
+            <BuyShares
+              sharePrice={sharePrice}
+              bonusAmount={balance}
+              fromBonusPage
+              isEarlyBird={isEarlyBird}
+            />
+          </div>
         </div>
       </div>
     </div>

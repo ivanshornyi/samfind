@@ -27,6 +27,7 @@ import { AppVersionModule } from "./modules/app-version/app-version.module";
 import { WalletModule } from "./modules/wallet/wallet.module";
 import { ShareModule } from "./modules/share/share.module";
 import { AppSettingsModule } from "./modules/app-settings/appSettings.module";
+import { SeedModule } from "./modules/seed/seed.module";
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { AppSettingsModule } from "./modules/app-settings/appSettings.module";
     WalletModule,
     ShareModule,
     AppSettingsModule,
+    SeedModule,
   ],
   controllers: [],
   providers: [],
