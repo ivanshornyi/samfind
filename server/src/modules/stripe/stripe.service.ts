@@ -399,19 +399,31 @@ export class StripeService {
       if (invoice.metadata.trading) {
         const baseUrl = this.configService.get("TRADING_API_URL");
         if (baseUrl)
-          this.httpService.post(
-            baseUrl,
-            {
-              message: "fail",
-              status: false,
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${this.configService.get("DEVICE_SECRET")}`,
-                "Content-Type": "application/json",
+          this.httpService
+            .post(
+              baseUrl,
+              {
+                message: "fail",
+                status: false,
               },
-            },
-          );
+              {
+                headers: {
+                  Authorization: `Bearer ${this.configService.get("DEVICE_SECRET")}`,
+                  "Content-Type": "application/json",
+                },
+              },
+            )
+            .subscribe({
+              next: (response) => {
+                console.log("✅ Sent to trading platform", response.data);
+              },
+              error: (error) => {
+                console.error(
+                  "❌ Trading platform Error",
+                  error.response?.data?.message,
+                );
+              },
+            });
       }
 
       await this.mailService.sendWarningPaymentFailed(user.email, invoiceLink);

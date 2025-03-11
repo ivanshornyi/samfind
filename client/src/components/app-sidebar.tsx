@@ -28,7 +28,7 @@ const NAVIGATION_ITEMS = [
     icon: IdCard,
   },
   {
-    title: "Invite friends",
+    title: "Referral system",
     path: "/account/invite-friends",
     icon: Gift,
   },

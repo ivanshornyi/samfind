@@ -100,25 +100,37 @@ export class ShareService {
 
     const baseUrl = this.configService.get("TRADING_API_URL");
     if (baseUrl)
-      this.httpService.post(
-        baseUrl,
-        {
-          message: "success",
-          status: true,
-          price,
-          quantity,
-          userId,
-          stockId,
-          externalUserId: userId,
-          paymentId: invoiceId,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${this.configService.get("DEVICE_SECRET")}`,
-            "Content-Type": "application/json",
+      this.httpService
+        .post(
+          baseUrl,
+          {
+            message: "success",
+            status: true,
+            offeredPrice: price / 100,
+            quantity,
+            userId,
+            stockId,
+            externalUserId: userId,
+            paymentId: invoiceId,
           },
-        },
-      );
+          {
+            headers: {
+              Authorization: `Bearer ${this.configService.get("DEVICE_SECRET")}`,
+              "Content-Type": "application/json",
+            },
+          },
+        )
+        .subscribe({
+          next: (response) => {
+            console.log("✅ Sent to trading platform", response.data);
+          },
+          error: (error) => {
+            console.error(
+              "❌ Trading platform Error",
+              error.response?.data?.message,
+            );
+          },
+        });
   }
 
   async createInvoiceToByShares({
