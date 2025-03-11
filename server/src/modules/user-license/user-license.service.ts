@@ -99,11 +99,14 @@ export class UserLicenseService {
     // send for new emails
     if (updateUserLicenseDto.availableEmails) {
       const invitationLink = `${this.configService.get("FRONTEND_DOMAIN")}/auth/sign-up?accountType=private&lId=${id}`;
+      const availableEmails = updateUserLicenseDto.availableEmails.map(
+        (email) => email.toLowerCase(),
+      );
 
       const currentEmails = license.availableEmails;
       const newEmails = [];
 
-      for (const email of updateUserLicenseDto.availableEmails) {
+      for (const email of availableEmails) {
         if (!currentEmails.includes(email)) {
           newEmails.push(email);
         }

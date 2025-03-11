@@ -69,6 +69,8 @@ model User {
   wallet                    Wallet?
   shareholdersData          UserShareholdersData?
   purchasedShares           PurchasedShare[]
+  saleInfo                  SaleInfo[]            @relation("SaleRelation")
+  invitedInfo               SaleInfo?             @relation("InvitedRelation")
 
   @@map("user")
 }
@@ -127,6 +129,20 @@ model UserReferral {
   walletTransactions WalletTransaction[]
 
   @@map("user_referral")
+}
+
+model SaleInfo {
+  id                 String              @id @default(uuid())
+  saleUser           User                @relation("SaleRelation", fields: [saleUserId], references: [id], onDelete: Cascade)
+  saleUserId         String              @unique
+  invitedUser        User                @relation("InvitedRelation", fields: [invitedUserId], references: [id], onDelete: Cascade)
+  invitedUserId      String              @unique
+  earnedAmount       Float               @default(0)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  walletTransactions WalletTransaction[]
+
+  @@map("sale_info")
 }
 
 model Organization {
@@ -190,6 +206,8 @@ model Wallet {
   discountAmount     Float               @default(0)
   bonusAmount        Float               @default(0)
   sharesAmount       Float               @default(0)
+  salesAmount        Float               @default(0)
+  sweatAmount        Float               @default(0)
   walletTransactions WalletTransaction[]
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
@@ -201,6 +219,8 @@ enum BalanceType {
   discount
   bonus
   shares
+  sale
+  sweat
 }
 
 enum TransactionType {
@@ -215,9 +235,11 @@ model WalletTransaction {
   wallet          Wallet          @relation(fields: [walletId], references: [id])
   walletId        String
   referral        UserReferral?   @relation(fields: [referralId], references: [id])
+  saleInfo        SaleInfo?       @relation(fields: [saleInfoId], references: [id])
   balanceType     BalanceType
   transactionType TransactionType
   referralId      String?
+  saleInfoId      String?
   invitedUserId   String?
   amount          Float           @default(0)
   description     String

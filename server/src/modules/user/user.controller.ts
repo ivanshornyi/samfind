@@ -8,6 +8,7 @@ import {
   ParseArrayPipe,
   Delete,
   Post,
+  Put,
 } from "@nestjs/common";
 
 import { User } from "@prisma/client";
