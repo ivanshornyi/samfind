@@ -133,3 +133,17 @@ body {
     linear-gradient(#000 0 0);
   mask-composite: exclude;
 }
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #CE9DF3;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #363637;
+}

@@ -17,59 +17,73 @@ export class OrganizationService {
     private readonly configService: ConfigService,
   ) {}
 
-  async create(createOrganizationDto: CreateOrganizationDto): Promise<Organization> {
+  async create(
+    createOrganizationDto: CreateOrganizationDto,
+  ): Promise<Organization> {
     const organization = await this.prisma.organization.create({
       data: {
         ...createOrganizationDto,
-      }
+      },
     });
 
     return organization;
   }
 
-  async update(id: string, updateOrganizationDto: UpdateOrganizationDto): Promise<Organization> {
+  async update(
+    id: string,
+    updateOrganizationDto: UpdateOrganizationDto,
+  ): Promise<Organization> {
     const organization = await this.prisma.organization.findUnique({
       where: {
         id,
       },
     });
 
+    let domains = organization.domains;
+    let availableEmails = organization.availableEmails;
+
     if (updateOrganizationDto.availableEmails) {
       const invitationLink = `${this.configService.get("FRONTEND_DOMAIN")}/auth/sign-up?accountType=private&orgId=${id}`;
-
+      availableEmails = updateOrganizationDto.availableEmails.map((email) =>
+        email.toLowerCase(),
+      );
       const currentEmails = organization.availableEmails;
       const newEmails = [];
-  
-      for (const email of updateOrganizationDto.availableEmails) {
+
+      for (const email of availableEmails) {
         if (!currentEmails.includes(email)) {
           newEmails.push(email);
         }
       }
 
       if (newEmails.length > 0) {
-        for (const email of updateOrganizationDto.availableEmails) {
+        await this.prisma.license.update({
+          where: {
+            ownerId: organization.ownerId,
+          },
+          data: {
+            availableEmails,
+          },
+        });
+
+        for (const email of newEmails) {
           await this.mailService.sendInvitation(email, invitationLink);
         }
       }
+    }
+
+    if (updateOrganizationDto.domains) {
+      domains = updateOrganizationDto.domains.map((d) => d.toLowerCase());
     }
 
     const updatedOrganization = await this.prisma.organization.update({
       where: { id },
       data: {
         ...updateOrganizationDto,
-      }
+        availableEmails,
+        domains,
+      },
     });
-
-    if (updateOrganizationDto.availableEmails) {
-      await this.prisma.license.update({
-        where: {
-          ownerId: organization.ownerId,
-        },
-        data: {
-          availableEmails: updateOrganizationDto.availableEmails,
-        }
-      });
-    }
 
     return updatedOrganization;
   }

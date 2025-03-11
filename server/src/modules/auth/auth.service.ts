@@ -63,10 +63,8 @@ export class AuthService {
     const registrationCode = this.generateCode().code;
     const registrationCodeExpiresAt = this.generateCode().codeExpiresAt;
 
-    await this.mailService.sendRegistrationCode(email, registrationCode);
-
     const existingUser = await this.userService.findUserByEmail(
-      email,
+      email.toLowerCase(),
       authType,
     );
 
@@ -82,13 +80,18 @@ export class AuthService {
       );
     }
 
+    await this.mailService.sendRegistrationCode(
+      email.toLowerCase(),
+      registrationCode,
+    );
+
     const hashedPassword = this.hashField(password);
 
     if (!existingUser) {
       const newUser = await this.userService.create({
         firstName,
         lastName,
-        email,
+        email: email.toLowerCase(),
         authType,
         password: hashedPassword,
         registrationCode,
@@ -138,7 +141,10 @@ export class AuthService {
   public async signIn(signInDto: SignInDto) {
     const { email, password, authType, mobileId } = signInDto;
 
-    const user = await this.userService.findUserByEmail(email, authType);
+    const user = await this.userService.findUserByEmail(
+      email.toLowerCase(),
+      authType,
+    );
 
     if (!user) {
       throw new NotFoundException("User not found");
@@ -172,7 +178,7 @@ export class AuthService {
     if (mobileId) {
       licenseInformation = await this.userLicenseService.checkDevice({
         mobile_id: mobileId,
-        email: user.email,
+        email: user.email.toLowerCase(),
       });
 
       if (licenseInformation.error) return { licenseInformation };
@@ -335,7 +341,7 @@ export class AuthService {
 
   public async verifyUserCode(authVerificationDto: AuthVerificationDto) {
     const user = await this.userService.findUserByEmail(
-      authVerificationDto.email,
+      authVerificationDto.email.toLowerCase(),
       UserAuthType.email,
     );
 
@@ -402,7 +408,11 @@ export class AuthService {
         throw new ConflictException("License limit is reached");
       }
 
-      if (!license.availableEmails.includes(authVerificationDto.email)) {
+      if (
+        !license.availableEmails.includes(
+          authVerificationDto.email.toLowerCase(),
+        )
+      ) {
         throw new ConflictException("This email does not have access");
       }
 
@@ -446,10 +456,12 @@ export class AuthService {
       const organizationDomains = organization.domains;
       const organizationEmails = organization.availableEmails;
 
-      const emailDomainPart = authVerificationDto.email.split("@")[1];
+      const emailDomainPart = authVerificationDto.email
+        .split("@")[1]
+        .toLowerCase();
 
       if (
-        !organizationEmails.includes(authVerificationDto.email) &&
+        !organizationEmails.includes(authVerificationDto.email.toLowerCase()) &&
         organizationDomains.every((domain) => !domain.includes(emailDomainPart))
       ) {
         throw new ConflictException("This email does not have access");

@@ -36,11 +36,11 @@ export default function WalletPage() {
   return (
     <div className="mx-auto max-w-[1000px]">
       <div className="w-full">
-        <h2 className="text-[32px] leading-[44px] font-semibold">Wallet</h2>
-        <p className="text-[20px] leading-[27px] font-semibold mt-3">
+        <h2 className="text-[24px] md:text-[32px] leading-[44px] font-semibold">Wallet</h2>
+        <p className="text-[16px] md:text-[20px] leading-[27px] font-semibold mt-0 md:mt-3">
           Your Earnings & Investments in One Place
         </p>
-        <div className="flex justify-center gap-4 mt-10 max-w-full md:flex-nowrap flex-wrap">
+        <div className="flex justify-center gap-4 mt-4 md:mt-10 max-w-full md:flex-nowrap flex-wrap">
           <BalanceBonus
             balance={wallet?.bonusAmount || 0}
             sharePrice={sharePrice}

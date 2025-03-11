@@ -15,4 +15,12 @@ export class UpdateWalletDto {
   @IsNumber()
   @IsOptional()
   sharesAmount?: number;
+
+  @IsNumber()
+  @IsOptional()
+  salesAmount?: number;
+
+  @IsNumber()
+  @IsOptional()
+  sweatAmount?: number;
 }

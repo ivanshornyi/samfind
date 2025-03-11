@@ -76,6 +76,14 @@ export class UpdateUserDto {
   @IsString()
   languageName?: string;
 
+  @IsOptional()
+  @IsBoolean()
+  isSale?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  isStaff?: boolean;
+
   // @IsString()
   // @IsOptional()
   // logo?: string;

@@ -16,7 +16,7 @@ export const BalanceShares = ({
   isEarlyBird,
 }: BalanceInfoProps) => {
   return (
-    <div className="flex flex-col justify-between items-start rounded-2xl bg-[#242424] relative w-full h-[260px] p-8 min-w-[380px]">
+    <div className="flex flex-col justify-between items-start rounded-2xl bg-[#242424] relative w-full p-8">
       <div className="w-full">
         <Popover.Root>
           <Popover.Trigger className="absolute top-4 right-5">
@@ -35,10 +35,10 @@ export const BalanceShares = ({
           </Popover.Portal>
         </Popover.Root>
         <p className="text-[20px] leading-[27px] font-semibold">Your Shares</p>
-        <div className="flex mt-8 justify-between">
+        <div className="flex mt-2 md:mt-8 justify-between">
           <div>
             <p className="text-[16px] leading-[22px]">Shares owned</p>
-            <p className="text-2xl sm:text-[32px] sm:leading-[43px] font-semibold text-[#CE9DF3] text-nowrap mb-2 md:mb-4 md:mt-2">
+            <p className="text-2xl sm:text-[32px] sm:leading-[43px] font-semibold text-[#CE9DF3] text-nowrap mb-2 md:mb-4">
               €{(balance * sharePrice) / 100}
             </p>
           </div>

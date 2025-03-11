@@ -17,6 +17,7 @@ interface SelectComponentProps {
   placeholder: string;
   isDisabled?: boolean;
   optionColor?: string;
+  menuPlacement?: "top" | "bottom";
 }
 
 export const SelectComponent = ({
@@ -26,6 +27,7 @@ export const SelectComponent = ({
   placeholder,
   isDisabled,
   optionColor,
+  menuPlacement,
 }: SelectComponentProps) => {
   const customStyles: any = {
     control: (provided: Record<string, unknown>, state: any) => ({
@@ -93,6 +95,7 @@ export const SelectComponent = ({
       placeholder={placeholder}
       styles={customStyles}
       isDisabled={isDisabled}
+      menuPlacement={menuPlacement || "bottom"}
     />
   );
 };
