@@ -1,10 +1,13 @@
 "use client";
 
 import {
-  BeginJourney,
   Features,
   Intro,
+  MobileApp,
+  Software,
+  WebPlatform,
   LicensingOptionList,
+  BeginJourney,
 } from "./_components";
 
 export default function Main() {
@@ -12,8 +15,11 @@ export default function Main() {
     <div>
       <Intro />
       <Features />
-      <BeginJourney />
+      <MobileApp />
+      <Software />
+      <WebPlatform />
       <LicensingOptionList />
+      <BeginJourney />
     </div>
   );
 }
