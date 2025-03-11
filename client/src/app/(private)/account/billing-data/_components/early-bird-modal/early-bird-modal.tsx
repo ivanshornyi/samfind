@@ -211,7 +211,12 @@ export const EarlyBirdModal = ({ planId }: EarlyBirdModalProps) => {
               </div>
             </div>
 
-            <ul className="space-y-4 mt-8 text-[15px] leading-[18px] font-semibold">
+            <p className="mt-4 text-disabled text-[15px] leading-[22px]">
+              Want more? Try increasing your share quantity! Get 1 month
+              free for every 6 shares purchased.
+            </p>
+
+            <ul className="space-y-4 mt-4 text-[15px] leading-[18px] font-semibold">
               <li className="flex items-center gap-4">
                 <Check className="w-4 h-4" />
                 <p>

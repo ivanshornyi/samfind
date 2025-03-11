@@ -197,6 +197,7 @@ export const ShareholderForm = ({
               value={selectedCountry}
               onChange={(value) => handleFormSelectChange("country", value)}
               placeholder="Select country"
+              menuPlacement="top"
             />
           </div>
           <div className="w-full">

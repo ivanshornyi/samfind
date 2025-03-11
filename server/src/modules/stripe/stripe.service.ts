@@ -8,12 +8,21 @@ import {
   PlanPeriod,
   PurchaseType,
   LicenseTierType,
+  TransactionType,
+  BalanceType,
 } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { UserService } from "../user/user.service";
 
 import { CreateIntentDto } from "./dto/create-intent-dto";
-import { getDate, getDaysInMonth, getMonth, isSameDay } from "date-fns";
+import {
+  getDate,
+  getDaysInMonth,
+  getMonth,
+  isBefore,
+  isSameDay,
+  subYears,
+} from "date-fns";
 import { MailService } from "../mail/mail.service";
 import { ShareService } from "../share/share.service";
 import { WalletService } from "../wallet/wallet.service";
@@ -450,7 +459,12 @@ export class StripeService {
           stockId,
           invoiceId: invoice.id,
         });
+        await this.checkAndUpdateSaleInfo(
+          userId,
+          Number(quantityShears) * appSettings.sharePrice,
+        );
       } else if (invoice.subscription) {
+        console.log(invoice);
         const { userId, userReferralCode, memberId, newPlan, quantity } =
           invoice.subscription_details.metadata;
         const metadata = invoice.subscription_details.metadata;
@@ -484,21 +498,26 @@ export class StripeService {
         if (userReferralCode) {
           // find user and update user discount
 
-          const discountAmount =
-            subscription.plan.period === PlanPeriod.yearly
-              ? Math.round(subscription.plan.price / 10)
-              : Math.round(subscription.plan.price / 10);
+          // const discountAmount = Math.round(invoice.total_excluding_tax / 10);
+          // subscription.plan.period === PlanPeriod.yearly
+          //   ? Math.round(subscription.plan.price / 10)
+          //   : Math.round(subscription.plan.price / 10);
 
           this.userService.findAndUpdateUserByReferralCode(
             Number(userReferralCode),
             subscription.user,
-            discountAmount,
+            invoice.total_excluding_tax,
           );
 
           delete metadata.userReferralCode;
           await this.updateSubscriptionMetadata(
             invoice.subscription as string,
             { userReferralCode: null },
+          );
+        } else {
+          await this.checkAndUpdateSaleInfo(
+            subscription.userId,
+            invoice.total_excluding_tax,
           );
         }
 
@@ -697,16 +716,55 @@ export class StripeService {
     }
   }
 
+  async checkAndUpdateSaleInfo(userId: string, totalAmount: number) {
+    const saleInfo = await this.prisma.saleInfo.findUnique({
+      where: { invitedUserId: userId },
+    });
+    const oneYearAgo = subYears(new Date(), 1);
+
+    if (saleInfo && !isBefore(new Date(saleInfo.createdAt), oneYearAgo)) {
+      const earnedAmount = Math.round(totalAmount / 10);
+
+      await this.prisma.saleInfo.update({
+        where: { id: saleInfo.id },
+        data: {
+          earnedAmount: { increment: earnedAmount },
+        },
+      });
+
+      const wallet = await this.prisma.wallet.update({
+        where: { userId: saleInfo.saleUserId },
+        data: { salesAmount: { increment: earnedAmount } },
+      });
+
+      if (!wallet) return;
+
+      this.prisma.walletTransaction.create({
+        data: {
+          userId: wallet.userId,
+          walletId: wallet.id,
+          amount: earnedAmount,
+          transactionType: TransactionType.income,
+          balanceType: BalanceType.sale,
+          saleInfoId: saleInfo.id,
+          description: `Income for the purchase of an invited user`,
+        },
+      });
+    }
+  }
+
   async updateCustomerDiscountForPurchasedShares(
     stripeCustomerId: string,
     sharesCount: number,
     sharePrice: number,
   ) {
     const validSharesCount = Math.floor(sharesCount / 6) * 6;
-    await this.updateCustomerBalance(
-      stripeCustomerId,
-      validSharesCount * sharePrice,
-    );
+    if (validSharesCount > 0) {
+      await this.updateCustomerBalance(
+        stripeCustomerId,
+        validSharesCount * sharePrice,
+      );
+    }
   }
 
   calculateDiscount(totalAmount: number, nextDate?: Date): number {

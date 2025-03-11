@@ -11,7 +11,7 @@ import { PaymentHistory, SubscriptionDetails } from "./_components";
 import { PricingCard } from "./_components/pricing-card";
 
 import { format } from "date-fns";
-import { PlanPeriod, PlanType } from "@/types";
+import { LicenseTierType, PlanPeriod, PlanType } from "@/types";
 // import { BonusHistoryModal } from "./_components/bonus-history-modal";
 
 export default function BillingData() {
@@ -51,7 +51,7 @@ export default function BillingData() {
                   planType={
                     userSubscriptionInfo.plan?.type as unknown as PlanType
                   }
-                  plan={`${userSubscriptionInfo.plan?.type} ${userSubscriptionInfo.plan?.period}`}
+                  plan={`${userSubscriptionInfo.plan?.type === LicenseTierType.EarlyBird ? "Early Bird(Standard)" : userSubscriptionInfo.plan?.type} ${userSubscriptionInfo.plan?.period}`}
                   isActive={userSubscriptionInfo.isActive}
                   renewalDate={
                     userSubscriptionInfo.nextDate
