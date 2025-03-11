@@ -40,7 +40,10 @@ export default function AuthLayout({
           className="absolute left-0 top-0 z-[-1] w-[60%]"
         />
 
-        <Link href="/" className="fixed top-6 left-5 flex items-center gap-3">
+        <Link
+          href="/"
+          className="fixed top-6 left-5 flex items-center gap-3 z-[11]"
+        >
           <ArrowLeftIcon size={30} />
           <span className="hidden sm:block">Back</span>
         </Link>
