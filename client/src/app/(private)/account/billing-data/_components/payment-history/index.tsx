@@ -25,11 +25,11 @@ export const PaymentHistory = () => {
   };
 
   return (
-    <div className="w-full mt-5 mb-[100px]">
-      <Table>
+    <div className="w-full mt-5 md:mb-[100px]">
+      <Table className="text-nowrap">
         <TableHeader className="hover:bg-transparent">
           <TableRow className="border-white/30 hover:bg-transparent">
-            <TableHead className="w-[250px] uppercase text-white/60">
+            <TableHead className="md:w-[250px] uppercase text-white/60">
               Invoice
             </TableHead>
             <TableHead className="uppercase text-white/60">
@@ -52,7 +52,7 @@ export const PaymentHistory = () => {
               <TableCell className="font-medium py-2">
                 <div className="">
                   <p>{historyItem.number}</p>
-                  <p className="text-disabled text-[12px] truncate w-[200px]">
+                  <p className="text-disabled text-[12px] truncate md:w-[200px]">
                     {historyItem.description}
                   </p>
                 </div>

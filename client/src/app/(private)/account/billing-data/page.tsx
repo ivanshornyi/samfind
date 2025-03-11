@@ -112,8 +112,8 @@ export default function BillingData() {
             </h2>
             {/* <BonusHistoryModal /> */}
           </div>
-          <div className="w-full overflow-x-auto">
-            <div className="min-w-[600px]">
+          <div className="w-full" id="custom-scrollbar">
+            <div className="md:min-w-[600px]">
               <PaymentHistory />
             </div>
           </div>
