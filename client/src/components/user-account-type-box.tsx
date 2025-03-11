@@ -13,9 +13,7 @@ export const UserAccountTypeBox = () => {
       <User size={18} />
       {user?.accountType === UserAccountType.Business
         ? "Business"
-        : user?.stripeCustomerId
-          ? "Personal"
-          : "Member"}{" "}
+        : "Personal"}{" "}
       Account
     </div>
   );
