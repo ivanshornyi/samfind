@@ -569,7 +569,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                     <div className="relative">
                       <Input
                         name="name"
-                        placeholder="Company name(required)"
+                        placeholder="Company name (required)"
                         value={organizationFormData.name}
                         onChange={handleOrganizationFormInputChange}
                         className="pl-11"
@@ -584,7 +584,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                       <div className="relative flex-1">
                         <Input
                           name="businessOrganizationNumber"
-                          placeholder="Business registration №"
+                          placeholder="Business registration No."
                           value={
                             organizationFormData.businessOrganizationNumber
                           }

@@ -15,7 +15,7 @@ export const BalanceBonus = ({
   isEarlyBird,
 }: BalanceInfoProps) => {
   return (
-    <div className="flex flex-col justify-between items-start rounded-2xl bg-[#242424] relative w-full h-[260px] p-8">
+    <div className="flex flex-col justify-between items-start rounded-2xl bg-[#242424] relative w-full p-8">
       <div className="w-full">
         <Popover.Root>
           <Popover.Trigger className="absolute top-4 right-5">
@@ -38,14 +38,14 @@ export const BalanceBonus = ({
         <p className="text-[20px] leading-[27px] font-semibold">
           Your bonus balance
         </p>
-        <p className="text-[16px] leading-[22px] mt-8">
+        <p className="text-[16px] leading-[22px] mt-2 md:mt-8">
           Total amount of bonuses from referrals
         </p>
 
         <p className="text-2xl sm:text-[32px] sm:leading-[43px] font-semibold text-[#CE9DF3] text-nowrap mb-2 md:mb-4 md:mt-2">
           €{balance / 100}
         </p>
-        <div className="flex gap-2 w-full mt-8">
+        <div className="flex flex-col xl:flex-row gap-2 w-full mt-4 md:mt-8">
           <div className="flex-1 w-full">
             <ConvertToDiscountModal />
           </div>
