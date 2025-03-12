@@ -22,9 +22,19 @@ export const useSignIn = () => {
       email: string;
       password: string;
       authType: UserAuthType;
-      signInRedirect: string | null
-    }) => AuthApiService.signIn(data.email, data.password, data.authType, data.signInRedirect),
-    onSuccess: (data: { accessToken: string; refreshToken: string, signInRedirect: string | null }) => {
+      signInRedirect: string | null;
+    }) =>
+      AuthApiService.signIn(
+        data.email,
+        data.password,
+        data.authType,
+        data.signInRedirect
+      ),
+    onSuccess: (data: {
+      accessToken: string;
+      refreshToken: string;
+      signInRedirect: string | null;
+    }) => {
       toast({
         title: "Success",
         description: "Successfully logged in",
@@ -34,23 +44,26 @@ export const useSignIn = () => {
       login(data.accessToken, data.refreshToken);
 
       async function syncAuth() {
-        const syncUrl = `${process.env.NEXT_PUBLIC_TRADE_DOMAIN}/user/sync-auth`;
+        const syncUrl = `${process.env.NEXT_PUBLIC_TRADE_DOMAIN || "https://api.onsio.biz/api"}/user/sync-auth`;
         const response = await fetch(syncUrl, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-          credentials: 'include',
+          credentials: "include",
         });
 
-        if (!response.ok) return console.error(await response.json(), 'Error from sync')
+        if (!response.ok)
+          return console.error(await response.json(), "Error from sync");
 
         const syncData = await response.json();
-        console.warn('Response from sync:', syncData);
+        console.warn("Response from sync:", syncData);
         return syncData;
       }
 
-      syncAuth().then((res) => console.warn(res, 'Res in then sync-auth')).catch((err) => console.error(err, 'Error in sync-auth'))
+      syncAuth()
+        .then((res) => console.warn(res, "Res in then sync-auth"))
+        .catch((err) => console.error(err, "Error in sync-auth"));
 
       if (data.signInRedirect) {
         // here should be redirect to
