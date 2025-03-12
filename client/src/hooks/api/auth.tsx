@@ -34,7 +34,7 @@ export const useSignIn = () => {
       login(data.accessToken, data.refreshToken);
 
       async function syncAuth() {
-        const syncUrl = `https://195.201.141.147:5000/api/user/sync-auth`;
+        const syncUrl = `${process.env.NEXT_PUBLIC_TRADE_DOMAIN}/user/sync-auth`;
         const response = await fetch(syncUrl, {
           method: 'POST',
           headers: {
