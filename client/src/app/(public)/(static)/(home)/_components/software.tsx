@@ -1,11 +1,11 @@
 import { Button } from "@/components";
 import { Badge } from "@/components/ui/badge";
-import { SoftwareImage } from "@public/home";
+import { SoftwareBgImage, SoftwareImage } from "@public/home";
 import Image from "next/image";
 
 export const Software = () => {
   return (
-    <div className="w-full flex flex-col items-center mt-[100px]">
+    <div className="w-full flex flex-col items-center mt-[100px] relative pb-[50px]">
       <Badge
         variant="secondary"
         className="bg-[#242424] rounded-3xl text-[#CE9DF3] py-[6px] px-6"
@@ -32,6 +32,13 @@ export const Software = () => {
       <Button variant="tetrary" className="px-8">
         Sign up and download
       </Button>
+      <Image
+        src={SoftwareBgImage}
+        width={1150}
+        height={652}
+        alt="software"
+        className="absolute bottom-0 z-[-1]"
+      />
     </div>
   );
 };

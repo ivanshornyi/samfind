@@ -3,6 +3,7 @@
 import {
   Features,
   Intro,
+  Solutoins,
   MobileApp,
   Software,
   WebPlatform,
@@ -14,6 +15,7 @@ export default function Main() {
   return (
     <div>
       <Intro />
+      <Solutoins />
       <Features />
       <MobileApp />
       <Software />

@@ -32,13 +32,13 @@ export const Intro = () => {
           </Link>
         </div>
       </div>
-      <Image
+      {/* <Image
         src={HomeIntro}
         width={703}
         height={676}
         alt="Background illustration"
         className="hidden md:block absolute top-[45%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 -z-[1]"
-      />
+      /> */}
       <Image
         src={HomeIntroMobile}
         width={703}
