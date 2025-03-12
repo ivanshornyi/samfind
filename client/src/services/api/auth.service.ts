@@ -11,7 +11,8 @@ export enum UserAuthType {
 const signIn = async (
   email: string,
   password: string,
-  authType: UserAuthType
+  authType: UserAuthType,
+  signInRedirect: string | null
 ) => {
   try {
     const response = await apiClient.post("/auth/sign-in", {
@@ -20,7 +21,7 @@ const signIn = async (
       authType,
     });
 
-    return response.data;
+    return { ...response.data, signInRedirect };
   } catch (error) {
     handleApiError(error);
   }

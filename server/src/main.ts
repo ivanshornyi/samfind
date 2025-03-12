@@ -20,6 +20,8 @@ async function bootstrap() {
       "http://localhost:3000",
       "http://localhost:5173",
       "http://localhost:4000",
+      "http://195.201.141.147",
+      "http://195.201.141.147:5000",
       "https://www.onsio.io",
       "https://www.onsio.io/api",
       "https://onsio.io",
