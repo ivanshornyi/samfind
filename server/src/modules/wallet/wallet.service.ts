@@ -52,6 +52,8 @@ export class WalletService {
     discountAmount,
     bonusAmount,
     sharesAmount,
+    salesAmount,
+    sweatAmount,
   }: UpdateWalletDto) {
     if (!discountAmount && !bonusAmount && !sharesAmount)
       throw new BadRequestException("No data to change");
@@ -69,16 +71,6 @@ export class WalletService {
           discountAmount,
           userId: wallet.userId,
         });
-        // await this.prisma.walletTransaction.create({
-        //   data: {
-        //     userId: wallet.userId,
-        //     walletId: wallet.id,
-        //     amount: discountAmount - wallet.discountAmount,
-        //     transactionType: TransactionType.income,
-        //     balanceType: BalanceType.discount,
-        //     description: "Transfer from a bonus balance",
-        //   },
-        // });
       }
 
       if (bonusAmount < wallet.bonusAmount) {
@@ -119,6 +111,58 @@ export class WalletService {
           },
         });
       }
+    } else if (bonusAmount && (salesAmount || salesAmount === 0)) {
+      if (bonusAmount > wallet.bonusAmount) {
+        await this.prisma.walletTransaction.create({
+          data: {
+            userId: wallet.userId,
+            walletId: wallet.id,
+            amount: bonusAmount - wallet.bonusAmount,
+            transactionType: TransactionType.income,
+            balanceType: BalanceType.bonus,
+            description: "Transfer from Salas balance",
+          },
+        });
+      }
+
+      if (salesAmount < wallet.salesAmount) {
+        await this.prisma.walletTransaction.create({
+          data: {
+            userId: wallet.userId,
+            walletId: wallet.id,
+            amount: wallet.salesAmount - salesAmount,
+            transactionType: TransactionType.expense,
+            balanceType: BalanceType.sale,
+            description: "Transfer to a bonus balance",
+          },
+        });
+      }
+    } else if (bonusAmount && (sweatAmount || sweatAmount === 0)) {
+      if (bonusAmount > wallet.bonusAmount) {
+        await this.prisma.walletTransaction.create({
+          data: {
+            userId: wallet.userId,
+            walletId: wallet.id,
+            amount: bonusAmount - wallet.bonusAmount,
+            transactionType: TransactionType.income,
+            balanceType: BalanceType.bonus,
+            description: "Transfer from Sweat balance",
+          },
+        });
+      }
+
+      if (sweatAmount < wallet.sweatAmount) {
+        await this.prisma.walletTransaction.create({
+          data: {
+            userId: wallet.userId,
+            walletId: wallet.id,
+            amount: wallet.sweatAmount - sweatAmount,
+            transactionType: TransactionType.expense,
+            balanceType: BalanceType.sweat,
+            description: "Transfer to a bonus balance",
+          },
+        });
+      }
     } else if (sharesAmount) {
       if (sharesAmount > wallet.sharesAmount) {
         await this.prisma.walletTransaction.create({
@@ -133,18 +177,6 @@ export class WalletService {
         });
       }
     }
-    // else if (discountAmount || discountAmount === 0) {
-    //   await this.prisma.walletTransaction.create({
-    //     data: {
-    //       userId: wallet.userId,
-    //       walletId: wallet.id,
-    //       amount: wallet.discountAmount - discountAmount,
-    //       transactionType: TransactionType.expense,
-    //       balanceType: BalanceType.discount,
-    //       description: "Pay Invoice",
-    //     },
-    //   });
-    // }
     const stripeUser = await this.stripeService.getCustomer(
       wallet.user.stripeCustomerId,
     );
@@ -156,6 +188,8 @@ export class WalletService {
         discountAmount: Math.abs(stripeUser.balance),
         bonusAmount,
         sharesAmount,
+        salesAmount,
+        sweatAmount,
       },
     });
   }

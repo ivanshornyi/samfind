@@ -58,7 +58,7 @@ export const BalanceShares = ({
           </div>
         </div>
 
-        <div className="flex gap-2 w-full mt-4">
+        <div className="flex gap-2 w-full mt-6">
           <BuyShares
             sharePrice={sharePrice}
             bonusAmount={bonusAmount}
