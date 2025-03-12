@@ -22,7 +22,7 @@ export class AuthController {
     if ("accessToken" in resp && "id" in resp) {
       res.cookie("accessToken", resp.accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        // secure: process.env.NODE_ENV === "production",
         sameSite: "strict", // CSRF guard
         maxAge: 15 * 60 * 1000, // 15m (in miliseconds)
         path: "/",
@@ -30,7 +30,7 @@ export class AuthController {
 
       res.cookie("refreshToken", resp.refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        // secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         path: "/",
@@ -38,7 +38,7 @@ export class AuthController {
 
       res.cookie("userId", resp.id, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        // secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         path: "/",
@@ -46,7 +46,7 @@ export class AuthController {
 
       res.cookie("userFirstName", resp.firstName, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        // secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         path: "/",
@@ -54,7 +54,7 @@ export class AuthController {
 
       res.cookie("userLastName", resp.lastName, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        // secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         path: "/",
