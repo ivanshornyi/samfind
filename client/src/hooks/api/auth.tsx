@@ -22,8 +22,9 @@ export const useSignIn = () => {
       email: string;
       password: string;
       authType: UserAuthType;
-    }) => AuthApiService.signIn(data.email, data.password, data.authType),
-    onSuccess: (data: { accessToken: string; refreshToken: string }) => {
+      signInRedirect: string | null
+    }) => AuthApiService.signIn(data.email, data.password, data.authType, data.signInRedirect),
+    onSuccess: (data: { accessToken: string; refreshToken: string, signInRedirect: string | null }) => {
       toast({
         title: "Success",
         description: "Successfully logged in",
@@ -32,7 +33,34 @@ export const useSignIn = () => {
 
       login(data.accessToken, data.refreshToken);
 
-      setTimeout(() => router.push("/account/license"), 100);
+      async function syncAuth() {
+        const syncUrl = `http://195.201.141.147:5000/api/user/sync-auth`;
+        const response = await fetch(syncUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        });
+
+        if (!response.ok) return console.error(await response.json(), 'Error from sync')
+
+        const syncData = await response.json();
+        console.warn('Response from sync:', syncData);
+        return syncData;
+      }
+
+      syncAuth().then((res) => console.warn(res, 'Res in then sync-auth')).catch((err) => console.error(err, 'Error in sync-auth'))
+
+      if (data.signInRedirect) {
+        // here should be redirect to
+        toast({
+          title: "Sync-auth",
+          description: "Successfully synced the data",
+          variant: "success",
+        });
+        // window.location.href = data.signInRedirect
+      } else setTimeout(() => router.push("/account/license"), 100);
     },
     onError: (error) => {
       handleToastError(error, toast);
@@ -71,6 +99,8 @@ export const useSendVerificationCode = () => {
       toast({
         description: "Successfully sended",
       });
+
+      // fetch to backend
     },
     onError: (error) => {
       handleToastError(error, toast);
