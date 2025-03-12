@@ -51,32 +51,28 @@ export const useSignIn = () => {
         return syncData
       }
 
-      if (!data.signInRedirect && data.backendLink) {
+      if (!data.signInRedirect && !data.backendLink) {
+        setTimeout(() => router.push("/account/license"), 100)
+      } else if (data.signInRedirect && data.backendLink) {
         syncAuth()
           .then((res) => {
             console.warn('Res in then sync-auth', res)
-            if (data.signInRedirect) {
-              toast({
-                title: "Sync-auth",
-                description: "Successfully synced the data",
-                variant: "success",
-              })
-              setTimeout(() => {
-                window.location.href = data.signInRedirect as string
-              }, 3000)
-            } else {
-              setTimeout(() => router.push("/account/license"), 100)
-            }
+            toast({
+              title: "Sync-auth",
+              description: "Successfully synced the data",
+              variant: "success",
+            })
+            setTimeout(() => {
+              window.location.href = data.signInRedirect as string
+            }, 3000)
           })
           .catch((err) => {
             console.error('Error in sync-auth', err)
-            if (data.signInRedirect) {
-              toast({
-                title: "Sync-auth",
-                description: "Failed to sync data",
-                variant: "destructive",
-              })
-            }
+            toast({
+              title: "Sync-auth",
+              description: "Failed to sync data",
+              variant: "destructive",
+            })
           })
       }
     },
