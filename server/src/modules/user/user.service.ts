@@ -90,7 +90,8 @@ export class UserService {
           earnedAmount: discountAmount,
         },
       });
-      this.prisma.walletTransaction.create({
+
+      await this.prisma.walletTransaction.create({
         data: {
           userId: user.id,
           walletId: user.wallet.id,
@@ -102,7 +103,7 @@ export class UserService {
           description: `Income from referral Registration on email ${newUser.email}`,
         },
       });
-      this.prisma.wallet.update({
+      await this.prisma.wallet.update({
         where: { id: user.wallet.id },
         data: { salesAmount: { increment: discountAmount } },
       });

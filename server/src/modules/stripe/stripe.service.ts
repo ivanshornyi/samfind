@@ -476,7 +476,6 @@ export class StripeService {
           Number(quantityShears) * appSettings.sharePrice,
         );
       } else if (invoice.subscription) {
-        console.log(invoice);
         const { userId, userReferralCode, memberId, newPlan, quantity } =
           invoice.subscription_details.metadata;
         const metadata = invoice.subscription_details.metadata;
@@ -751,7 +750,7 @@ export class StripeService {
 
       if (!wallet) return;
 
-      this.prisma.walletTransaction.create({
+      await this.prisma.walletTransaction.create({
         data: {
           userId: wallet.userId,
           walletId: wallet.id,
