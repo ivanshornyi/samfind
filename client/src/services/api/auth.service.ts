@@ -12,7 +12,8 @@ const signIn = async (
   email: string,
   password: string,
   authType: UserAuthType,
-  signInRedirect: string | null
+  signInRedirect: string | null,
+  backendLink: string | null
 ) => {
   try {
     const response = await apiClient.post("/auth/sign-in", {
@@ -21,7 +22,7 @@ const signIn = async (
       authType,
     });
 
-    return { ...response.data, signInRedirect };
+    return { ...response.data, signInRedirect, backendLink };
   } catch (error) {
     handleApiError(error);
   }
