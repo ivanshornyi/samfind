@@ -69,11 +69,13 @@ export const useSignIn = () => {
         })
         .catch((err) => {
           console.error('Error in sync-auth', err)
-          toast({
-            title: "Sync-auth",
-            description: "Failed to sync data",
-            variant: "destructive",
-          })
+          if (data.signInRedirect) {
+            toast({
+              title: "Sync-auth",
+              description: "Failed to sync data",
+              variant: "destructive",
+            })
+          }
         })
     },
     onError: (error) => {
