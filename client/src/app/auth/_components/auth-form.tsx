@@ -65,7 +65,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
   const referralCode = searchParams.get("userReferralCode");
   const licenseId = searchParams.get("lId");
   const organizationId = searchParams.get("orgId");
-  const redirectUrl = searchParams.get('redirect')
+  const redirectUrl = searchParams.get("redirect")
+  const backendUrl = searchParams.get("backend")
 
   const { data: organizationName } = useGetUserOrganizationName(organizationId);
   const { data: userName } = useGetUserName(licenseId);
@@ -181,7 +182,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
         email: formData.email,
         password: formData.password.trim(),
         authType: UserAuthType.Email,
-        signInRedirect: redirectUrl
+        signInRedirect: redirectUrl,
+        backendLink: backendUrl
       });
     }
 
