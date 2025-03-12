@@ -8,6 +8,21 @@ export enum UserAuthType {
   Email = "email",
 }
 
+const syncAuth = async (
+  backendUrl: string | null
+) => {
+  try {
+    const response = await apiClient.post("/auth/sync-auth", {
+      backendUrl
+    });
+
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
+
 const signIn = async (
   email: string,
   password: string,
@@ -134,6 +149,7 @@ const verifyUser = async (data: VerifyData) => {
 };
 
 export const AuthApiService = {
+  syncAuth,
   signIn,
   signUp,
   sendVerificationCode,
