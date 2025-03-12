@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export const Solutoins = () => {
   return (
-    <div className="flex items-center gap-[100px]">
+    <div className="items-center gap-[100px] grid grid-cols-1 sm:grid-cols-2 ">
       <Image src={SolutionsImage} width={600} height={763} alt="solutoins" />
       <div className="flex flex-col">
         <h2 className="font-bold text-[40px] leading-[120%]">

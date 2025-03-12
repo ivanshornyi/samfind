@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export const WebPlatform = () => {
   return (
-    <div className="flex py-[48px] mt-[100px] gap-[48px]">
+    <div className="grid grid-cols-1 sm:grid-cols-2  py-[48px] mt-[100px] gap-[48px]">
       <div className="flex flex-col gap-[48px] w-full max-w-[560px]">
         <Badge
           variant="secondary"
