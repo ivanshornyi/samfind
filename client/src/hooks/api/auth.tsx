@@ -34,7 +34,7 @@ export const useSignIn = () => {
       login(data.accessToken, data.refreshToken);
 
       async function syncAuth() {
-        const syncUrl = `${process.env.NEXT_PUBLIC_TRADE_DOMAIN}/user/sync-auth`;
+        const syncUrl = `${process.env.TRADE_DOMAIN}/user/sync-auth`;
         const response = await fetch(syncUrl, {
           method: 'POST',
           headers: {
