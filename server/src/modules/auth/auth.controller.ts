@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Req, Res } from "@nestjs/common";
-import { Response } from "express";
+import { Request, Response } from "express";
 import { SignInDto, SignUpDto } from "./dto/auth-user-dto";
 import { ResetPasswordDto } from "./dto/reset-password-dto";
 
@@ -14,6 +14,36 @@ import { AuthVerificationDto } from "./dto/auth-verification-dto";
 export class AuthController {
   public constructor(private readonly authService: AuthService) { }
 
+  @ApiOperation({ summary: "Proxy sync authentication to onsio.biz" })
+  @Post('/sync-auth')
+  async syncAuthProxy(@Req() req: Request, @Res() res: Response, @Body() body: { backendUrl: string }) {
+    try {
+      console.log('Cookies sent to .biz:', req.headers.cookie)
+      const response = await fetch(`${body.backendUrl}`, {
+        method: 'POST',
+        headers: {
+          Cookie: req.headers.cookie,
+          'Content-Type': 'application/json',
+        },
+        credentials: "include",
+      });
+
+      const responseData = await response.json()
+
+      if (!response.ok) {
+        res.status(response.status).json(responseData);
+        return;
+      }
+
+      response.headers['set-cookie']?.forEach((cookie) => res.setHeader('Set-Cookie', cookie));
+
+      res.status(response.status).json(responseData);
+    } catch (error) {
+      console.error('Error in sync-auth proxy:', error);
+      res.status(500).json({ message: 'Sync failed', error: error.message });
+    }
+  }
+
   @ApiOperation({ summary: "Sign in" })
   @Post("/sign-in")
   public async signIn(@Body() signInUserDto: SignInDto, @Res() res: Response) {
@@ -23,7 +53,7 @@ export class AuthController {
       res.cookie("accessToken", resp.accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict", // CSRF guard
+        sameSite: "none", // CSRF guard (pass for sync in diffirent domains)
         maxAge: 15 * 60 * 1000, // 15m (in miliseconds)
         path: "/",
       });
@@ -31,7 +61,7 @@ export class AuthController {
       res.cookie("refreshToken", resp.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "none",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         path: "/",
       });
@@ -39,7 +69,7 @@ export class AuthController {
       res.cookie("userId", resp.id, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "none",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         path: "/",
       });
@@ -47,7 +77,7 @@ export class AuthController {
       res.cookie("userFirstName", resp.firstName, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "none",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         path: "/",
       });
@@ -55,7 +85,7 @@ export class AuthController {
       res.cookie("userLastName", resp.lastName, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "none",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         path: "/",
       });

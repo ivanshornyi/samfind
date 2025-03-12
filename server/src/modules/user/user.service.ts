@@ -26,6 +26,7 @@ import { createHash } from "crypto";
 import { AddUserShareholderDataDto } from "./dto/add-user-shareholder-dto";
 import { StripeService } from "../stripe/stripe.service";
 import { addMonths } from "date-fns";
+import { SubscriptionService } from "../subscription/subscription.service";
 
 @Injectable()
 export class UserService {
@@ -33,6 +34,7 @@ export class UserService {
     private readonly prisma: PrismaService,
     @Inject(forwardRef(() => StripeService))
     private readonly stripeService: StripeService,
+    private readonly subscriptionService: SubscriptionService,
   ) {}
 
   async findAll(findUserDto: FindUserDto): Promise<User[]> {
@@ -431,30 +433,15 @@ export class UserService {
   async deleteUser(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      include: { License: true, subscription: true },
+      include: { subscription: true },
     });
 
     if (!user) {
       throw new NotFoundException("User not found");
     }
 
-    if (user.License.length) {
-      const licenseIds = user.License.map((l) => l.id);
-      await this.prisma.license.updateMany({
-        where: {
-          id: { in: licenseIds },
-        },
-        data: {
-          status: LicenseStatus.inactive,
-        },
-      });
-    }
-
-    if (user.subscription) {
-      await this.prisma.subscription.update({
-        where: { id: user.subscription.id },
-        data: { isActive: false },
-      });
+    if (user.subscription && user.subscription.isActive) {
+      await this.subscriptionService.cancelSubscription(user.subscription.id);
     }
 
     await this.prisma.user.update({
