@@ -4,6 +4,7 @@ import { PrismaService } from "nestjs-prisma";
 import { StripeService } from "../stripe/stripe.service";
 import { LicenseStatus, LicenseTierType } from "@prisma/client";
 import { MailService } from "../mail/mail.service";
+import { subDays } from "date-fns";
 
 @Injectable()
 export class CronService {
@@ -16,15 +17,14 @@ export class CronService {
   ) {}
 
   @Cron("0 9 * * *")
-  //   @Cron("40 15 * * *")
+  // @Cron("43 15 * * *")
   async setInactiveStatusNotPayedSubscriptions() {
     try {
       this.logger.log(
         "Running every day at 09:00 AM Check Unpaid Subscriptions - start",
       );
 
-      const fiveDaysAgo = new Date();
-      fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+      const fiveDaysAgo = subDays(new Date(), 5);
 
       const subscriptions = await this.prisma.subscription.findMany({
         where: {
