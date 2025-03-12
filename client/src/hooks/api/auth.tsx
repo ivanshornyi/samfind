@@ -45,9 +45,7 @@ export const useSignIn = () => {
               description: "Successfully synced the data",
               variant: "success",
             })
-            // setTimeout(() => {
-            //   window.location.href = data.signInRedirect as string
-            // }, 3000)
+            window.location.href = data.signInRedirect as string
           }).catch((err) => {
             console.error('Error in sync-auth', err)
             toast({
@@ -57,48 +55,6 @@ export const useSignIn = () => {
             })
           })
       }
-
-      // async function syncAuth() {
-      //   const syncUrl = `${data.backendLink}`
-      //   const response = await fetch(syncUrl, {
-      //     method: 'POST',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //     },
-      //     credentials: 'include',
-      //   })
-
-      //   if (!response.ok) return console.error('Error from sync:', await response.json())
-
-      //   const syncData = await response.json()
-      //   console.warn('Response from sync:', syncData)
-      //   return syncData
-      // }
-
-      // if (!data.signInRedirect && !data.backendLink) {
-      //   setTimeout(() => router.push("/account/license"), 100)
-      // } else if (data.signInRedirect && data.backendLink) {
-      //   syncAuth()
-      //     .then((res) => {
-      //       console.warn('Res in then sync-auth', res)
-      //       toast({
-      //         title: "Sync-auth",
-      //         description: "Successfully synced the data",
-      //         variant: "success",
-      //       })
-      //       setTimeout(() => {
-      //         window.location.href = data.signInRedirect as string
-      //       }, 3000)
-      //     })
-      //     .catch((err) => {
-      //       console.error('Error in sync-auth', err)
-      //       toast({
-      //         title: "Sync-auth",
-      //         description: "Failed to sync data",
-      //         variant: "destructive",
-      //       })
-      //     })
-      // }
     },
     onError: (error) => {
       handleToastError(error, toast)
