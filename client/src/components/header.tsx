@@ -7,8 +7,7 @@ import { useContext } from "react";
 
 import { Button } from "@/components";
 import { AuthContext } from "@/context";
-
-import { Logo } from "@public/images";
+import { LogoSvg } from "@public/images";
 import { User } from "lucide-react";
 import { MenuMobile } from "./menu-mobile";
 
@@ -72,7 +71,7 @@ export const Header = () => {
       >
         <div className="flex items-center gap-10">
           <Link href="/">
-            <Image src={Logo} width={110} height={28} alt="logo" />
+            <Image src={LogoSvg} width={110} height={28} alt="logo" />
           </Link>
 
           <nav className="hidden lg:block">
