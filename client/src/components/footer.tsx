@@ -28,8 +28,8 @@ const links: { menu: Link[]; legals: Link[]; system: Link[]; info: Link[] } = {
   ],
   legals: [
     { label: "Privacy Policy", href: "/policy" },
-    { label: "Terms of Use", href: "/policy" },
-    { label: "Cookie Policy", href: "/policy" },
+    { label: "Terms of Use", href: "/terms" },
+    { label: "Cookie Policy", href: "/cookie" },
   ],
   system: [
     { label: "Onsio App", href: "/" },
@@ -37,8 +37,8 @@ const links: { menu: Link[]; legals: Link[]; system: Link[]; info: Link[] } = {
   ],
   info: [
     { label: "Privacy Policy", href: "/policy" },
-    { label: "Terms of Use", href: "/policy" },
-    { label: "Cookie Policy", href: "/policy" },
+    { label: "Terms of Use", href: "/terms" },
+    { label: "Cookie Policy", href: "/cookie" },
   ],
 };
 

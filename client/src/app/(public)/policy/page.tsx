@@ -1,7 +1,7 @@
 import EllipsePolicyImage from "@public/policy-bg.png";
 import Image from "next/image";
 
-export default function DownloadSoftware() {
+export default function Policy() {
   return (
     <div className="w-full space-y-6 sm:space-y-[68px] py-14 relative">
       <Image
@@ -11,13 +11,19 @@ export default function DownloadSoftware() {
         alt="Background illustration"
         className="absolute top-0 left-1/2 transform -translate-x-1/2 z-[-1]"
       />
-      <h1 className="font-semibold text-[48px] leading-[48px] text-center">
+      <h1 className="font-semibold text-[32px]  sm:text-[48px] text-center">
         Privacy Policy
       </h1>
-      <p className="mt-4 mx-auto max-w-[300px] p-[26px] py-[6px] text-[16px] font-medium bg-[#242424] rounded-full">
+      <p
+        className="mx-auto max-w-[300px] p-[26px] py-[6px] text-[16px] font-medium bg-[#242424] rounded-full"
+        style={{ marginTop: "25px" }}
+      >
         Last Updated: February 10, 2025
       </p>
-      <div className="flex flex-col gap-4 mt-4 text-[16px] font-medium px-[140px]">
+      <div
+        className="flex flex-col gap-4 mt-4 text-[16px] font-medium sm:px-[140px]"
+        style={{ marginTop: "36px" }}
+      >
         <p>Introduction</p>
         <p>
           {`At Onsio ("we," "our," or "us"), we take your privacy seriously. This

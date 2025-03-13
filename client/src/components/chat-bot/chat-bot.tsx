@@ -98,7 +98,7 @@ export default function ChatBot() {
 
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0" />
-          <Dialog.Content className="z-20 fixed bottom-8 right-8 w-full sm:w-[570px] max-h-[700px] p-6 backdrop-blur-2xl rounded-[30px] bg-black/30">
+          <Dialog.Content className="z-20 fixed bottom-8 right-0 sm:right-8 w-full sm:w-[570px] max-h-[700px] p-6 backdrop-blur-2xl rounded-[30px] bg-black/30">
             <div className="absolute right-1 top-1">
               <Dialog.Close
                 onClick={() => {
@@ -264,7 +264,7 @@ export default function ChatBot() {
                     <div className="absolute bottom-0" ref={messagesEndRef} />
                   </div>
 
-                  <div className="mt-6 h-[60px] bg-[#28282C] rounded-[20px] p-4 overflow-auto flex items-center space-x-2 w-full relative">
+                  <div className="mt-6 h-[60px] bg-[#28282C] rounded-[20px] p-4 flex items-center space-x-2 w-full relative overflow-hidden">
                     <Input
                       value={inputText}
                       onChange={(e) => setInputText(e.target.value)}
