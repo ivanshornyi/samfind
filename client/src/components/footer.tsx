@@ -27,18 +27,18 @@ const links: { menu: Link[]; legals: Link[]; system: Link[]; info: Link[] } = {
     { label: "License Management", href: "/license-management" },
   ],
   legals: [
-    { label: "Privacy Policy", href: "/privacy" },
-    { label: "Terms of Use", href: "/terms" },
-    { label: "Cookie Policy", href: "/cookies" },
+    { label: "Privacy Policy", href: "/policy" },
+    { label: "Terms of Use", href: "/policy" },
+    { label: "Cookie Policy", href: "/policy" },
   ],
   system: [
     { label: "Onsio App", href: "/" },
     { label: "Onsio Software", href: "/" },
   ],
   info: [
-    { label: "Privacy Policy", href: "/privacy" },
-    { label: "Terms of Use", href: "/terms" },
-    { label: "Cookie Policy", href: "/cookies" },
+    { label: "Privacy Policy", href: "/policy" },
+    { label: "Terms of Use", href: "/policy" },
+    { label: "Cookie Policy", href: "/policy" },
   ],
 };
 
