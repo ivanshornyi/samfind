@@ -23,15 +23,15 @@ export const LicensingOptionCard = ({
   const { user } = useContext(AuthContext);
   return (
     <div
-      className={`h-fit flex-1 ${isLarge ? "bg-[#302935]" : "bg-card"} px-6 py-8 rounded-[20px] transition-all hover:shadow-[0_2px_20px_0_#B668F080]`}
+      className={`flex-1 ${isLarge ? "bg-[#302935]" : "bg-card"} px-6 py-8 rounded-[20px] transition-all hover:shadow-[0_2px_20px_0_#B668F080]`}
     >
       <h3 className="font-semibold text-[32px] leading-[43px] mb-4 first-letter:uppercase">
         {option.title}
       </h3>
-      <p className="font-normal text-base mb-10">{option.description}</p>
+      <p className="font-normal text-base mb-6">{option.description}</p>
 
       {option.price !== 0 ? (
-        <div className="mb-10 flex gap-2 items-center justify-between">
+        <div className="mb-6 flex gap-2 items-center justify-between">
           <div className="flex items-center">
             {/* <div className="flex items-start justify-end">
               <Image src={DollarIcon} alt="dollar" width={23} height={49} />
@@ -48,7 +48,7 @@ export const LicensingOptionCard = ({
 
       <Button
         variant={option.buttonVariant}
-        className={`w-full mb-10 border-none ${isLarge ? "py-[13px]" : ""}`}
+        className={`w-full mb-6 border-none ${isLarge ? "py-[13px]" : ""}`}
         onClick={() =>
           router.push(user ? "/account/billing-data" : "/auth/account-type")
         }

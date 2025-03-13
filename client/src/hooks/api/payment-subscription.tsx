@@ -13,7 +13,7 @@ import { handleToastError } from "@/errors";
 const handleRedirect = (url: string) => {
   const link = document.createElement("a");
   link.href = url;
-  link.target = "_blank";
+  link.target = "about:blank";
   link.rel = "noopener noreferrer";
   document.body.appendChild(link);
   link.click();

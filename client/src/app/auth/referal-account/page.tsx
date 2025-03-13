@@ -19,8 +19,7 @@ export default function AccountReferalType() {
 
   const searchParams = useSearchParams();
   const referralCode = searchParams.get("referralCode");
-
-  console.log(referralCode);
+  if (referralCode) localStorage.setItem("referralCode", referralCode);
 
   const handleChooseAccountType = (type: UserAccountType) => {
     setAccountCards(
