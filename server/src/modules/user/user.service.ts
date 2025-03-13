@@ -67,7 +67,7 @@ export class UserService {
   async findAndUpdateUserByReferralCode(
     referralCode: number,
     newUser: User,
-    discountNumber: number,
+    totalAmount: number,
   ) {
     const user = await this.prisma.user.findUnique({
       where: { referralCode },
@@ -80,35 +80,65 @@ export class UserService {
 
     if (!user || !userReferral || !user.wallet) return;
 
-    await this.prisma.wallet.update({
-      where: { id: user.wallet.id },
-      data: { bonusAmount: { increment: discountNumber } },
-    });
+    const discountAmount = Math.round(totalAmount / 10);
 
-    await this.prisma.walletTransaction.create({
-      data: {
-        userId: user.id,
-        walletId: user.wallet.id,
-        amount: discountNumber,
-        transactionType: TransactionType.income,
-        balanceType: BalanceType.bonus,
-        referralId: userReferral.id,
-        invitedUserId: newUser.id,
-        description: `Income from referral Registration on email ${newUser.email}`,
-      },
-    });
+    if (user.isSale) {
+      const saleInfo = await this.prisma.saleInfo.create({
+        data: {
+          saleUserId: user.id,
+          invitedUserId: newUser.id,
+          earnedAmount: discountAmount,
+        },
+      });
+      this.prisma.walletTransaction.create({
+        data: {
+          userId: user.id,
+          walletId: user.wallet.id,
+          amount: discountAmount,
+          transactionType: TransactionType.income,
+          balanceType: BalanceType.sale,
+          saleInfoId: saleInfo.id,
+          invitedUserId: newUser.id,
+          description: `Income from referral Registration on email ${newUser.email}`,
+        },
+      });
+      this.prisma.wallet.update({
+        where: { id: user.wallet.id },
+        data: { salesAmount: { increment: discountAmount } },
+      });
+    } else {
+      const referralUserIds = userReferral.invitedUserIds;
+      referralUserIds.push(newUser.id);
 
-    const referralUserIds = userReferral.invitedUserIds;
-    referralUserIds.push(newUser.id);
+      await this.prisma.$transaction([
+        this.prisma.wallet.update({
+          where: { id: user.wallet.id },
+          data: { bonusAmount: { increment: discountAmount } },
+        }),
 
-    await this.prisma.userReferral.update({
-      where: {
-        userId: user.id,
-      },
-      data: {
-        invitedUserIds: referralUserIds,
-      },
-    });
+        this.prisma.walletTransaction.create({
+          data: {
+            userId: user.id,
+            walletId: user.wallet.id,
+            amount: discountAmount,
+            transactionType: TransactionType.income,
+            balanceType: BalanceType.bonus,
+            referralId: userReferral.id,
+            invitedUserId: newUser.id,
+            description: `Income from referral Registration on email ${newUser.email}`,
+          },
+        }),
+
+        this.prisma.userReferral.update({
+          where: {
+            userId: user.id,
+          },
+          data: {
+            invitedUserIds: referralUserIds,
+          },
+        }),
+      ]);
+    }
 
     //Update invited user
     await this.prisma.user.update({
@@ -128,14 +158,14 @@ export class UserService {
 
     await this.prisma.wallet.update({
       where: { userId: newUser.id },
-      data: { bonusAmount: { increment: discountNumber } },
+      data: { bonusAmount: { increment: discountAmount } },
     });
 
     await this.prisma.walletTransaction.create({
       data: {
         userId: newUser.id,
         walletId: newUserWallet.id,
-        amount: discountNumber,
+        amount: discountAmount,
         transactionType: TransactionType.income,
         balanceType: BalanceType.bonus,
         description: `Bonus for registration via referral link`,

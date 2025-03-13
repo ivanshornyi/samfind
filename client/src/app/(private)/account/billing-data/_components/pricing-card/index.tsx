@@ -131,7 +131,8 @@ export const PricingCard = ({
       {isPaySubscriptionPending && <FullScreenLoader />}
       <CardHeader className="space-y-4">
         <h3 className="text-2xl font-semibold capitalize">
-          {plan.type === "earlyBird"? "Early Bird": plan.type} {plan.period}
+          {plan.type === PlanType.EarlyBird ? "Early Bird" : plan.type}{" "}
+          {plan.period}
         </h3>
         <p
           className={`${plan.type === PlanType.EarlyBird ? "text-[#CE9DF3]" : "text-[#C4C4C4]"} text-sm max-w-[250px]`}
