@@ -56,6 +56,30 @@ export const LicensingOptionList = () => {
           };
       });
 
+      newPlanOptions.sort((a, b) => {
+        if (a.title === "Freemium") return 1;
+        if (b.title === "Freemium") return -1;
+        if (
+          a.period === PlanPeriod.Monthly &&
+          b.period !== PlanPeriod.Monthly
+        ) {
+          return -1;
+        }
+        if (
+          a.period !== PlanPeriod.Monthly &&
+          b.period === PlanPeriod.Monthly
+        ) {
+          return 1;
+        }
+        if (a.period === PlanPeriod.Yearly && b.period !== PlanPeriod.Yearly) {
+          return -1;
+        }
+        if (a.period !== PlanPeriod.Yearly && b.period === PlanPeriod.Yearly) {
+          return 1;
+        }
+        return a.price - b.price;
+      });
+
       setPlanOptions(newPlanOptions);
     }
   }, [plans]);
