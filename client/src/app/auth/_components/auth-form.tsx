@@ -68,7 +68,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
   const { data: organizationName } = useGetUserOrganizationName(organizationId);
   const { data: userName } = useGetUserName(licenseId);
 
-  const [checked, setChecked] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -193,14 +192,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
       ) {
         toast({
           description: "Some fields are empty",
-        });
-
-        return;
-      }
-
-      if (!checked) {
-        toast({
-          description: "Please confirm Terms and Privacy Policy",
         });
 
         return;
@@ -493,55 +484,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                           </label>
                         ))}
                       </div>
-                      <label className="flex items-center space-x-2 mt-4">
-                        <input
-                          type="checkbox"
-                          checked={checked}
-                          onChange={() => setChecked(!checked)}
-                          className="hidden"
-                        />
-                        <div
-                          style={{ marginLeft: 0 }}
-                          className={`w-5 h-5 flex items-center justify-center border-2 rounded-md cursor-pointer ${
-                            checked ? "border-[#A64CE8]" : "border-gray-500"
-                          }`}
-                        >
-                          {checked && (
-                            <svg
-                              className="w-4 h-4 text-[#A64CE8]"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="3"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            >
-                              <polyline points="20 6 9 17 4 12" />
-                            </svg>
-                          )}
-                        </div>
-                        <p className="text-lg">
-                          I agree to the{" "}
-                          <Link
-                            href="/policy"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="font-bold underline"
-                          >
-                            Terms
-                          </Link>{" "}
-                          and{" "}
-                          <Link
-                            href="/policy"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="font-bold underline"
-                          >
-                            Privacy Policy
-                          </Link>
-                          .
-                        </p>
-                      </label>
                     </div>
                   )}
 
@@ -708,6 +650,30 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
             )}
           </Button>
         </form>
+
+        {authPageType === "signUp" ? (
+          <p className="text-lg mt-4 text-center">
+            By continuing, I agree to the{" "}
+            <Link
+              href="/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold underline"
+            >
+              Terms
+            </Link>{" "}
+            and{" "}
+            <Link
+              href="/policy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold underline"
+            >
+              Privacy Policy
+            </Link>
+            .
+          </p>
+        ) : null}
 
         <div className="pt-4">
           {authPageType === "signIn" && <SendResetPasswordCodeModal />}
