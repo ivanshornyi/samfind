@@ -8,63 +8,59 @@ import { PlanPeriod, PlanType } from "@/types";
 
 export const LicensingOptionList = () => {
   const { data: plans } = useGetPlans();
+  console.log("plans: ", plans);
   const [planOptions, setPlanOptions] = useState<LicensingOptionType[]>([]);
 
   useEffect(() => {
     if (plans?.length) {
-      const newPlanOptions: LicensingOptionType[] = plans
-        .filter((plan) => plan.type !== PlanType.EarlyBird)
-        .map((plan) => {
-          if (plan.type === PlanType.Freemium) {
-            return {
-              id: plan.id,
-              title: "Freemium",
-              period: plan.period,
-              tierType: plan.type,
-              description: "Essential features for personal and community use",
-              price: 0,
-              buttonText: "Get Started Free",
-              buttonVariant: "secondary",
-              features: [
-                "Essential features",
-                "Community access",
-                "Basic support",
-              ],
-              footerText: "Community Edition",
-              isPremium: false,
-            };
-          } else
-            return {
-              id: plan.id,
-              title:
-                plan.type +
-                "  " +
-                `${plan.period === PlanPeriod.Monthly ? "Monthly" : "Yearly"}`,
-              tierType: plan.type,
-              period: plan.period,
-              description:
-                "Boost your capabilities with premium features and priority support.",
-              price: plan.price / 100,
-              buttonText: "Buy Standard",
-              buttonVariant: "default",
-              features: [
-                "Enhanced capabilities",
-                "Priority updates",
-                "Premium support",
-              ],
-              footerText: undefined,
-              isPremium: true,
-            };
-        });
+      const newPlanOptions: LicensingOptionType[] = plans.map((plan) => {
+        if (plan.type === PlanType.Freemium) {
+          return {
+            id: plan.id,
+            title: "Freemium",
+            period: plan.period,
+            tierType: plan.type,
+            description: "Essential features for personal and community use",
+            price: 0,
+            buttonText: "Get Started Free",
+            buttonVariant: "secondary",
+            features: [
+              "Essential features",
+              "Community access",
+              "Basic support",
+            ],
+            footerText: "Community Edition",
+            isPremium: false,
+          };
+        } else
+          return {
+            id: plan.id,
+            title:
+              plan.type +
+              "  " +
+              `${plan.period === PlanPeriod.Monthly ? "Monthly" : "Yearly"}`,
+            tierType: plan.type,
+            period: plan.period,
+            description:
+              "Boost your capabilities with premium features and priority support.",
+            price: plan.price / 100,
+            buttonText: "Buy Standard",
+            buttonVariant: "default",
+            features: [
+              "Enhanced capabilities",
+              "Priority updates",
+              "Premium support",
+            ],
+            footerText: undefined,
+            isPremium: true,
+          };
+      });
 
       setPlanOptions(newPlanOptions);
     }
   }, [plans]);
   return (
-    <div
-      id="pricing"
-      className="mt-20 sm:mt-[120px] mb-20 mx-auto xl:w-[1200px]"
-    >
+    <div id="pricing" className="mt-20 sm:mt-[120px] mb-20 mx-auto">
       <div className="mb-[40px] sm:mb-[50px] flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5 lg:gap-0">
         <h2 className="text-2xl lg:text-[40px] font-semibold">
           Licensing Options
@@ -80,7 +76,7 @@ export const LicensingOptionList = () => {
           <LicensingOptionCard
             key={option.id}
             option={option}
-            isLarge={index % 2 !== 0}
+            isLarge={false}
           />
         ))}
       </div>
