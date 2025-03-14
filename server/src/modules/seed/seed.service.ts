@@ -55,7 +55,7 @@ export class SeedService implements OnModuleInit {
         });
 
         await this.planService.addPlan({
-          price: 999,
+          price: 9900,
           type: LicenseTierType.standard,
           period: PlanPeriod.yearly,
         });

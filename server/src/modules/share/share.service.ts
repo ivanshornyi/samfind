@@ -182,7 +182,7 @@ export class ShareService {
       stockId,
     };
 
-    const invoice = await this.stripeService.createAndPayInvoice({
+    const session = await this.stripeService.createPaymentSession({
       customerId: stripeCustomerId,
       priceId: appSettings.shareStripePriceId,
       quantity,
@@ -191,6 +191,6 @@ export class ShareService {
       // tax: false,
     });
 
-    return { url: invoice.hosted_invoice_url };
+    return { url: session.url };
   }
 }

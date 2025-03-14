@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Post, Req, Res } from "@nestjs/common";
-import { Request, Response } from "express";
+import { Body, Controller, Post, Req, Res } from "@nestjs/common";
+import { Response } from "express";
 import { SignInDto, SignUpDto } from "./dto/auth-user-dto";
 import { ResetPasswordDto } from "./dto/reset-password-dto";
 
@@ -13,36 +13,6 @@ import { AuthVerificationDto } from "./dto/auth-verification-dto";
 @Controller("auth")
 export class AuthController {
   public constructor(private readonly authService: AuthService) { }
-
-  @ApiOperation({ summary: "Proxy sync authentication to onsio.biz" })
-  @Post('/sync-auth')
-  async syncAuthProxy(@Req() req: Request, @Res() res: Response, @Body() body: { backendUrl: string }) {
-    try {
-      console.log('Cookies sent to .biz:', req.headers.cookie)
-      const response = await fetch(`${body.backendUrl}`, {
-        method: 'POST',
-        headers: {
-          Cookie: req.headers.cookie,
-          'Content-Type': 'application/json',
-        },
-        credentials: "include",
-      });
-
-      const responseData = await response.json()
-
-      if (!response.ok) {
-        res.status(response.status).json(responseData);
-        return;
-      }
-
-      response.headers['set-cookie']?.forEach((cookie) => res.setHeader('Set-Cookie', cookie));
-
-      res.status(response.status).json(responseData);
-    } catch (error) {
-      console.error('Error in sync-auth proxy:', error);
-      res.status(500).json({ message: 'Sync failed', error: error.message });
-    }
-  }
 
   @ApiOperation({ summary: "Sign in" })
   @Post("/sign-in")

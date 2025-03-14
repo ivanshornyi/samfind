@@ -24,8 +24,8 @@ export const useSignIn = () => {
       authType: UserAuthType
       signInRedirect: string | null
       backendLink: string | null
-    }) => AuthApiService.signIn(data.email, data.password, data.authType, data.signInRedirect, data.backendLink),
-    onSuccess: (data: { accessToken: string, refreshToken: string, signInRedirect: string | null, backendLink: string | null }) => {
+    }) => AuthApiService.signIn(data.email, data.password, data.authType),
+    onSuccess: (data: { accessToken: string, refreshToken: string }) => {
       toast({
         title: "Success",
         description: "Successfully logged in",
@@ -33,28 +33,7 @@ export const useSignIn = () => {
       })
 
       login(data.accessToken, data.refreshToken)
-
-      if (!data.signInRedirect && !data.backendLink) {
-        setTimeout(() => router.push("/account/license"), 100)
-      } else {
-        AuthApiService.syncAuth(data.backendLink)
-          .then((res) => {
-            console.warn('Res in then sync-auth', res)
-            toast({
-              title: "Sync-auth",
-              description: "Successfully synced the data",
-              variant: "success",
-            })
-            window.location.href = data.signInRedirect as string
-          }).catch((err) => {
-            console.error('Error in sync-auth', err)
-            toast({
-              title: "Sync-auth",
-              description: "Failed to sync data",
-              variant: "destructive",
-            })
-          })
-      }
+      setTimeout(() => router.push("/account/license"), 100)
     },
     onError: (error) => {
       handleToastError(error, toast)

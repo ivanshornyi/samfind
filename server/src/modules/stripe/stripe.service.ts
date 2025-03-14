@@ -29,15 +29,6 @@ import { WalletService } from "../wallet/wallet.service";
 import { SubscriptionService } from "../subscription/subscription.service";
 import { HttpService } from "@nestjs/axios";
 
-interface ICreatePaymentSession {
-  customerId: string;
-  priceId: string;
-  quantity: number;
-  subscriptionId: string;
-  description?: string;
-  discountId?: string;
-}
-
 interface ICreateInvoiceItem {
   customerId: string;
   invoiceId: string;
@@ -174,41 +165,68 @@ export class StripeService {
     priceId,
     quantity,
     description,
-    subscriptionId,
-    discountId,
-  }: ICreatePaymentSession) => {
-    if (discountId) {
-      await this.stripe.customers.update(customerId, {
-        coupon: discountId,
+    metadata,
+    tax,
+  }: ICreateAndPayInvoice) => {
+    let stripeTaxId = null;
+
+    if (tax) {
+      const appSettings = await this.prisma.appSettings.findFirst({
+        where: {},
       });
+      stripeTaxId =
+        tax === "added"
+          ? appSettings?.stripeTaxAddedId
+          : appSettings?.stripeTaxInclusive;
+    }
+
+    const lineItems = [
+      {
+        price: priceId,
+        quantity,
+        tax_rates: stripeTaxId ? [stripeTaxId] : undefined,
+      },
+    ];
+
+    const customer = await this.getCustomer(customerId);
+    if (!customer) return;
+    const customerBalance = customer.balance;
+
+    if (customerBalance < 0) {
+      await this.updateCustomerBalance(
+        customerId,
+        Math.abs(customerBalance),
+        true,
+      );
     }
 
     const session = await this.stripe.checkout.sessions.create({
-      line_items: [
-        {
-          price: priceId,
-          quantity,
-        },
-      ],
-      // allow_promotion_codes: discountId ? true : undefined,
+      line_items: lineItems,
       invoice_creation: {
         enabled: true,
         invoice_data: {
-          metadata: {
-            subscriptionId,
-          },
+          metadata,
+          description,
         },
       },
-      discounts: discountId ? [{ coupon: discountId }] : undefined,
       customer: customerId,
       mode: "payment",
       payment_intent_data: {
         setup_future_usage: "off_session",
         description,
       },
-      success_url: "http://localhost:3000/",
-      cancel_url: "http://localhost:3000/",
+      success_url: metadata.trading
+        ? undefined
+        : `${this.configService.get("ONSIO_APP_URL")}/account/wallet`,
+      cancel_url: metadata.trading
+        ? undefined
+        : `${this.configService.get("ONSIO_APP_URL")}/account/wallet`,
     });
+
+    if (customerBalance < 0) {
+      await this.updateCustomerBalance(customerId, Math.abs(customerBalance));
+    }
+
     return session;
   };
 
@@ -506,6 +524,11 @@ export class StripeService {
 
         let licenseId = subscription.licenseId;
 
+        const stripeSubscriptionId =
+          typeof invoice.subscription === "string"
+            ? invoice.subscription
+            : invoice.subscription.id;
+
         if (userReferralCode) {
           // find user and update user discount
 
@@ -533,6 +556,7 @@ export class StripeService {
         }
 
         if (subscription.licenseId && memberId) {
+          //add new member
           const member = await this.prisma.user.findUnique({
             where: { id: memberId },
           });
@@ -545,10 +569,9 @@ export class StripeService {
             },
           });
 
-          await this.updateSubscriptionMetadata(
-            invoice.subscription as string,
-            { memberId: null },
-          );
+          await this.updateSubscriptionMetadata(stripeSubscriptionId, {
+            memberId: null,
+          });
         } else if (
           subscription.user.accountType === UserAccountType.private &&
           newPlan &&
@@ -594,10 +617,10 @@ export class StripeService {
             });
           }
 
-          await this.updateSubscriptionMetadata(
-            invoice.subscription as string,
-            { newPlan: null, quantity: null },
-          );
+          await this.updateSubscriptionMetadata(stripeSubscriptionId, {
+            newPlan: null,
+            quantity: null,
+          });
         } else if (
           subscription.user.accountType === UserAccountType.business &&
           newPlan
@@ -655,15 +678,14 @@ export class StripeService {
             licenseId = subscription.licenseId;
           }
 
-          await this.updateSubscriptionMetadata(
-            invoice.subscription as string,
-            { newPlan: null, quantity: null },
-          );
+          await this.updateSubscriptionMetadata(stripeSubscriptionId, {
+            newPlan: null,
+            quantity: null,
+          });
         }
 
-        const stripeSubscription = await this.getSubscriptionById(
-          invoice.subscription as string,
-        );
+        const stripeSubscription =
+          await this.getSubscriptionById(stripeSubscriptionId);
 
         if (
           subscription.plan.type === LicenseTierType.earlyBird &&
@@ -700,6 +722,7 @@ export class StripeService {
         await this.prisma.subscription.update({
           where: { id: subscription.id },
           data: {
+            stripeSubscriptionId,
             licenseId,
             isActive: true,
             isInTrial: false,
@@ -878,6 +901,43 @@ export class StripeService {
       metadata,
       description,
     });
+  }
+
+  async createSubscriptionSession({
+    stripeCustomerId,
+    items,
+    tax,
+    metadata,
+    description,
+  }: ICreateSubscription) {
+    let lineItems = items;
+    if (tax) {
+      const appSettings = await this.prisma.appSettings.findFirst({
+        where: {},
+      });
+      const stripeTaxId =
+        tax === "added"
+          ? appSettings?.stripeTaxAddedId
+          : appSettings?.stripeTaxInclusive;
+
+      lineItems = items.map((i) => ({ ...i, tax_rates: [stripeTaxId] }));
+    }
+
+    const session = await this.stripe.checkout.sessions.create({
+      mode: "subscription",
+      customer: stripeCustomerId,
+      success_url: `${this.configService.get("ONSIO_APP_URL")}/account/billing-data`,
+      cancel_url: `${this.configService.get("ONSIO_APP_URL")}/account/billing-data`,
+      payment_method_types: ["card", "paypal"],
+      line_items: lineItems,
+      subscription_data: {
+        metadata,
+        description,
+      },
+      expand: ["subscription"],
+    });
+
+    return session;
   }
 
   async getInvoiceById(invoiceId: string) {
