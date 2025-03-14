@@ -341,3 +341,14 @@ model PurchasedShare {
 
   @@map("purchased_share")
 }
+
+model PreRegisterBonus {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  amount    Float
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("pre_register_bonus")
+}
