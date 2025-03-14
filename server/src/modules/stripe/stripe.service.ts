@@ -216,10 +216,10 @@ export class StripeService {
         description,
       },
       success_url: metadata.trading
-        ? undefined
+        ? this.configService.get("TRADING_APP_URL")
         : `${this.configService.get("ONSIO_APP_URL")}/account/wallet`,
       cancel_url: metadata.trading
-        ? undefined
+        ? this.configService.get("TRADING_APP_URL")
         : `${this.configService.get("ONSIO_APP_URL")}/account/wallet`,
     });
 
@@ -530,13 +530,6 @@ export class StripeService {
             : invoice.subscription.id;
 
         if (userReferralCode) {
-          // find user and update user discount
-
-          // const discountAmount = Math.round(invoice.total_excluding_tax / 10);
-          // subscription.plan.period === PlanPeriod.yearly
-          //   ? Math.round(subscription.plan.price / 10)
-          //   : Math.round(subscription.plan.price / 10);
-
           this.userService.findAndUpdateUserByReferralCode(
             Number(userReferralCode),
             subscription.user,
