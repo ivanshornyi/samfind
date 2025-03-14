@@ -27,6 +27,7 @@ import { AddUserShareholderDataDto } from "./dto/add-user-shareholder-dto";
 import { StripeService } from "../stripe/stripe.service";
 import { addMonths } from "date-fns";
 import { SubscriptionService } from "../subscription/subscription.service";
+import { AddPreRegisterBonusDto } from "./dto/add-pre-register-bonus-dto";
 
 @Injectable()
 export class UserService {
@@ -496,5 +497,50 @@ export class UserService {
     return await this.prisma.userShareholdersData.findUnique({
       where: { userId },
     });
+  }
+
+  async addPreRegisterBonus({ email, amount }: AddPreRegisterBonusDto) {
+    const existedBonus = await this.prisma.preRegisterBonus.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+
+    if (existedBonus) throw new BadRequestException("Bonus Already added");
+
+    return await this.prisma.preRegisterBonus.create({
+      data: { email: email.toLowerCase(), amount },
+    });
+  }
+
+  async checkPreRegisterBonus(email: string, userId: string, walletId: string) {
+    const existedBonus = await this.prisma.preRegisterBonus.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+
+    if (!existedBonus) return;
+
+    await this.prisma.$transaction([
+      this.prisma.preRegisterBonus.update({
+        where: {
+          id: existedBonus.id,
+        },
+        data: {
+          used: true,
+        },
+      }),
+      this.prisma.wallet.update({
+        where: { id: walletId },
+        data: { bonusAmount: existedBonus.amount },
+      }),
+      this.prisma.walletTransaction.create({
+        data: {
+          userId,
+          walletId,
+          amount: existedBonus.amount,
+          transactionType: TransactionType.income,
+          balanceType: BalanceType.bonus,
+          description: `Transfer from pre register bonus`,
+        },
+      }),
+    ]);
   }
 }

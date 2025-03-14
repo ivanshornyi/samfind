@@ -8,7 +8,6 @@ import {
   ParseArrayPipe,
   Delete,
   Post,
-  Put,
 } from "@nestjs/common";
 
 import { User } from "@prisma/client";
@@ -20,10 +19,7 @@ import { ApiOperation, ApiTags, ApiQuery } from "@nestjs/swagger";
 import { UpdateUserDto } from "./dto/update-user-dto";
 import { FindUserDto } from "./dto/find-user-dto";
 import { AddUserShareholderDataDto } from "./dto/add-user-shareholder-dto";
-
-// import { RefreshGuard } from "src/common/guards/refresh.guard";
-
-// import { AuthenticatedRequest } from "src/common/types/interfaces/auth-request.interface";
+import { AddPreRegisterBonusDto } from "./dto/add-pre-register-bonus-dto";
 
 @ApiTags("Users")
 @Controller("user")
@@ -151,5 +147,13 @@ export class UserController {
     @Body() addUserShareholderDataDto: AddUserShareholderDataDto,
   ) {
     return this.userService.addUserShareholderData(addUserShareholderDataDto);
+  }
+
+  @ApiOperation({ summary: "Add Pre Register Bonus" })
+  @Post("/pre-register-bonus")
+  async addPreRegisterBonus(
+    @Body() addPreRegisterBonusDto: AddPreRegisterBonusDto,
+  ) {
+    return this.userService.addPreRegisterBonus(addPreRegisterBonusDto);
   }
 }

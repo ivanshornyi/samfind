@@ -101,12 +101,6 @@ export class AuthService {
         isFromNorway,
       });
 
-      await this.prisma.wallet.create({
-        data: {
-          userId: newUser.id,
-        },
-      });
-
       if (organization) {
         const userOrganization = await this.prisma.organization.create({
           data: {
@@ -490,6 +484,18 @@ export class AuthService {
     const tokens = await this.tokenService.generateTokens({
       sub: user.id,
     });
+
+    const wallet = await this.prisma.wallet.create({
+      data: {
+        userId: user.id,
+      },
+    });
+
+    await this.userService.checkPreRegisterBonus(
+      user.email,
+      user.id,
+      wallet.id,
+    );
 
     await this.tokenService.updateRefreshToken(user.id, tokens.refreshToken);
 
