@@ -41,7 +41,7 @@ export class SubscriptionService {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
 
     if (!user) throw new NotFoundException("User not found");
-    let invoiceId = null;
+    let url = null;
     let stripeCustomerId = user.stripeCustomerId;
 
     let subscription = await this.prisma.subscription.findUnique({
@@ -101,7 +101,7 @@ export class SubscriptionService {
           : "inclusive";
 
     if (!subscription) {
-      const stripeSubscription = await this.stripeService.createSubscription({
+      const stripeSession = await this.stripeService.createSubscriptionSession({
         stripeCustomerId,
         items,
         tax,
@@ -110,11 +110,6 @@ export class SubscriptionService {
           plan.type === LicenseTierType.earlyBird ? 1 : quantity
         }.`,
       });
-
-      invoiceId =
-        typeof stripeSubscription.latest_invoice === "string"
-          ? stripeSubscription.latest_invoice
-          : stripeSubscription.latest_invoice.id;
 
       subscription = await this.prisma.subscription.create({
         data: {
@@ -123,17 +118,19 @@ export class SubscriptionService {
           planId: plan.id,
           isActive: false,
           isInTrial: false,
-          stripeSubscriptionId: stripeSubscription.id,
-          nextDate: new Date(stripeSubscription.current_period_end * 1000),
+          nextDate: new Date(),
         },
         include: { plan: true },
       });
-    } else {
-      await this.stripeService.cancelSubscriptionById(
-        subscription.stripeSubscriptionId,
-      );
 
-      const stripeSubscription = await this.stripeService.createSubscription({
+      url = stripeSession.url;
+    } else {
+      if (subscription.stripeSubscriptionId)
+        await this.stripeService.cancelSubscriptionById(
+          subscription.stripeSubscriptionId,
+        );
+
+      const stripeSession = await this.stripeService.createSubscriptionSession({
         stripeCustomerId,
         items,
         tax,
@@ -143,28 +140,22 @@ export class SubscriptionService {
         }.`,
       });
 
-      invoiceId =
-        typeof stripeSubscription.latest_invoice === "string"
-          ? stripeSubscription.latest_invoice
-          : stripeSubscription.latest_invoice.id;
-
       subscription = await this.prisma.subscription.update({
         where: { id: subscription.id },
         data: {
           userId,
           licenseId: license?.id,
-          stripeSubscriptionId: stripeSubscription.id,
           planId: plan.id,
           isActive: false,
           isInTrial: false,
-          nextDate: new Date(stripeSubscription.current_period_end * 1000),
+          nextDate: new Date(),
         },
         include: { plan: true },
       });
+      url = stripeSession.url;
     }
-    const invoice = await this.stripeService.getInvoiceById(invoiceId);
 
-    return { url: invoice?.hosted_invoice_url };
+    return { url };
   }
 
   async payInvoice() {

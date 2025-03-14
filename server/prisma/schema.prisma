@@ -188,7 +188,7 @@ model Subscription {
   planId               String
   isActive             Boolean
   isInTrial            Boolean
-  stripeSubscriptionId String
+  stripeSubscriptionId String?
   stripeInvoiceIds     String[]  @default([])
   nextDate             DateTime
   cancelDate           DateTime?

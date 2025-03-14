@@ -91,7 +91,7 @@ export class MailService {
         subject: "Payment error Invoice",
         html: `
         <div>
-          <p>An error occurred during the automatic payment of the Invoice. Please pay manually by following the link</p>
+          <p>An error occurred during the payment of the Invoice. Please pay manually by following the link</p>
           <p><a href="${link}">Invoice link</a></p>
         </div>
         `,
