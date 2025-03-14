@@ -51,10 +51,4 @@ export class SubscriptionController {
   async changePlan(@Body() changePlanDto: ChangePlanDto) {
     return this.subscriptionService.changePlan(changePlanDto);
   }
-
-  @ApiOperation({ summary: "Get Test Invoice" })
-  @Get("invoice")
-  async getInvoice() {
-    return this.subscriptionService.getInvoice();
-  }
 }

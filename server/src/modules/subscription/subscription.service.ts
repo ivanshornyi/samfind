@@ -516,22 +516,4 @@ export class SubscriptionService {
       }
     }
   }
-
-  async getInvoice() {
-    // const metadata = {
-    //   quantity: 1,
-    //   userId: null,
-    // };
-    // await this.stripeService.updateSubscriptionMetadata(
-    //   "sub_1Qx35fIQ0ONDLa6ipDSz3ypQ",
-    //   metadata,
-    // );
-    // return await this.stripeService.getSubscriptionById(
-    //   "sub_1Qx35fIQ0ONDLa6ipDSz3ypQ",
-    // );
-    return await this.stripeService.getCustomer("cus_RsI52aPRbvrJlx");
-    return await this.stripeService.getInvoiceById(
-      "in_1QyWH1IQ0ONDLa6iT2udZXA9",
-    );
-  }
 }
