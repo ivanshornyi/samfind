@@ -1,5 +1,6 @@
 import EllipsePolicyImage from "@public/policy-bg.png";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Policy() {
   return (
@@ -205,10 +206,15 @@ export default function Policy() {
           practices, please contact us at:
         </p>
         <div>
-          <p>Onsio AS</p>
+          <p>Contact Us</p>
           <ul>
             <li className="before:content-['-'] before:mr-2">
-              Email: privacy@onsio.com
+              If you have questions about this Privacy Policy or our privacy
+              practices, please contact us at{" "}
+              <Link href="/support" className="text-blue-500 hover:underline">
+                Support
+              </Link>
+              .
             </li>
           </ul>
         </div>

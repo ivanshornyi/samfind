@@ -23,8 +23,8 @@ export const NAVIGATION_ITEMS = [
     path: "/about",
   },
   {
-    title: "FAQ",
-    path: "/faq",
+    title: "Support",
+    path: "/support",
   },
   {
     title: "Invest",

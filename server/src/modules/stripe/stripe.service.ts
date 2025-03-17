@@ -570,6 +570,7 @@ export class StripeService {
           newPlan &&
           subscription.license
         ) {
+          //new Plan private user
           const plan = await this.prisma.plan.findUnique({
             where: { id: newPlan },
           });
@@ -618,6 +619,7 @@ export class StripeService {
           subscription.user.accountType === UserAccountType.business &&
           newPlan
         ) {
+          //new Business private user
           const plan = await this.prisma.plan.findUnique({
             where: { id: newPlan },
           });

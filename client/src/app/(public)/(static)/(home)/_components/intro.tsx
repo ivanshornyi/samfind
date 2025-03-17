@@ -13,7 +13,7 @@ export const Intro = () => {
         <div className="space-y-4">
           <h1 className="text-start sm:text-center text-[40px] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold">
             Transform Your Digital <br className="hidden sm:block " />
-            Experience with Onsiof
+            Experience with Onsio
           </h1>
         </div>
         <div className="w-full sm:w-fit gap-[10px] sm:gap-0 flex flex-col sm:flex-row items-center">
