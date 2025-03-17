@@ -7,8 +7,7 @@ import { useContext } from "react";
 
 import { Button } from "@/components";
 import { AuthContext } from "@/context";
-
-import { Logo } from "@public/images";
+import { LogoSvg } from "@public/images";
 import { User } from "lucide-react";
 import { MenuMobile } from "./menu-mobile";
 
@@ -23,8 +22,8 @@ export const NAVIGATION_ITEMS = [
     path: "/about",
   },
   {
-    title: "FAQ",
-    path: "/faq",
+    title: "Support",
+    path: "/support",
   },
   {
     title: "Invest",
@@ -60,7 +59,7 @@ export const Header = () => {
   return (
     <header
       className="
-        w-full fixed top-0 left-0 z-10 bg-transparent
+        w-full fixed top-0 left-0 z-10 bg-[#1F1E1F] bg-transparent
         px-5
       "
     >
@@ -75,9 +74,8 @@ export const Header = () => {
             onClick={() => router.push("/")}
             className="z-1000 cursor-pointer"
           >
-            <Image src={Logo} width={110} height={28} alt="logo" />
+            <Image src={LogoSvg} width={110} height={28} alt="logo" />
           </div>
-
           <nav className="hidden lg:block">
             <ul className="flex items-center gap-8">
               {NAVIGATION_ITEMS.map((item) => (

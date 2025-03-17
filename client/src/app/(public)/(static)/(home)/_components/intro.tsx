@@ -13,20 +13,24 @@ export const Intro = () => {
         <div className="space-y-4">
           <h1 className="text-start sm:text-center text-[40px] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold">
             Transform Your Digital <br className="hidden sm:block " />
-            Experience with Onsiof
+            Experience with Onsio
           </h1>
+          <div className="text-start sm:text-center text-[20px] ">
+            Select early bird access and become an investor in a
+            <br className="hidden sm:block " /> privacy-first AI platform.
+          </div>
         </div>
         <div className="w-full sm:w-fit gap-[10px] sm:gap-0 flex flex-col sm:flex-row items-center">
           <Link href={user ? "/download-app" : "/auth/account-type"}>
             <Button
               variant="default"
-              className="w-full sm:w-[250px] h-[44px] rounded-[30px] text-xl font-medium text-[#8F40E5] border-[#A64CE8]"
+              className="w-[361px] sm:w-[250px] h-[44px] rounded-[30px] text-xl font-medium text-[#8F40E5] border-[#A64CE8]"
             >
               Sign Up
             </Button>
           </Link>
           <Link href="/learn-more/mobile-app">
-            <button className="w-[250px] h-[44px] flex justify-center items-center gap-[5px] text-2xl font-medium">
+            <button className="w-[250px] h-[44px] flex justify-center items-center gap-[5px] text-xl font-medium">
               <span>Learn More</span>
             </button>
           </Link>

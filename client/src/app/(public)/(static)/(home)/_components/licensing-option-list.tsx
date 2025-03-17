@@ -36,9 +36,11 @@ export const LicensingOptionList = () => {
           return {
             id: plan.id,
             title:
-              plan.type +
-              "  " +
-              `${plan.period === PlanPeriod.Monthly ? "Monthly" : "Yearly"}`,
+              plan.type === PlanType.EarlyBird
+                ? "Early Bird"
+                : plan.type +
+                  "  " +
+                  `${plan.period === PlanPeriod.Monthly ? "Monthly" : "Yearly"}`,
             tierType: plan.type,
             period: plan.period,
             description:
@@ -54,6 +56,30 @@ export const LicensingOptionList = () => {
             footerText: undefined,
             isPremium: true,
           };
+      });
+
+      newPlanOptions.sort((a, b) => {
+        if (a.title === "Freemium") return 1;
+        if (b.title === "Freemium") return -1;
+        if (
+          a.period === PlanPeriod.Monthly &&
+          b.period !== PlanPeriod.Monthly
+        ) {
+          return -1;
+        }
+        if (
+          a.period !== PlanPeriod.Monthly &&
+          b.period === PlanPeriod.Monthly
+        ) {
+          return 1;
+        }
+        if (a.period === PlanPeriod.Yearly && b.period !== PlanPeriod.Yearly) {
+          return -1;
+        }
+        if (a.period !== PlanPeriod.Yearly && b.period === PlanPeriod.Yearly) {
+          return 1;
+        }
+        return a.price - b.price;
       });
 
       setPlanOptions(newPlanOptions);

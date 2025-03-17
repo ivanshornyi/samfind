@@ -22,7 +22,7 @@ const links: { menu: Link[]; legals: Link[]; system: Link[]; info: Link[] } = {
   menu: [
     { label: "Pricing", href: "/#pricing" },
     { label: "About", href: "/about" },
-    { label: "FAQ", href: "/faq" },
+    { label: "Support", href: "/support" },
     { label: "Contact", href: "/contact" },
     { label: "License Management", href: "/license-management" },
   ],
