@@ -36,9 +36,11 @@ export const LicensingOptionList = () => {
           return {
             id: plan.id,
             title:
-              plan.type +
-              "  " +
-              `${plan.period === PlanPeriod.Monthly ? "Monthly" : "Yearly"}`,
+              plan.type === PlanType.EarlyBird
+                ? "Early Bird"
+                : plan.type +
+                  "  " +
+                  `${plan.period === PlanPeriod.Monthly ? "Monthly" : "Yearly"}`,
             tierType: plan.type,
             period: plan.period,
             description:
