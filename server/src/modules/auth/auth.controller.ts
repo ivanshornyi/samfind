@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Post, Req } from "@nestjs/common";
-
+import { Body, Controller, Post, Req, Res } from "@nestjs/common";
+import { Response } from "express";
 import { SignInDto, SignUpDto } from "./dto/auth-user-dto";
 import { ResetPasswordDto } from "./dto/reset-password-dto";
 
@@ -12,12 +12,56 @@ import { AuthVerificationDto } from "./dto/auth-verification-dto";
 @ApiTags("Authentication")
 @Controller("auth")
 export class AuthController {
-  public constructor(private readonly authService: AuthService) {}
+  public constructor(private readonly authService: AuthService) { }
 
   @ApiOperation({ summary: "Sign in" })
   @Post("/sign-in")
-  public async signIn(@Body() signInUserDto: SignInDto) {
-    return this.authService.signIn(signInUserDto);
+  public async signIn(@Body() signInUserDto: SignInDto, @Res() res: Response) {
+    const resp = await this.authService.signIn(signInUserDto);
+
+    if ("accessToken" in resp && "id" in resp) {
+      res.cookie("accessToken", resp.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "none", // CSRF guard (pass for sync in diffirent domains)
+        maxAge: 15 * 60 * 1000, // 15m (in miliseconds)
+        path: "/",
+      });
+
+      res.cookie("refreshToken", resp.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "none",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: "/",
+      });
+
+      res.cookie("userId", resp.id, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "none",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: "/",
+      });
+
+      res.cookie("userFirstName", resp.firstName, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "none",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: "/",
+      });
+
+      res.cookie("userLastName", resp.lastName, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "none",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: "/",
+      });
+    }
+
+    return res.status(200).json(resp);
   }
 
   @ApiOperation({ summary: "Sign up" })
@@ -71,7 +115,36 @@ export class AuthController {
 
   @ApiOperation({ summary: "Verify user" })
   @Post("/verify")
-  public async verifyUser(@Body() verificationDto: AuthVerificationDto) {
-    return this.authService.verifyUserCode(verificationDto);
+  public async verifyUser(
+    @Body() verificationDto: AuthVerificationDto,
+    @Res() res: Response,
+  ) {
+    const resp = await this.authService.verifyUserCode(verificationDto);
+
+    res.cookie("accessToken", resp.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict", // CSRF guard
+      maxAge: 15 * 60 * 1000, // 15m (in miliseconds)
+      path: "/",
+    });
+
+    res.cookie("refreshToken", resp.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: "/",
+    });
+
+    res.cookie("userId", resp.id, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: "/",
+    });
+
+    return res.status(200).json(resp);
   }
 }

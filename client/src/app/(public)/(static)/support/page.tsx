@@ -1,6 +1,6 @@
 import { Questions } from "./_components";
 
-export default function Faq() {
+export default function Support() {
   return (
     <div className="w-full">
       <Questions />

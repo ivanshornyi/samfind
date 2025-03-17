@@ -22,8 +22,8 @@ export const NAVIGATION_ITEMS = [
     path: "/about",
   },
   {
-    title: "FAQ",
-    path: "/faq",
+    title: "Support",
+    path: "/support",
   },
   {
     title: "Invest",
@@ -70,10 +70,12 @@ export const Header = () => {
         "
       >
         <div className="flex items-center gap-10">
-          <Link href="/">
+          <div
+            onClick={() => router.push("/")}
+            className="z-1000 cursor-pointer"
+          >
             <Image src={LogoSvg} width={110} height={28} alt="logo" />
-          </Link>
-
+          </div>
           <nav className="hidden lg:block">
             <ul className="flex items-center gap-8">
               {NAVIGATION_ITEMS.map((item) => (

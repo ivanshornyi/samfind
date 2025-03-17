@@ -41,16 +41,12 @@ import {
 
 import { ReusableTable } from "@/components/table";
 import { AuthContext } from "@/context";
-import {
-  CopyLinkButton,
-  DeleteMember,
-  InviteMember,
-  ProgressChart,
-} from "./_components";
+import { DeleteMember, InviteMember, ProgressChart } from "./_components";
 
 import {
   ArrowUpDown,
   Check,
+  Copy,
   Download,
   Info,
   MoreHorizontal,
@@ -323,9 +319,13 @@ export default function License() {
                       }
                     />
                     <div className="flex items-center gap-6">
-                      <CopyLinkButton
-                        handleCopyInvitation={handleCopyInvitation}
-                      />
+                      <Button
+                        variant="ghost"
+                        leftIcon={<Copy />}
+                        onClick={handleCopyInvitation}
+                      >
+                        Copy invite link
+                      </Button>
                       <InviteMember
                         allowedMembers={userLicense.limit}
                         handleCopyInvitation={handleCopyInvitation}

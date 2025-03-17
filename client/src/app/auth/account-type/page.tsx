@@ -4,6 +4,7 @@ import { Button, Card } from "@/components";
 import type { UserAccountType } from "@/types";
 import { Check } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { type AccountCard, ACCOUNT_TYPE_CARD_ITEMS } from "./data";
 
@@ -15,6 +16,8 @@ export default function AccountType() {
   const [accountType, setAccountType] = useState<UserAccountType>(
     ACCOUNT_TYPE_CARD_ITEMS[0].type
   );
+
+  const router = useRouter();
 
   const handleChooseAccountType = (type: UserAccountType) => {
     setAccountCards(
@@ -33,6 +36,12 @@ export default function AccountType() {
       }
     });
   }, [accountCards]);
+
+  useEffect(() => {
+    const referralCode = localStorage.getItem("referralCode");
+    if (referralCode)
+      router.push(`referal-account?referralCode=${referralCode}`);
+  }, [router]);
 
   return (
     <div className="max-w-3xl text-white p-8">

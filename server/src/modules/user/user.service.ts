@@ -26,6 +26,8 @@ import { createHash } from "crypto";
 import { AddUserShareholderDataDto } from "./dto/add-user-shareholder-dto";
 import { StripeService } from "../stripe/stripe.service";
 import { addMonths } from "date-fns";
+import { SubscriptionService } from "../subscription/subscription.service";
+import { AddPreRegisterBonusDto } from "./dto/add-pre-register-bonus-dto";
 
 @Injectable()
 export class UserService {
@@ -33,6 +35,7 @@ export class UserService {
     private readonly prisma: PrismaService,
     @Inject(forwardRef(() => StripeService))
     private readonly stripeService: StripeService,
+    private readonly subscriptionService: SubscriptionService,
   ) {}
 
   async findAll(findUserDto: FindUserDto): Promise<User[]> {
@@ -90,7 +93,8 @@ export class UserService {
           earnedAmount: discountAmount,
         },
       });
-      this.prisma.walletTransaction.create({
+
+      await this.prisma.walletTransaction.create({
         data: {
           userId: user.id,
           walletId: user.wallet.id,
@@ -102,7 +106,7 @@ export class UserService {
           description: `Income from referral Registration on email ${newUser.email}`,
         },
       });
-      this.prisma.wallet.update({
+      await this.prisma.wallet.update({
         where: { id: user.wallet.id },
         data: { salesAmount: { increment: discountAmount } },
       });
@@ -430,30 +434,15 @@ export class UserService {
   async deleteUser(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      include: { License: true, subscription: true },
+      include: { subscription: true },
     });
 
     if (!user) {
       throw new NotFoundException("User not found");
     }
 
-    if (user.License.length) {
-      const licenseIds = user.License.map((l) => l.id);
-      await this.prisma.license.updateMany({
-        where: {
-          id: { in: licenseIds },
-        },
-        data: {
-          status: LicenseStatus.inactive,
-        },
-      });
-    }
-
-    if (user.subscription) {
-      await this.prisma.subscription.update({
-        where: { id: user.subscription.id },
-        data: { isActive: false },
-      });
+    if (user.subscription && user.subscription.isActive) {
+      await this.subscriptionService.cancelSubscription(user.subscription.id);
     }
 
     await this.prisma.user.update({
@@ -508,5 +497,50 @@ export class UserService {
     return await this.prisma.userShareholdersData.findUnique({
       where: { userId },
     });
+  }
+
+  async addPreRegisterBonus({ email, amount }: AddPreRegisterBonusDto) {
+    const existedBonus = await this.prisma.preRegisterBonus.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+
+    if (existedBonus) throw new BadRequestException("Bonus Already added");
+
+    return await this.prisma.preRegisterBonus.create({
+      data: { email: email.toLowerCase(), amount },
+    });
+  }
+
+  async checkPreRegisterBonus(email: string, userId: string, walletId: string) {
+    const existedBonus = await this.prisma.preRegisterBonus.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+
+    if (!existedBonus) return;
+
+    await this.prisma.$transaction([
+      this.prisma.preRegisterBonus.update({
+        where: {
+          id: existedBonus.id,
+        },
+        data: {
+          used: true,
+        },
+      }),
+      this.prisma.wallet.update({
+        where: { id: walletId },
+        data: { bonusAmount: existedBonus.amount },
+      }),
+      this.prisma.walletTransaction.create({
+        data: {
+          userId,
+          walletId,
+          amount: existedBonus.amount,
+          transactionType: TransactionType.income,
+          balanceType: BalanceType.bonus,
+          description: `Transfer from pre register bonus`,
+        },
+      }),
+    ]);
   }
 }

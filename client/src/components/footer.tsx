@@ -22,23 +22,23 @@ const links: { menu: Link[]; legals: Link[]; system: Link[]; info: Link[] } = {
   menu: [
     { label: "Pricing", href: "/#pricing" },
     { label: "About", href: "/about" },
-    { label: "FAQ", href: "/faq" },
+    { label: "Support", href: "/support" },
     { label: "Contact", href: "/contact" },
     { label: "License Management", href: "/license-management" },
   ],
   legals: [
-    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Privacy Policy", href: "/policy" },
     { label: "Terms of Use", href: "/terms" },
-    { label: "Cookie Policy", href: "/cookies" },
+    { label: "Cookie Policy", href: "/cookie" },
   ],
   system: [
     { label: "Onsio App", href: "/" },
     { label: "Onsio Software", href: "/" },
   ],
   info: [
-    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Privacy Policy", href: "/policy" },
     { label: "Terms of Use", href: "/terms" },
-    { label: "Cookie Policy", href: "/cookies" },
+    { label: "Cookie Policy", href: "/cookie" },
   ],
 };
 
@@ -126,6 +126,7 @@ const FooterSection = ({ title, links }: { title: string; links: Link[] }) => {
 
 export const Footer = () => {
   const pathname = usePathname();
+  const router = useRouter();
 
   return (
     <footer className="text-white py-[14px] sm:py-10 sm:pb-[60px] px-5 sm:px-6 text-nowrap relative overflow-hidden">
@@ -137,9 +138,12 @@ export const Footer = () => {
       )}
       <div className="mx-auto flex flex-col lg:flex-row gap-10 justify-between">
         <div className="flex flex-col lg:block space-y-[30px] lg:space-y-[122px]">
-          <Link href="/">
-            <Image src={Logo} width={110} height={28} alt="" />
-          </Link>
+          <div
+            onClick={() => router.push("/")}
+            className="z-1000 cursor-pointer"
+          >
+            <Image src={Logo} width={110} height={28} alt="logo" />
+          </div>
           <div className="lg:hidden">
             <h3 className="text-xl font-bold mb-2">Stay Updated.</h3>
             <p className="text-base text-[#E6E6E6] mb-6">

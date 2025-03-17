@@ -33,16 +33,13 @@ const validatePassword = (password: string) => {
   const hasNumber = /\d/.test(password);
   const hasUpperCase = /[A-Z]/.test(password);
   const hasLowerCase = /[a-z]/.test(password);
-  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
   return {
     minLength,
     hasNumber,
     hasUpperCase,
     hasLowerCase,
-    hasSpecialChar,
-    isValid:
-      minLength && hasNumber && hasUpperCase && hasLowerCase && hasSpecialChar,
+    isValid: minLength && hasNumber && hasUpperCase && hasLowerCase,
   };
 };
 
@@ -65,6 +62,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
   const referralCode = searchParams.get("userReferralCode");
   const licenseId = searchParams.get("lId");
   const organizationId = searchParams.get("orgId");
+  const redirectUrl = searchParams.get("redirect");
+  const backendUrl = searchParams.get("backend");
 
   const { data: organizationName } = useGetUserOrganizationName(organizationId);
   const { data: userName } = useGetUserName(licenseId);
@@ -98,7 +97,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
     hasNumber: false,
     hasUpperCase: false,
     hasLowerCase: false,
-    hasSpecialChar: false,
     isValid: false,
   });
 
@@ -180,6 +178,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
         email: formData.email,
         password: formData.password.trim(),
         authType: UserAuthType.Email,
+        signInRedirect: redirectUrl,
+        backendLink: backendUrl,
       });
     }
 
@@ -310,6 +310,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
       router.push("/");
     }
   }, [searchParams, accountType]);
+
+  useEffect(() => {
+    if (isSignUpSuccess) localStorage.removeItem("referralCode");
+  }, [isSignUpSuccess]);
 
   return (
     <>
@@ -540,17 +544,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
                           )}{" "}
                           At least one lowercase letter (a-z).
                         </li>
-                        <li
-                          className={`flex items-center gap-2 ${passwordValidation.hasSpecialChar ? "text-green-500" : "text-red-500"}`}
-                        >
-                          {passwordValidation.hasSpecialChar ? (
-                            <Check style={{ width: "10px", height: "10px" }} />
-                          ) : (
-                            <X style={{ width: "10px", height: "10px" }} />
-                          )}{" "}
-                          At least one special character (e.g., @, #, $, %,
-                          etc.)
-                        </li>
                       </ul>
                     </div>
                   ) : null}
@@ -657,6 +650,30 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authPageType }) => {
             )}
           </Button>
         </form>
+
+        {authPageType === "signUp" ? (
+          <p className="text-lg mt-4 text-center">
+            By continuing, I agree to the{" "}
+            <Link
+              href="/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold underline"
+            >
+              Terms
+            </Link>{" "}
+            and{" "}
+            <Link
+              href="/policy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold underline"
+            >
+              Privacy Policy
+            </Link>
+            .
+          </p>
+        ) : null}
 
         <div className="pt-4">
           {authPageType === "signIn" && <SendResetPasswordCodeModal />}

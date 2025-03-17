@@ -36,7 +36,7 @@ export class AppVersionController {
     return await this.appVersionService.addAppVersion(addAppVersionDto);
   }
 
-  @ApiOperation({ summary: "Add App Version" })
+  @ApiOperation({ summary: "Get last App Version" })
   @Get("/:os")
   async getLastAppVersion(
     @Headers("authorization") authHeader: string,

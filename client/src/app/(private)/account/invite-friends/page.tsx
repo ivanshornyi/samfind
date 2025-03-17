@@ -65,7 +65,7 @@ export default function InvitedFriends() {
         <div className="flex flex-col">
           <div className="flex justify-between mb-6">
             <h2 className="text-2xl sm:text-[32px] leading-[44px] font-semibold">
-              Invite a Friend
+              Referral system
             </h2>
             <div className="lg:hidden">
               <BalanceInfo balance={bonusAmount} />
