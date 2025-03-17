@@ -82,13 +82,13 @@ export const Features = () => {
         ))}
       </div>
 
-      <div className="flex items-center justify-center gap-2 mt-[48px]">
+      <div className="flex sm:flex-row flex-row-reverse items-center justify-center gap-2 mt-[48px]">
         <Button className="w-full max-w-[200px]" variant="secondary">
           Sign Up
         </Button>
         <div className="w-full max-w-[200px] flex justify-center">
           <Link href="/learn-more/mobile-app">
-            <button className="flex justify-center items-center gap-[5px] text-2xl font-medium">
+            <button className="flex justify-center items-center gap-[5px] text-xl font-medium">
               <span>Learn More</span>
             </button>
           </Link>
