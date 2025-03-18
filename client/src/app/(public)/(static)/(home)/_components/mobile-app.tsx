@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export const MobileApp = () => {
   return (
-    <div className="w-full flex flex-col items-center mt-[100px]">
+    <div className="w-full flex flex-col items-center mt-[100px]" id="mobile">
       <Badge
         variant="secondary"
         className="bg-[#242424] rounded-3xl text-[#CE9DF3] py-[6px] px-6"

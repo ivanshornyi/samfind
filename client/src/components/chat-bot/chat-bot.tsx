@@ -14,6 +14,7 @@ import { Button, Input } from "@/components";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ContactForm } from "./contact-form";
 import { usePathname } from "next/navigation";
+import { useChat } from "@/providers/chat";
 
 const options = [
   { name: "What can this platform do?", value: "aboutPlatform" },
@@ -23,7 +24,9 @@ const options = [
 ];
 
 export default function ChatBot() {
-  const [open, setOpen] = useState<boolean>(false);
+  const context = useChat();
+  const setOpen = context.toggleChat;
+  const open = context.isOpen;
   const [stage, setStage] = useState<"start" | "contact" | "chat">("start");
   const [option, setOption] = useState<
     "" | "aboutPlatform" | "pricingPlans" | "pricing" | "getStarted"

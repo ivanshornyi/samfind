@@ -54,7 +54,7 @@ export function InvestCalcPrice({ sharePrice }: Props): React.ReactNode {
               <p className="text-customGreyColorSubText text-[15px] font-[600] leading-[18px]">
                 Current price per share
               </p>
-              <p className="text-[24px] font-[600]">${sharePrice}</p>
+              <p className="text-[24px] font-[600]">€{sharePrice}</p>
             </div>
             <div className="flex flex-col gap-[20px]">
               <p className="text-customGreyColorSubText text-[15px] font-[600] leading-[18px]">
@@ -71,7 +71,7 @@ export function InvestCalcPrice({ sharePrice }: Props): React.ReactNode {
                 Total
               </p>
               <p className="text-[24px] font-[600]">
-                ${Math.round(sharePrice * amountOfShare * 100) / 100}
+                €{Math.round(sharePrice * amountOfShare * 100) / 100}
               </p>
             </div>
           </div>
@@ -80,7 +80,7 @@ export function InvestCalcPrice({ sharePrice }: Props): React.ReactNode {
               Potential value
             </p>
             <p className="text-customPinkSubText text-[40px] font-[600]">
-              $ {calculatedPrice}
+              € {calculatedPrice}
             </p>
           </div>
           <p className="text-customGreyCoalSubText text-[16px] font-[600]">
