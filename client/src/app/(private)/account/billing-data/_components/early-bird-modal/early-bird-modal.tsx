@@ -233,7 +233,9 @@ export const EarlyBirdModal = ({ planId }: EarlyBirdModalProps) => {
                   <span className="text-[#CE9DF3] mx-1">
                     €
                     {Math.round(
-                      (((sharePrice / 0.01416) * 100) / 100) * 5 * quantity
+                      (((sharePrice / 0.01416) * 100) / 100 / 100) *
+                        5 *
+                        quantity
                     )
                       .toLocaleString("en-US")
                       .replace(/,/g, " ")}
