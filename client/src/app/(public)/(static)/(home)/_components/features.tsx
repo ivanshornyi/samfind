@@ -54,7 +54,7 @@ const features = [
 
 export const Features = () => {
   return (
-    <div className="mt-20 sm:mt-[120px] mx-auto">
+    <div className="mt-20 sm:mt-[120px] mx-auto" id="feature">
       <h2 className="text-[#CE9DF3] text-xl mb-6 font-semibold">
         Access to Feature
       </h2>
@@ -87,11 +87,16 @@ export const Features = () => {
           Sign Up
         </Button>
         <div className="w-full max-w-[200px] flex justify-center">
-          <Link href="/learn-more/mobile-app">
-            <button className="flex justify-center items-center gap-[5px] text-xl font-medium">
-              <span>Learn More</span>
-            </button>
-          </Link>
+          <button
+            className="flex justify-center items-center gap-[5px] text-xl font-medium"
+            onClick={() => {
+              document
+                .getElementById("mobileApp")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+          >
+            <span>Learn More</span>
+          </button>
         </div>
       </div>
     </div>
