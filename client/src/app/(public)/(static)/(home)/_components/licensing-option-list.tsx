@@ -98,7 +98,7 @@ export const LicensingOptionList = () => {
       </div>
 
       <div className="flex flex-col items-center ml:flex-row gap-5">
-        {planOptions.map((option, index) => (
+        {planOptions.map((option) => (
           <LicensingOptionCard
             key={option.id}
             option={option}

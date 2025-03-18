@@ -292,7 +292,7 @@ export const BuyShares = ({
                   <span className="text-[#CE9DF3] mx-1">
                     €
                     {Math.round(
-                      (((sharePrice / 0.01416) * 100) / 100) *
+                      (((sharePrice / 0.01416) * 100) / 100 / 100) *
                         5 *
                         Number(moneySharesQuantity)
                     )
