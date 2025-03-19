@@ -31,11 +31,16 @@ export const MobileApp = () => {
         >
           Sign up and download
         </Button>
-        <Link href="/learn-more/mobile-app">
-          <button className="text-[16px] max-w-[200px] min-w-[125px] h-[44px] flex justify-center items-center gap-[5px] text-xl font-medium">
-            <span>Learn More</span>
-          </button>
-        </Link>
+        <button
+          className="text-[16px] max-w-[200px] min-w-[125px] h-[44px] flex justify-center items-center gap-[5px] text-xl font-medium"
+          onClick={() => {
+            document
+              .getElementById("software")
+              ?.scrollIntoView({ behavior: "smooth" });
+          }}
+        >
+          <span>Learn More</span>
+        </button>
       </div>
     </div>
   );

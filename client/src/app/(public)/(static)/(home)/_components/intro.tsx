@@ -29,11 +29,16 @@ export const Intro = () => {
               Sign Up
             </Button>
           </Link>
-          <Link href="/learn-more/mobile-app">
-            <button className="w-[250px] h-[44px] flex justify-center items-center gap-[5px] text-xl font-medium">
-              <span>Learn More</span>
-            </button>
-          </Link>
+          <button
+            className="w-[250px] h-[44px] flex justify-center items-center gap-[5px] text-xl font-medium"
+            onClick={() => {
+              document
+                .getElementById("solution")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+          >
+            <span>Learn More</span>
+          </button>
         </div>
       </div>
       <Image

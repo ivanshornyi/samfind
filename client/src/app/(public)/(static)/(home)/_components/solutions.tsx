@@ -5,7 +5,10 @@ import Link from "next/link";
 
 export const Solutoins = () => {
   return (
-    <div className="items-center gap-[100px] grid grid-cols-1 sm:grid-cols-2 ">
+    <div
+      className="items-center gap-[100px] grid grid-cols-1 sm:grid-cols-2 "
+      id="solution"
+    >
       <Image src={SolutionsImage} width={600} height={763} alt="solutoins" />
       <div className="flex flex-col">
         <h2 className="font-bold sm:text-[40px] text-[24px] leading-[120%]">
@@ -25,11 +28,16 @@ export const Solutoins = () => {
           >
             Sign up
           </Button>
-          <Link href="/learn-more/mobile-app">
-            <button className="max-w-[200px] min-w-[177px] h-[44px] flex justify-center items-center gap-[5px] text-xl font-medium">
-              <span>Learn More</span>
-            </button>
-          </Link>
+          <button
+            className="max-w-[200px] min-w-[177px] h-[44px] flex justify-center items-center gap-[5px] text-xl font-medium"
+            onClick={() => {
+              document
+                .getElementById("feature")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+          >
+            <span>Learn More</span>
+          </button>
         </div>
       </div>
     </div>
