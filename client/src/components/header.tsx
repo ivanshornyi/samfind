@@ -3,13 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 
 import { Button } from "@/components";
 import { AuthContext } from "@/context";
 import { LogoSvg } from "@public/images";
 import { User } from "lucide-react";
 import { MenuMobile } from "./menu-mobile";
+import { ArrowDown } from "@public/icons";
 
 export const NAVIGATION_ITEMS = [
   {
@@ -29,7 +30,15 @@ export const NAVIGATION_ITEMS = [
     title: "Invest",
     path: "/invest",
   },
-  // {
+  {
+    title: "Products",
+    subItems: [
+      { title: "Mobile App (IOS, Android)", path: "/#mobile" },
+      { title: "Software (MacOS, Windows)", path: "/#software" },
+      { title: "Web Platform (Onsio.ai)", path: "/" },
+    ],
+  },
+  //  {
   //   title: "License Management",
   //   path: "/license-management",
   // },
@@ -39,6 +48,7 @@ export const Header = () => {
   const { isLoggedIn, user } = useContext(AuthContext);
   const router = useRouter();
   const pathname = usePathname();
+  const [openProducts, setOpenProducts] = useState<boolean>(false);
 
   const handleNavigation = (path: string, isHash?: boolean) => {
     if (isHash) {
@@ -79,12 +89,47 @@ export const Header = () => {
           <nav className="hidden lg:block">
             <ul className="flex items-center gap-8">
               {NAVIGATION_ITEMS.map((item) => (
-                <li
-                  key={item.title}
-                  onClick={() => handleNavigation(item.path, item.isHash)}
-                  className="font-medium text-base transition-all hover:text-violet-50 hover:underline active:text-violet-200 cursor-pointer"
-                >
-                  {item.title}
+                <li key={item.title}>
+                  {!item.subItems ? (
+                    <span
+                      className="font-medium text-base transition-all hover:text-violet-50 hover:underline active:text-violet-200 cursor-pointer"
+                      onClick={() => handleNavigation(item.path, item.isHash)}
+                    >
+                      {item.title}
+                    </span>
+                  ) : (
+                    <span
+                      className="relative"
+                      onClick={() => setOpenProducts(!openProducts)}
+                    >
+                      <span className=" flex flex-row gap-[8px] font-medium text-base transition-all hover:text-violet-50 hover:underline active:text-violet-200 cursor-pointer">
+                        {item.title}
+                        <Image
+                          alt="arrow down icon"
+                          className={`transition rotate-${openProducts ? "180" : "0"}`}
+                          src={ArrowDown}
+                        />
+                      </span>
+                      <ul
+                        hidden={!openProducts}
+                        className="absolute left-[-15px] top-[20px] w-[262px] h-[168px] rounded-[16px] p-[16px] gap-8px"
+                      >
+                        <div className="flex flex-col gap-[12px]">
+                          {item.subItems.map((subItem) => (
+                            <button
+                              key={subItem.title}
+                              className="font-medium text-[#A8A8A8] transition-all hover:text-violet-50 hover:underline active:text-violet-200 cursor-pointer text-start border-b-[1px] border-[#363637] px-[8px]"
+                              onClick={() =>
+                                handleNavigation(subItem.path, false)
+                              }
+                            >
+                              {subItem.title}
+                            </button>
+                          ))}
+                        </div>
+                      </ul>
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>

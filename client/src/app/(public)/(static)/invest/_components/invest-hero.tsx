@@ -24,9 +24,6 @@ export function InvestHero(): React.ReactNode {
             <p className="bg-customBlackTags text-customPinkSubText text-[14px] font-[500] py-[6.5px] px-[26.5px] rounded-[25px]">
               Invest & Grow
             </p>
-            <p className="bg-customBlackTags text-customPinkSubText text-[14px] font-[500] py-[6.5px] px-[26.5px] rounded-[25px]">
-              Get 10% Off – Join Early
-            </p>
           </div>
           <div className="flex flex-col gap-[32px]">
             <h1 className="text-white text-[96px] font-[800] leading-[96px]">
@@ -42,10 +39,6 @@ export function InvestHero(): React.ReactNode {
               className="rounded-[30px] py-[8px] px-[32px] border border-customGreyButton bg-white backdrop-blur-customPinkButtonBGRGBA text-customSaturedPinkButtonText text-[16px] font-[500]"
             >
               Join as an Early Bird
-            </button>
-            <button className="text-white text-[16px] font-[500] flex gap-[8px] items-center">
-              Become a Key Investor
-              <ArrowUpRight className="w-[30px] h-[30px]" />
             </button>
           </div>
         </div>
