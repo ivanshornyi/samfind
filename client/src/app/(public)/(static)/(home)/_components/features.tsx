@@ -7,7 +7,6 @@ import {
   DeepResearch,
 } from "@public/home";
 import { Button } from "@/components";
-import Link from "next/link";
 
 const features = [
   {
@@ -82,16 +81,16 @@ export const Features = () => {
         ))}
       </div>
 
-      <div className="flex sm:flex-row flex-row-reverse items-center justify-center gap-2 mt-[48px]">
+      <div className="flex sm:flex-row flex-row-reverse items-center justify-center gap-2 mt-[48px] text[16px] ">
         <Button className="w-full max-w-[200px]" variant="secondary">
           Sign Up
         </Button>
         <div className="w-full max-w-[200px] flex justify-center">
           <button
-            className="flex justify-center items-center gap-[5px] text-xl font-medium"
+            className="flex justify-center items-center gap-[5px] text[16px] font-medium"
             onClick={() => {
               document
-                .getElementById("mobileApp")
+                .getElementById("mobile")
                 ?.scrollIntoView({ behavior: "smooth" });
             }}
           >

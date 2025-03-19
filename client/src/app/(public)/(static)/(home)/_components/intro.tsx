@@ -8,7 +8,10 @@ import { useContext } from "react";
 export const Intro = () => {
   const { user } = useContext(AuthContext);
   return (
-    <div className="relative font-manrope h-[743px] sm:h-[824px] flex items-center justify-center">
+    <div
+      className="relative font-manrope h-[743px] sm:h-[824px] flex items-center justify-center"
+      id="intro"
+    >
       <div className="absolute sm:inset-0 flex flex-col items-center justify-center space-y-[83px] sm:space-y-8 text-center bottom-[8%]">
         <div className="space-y-4">
           <h1 className="text-start sm:text-center text-[40px] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold">
@@ -24,13 +27,13 @@ export const Intro = () => {
           <Link href={user ? "/download-app" : "/auth/account-type"}>
             <Button
               variant="default"
-              className="w-[361px] sm:w-[250px] h-[44px] rounded-[30px] text-xl font-medium text-[#8F40E5] border-[#A64CE8]"
+              className="w-[361px] sm:w-[250px] h-[44px] rounded-[30px] text[16px]  font-medium text-[#8F40E5] border-[#A64CE8]"
             >
               Sign Up
             </Button>
           </Link>
           <button
-            className="w-[250px] h-[44px] flex justify-center items-center gap-[5px] text-xl font-medium"
+            className="w-[250px] h-[44px] flex justify-center items-center gap-[5px] text-[16px] font-medium"
             onClick={() => {
               document
                 .getElementById("solution")

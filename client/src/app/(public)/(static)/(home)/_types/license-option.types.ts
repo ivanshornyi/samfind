@@ -8,8 +8,11 @@ export type LicensingOptionType = {
   description: string;
   price: number;
   buttonText: string;
-  buttonVariant: "default" | "secondary";
+  buttonVariant: "default" | "secondary" | "purple";
   features: string[];
   footerText?: string;
   isPremium: boolean;
+  background: string | undefined;
+  ulText: string | undefined;
+  border: string | undefined;
 };
