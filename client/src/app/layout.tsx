@@ -10,6 +10,7 @@ import { TanstackProvider } from "@/providers";
 
 import { Manrope } from "next/font/google";
 import "./globals.css";
+import { ChatProvider } from "@/providers/chat";
 
 const manrope = Manrope({
   variable: "--font-monrope",
@@ -57,16 +58,18 @@ export default function RootLayout({
 }>) {
   return (
     <TanstackProvider>
-      <html lang="en">
-        <body
-          className={`${manrope.variable} antialiased bg-background w-full`}
-        >
-          <Toaster />
-          <Suspense>
-            <AuthContextProvider>{children}</AuthContextProvider>
-          </Suspense>
-        </body>
-      </html>
+      <ChatProvider>
+        <html lang="en">
+          <body
+            className={`${manrope.variable} antialiased bg-background w-full`}
+          >
+            <Toaster />
+            <Suspense>
+              <AuthContextProvider>{children}</AuthContextProvider>
+            </Suspense>
+          </body>
+        </html>
+      </ChatProvider>
     </TanstackProvider>
   );
 }
