@@ -48,7 +48,7 @@ export const LicensingOptionList = () => {
             period: plan.period,
             description: "6 shares = 1 month of using all Onsio tools for free",
             price: plan.price / 100,
-            buttonText: "Buy Standard",
+            buttonText: "Get Started",
             buttonVariant: "purple",
             features: [
               "All the benefits of a monthly subscription",

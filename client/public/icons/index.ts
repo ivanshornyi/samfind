@@ -8,6 +8,10 @@ import TwitterIcon from "./twitter.svg";
 import CheckmarkDonePinkSVG from "./check-done-pink.svg";
 import ArrowDownWhite from "./arrow-down-white.svg";
 import ArrowDownPink from "./arrow-down-pink.svg";
+import ComingSoon from "./coming-soon.svg";
+import GoTo from "./go-to.svg";
+import Support from "./support.svg";
+import Logout from "./logout.svg";
 
 export {
   CheckmarkDonePinkSVG,
@@ -20,4 +24,8 @@ export {
   TwitterIcon,
   ArrowDownWhite,
   ArrowDownPink,
+  ComingSoon,
+  GoTo,
+  Support,
+  Logout,
 };

@@ -13,8 +13,10 @@ import {
   AlertDialogFooter,
 } from "@/components";
 
-import { LogOut, X } from "lucide-react";
+import { X } from "lucide-react";
 import { AuthContext } from "@/context";
+import { Logout } from "@public/icons";
+import Image from "next/image";
 
 export const LogoutModal = () => {
   const [open, setOpen] = useState<boolean>(false);
@@ -24,7 +26,13 @@ export const LogoutModal = () => {
     <AlertDialog open={open} onOpenChange={setOpen}>
       <Button
         variant="menuItem"
-        leftIcon={<LogOut style={{ width: "24px", height: "24px" }} />}
+        leftIcon={
+          <Image
+            src={Logout}
+            alt="logout"
+            style={{ width: "24px", height: "24px" }}
+          />
+        }
         onClick={() => setOpen(true)}
       >
         Logout
