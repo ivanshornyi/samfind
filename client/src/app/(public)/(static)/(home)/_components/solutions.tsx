@@ -1,7 +1,6 @@
 import { Button } from "@/components";
 import { SolutionsImage } from "@public/home";
 import Image from "next/image";
-import Link from "next/link";
 
 export const Solutoins = () => {
   return (
@@ -21,7 +20,7 @@ export const Solutoins = () => {
           possibilities for research, content generation, and data management,
           all while protecting your digital identity.
         </h3>
-        <div className="flex sm:flex-row flex-row-reverse sm:flex items-center gap-[6px] mt-[48px]">
+        <div className="flex sm:flex-row flex-row-reverse sm:flex items-center gap-[6px] mt-[48px] text[16px] ">
           <Button
             variant="secondary"
             className="w-full max-w-[200px] min-w-[177px]"
@@ -29,7 +28,7 @@ export const Solutoins = () => {
             Sign up
           </Button>
           <button
-            className="max-w-[200px] min-w-[177px] h-[44px] flex justify-center items-center gap-[5px] text-xl font-medium"
+            className="max-w-[200px] min-w-[177px] h-[44px] flex justify-center items-center gap-[5px] text-[16px] font-medium"
             onClick={() => {
               document
                 .getElementById("feature")

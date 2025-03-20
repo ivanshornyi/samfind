@@ -1,6 +1,5 @@
 "use client";
 
-import { Button, Input } from "@/components/ui";
 import {
   Facebook,
   Instagram,
@@ -18,22 +17,22 @@ type Link = {
   href: string;
 };
 
-const links: { menu: Link[]; legals: Link[]; system: Link[]; info: Link[] } = {
+const links: { menu: Link[]; legals: Link[]; product: Link[]; info: Link[] } = {
   menu: [
     { label: "Pricing", href: "/#pricing" },
     { label: "About", href: "/about" },
     { label: "Support", href: "/support" },
-    { label: "Contact", href: "/contact" },
-    { label: "License Management", href: "/license-management" },
+    { label: "Invest", href: "/invest" },
   ],
   legals: [
     { label: "Privacy Policy", href: "/policy" },
     { label: "Terms of Use", href: "/terms" },
     { label: "Cookie Policy", href: "/cookie" },
   ],
-  system: [
-    { label: "Onsio App", href: "/" },
-    { label: "Onsio Software", href: "/" },
+  product: [
+    { label: "Mobile App (IOS, Android)", href: "/#mobile" },
+    { label: "Software (MacOS, Windows)", href: "/#software" },
+    { label: "Web Platform (Onsio.ai)", href: "/" },
   ],
   info: [
     { label: "Privacy Policy", href: "/policy" },
@@ -144,36 +143,6 @@ export const Footer = () => {
           >
             <Image src={Logo} width={110} height={28} alt="logo" />
           </div>
-          <div className="lg:hidden">
-            <h3 className="text-xl font-bold mb-2">Stay Updated.</h3>
-            <p className="text-base text-[#E6E6E6] mb-6">
-              Join our community of innovators
-            </p>
-            <Input
-              type="email"
-              placeholder="Enter your email address"
-              className="mb-2"
-            />
-            <p className="text-sm text-[#E6E6E6] mb-6">
-              By submitting this form you agree to our{" "}
-              <Link href="/privacy" className="underline">
-                Privacy policy
-              </Link>
-            </p>
-            <Button
-              type="submit"
-              variant="secondary"
-              className="rounded-[30px] border-none w-full mb-6"
-            >
-              Subscribe now
-            </Button>
-            <div className="text-sm text-[#616161] flex sm:justify-center space-x-2 overflow-x-scroll no-scrollbar">
-              <span>• Latest updates</span>
-              <span>• Technology insights</span>
-              <span>• Success stories</span>
-              <span>• Community highlights</span>
-            </div>
-          </div>
           <div
             style={{ margin: 0 }}
             className="hidden  lg:flex flex-col justify-between max-h-[230px] pt-[36px] h-[100%]"
@@ -185,9 +154,9 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="flex flex-row xl:gap-12">
+        <div className="flex flex-row xl:gap-12 justify-between">
           <FooterSection title="Menu" links={links.menu} />
-          <FooterSection title="System" links={links.system} />
+          <FooterSection title="Product" links={links.product} />
           <FooterSection title="Info" links={links.info} />
           {/* <FooterSection title="Legals" links={links.legals} /> */}
         </div>

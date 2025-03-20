@@ -10,7 +10,7 @@ import { AuthContext } from "@/context";
 import { LogoSvg } from "@public/images";
 import { User } from "lucide-react";
 import { MenuMobile } from "./menu-mobile";
-import { ArrowDown } from "@public/icons";
+import { ArrowDownWhite, ArrowDownPink } from "@public/icons";
 
 export const NAVIGATION_ITEMS = [
   {
@@ -33,9 +33,9 @@ export const NAVIGATION_ITEMS = [
   {
     title: "Products",
     subItems: [
-      { title: "Mobile App (IOS, Android)", path: "/#mobile" },
-      { title: "Software (MacOS, Windows)", path: "/#software" },
-      { title: "Web Platform (Onsio.ai)", path: "/" },
+      { title: "Mobile App (IOS, Android)", path: "/#mobile", isHash: true },
+      { title: "Software (MacOS, Windows)", path: "/#software", isHash: true },
+      { title: "Web Platform (Onsio.ai)", path: "/#intro", isHash: true },
     ],
   },
   //  {
@@ -54,8 +54,9 @@ export const Header = () => {
     if (isHash) {
       if (pathname === "/") {
         // If we're already on home page, smooth scroll to the section
+        console.log(path);
         document
-          .getElementById("pricing")
+          .getElementById(path.split("#")[1])
           ?.scrollIntoView({ behavior: "smooth" });
       } else {
         // If we're on a different page, navigate to home page with hash
@@ -87,7 +88,7 @@ export const Header = () => {
             <Image src={LogoSvg} width={110} height={28} alt="logo" />
           </div>
           <nav className="hidden lg:block">
-            <ul className="flex items-center gap-8">
+            <ul className="flex items-center gap-8 text-[12px] sm:text-[16px]">
               {NAVIGATION_ITEMS.map((item) => (
                 <li key={item.title}>
                   {!item.subItems ? (
@@ -100,27 +101,35 @@ export const Header = () => {
                   ) : (
                     <span
                       className="relative"
-                      onClick={() => setOpenProducts(!openProducts)}
+                      onMouseEnter={() => setOpenProducts(!openProducts)}
+                      onMouseLeave={() => setOpenProducts(!openProducts)}
                     >
-                      <span className=" flex flex-row gap-[8px] font-medium text-base transition-all hover:text-violet-50 hover:underline active:text-violet-200 cursor-pointer">
+                      <span className="group flex flex-row gap-[8px] font-medium text-base transition-all hover:text-violet-50 hover:underline active:text-violet-200 cursor-pointer">
                         {item.title}
                         <Image
+                          id="headerArrow"
                           alt="arrow down icon"
-                          className={`transition rotate-${openProducts ? "180" : "0"}`}
-                          src={ArrowDown}
+                          className={`transition duration-700 ${openProducts ? "hidden" : ""}`}
+                          src={ArrowDownWhite}
+                        />{" "}
+                        <Image
+                          id="headerArrow"
+                          alt="arrow down icon"
+                          className={`transition duration-700 ${!openProducts ? "hidden" : ""}`}
+                          src={ArrowDownPink}
                         />
                       </span>
                       <ul
                         hidden={!openProducts}
-                        className="absolute left-[-15px] top-[20px] w-[262px] h-[168px] rounded-[16px] p-[16px] gap-8px"
+                        className="absolute bg-[#232323D4] left-[-15px] top-[20px] w-[262px] rounded-[16px] p-[16px] gap-8px"
                       >
                         <div className="flex flex-col gap-[12px]">
                           {item.subItems.map((subItem) => (
                             <button
                               key={subItem.title}
-                              className="font-medium text-[#A8A8A8] transition-all hover:text-violet-50 hover:underline active:text-violet-200 cursor-pointer text-start border-b-[1px] border-[#363637] px-[8px]"
+                              className="font-medium text-[#A8A8A8] transition-all hover:text-violet-50 hover:underline active:text-violet-200 cursor-pointer text-start border-b-[1px] border-[#363637] px-[8px] pb-[8px]"
                               onClick={() =>
-                                handleNavigation(subItem.path, false)
+                                handleNavigation(subItem.path, subItem.isHash)
                               }
                             >
                               {subItem.title}

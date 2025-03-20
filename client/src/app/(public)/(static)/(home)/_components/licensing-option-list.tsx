@@ -31,31 +31,55 @@ export const LicensingOptionList = () => {
             ],
             footerText: "Community Edition",
             isPremium: false,
+            background: "bg-card",
           };
-        } else
+        } else if (plan.type === PlanType.EarlyBird)
           return {
             id: plan.id,
             title:
               plan.type === PlanType.EarlyBird
-                ? "Early Bird"
+                ? "Early Bird Campaign"
                 : plan.type +
                   "  " +
                   `${plan.period === PlanPeriod.Monthly ? "Monthly" : "Yearly"}`,
             tierType: plan.type,
             period: plan.period,
-            description:
-              "Boost your capabilities with premium features and priority support.",
+            description: "6 shares = 1 month of using all Onsio tools for free",
+            price: plan.price / 100,
+            buttonText: "Buy Standard",
+            buttonVariant: "purple",
+            features: [
+              "All the benefits of a monthly subscription",
+              "Free access to our platform (web, mobile, desktop)",
+              "The potential to sell shares later for profit",
+              "Be part of the company’s growth",
+            ],
+            footerText: undefined,
+            isPremium: true,
+            background: "bg-[#1F1E1F]",
+            border: "bg-gradient-to-r from-[#A8A8A8] to-[#A64CE8]",
+            ulText: "Exclusive perks for shareholders:",
+          };
+        else if (plan.type === PlanType.Standard) {
+          return {
+            id: plan.id,
+            title: `Standard ${plan.period === PlanPeriod.Monthly ? "Monthly" : "Yearly"}`,
+            period: plan.period,
+            tierType: plan.type,
+            description: "Essential features for personal and community use",
             price: plan.price / 100,
             buttonText: "Buy Standard",
             buttonVariant: "default",
             features: [
-              "Enhanced capabilities",
-              "Priority updates",
-              "Premium support",
+              "Essential features",
+              "Community access",
+              "Basic support",
             ],
             footerText: undefined,
-            isPremium: true,
+            isPremium: false,
+            background: "bg-[#302935]",
           };
+        }
       });
 
       newPlanOptions.sort((a, b) => {

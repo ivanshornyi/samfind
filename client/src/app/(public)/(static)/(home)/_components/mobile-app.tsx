@@ -2,7 +2,6 @@ import { Button } from "@/components/ui";
 import { Badge } from "@/components/ui/badge";
 import { MobileAppImage } from "@public/home";
 import Image from "next/image";
-import Link from "next/link";
 
 export const MobileApp = () => {
   return (
@@ -24,7 +23,7 @@ export const MobileApp = () => {
         className="mt-12"
         alt="mobile app image"
       />
-      <div className="flex sm:flex-row flex-row-reverse sm:flex items-center gap-[6px] mt-[48px]">
+      <div className="flex sm:flex-row flex-row-reverse sm:flex items-center gap-[6px] mt-[48px] text[16px] ">
         <Button
           variant="secondary"
           className="w-full max-w-[200px] min-w-[177px]"
@@ -32,7 +31,7 @@ export const MobileApp = () => {
           Sign up and download
         </Button>
         <button
-          className="text-[16px] max-w-[200px] min-w-[125px] h-[44px] flex justify-center items-center gap-[5px] text-xl font-medium"
+          className="text-[16px] max-w-[200px] min-w-[125px] h-[44px] flex justify-center items-center gap-[5px] text-[16px] font-medium"
           onClick={() => {
             document
               .getElementById("software")

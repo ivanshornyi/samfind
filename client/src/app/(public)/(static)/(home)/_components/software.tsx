@@ -32,7 +32,7 @@ export const Software = () => {
         className="mt-12"
         alt="mobile app image"
       />
-      <Button variant="tetrary" className="px-8">
+      <Button variant="tetrary" className="px-8 text[16px] ">
         Sign up and download
       </Button>
       <Image
