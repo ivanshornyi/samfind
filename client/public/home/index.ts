@@ -7,6 +7,7 @@ import WebPlatformImage from "./web-platform.png";
 import SolutionsImage from "./solutions.png";
 import SoftwareBgImage from "./software-bg.png";
 import BeginJourneyBgImage from "./begin-journey-bg.png";
+import ArrowToChatImage from "./line.svg";
 
 export {
   HomeIntro,
@@ -17,4 +18,5 @@ export {
   SolutionsImage,
   SoftwareBgImage,
   BeginJourneyBgImage,
+  ArrowToChatImage,
 };

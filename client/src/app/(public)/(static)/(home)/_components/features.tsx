@@ -7,7 +7,6 @@ import {
   DeepResearch,
 } from "@public/home";
 import { Button } from "@/components";
-import Link from "next/link";
 
 const features = [
   {
@@ -54,7 +53,7 @@ const features = [
 
 export const Features = () => {
   return (
-    <div className="mt-20 sm:mt-[120px] mx-auto">
+    <div className="mt-20 sm:mt-[120px] mx-auto" id="feature">
       <h2 className="text-[#CE9DF3] text-xl mb-6 font-semibold">
         Access to Feature
       </h2>
@@ -82,16 +81,21 @@ export const Features = () => {
         ))}
       </div>
 
-      <div className="flex sm:flex-row flex-row-reverse items-center justify-center gap-2 mt-[48px]">
+      <div className="flex sm:flex-row flex-row-reverse items-center justify-center gap-2 mt-[48px] text[16px] ">
         <Button className="w-full max-w-[200px]" variant="secondary">
           Sign Up
         </Button>
         <div className="w-full max-w-[200px] flex justify-center">
-          <Link href="/learn-more/mobile-app">
-            <button className="flex justify-center items-center gap-[5px] text-xl font-medium">
-              <span>Learn More</span>
-            </button>
-          </Link>
+          <button
+            className="flex justify-center items-center gap-[5px] text[16px] font-medium"
+            onClick={() => {
+              document
+                .getElementById("mobile")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+          >
+            <span>Learn More</span>
+          </button>
         </div>
       </div>
     </div>

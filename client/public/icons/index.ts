@@ -5,7 +5,9 @@ import FacebookIcon from "./facebook.svg";
 import InstagramIcon from "./instagram.svg";
 import LinkedinIcon from "./linkedin.svg";
 import TwitterIcon from "./twitter.svg";
-import CheckmarkDonePinkSVG from './check-done-pink.svg'
+import CheckmarkDonePinkSVG from "./check-done-pink.svg";
+import ArrowDownWhite from "./arrow-down-white.svg";
+import ArrowDownPink from "./arrow-down-pink.svg";
 
 export {
   CheckmarkDonePinkSVG,
@@ -16,4 +18,6 @@ export {
   InstagramIcon,
   LinkedinIcon,
   TwitterIcon,
+  ArrowDownWhite,
+  ArrowDownPink,
 };

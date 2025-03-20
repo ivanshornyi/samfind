@@ -5,7 +5,10 @@ import Image from "next/image";
 
 export const Software = () => {
   return (
-    <div className="w-full flex flex-col items-center mt-[100px] relative pb-[50px]">
+    <div
+      className="w-full flex flex-col items-center mt-[100px] relative pb-[50px]"
+      id="software"
+    >
       <Badge
         variant="secondary"
         className="bg-[#242424] rounded-3xl text-[#CE9DF3] py-[6px] px-6"
@@ -29,7 +32,7 @@ export const Software = () => {
         className="mt-12"
         alt="mobile app image"
       />
-      <Button variant="tetrary" className="px-8">
+      <Button variant="tetrary" className="px-8 text[16px] ">
         Sign up and download
       </Button>
       <Image

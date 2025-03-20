@@ -496,7 +496,6 @@ export class StripeService {
       } else if (invoice.subscription) {
         const { userId, userReferralCode, memberId, newPlan, quantity } =
           invoice.subscription_details.metadata;
-        const metadata = invoice.subscription_details.metadata;
         let isEarlyBirdNew = false;
 
         const subscription = await this.prisma.subscription.findUnique({
@@ -536,7 +535,6 @@ export class StripeService {
             invoice.total_excluding_tax,
           );
 
-          delete metadata.userReferralCode;
           await this.updateSubscriptionMetadata(
             invoice.subscription as string,
             { userReferralCode: null },
@@ -619,7 +617,7 @@ export class StripeService {
           subscription.user.accountType === UserAccountType.business &&
           newPlan
         ) {
-          //new Business private user
+          //new Plan business user
           const plan = await this.prisma.plan.findUnique({
             where: { id: newPlan },
           });
