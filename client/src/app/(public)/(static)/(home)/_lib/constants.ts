@@ -14,6 +14,9 @@ export const licensingOptions: LicensingOptionType[] = [
     features: ["Essential features", "Community access", "Basic support"],
     footerText: "Community Edition",
     isPremium: false,
+    background: "bg-card",
+    border: "",
+    ulText: "",
   },
   {
     id: 2,
@@ -28,5 +31,8 @@ export const licensingOptions: LicensingOptionType[] = [
     features: ["Enhanced capabilities", "Priority updates", "Premium support"],
     footerText: undefined,
     isPremium: true,
+    background: "bg-[#302935]",
+    border: "",
+    ulText: "",
   },
 ];
