@@ -32,6 +32,8 @@ export const LicensingOptionList = () => {
             footerText: "Community Edition",
             isPremium: false,
             background: "bg-card",
+            border: "",
+            ulText: "",
           };
         } else if (plan.type === PlanType.EarlyBird)
           return {
@@ -60,7 +62,7 @@ export const LicensingOptionList = () => {
             border: "bg-gradient-to-r from-[#A8A8A8] to-[#A64CE8]",
             ulText: "Exclusive perks for shareholders:",
           };
-        else if (plan.type === PlanType.Standard) {
+        else {
           return {
             id: plan.id,
             title: `Standard ${plan.period === PlanPeriod.Monthly ? "Monthly" : "Yearly"}`,
@@ -78,6 +80,8 @@ export const LicensingOptionList = () => {
             footerText: undefined,
             isPremium: false,
             background: "bg-[#302935]",
+            border: "",
+            ulText: "",
           };
         }
       });
