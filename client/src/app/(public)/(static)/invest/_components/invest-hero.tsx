@@ -1,8 +1,7 @@
 "use client";
 
-import { OImage } from "@public/contact";
+import { oImage, OImage } from "@public/contact";
 import { CheckmarkDonePinkSVG } from "@public/icons";
-import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 
 const ListDataMock: string[] = [
@@ -14,10 +13,10 @@ const ListDataMock: string[] = [
 
 export function InvestHero(): React.ReactNode {
   return (
-    <section aria-label="investment-hero" className="pt-[195px] relative">
+    <section aria-label="investment-hero" className="sm:pt-[195px] relative">
       <div
         aria-label="wrapper"
-        className="mx-auto flex gap-[98px] w-full max-w-[1160px]"
+        className="mx-auto flex sm:gap-[98px] gap-[32px] w-full max-w-[1160px] sm:flex-row flex-col"
       >
         <div className="flex flex-col gap-[32px] w-[592px] max-w-[592px]">
           <div className="flex gap-[3px] justify-start items-center">
@@ -26,10 +25,10 @@ export function InvestHero(): React.ReactNode {
             </p>
           </div>
           <div className="flex flex-col gap-[32px]">
-            <h1 className="text-white text-[96px] font-[800] leading-[96px]">
+            <h1 className="text-[40px] sm:text-[96px] font-[800] sm:leading-[96px]">
               Early Bird Campaign
             </h1>
-            <p className="text-customPinkSubText text-[32px] font-[600]">
+            <p className="text-customPinkSubText text-[20px] font-[600]">
               6 shares=1 months for free
             </p>
           </div>
@@ -43,7 +42,7 @@ export function InvestHero(): React.ReactNode {
           </div>
         </div>
         <div className="flex flex-col gap-[16px] w-[568px] max-w-[568px] justify-end">
-          <h2 className="text-white text-[20px] font-[500]">
+          <h2 className="text-white sm:text-[20px] text-[16px] font-[500]">
             Exclusive perks for shareholders:
           </h2>
           <ul>
@@ -51,27 +50,20 @@ export function InvestHero(): React.ReactNode {
               return (
                 <li
                   key={item}
-                  className="flex gap-[20px] items-center text-white text-[20px] font-[500]"
+                  className="flex gap-[20px] items-center text-white sm:text-[20px] text-[16px] font-[500]"
                 >
                   <Image
                     src={CheckmarkDonePinkSVG}
                     alt="checkmark"
                     width={24}
                     height={24}
-                  />{" "}
+                  />
                   {item}
                 </li>
               );
             })}
           </ul>
         </div>
-        <Image
-          src={OImage}
-          width={750}
-          height={200}
-          alt="Background illustration"
-          className="absolute top-[-100px] right-[-100px]"
-        />
       </div>
     </section>
   );

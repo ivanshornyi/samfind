@@ -17,7 +17,7 @@ import { Close as CloseSheet } from "@radix-ui/react-dialog";
 import Image from "next/image";
 import Link from "next/link";
 import { useContext, useState } from "react";
-import { ArrowDown } from "@public/icons";
+import { ArrowDownWhite, ArrowDownPink } from "@public/icons";
 
 export const MenuMobile = () => {
   const { isLoggedIn, user } = useContext(AuthContext);
@@ -69,24 +69,31 @@ export const MenuMobile = () => {
                       key={item.title}
                       onClick={() => setOpenProducts(!openProducts)}
                     >
-                      <span className=" flex flex-row justify-center gap-[8px] font-medium text-base transition-all hover:text-violet-50 hover:underline active:text-violet-200 cursor-pointer">
+                      <span
+                        className={`flex flex-row justify-center gap-[8px] font-medium ${openProducts ? "text-violet-50 underline" : ""} active:text-violet-200 cursor-pointer text-[14px]`}
+                      >
                         {item.title}
                         <Image
                           alt="arrow down icon"
-                          className={`transition duration-700 rotate-${openProducts ? "180" : "0"}`}
-                          src={ArrowDown}
+                          className={`transition transform duration-700 ${openProducts ? "hidden" : ""}`}
+                          src={ArrowDownWhite}
+                        />
+                        <Image
+                          alt="arrow down icon"
+                          className={`transition transform duration-700 ${!openProducts ? "hidden" : ""}`}
+                          src={ArrowDownPink}
                         />
                       </span>
                       <ul hidden={!openProducts}>
                         <div
-                          className={`flex flex-col text-center gap-5 pt-5 transition-transform duration-700 h-${openProducts ? "0%" : "180%"}`}
+                          className={`flex flex-col text-center gap-5 pt-5 transition-all duration-700 transform:h-${openProducts ? "0%" : "180%"}`}
                         >
                           {item.subItems.map((subItem) => (
                             <SheetClose asChild key={subItem.title}>
                               <Link href={subItem.path}>
                                 <span
                                   key={subItem.title}
-                                  className="font-medium text-[#A8A8A8] transition-all hover:text-violet-50 hover:underline active:text-violet-200 cursor-pointer text-center py-[8px]"
+                                  className="font-medium text-[#A8A8A8] hover:text-violet-50 hover:underline active:text-violet-200 cursor-pointer text-center py-[8px] text-[14px]"
                                 >
                                   {subItem.title}
                                 </span>

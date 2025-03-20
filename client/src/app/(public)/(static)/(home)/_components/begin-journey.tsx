@@ -17,7 +17,7 @@ export const BeginJourney = () => {
       <Link href={user ? "/download-app" : "/auth/account-type"}>
         <Button
           variant="default"
-          className="w-full sm:w-[250px] h-[44px] rounded-[30px] text-xl font-medium text-[#8F40E5] border-[#A64CE8]"
+          className="w-full w-[250px] h-[44px] rounded-[30px] text[16px] font-medium text-[#8F40E5] border-[#A64CE8]"
         >
           Sign Up
         </Button>
