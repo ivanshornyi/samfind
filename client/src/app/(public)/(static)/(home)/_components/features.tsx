@@ -72,18 +72,23 @@ export const Features = () => {
             className={`bg-card w-full py-8 px-6 rounded-[20px] flex flex-col justify-between"}`}
           >
             <div
-              className={`${feature.badge ? "flex flex-row justify-between" : ""}`}
+              className={`${feature.badge ? "flex flex-row justify-between gap-[16px]" : ""}`}
             >
-              <div className="flex justify-center py-2 items-center rounded-3xl border-solid border-2 border-[#363637] gap-[6px] mb-8">
+              <div className="min-w-[154px] flex justify-center py-2 items-center rounded-3xl border-solid border-2 border-[#363637] gap-[6px] mb-8">
                 <Image src={feature.icon} width={24} height={24} alt="Icon" />
-                <h4 className="text-[#CE9DF3] text-sm font-medium">
+                <h4 className="text-[#CE9DF3] text-sm font-medium ">
                   {feature.category}
                 </h4>
               </div>
               <div
-                className={`${feature.badge ? "" : "hidden"} bg-gradient-to-r from-[#12093109] to-[#351B93] h-[40px] w-[157px] text-center text-[15px] rounded-[30px] py-[8px] px-[16px] flex flex-row gap-[4px]`}
+                className={`${feature.badge ? "" : "hidden"} font-medium bg-gradient-to-r from-[#12093109] to-[#351B93] max-w-[157px] min-w-[151px] text-center text-sm rounded-[30px] py-[8px] px-[16px] mb-8 flex flex-row gap-[4px]`}
               >
-                <Image src={ComingSoon} alt="Coming Soon" />
+                <Image
+                  src={ComingSoon}
+                  width={24}
+                  height={24}
+                  alt="Coming Soon icon"
+                />
                 Coming Soon
               </div>
             </div>

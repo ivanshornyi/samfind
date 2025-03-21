@@ -70,7 +70,7 @@ export default function DownloadSoftware() {
 
       <div className="w-full flex justify-center">
         <button className="font-normal text-base text-[#A8A8A8]">
-          I&apos;ll do that later
+          Use Onsio on Web
         </button>
       </div>
     </div>

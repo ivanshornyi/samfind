@@ -3,6 +3,7 @@
 import { oImage, OImage } from "@public/contact";
 import { CheckmarkDonePinkSVG } from "@public/icons";
 import Image from "next/image";
+import Link from "next/link";
 
 const ListDataMock: string[] = [
   "All the benefits of a monthly subscription",
@@ -13,7 +14,10 @@ const ListDataMock: string[] = [
 
 export function InvestHero(): React.ReactNode {
   return (
-    <section aria-label="investment-hero" className="sm:pt-[195px] relative ">
+    <section
+      aria-label="investment-hero"
+      className="sm:pt-[195px] pt-[60px] relative "
+    >
       <div
         aria-label="wrapper"
         className="mx-auto flex sm:gap-[98px] gap-[32px] w-full sm:max-w-[1160px] sm:flex-row flex-col"
@@ -33,12 +37,14 @@ export function InvestHero(): React.ReactNode {
             </p>
           </div>
           <div className="hidden sm:block gap-[16px] items-center justify-start ">
-            <button
-              aria-label="Early Bird campaign assignment"
-              className="rounded-[30px] py-[8px] px-[32px] border border-customGreyButton bg-white backdrop-blur-customPinkButtonBGRGBA text-customSaturedPinkButtonText text-[16px] font-[500]"
-            >
-              Join as an Early Bird
-            </button>
+            <Link href={"/account/billing-data"}>
+              <button
+                aria-label="Early Bird campaign assignment"
+                className="rounded-[30px] py-[8px] px-[32px] border border-customGreyButton bg-white backdrop-blur-customPinkButtonBGRGBA text-customSaturedPinkButtonText text-[16px] font-[500]"
+              >
+                Join as an Early Bird
+              </button>
+            </Link>
           </div>
         </div>
         <div className="flex flex-col gap-[16px] max-w-[360px] sm:max-w-[568px] justify-end">
@@ -65,12 +71,14 @@ export function InvestHero(): React.ReactNode {
           </ul>
         </div>
         <div className="flex justify-center">
-          <button
-            aria-label="Early Bird campaign assignment"
-            className="sm:hidden rounded-[30px] max-w-[250px] py-[8px] px-[32px] border border-customGreyButton bg-white backdrop-blur-customPinkButtonBGRGBA text-customSaturedPinkButtonText text-[16px] font-[500]"
-          >
-            Join as an Early Bird
-          </button>
+          <Link href={"/account/billing-data"}>
+            <button
+              aria-label="Early Bird campaign assignment"
+              className="sm:hidden rounded-[30px] max-w-[250px] py-[8px] px-[32px] border border-customGreyButton bg-white backdrop-blur-customPinkButtonBGRGBA text-customSaturedPinkButtonText text-[16px] font-[500]"
+            >
+              Join as an Early Bird
+            </button>
+          </Link>
         </div>
       </div>
 

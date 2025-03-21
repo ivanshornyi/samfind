@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { Button } from "@/components";
 import { AuthContext } from "@/context";
@@ -67,12 +67,23 @@ export const Header = () => {
     }
   };
 
+  const [bgColor, setBgColor] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 200) setBgColor(true);
+      else setBgColor(false);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <header
-      className="
-        w-full fixed top-0 left-0 z-10 bg-[#1F1E1F] bg-transparent
-        px-5
-      "
+      className={`
+        w-full fixed top-0 left-0 z-10 bg-[#1F1E1F]
+        px-5 ${bgColor ? "transition duration-500" : "transition duration-500 bg-transparent"}
+      `}
     >
       <div
         className="
@@ -104,7 +115,9 @@ export const Header = () => {
                       onMouseEnter={() => setOpenProducts(!openProducts)}
                       onMouseLeave={() => setOpenProducts(!openProducts)}
                     >
-                      <span className="group flex flex-row gap-[8px] font-medium text-base transition-all hover:text-violet-50 hover:underline active:text-violet-200 cursor-pointer">
+                      <span
+                        className={`group flex flex-row gap-[8px] font-medium text-base transition-all ${openProducts ? "text-violet-50 underline" : ""} active:text-violet-200 cursor-pointer`}
+                      >
                         {item.title}
                         <Image
                           id="headerArrow"
@@ -121,20 +134,22 @@ export const Header = () => {
                       </span>
                       <ul
                         hidden={!openProducts}
-                        className="absolute bg-[#232323D4] left-[-15px] top-[20px] w-[262px] rounded-[16px] p-[16px] gap-8px"
+                        className="absolute left-[-32px] bg-transparent top-[20px] w-[262px] rounded-[16px] p-[16px] gap-[8px]"
                       >
-                        <div className="flex flex-col gap-[12px]">
-                          {item.subItems.map((subItem) => (
-                            <button
-                              key={subItem.title}
-                              className="font-medium text-[#A8A8A8] transition-all hover:text-violet-50 hover:underline active:text-violet-200 cursor-pointer text-start border-b-[1px] border-[#363637] px-[8px] pb-[8px]"
-                              onClick={() =>
-                                handleNavigation(subItem.path, subItem.isHash)
-                              }
-                            >
-                              {subItem.title}
-                            </button>
-                          ))}
+                        <div className="flex items-center w-[262px] bg-[#222222] h-[168px] rounded-[16px] gap-[8px] justify-center align-center">
+                          <div className="flex flex-col gap-[12px]">
+                            {item.subItems.map((subItem) => (
+                              <button
+                                key={subItem.title}
+                                className="font-medium text-[#A8A8A8] text-[16px] transition-all hover:text-violet-50 hover:underline active:text-violet-200 cursor-pointer text-start border-b-[1px] border-[#363637] pb-[8px]"
+                                onClick={() =>
+                                  handleNavigation(subItem.path, subItem.isHash)
+                                }
+                              >
+                                {subItem.title}
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       </ul>
                     </span>
