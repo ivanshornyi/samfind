@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 
 export function InvestFAQ(): React.ReactNode {
   return (
@@ -19,12 +19,14 @@ export function InvestFAQ(): React.ReactNode {
           </p>
         </div>
         <div className="flex items-end justify-center">
-          <button
-            aria-label="Early Bird campaign assignment"
-            className="rounded-[30px] py-[8px] px-[32px] border border-customGreyButton bg-white backdrop-blur-customPinkButtonBGRGBA text-customSaturedPinkButtonText text-[16px] min-w-[250px] font-[500]"
-          >
-            Join as an Early Bird
-          </button>
+          <Link href="/account/billing-data">
+            <button
+              aria-label="Early Bird campaign assignment"
+              className="rounded-[30px] py-[8px] px-[32px] border border-customGreyButton bg-white backdrop-blur-customPinkButtonBGRGBA text-customSaturedPinkButtonText text-[16px] min-w-[250px] font-[500]"
+            >
+              Join as an Early Bird
+            </button>
+          </Link>
         </div>
       </div>
     </section>
