@@ -20,6 +20,7 @@ import { IdCard, Gift, CreditCard, User, Download, Wallet } from "lucide-react";
 import { Logo } from "@public/images";
 import Link from "next/link";
 import Image from "next/image";
+import { Support, GoTo } from "@public/icons/index";
 
 const NAVIGATION_ITEMS = [
   {
@@ -136,12 +137,40 @@ export const AppSidebar = () => {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="space-y-4 px-4 bg-background">
+        <Link href="/">
+          <Button
+            variant="menuItem"
+            leftIcon={
+              <Image
+                src={GoTo}
+                alt="go to Onsio.io"
+                style={{ width: "24px", height: "24px" }}
+              />
+            }
+          >
+            Go to Onsio.io
+          </Button>
+        </Link>
         <Link href="/download-app">
           <Button
             variant="menuItem"
             leftIcon={<Download style={{ width: "24px", height: "24px" }} />}
           >
-            Download app
+            Get App / Software
+          </Button>
+        </Link>
+        <Link href="/support">
+          <Button
+            variant="menuItem"
+            leftIcon={
+              <Image
+                src={Support}
+                alt="support"
+                style={{ width: "24px", height: "24px" }}
+              />
+            }
+          >
+            Support
           </Button>
         </Link>
         {/* <Button
