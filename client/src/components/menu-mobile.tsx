@@ -12,7 +12,7 @@ import {
 } from "@/components";
 import { AuthContext } from "@/context";
 import { HeaderMenuCloseIcon, HeaderMenuIcon } from "@public/icons";
-import { Logo } from "@public/images";
+import { LogoSvg } from "@public/images";
 import { Close as CloseSheet } from "@radix-ui/react-dialog";
 import Image from "next/image";
 import Link from "next/link";
@@ -34,17 +34,17 @@ export const MenuMobile = () => {
         <SheetContent
           side="bottom"
           hideClose
-          className="h-dvh border-none bg-transparent backdrop-blur-[14px]"
+          className="h-dvh border-none bg-transparent backdrop-blur-[14px] bg-gradient-to-b from-[#1F1E1FCC] to-[#1F1E1F]"
         >
           <div className="absolute top-0 right-0 left-0 bottom-0 z-[-1000]"></div>
           <SheetHeader className="justify-between h-[80%]">
             <div className="flex justify-between items-center">
               <Link href="/">
                 <Image
-                  src={Logo}
+                  src={LogoSvg}
                   alt="logo"
-                  width={110}
-                  className="h-7 w-[110px] min-w-[110px]"
+                  width={80}
+                  className="h-[22.5px] w-[80px] min-w-[80px] "
                 />
               </Link>
               <CloseSheet asChild>

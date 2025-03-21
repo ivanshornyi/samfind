@@ -7,6 +7,7 @@ import {
   DeepResearch,
 } from "@public/home";
 import { Button } from "@/components";
+import { ComingSoon } from "@public/icons";
 
 const features = [
   {
@@ -48,6 +49,7 @@ const features = [
       "Conduct in-depth research with comprehensive results from multiple sources.",
     category: "Deep research",
     icon: DeepResearch,
+    badge: true,
   },
 ];
 
@@ -69,11 +71,26 @@ export const Features = () => {
             key={index}
             className={`bg-card w-full py-8 px-6 rounded-[20px] flex flex-col justify-between"}`}
           >
-            <div className="flex justify-center py-2 items-center rounded-3xl border-solid border-2 border-[#363637] gap-[6px] mb-8">
-              <Image src={feature.icon} width={24} height={24} alt="Icon" />
-              <h4 className="text-[#CE9DF3] text-sm font-medium">
-                {feature.category}
-              </h4>
+            <div
+              className={`${feature.badge ? "flex flex-row justify-between gap-[16px]" : ""}`}
+            >
+              <div className="min-w-[154px] flex justify-center py-2 items-center rounded-3xl border-solid border-2 border-[#363637] gap-[6px] mb-8">
+                <Image src={feature.icon} width={24} height={24} alt="Icon" />
+                <h4 className="text-[#CE9DF3] text-sm font-medium ">
+                  {feature.category}
+                </h4>
+              </div>
+              <div
+                className={`${feature.badge ? "" : "hidden"} font-medium bg-gradient-to-r from-[#12093109] to-[#351B93] max-w-[157px] min-w-[151px] text-center text-sm rounded-[30px] py-[8px] px-[16px] mb-8 flex flex-row gap-[4px]`}
+              >
+                <Image
+                  src={ComingSoon}
+                  width={24}
+                  height={24}
+                  alt="Coming Soon icon"
+                />
+                Coming Soon
+              </div>
             </div>
             <h3 className="text-3xl font-semibold mb-6">{feature.title}</h3>
             <p className="font-normal text-base">{feature.description}</p>
